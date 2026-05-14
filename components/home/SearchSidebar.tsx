@@ -4,7 +4,13 @@ import Image from "next/image"
 import { Search, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { Sheet, SheetClose, SheetContent } from "@/components/ui/sheet"
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+} from "@/components/ui/sheet"
 
 type SearchSidebarProps = {
   open: boolean
@@ -75,14 +81,14 @@ export function SearchSidebar({ open, onOpenChange }: SearchSidebarProps) {
         side="right"
         showCloseButton={false}
         overlayClassName="z-[120] bg-black/50 backdrop-blur-[1px]"
-        className="z-[130] border-l border-white/10 bg-black p-0 text-white shadow-[0_0_80px_rgba(0,0,0,0.45)]"
+        className="z-[130] border-l border-white/10 bg-black p-0 text-white shadow-[0_0_80px_rgba(0,0,0,0.45)] ease-in-out duration-300"
         style={{ width: "min(100vw, 420px)", maxWidth: "none" }}
       >
         <div className="flex h-full flex-col">
           <div className="flex items-center justify-between border-b border-white/10 px-5 py-5">
-            <p className="text-[0.75rem] font-medium uppercase tracking-[0.18em] text-white">
+            <SheetTitle className="text-[0.75rem] font-medium uppercase tracking-[0.18em] text-white">
               Search
-            </p>
+            </SheetTitle>
 
             <SheetClose asChild>
               <button
@@ -94,6 +100,10 @@ export function SearchSidebar({ open, onOpenChange }: SearchSidebarProps) {
               </button>
             </SheetClose>
           </div>
+
+          <SheetDescription className="sr-only">
+            Search products, browse trending searches, and view featured best sellers.
+          </SheetDescription>
 
           <div className="flex-1 overflow-y-auto px-5 py-6">
             <div className="relative">
