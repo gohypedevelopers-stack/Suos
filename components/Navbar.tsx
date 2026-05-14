@@ -82,13 +82,20 @@ export function Navbar({
   const [isScrolled, setIsScrolled] = useState(
     () => typeof window !== "undefined" && window.scrollY > 50
   )
-  const [isVisible, setIsVisible] = useState(true)
+  const [showHeader, setShowHeader] = useState(true)
   const lastScrollYRef = useRef(
     typeof window !== "undefined" ? window.scrollY : 0
   )
   const isOverlay = variant === "overlay"
   const isOverlayLight = isOverlay && !isScrolled
   const tone: "dark" | "light" = isOverlayLight ? "light" : "dark"
+  const overlayTransform = isOverlay
+    ? showHeader
+      ? isScrolled
+        ? "translate3d(0,0,0)"
+        : "translate3d(0,50px,0)"
+      : "translate3d(0,-120%,0)"
+    : undefined
 
   useEffect(() => {
     if (!isOverlay) {
@@ -99,19 +106,18 @@ export function Navbar({
       const currentY = window.scrollY
       const previousY = lastScrollYRef.current
       const hasScrolledPastThreshold = currentY > 50
+      const scrollDelta = currentY - previousY
 
       setIsScrolled(hasScrolledPastThreshold)
 
-      if (!hasScrolledPastThreshold) {
-        setIsVisible(true)
-        lastScrollYRef.current = currentY
-        return
-      }
-
-      if (currentY > previousY) {
-        setIsVisible(true)
-      } else if (currentY < previousY) {
-        setIsVisible(false)
+      if (hasScrolledPastThreshold) {
+        if (scrollDelta > 8) {
+          setShowHeader(true)
+        } else if (scrollDelta < -8) {
+          setShowHeader(false)
+        }
+      } else if (previousY === 0 || scrollDelta > 8) {
+        setShowHeader(true)
       }
 
       lastScrollYRef.current = currentY
@@ -130,16 +136,17 @@ export function Navbar({
       className={cn(
         isOverlay
           ? cn(
-              "fixed inset-x-0 top-0 z-[100] h-[98px] transform-gpu transition-[background-color,color,box-shadow,transform] duration-500 ease-out will-change-transform",
-              isVisible
+              "fixed inset-x-0 top-0 z-[100] h-[98px] transform-gpu transition-[background-color,color,box-shadow,transform] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform",
+              showHeader
                 ? isScrolled
-                  ? "translate-y-0 bg-white text-black shadow-[0_1px_0_rgba(0,0,0,0.08)]"
-                  : "translate-y-[50px] bg-transparent text-white opacity-100"
-                : "-translate-y-full bg-white text-black shadow-[0_1px_0_rgba(0,0,0,0.08)] pointer-events-none"
+                  ? "bg-white text-black shadow-[0_1px_0_rgba(0,0,0,0.08)]"
+                  : "bg-transparent text-white"
+                : "bg-white text-black shadow-[0_1px_0_rgba(0,0,0,0.08)] pointer-events-none"
             )
           : "border-b border-transparent bg-white text-black lg:h-[98px]",
         className
       )}
+      style={isOverlay ? { transform: overlayTransform } : undefined}
     >
       <div className="h-full w-full px-4 sm:px-6 lg:px-8 xl:px-10">
         <div className="hidden h-full lg:grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-0">
