@@ -6,6 +6,7 @@ import { Heart, Search, UserRound } from "lucide-react"
 import { useEffect, useRef, useState, type ReactNode } from "react"
 
 import { cn } from "@/lib/utils"
+import { SearchSidebar } from "@/components/home/SearchSidebar"
 
 const primaryNav = [
   { label: "Women", href: "/#women" },
@@ -51,15 +52,18 @@ function IconButton({
   label,
   children,
   tone = "dark",
+  onClick,
 }: {
   label: string
   children: ReactNode
   tone?: "dark" | "light"
+  onClick?: () => void
 }) {
   return (
     <button
       type="button"
       aria-label={label}
+      onClick={onClick}
       className={cn(
         "inline-flex size-9 items-center justify-center transition-opacity hover:opacity-60 focus-visible:outline-none focus-visible:ring-2",
         tone === "light"
@@ -83,17 +87,22 @@ export function Navbar({
     () => typeof window !== "undefined" && window.scrollY > 50
   )
   const [showHeader, setShowHeader] = useState(true)
+  const [isSettlingTop, setIsSettlingTop] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
   const lastScrollYRef = useRef(
     typeof window !== "undefined" ? window.scrollY : 0
   )
+  const topRevealTimerRef = useRef<number | null>(null)
   const isOverlay = variant === "overlay"
-  const isOverlayLight = isOverlay && !isScrolled
+  const isOverlayLight = isOverlay && !isScrolled && !isSettlingTop
   const tone: "dark" | "light" = isOverlayLight ? "light" : "dark"
   const overlayTransform = isOverlay
     ? showHeader
-      ? isScrolled
-        ? "translate3d(0,0,0)"
-        : "translate3d(0,50px,0)"
+      ? isSettlingTop
+        ? "translate3d(0,50px,0)"
+        : isScrolled
+          ? "translate3d(0,0,0)"
+          : "translate3d(0,50px,0)"
       : "translate3d(0,-120%,0)"
     : undefined
 
@@ -102,22 +111,45 @@ export function Navbar({
       return
     }
 
+    const clearTopRevealTimer = () => {
+      if (topRevealTimerRef.current !== null) {
+        window.clearTimeout(topRevealTimerRef.current)
+        topRevealTimerRef.current = null
+      }
+      setIsSettlingTop(false)
+    }
+
     const updateScrollState = () => {
       const currentY = window.scrollY
       const previousY = lastScrollYRef.current
       const hasScrolledPastThreshold = currentY > 50
       const scrollDelta = currentY - previousY
 
+      clearTopRevealTimer()
       setIsScrolled(hasScrolledPastThreshold)
 
       if (hasScrolledPastThreshold) {
+        setIsSettlingTop(false)
         if (scrollDelta > 8) {
           setShowHeader(true)
         } else if (scrollDelta < -8) {
           setShowHeader(false)
         }
-      } else if (previousY === 0 || scrollDelta > 8) {
+      } else {
         setShowHeader(true)
+
+        if (previousY > 50) {
+          setIsScrolled(true)
+          setIsSettlingTop(true)
+          topRevealTimerRef.current = window.setTimeout(() => {
+            setIsScrolled(false)
+            setIsSettlingTop(false)
+            topRevealTimerRef.current = null
+          }, 700)
+        } else {
+          setIsScrolled(false)
+          setIsSettlingTop(false)
+        }
       }
 
       lastScrollYRef.current = currentY
@@ -127,6 +159,7 @@ export function Navbar({
     window.addEventListener("scroll", updateScrollState, { passive: true })
 
     return () => {
+      clearTopRevealTimer()
       window.removeEventListener("scroll", updateScrollState)
     }
   }, [isOverlay])
@@ -186,17 +219,28 @@ export function Navbar({
 
           <div className="flex items-center justify-self-end gap-4 xl:gap-6">
             <div className="relative h-[34px] w-[220px] shrink-0 xl:w-[266px]">
-              <input
-                type="search"
+              <button
+                type="button"
                 aria-label="Search products"
-                placeholder="What are you looking for?"
+                aria-haspopup="dialog"
+                aria-expanded={searchOpen}
+                onClick={() => setSearchOpen(true)}
                 className={cn(
-                  "h-full w-full bg-transparent px-4 pr-10 text-[0.875rem] outline-none placeholder:transition-opacity",
+                  "relative flex h-full w-full items-center bg-transparent px-4 pr-10 text-left text-[0.875rem] outline-none transition-opacity hover:opacity-80",
                   isOverlayLight
-                    ? "border border-white/80 text-white placeholder:text-white/80"
-                    : "border border-black/80 text-black placeholder:text-black/80"
+                    ? "border border-white/80 text-white"
+                    : "border border-black/80 text-black"
                 )}
-              />
+              >
+                <span
+                  className={cn(
+                    "block truncate",
+                    isOverlayLight ? "text-white/80" : "text-black/80"
+                  )}
+                >
+                  What are you looking for?
+                </span>
+              </button>
               <Search
                 aria-hidden="true"
                 className={cn(
@@ -229,7 +273,11 @@ export function Navbar({
 
         <div className="flex flex-col gap-3 py-4 lg:hidden">
           <div className="flex items-center justify-between gap-4">
-            <IconButton label="Search" tone={tone}>
+            <IconButton
+              label="Search"
+              tone={tone}
+              onClick={() => setSearchOpen(true)}
+            >
               <Search className="size-[18px] stroke-[1.7]" />
             </IconButton>
 
@@ -291,6 +339,8 @@ export function Navbar({
           </nav>
         </div>
       </div>
+
+      <SearchSidebar open={searchOpen} onOpenChange={setSearchOpen} />
     </header>
   )
 }
