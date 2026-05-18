@@ -43,7 +43,7 @@ const denimSlides: DenimSlide[] = [
 
 function DenimSlideCard({ slide }: { slide: DenimSlide }) {
   return (
-    <article className="relative h-[500px] overflow-hidden bg-[#eef2f2] sm:h-[580px] md:h-[640px] lg:h-[700px]">
+    <article className="relative h-[500px] overflow-hidden bg-white sm:h-[580px] md:h-[640px] lg:h-[700px]">
       <Image
         src={slide.image}
         alt={slide.alt}
