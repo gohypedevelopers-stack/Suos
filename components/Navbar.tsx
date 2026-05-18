@@ -67,7 +67,6 @@ function NavLink({
   active = false,
   selected = false,
   mobile = false,
-  tone = "dark",
   onMouseEnter,
   onMouseLeave,
   onFocus,
@@ -81,7 +80,6 @@ function NavLink({
   active?: boolean
   selected?: boolean
   mobile?: boolean
-  tone?: "dark" | "light"
   onMouseEnter?: MouseEventHandler<HTMLAnchorElement>
   onMouseLeave?: MouseEventHandler<HTMLAnchorElement>
   onFocus?: FocusEventHandler<HTMLAnchorElement>
@@ -104,16 +102,13 @@ function NavLink({
       onBlur={onBlur}
       onClick={onClick}
       className={cn(
-        "relative whitespace-nowrap uppercase transition-opacity",
+        "relative whitespace-nowrap uppercase text-current transition-[color,opacity] duration-300 ease-out",
         mobile
           ? "flex-none text-[0.75rem] tracking-[0.18em]"
           : "text-[0.875rem] tracking-[0.12em]",
         isEmphasized ? "opacity-100" : "hover:opacity-60",
         isEmphasized &&
-          cn(
-            "after:absolute after:left-0 after:top-full after:mt-1.5 after:h-px after:w-full after:content-['']",
-            tone === "light" ? "after:bg-white" : "after:bg-black"
-          )
+          "after:absolute after:left-0 after:top-full after:mt-1.5 after:h-px after:w-full after:bg-current after:content-['']"
       )}
     >
       {children}
@@ -138,10 +133,10 @@ function IconButton({
       aria-label={label}
       onClick={onClick}
       className={cn(
-        "inline-flex size-9 items-center justify-center transition-opacity hover:opacity-60 focus-visible:outline-none focus-visible:ring-2",
+        "inline-flex size-9 items-center justify-center text-current transition-[color,opacity] duration-300 ease-out hover:opacity-60 focus-visible:outline-none focus-visible:ring-2",
         tone === "light"
-          ? "text-white focus-visible:ring-white/30"
-          : "text-black focus-visible:ring-black/25"
+          ? "focus-visible:ring-white/30"
+          : "focus-visible:ring-black/25"
       )}
     >
       {children}
@@ -247,27 +242,16 @@ export function Navbar({
 }) {
   const defaultNavKey: NavKey = "men"
   const [isScrolled, setIsScrolled] = useState(false)
-  const [showHeader, setShowHeader] = useState(true)
-  const [isSettlingTop, setIsSettlingTop] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [selectedNav, setSelectedNav] = useState<NavKey>(defaultNavKey)
   const [activeMenu, setActiveMenu] = useState<NavKey | null>(null)
-  const lastScrollYRef = useRef(0)
-  const topRevealTimerRef = useRef<number | null>(null)
+  const scrollFrameRef = useRef<number | null>(null)
   const menuCloseTimerRef = useRef<number | null>(null)
+  const SCROLL_THRESHOLD = 30
   const isOverlay = variant === "overlay"
-  const isOverlayLight = isOverlay && !isScrolled && !isSettlingTop
+  const isOverlayLight = isOverlay && !isScrolled
   const tone: "dark" | "light" = isOverlayLight ? "light" : "dark"
   const visualActiveMenu = activeMenu ?? selectedNav
-  const overlayTransform = isOverlay
-    ? showHeader
-      ? isSettlingTop
-        ? "translate3d(0,50px,0)"
-        : isScrolled
-          ? "translate3d(0,0,0)"
-          : "translate3d(0,50px,0)"
-      : "translate3d(0,-120%,0)"
-    : undefined
 
   const clearMenuCloseTimer = () => {
     if (menuCloseTimerRef.current !== null) {
@@ -309,75 +293,37 @@ export function Navbar({
       return
     }
 
-    const clearTopRevealTimer = () => {
-      if (topRevealTimerRef.current !== null) {
-        window.clearTimeout(topRevealTimerRef.current)
-        topRevealTimerRef.current = null
-      }
-      setIsSettlingTop(false)
-    }
-
     const updateScrollState = () => {
-      const currentY = window.scrollY
-      const previousY = lastScrollYRef.current
-      const hasScrolledPastThreshold = currentY > 50
-      const scrollDelta = currentY - previousY
+      scrollFrameRef.current = null
 
-      clearTopRevealTimer()
-      setIsScrolled(hasScrolledPastThreshold)
+      const nextIsScrolled = window.scrollY > SCROLL_THRESHOLD
+      setIsScrolled((current) =>
+        current === nextIsScrolled ? current : nextIsScrolled
+      )
+    }
 
-      if (hasScrolledPastThreshold) {
-        setIsSettlingTop(false)
-        if (scrollDelta > 8) {
-          setShowHeader(true)
-        } else if (scrollDelta < -8) {
-          clearMenuCloseTimer()
-          setActiveMenu(null)
-          setShowHeader(false)
-        }
-      } else {
-        setShowHeader(true)
-
-        if (previousY > 50) {
-          setIsScrolled(true)
-          setIsSettlingTop(true)
-          topRevealTimerRef.current = window.setTimeout(() => {
-            setIsScrolled(false)
-            setIsSettlingTop(false)
-            topRevealTimerRef.current = null
-          }, 700)
-        } else {
-          setIsScrolled(false)
-          setIsSettlingTop(false)
-        }
+    const scheduleScrollStateUpdate = () => {
+      if (scrollFrameRef.current !== null) {
+        return
       }
 
-      lastScrollYRef.current = currentY
+      scrollFrameRef.current = window.requestAnimationFrame(updateScrollState)
     }
 
-    let rafId1 = 0
-    let rafId2 = 0
-
-    const syncScrollState = () => {
-      updateScrollState()
-
-      rafId1 = window.requestAnimationFrame(() => {
-        updateScrollState()
-        rafId2 = window.requestAnimationFrame(updateScrollState)
-      })
-    }
-
-    lastScrollYRef.current = window.scrollY
-    syncScrollState()
-    window.addEventListener("scroll", updateScrollState, { passive: true })
-    window.addEventListener("pageshow", syncScrollState)
+    updateScrollState()
+    window.addEventListener("scroll", scheduleScrollStateUpdate, {
+      passive: true,
+    })
+    window.addEventListener("pageshow", updateScrollState)
 
     return () => {
-      clearTopRevealTimer()
-      window.cancelAnimationFrame(rafId1)
-      window.cancelAnimationFrame(rafId2)
-      window.removeEventListener("scroll", updateScrollState)
-      window.removeEventListener("pageshow", syncScrollState)
+      if (scrollFrameRef.current !== null) {
+        window.cancelAnimationFrame(scrollFrameRef.current)
+        scrollFrameRef.current = null
+      }
+
+      window.removeEventListener("scroll", scheduleScrollStateUpdate)
+      window.removeEventListener("pageshow", updateScrollState)
     }
   }, [isOverlay])
 
@@ -394,17 +340,12 @@ export function Navbar({
       className={cn(
         isOverlay
           ? cn(
-              "fixed inset-x-0 top-0 z-[100] h-[98px] transform-gpu transition-[background-color,color,box-shadow,transform] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform",
-              showHeader
-                ? isScrolled
-                  ? "bg-white text-black shadow-[0_1px_0_rgba(0,0,0,0.08)]"
-                  : "bg-transparent text-white"
-                : "bg-white text-black shadow-[0_1px_0_rgba(0,0,0,0.08)] pointer-events-none"
+              "navbar-shell fixed inset-x-0 top-0 left-0 z-[9999] h-[98px] border-b border-transparent bg-transparent text-white",
+              isScrolled && "is-scrolled"
             )
           : "border-b border-transparent bg-white text-black lg:h-[98px]",
         className
       )}
-      style={isOverlay ? { transform: overlayTransform } : undefined}
     >
       <div className="h-full w-full px-4 sm:px-6 lg:px-8">
         <div className="hidden h-full lg:grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-0">
@@ -420,7 +361,6 @@ export function Navbar({
                 selected={selectedNav === item.key}
                 ariaHaspopup="menu"
                 ariaExpanded={activeMenu === item.key}
-                tone={tone}
                 onMouseEnter={() => openMenu(item.key)}
                 onMouseLeave={scheduleMenuClose}
                 onFocus={() => openMenu(item.key)}
@@ -453,7 +393,7 @@ export function Navbar({
               height={120}
               priority
               className={cn(
-                "block h-auto w-[9.5rem] max-w-none",
+                "block h-auto w-[9.5rem] max-w-none transition-[filter] duration-300 ease-out",
                 isOverlayLight && "invert"
               )}
             />
@@ -468,35 +408,25 @@ export function Navbar({
                 aria-expanded={searchOpen}
                 onClick={() => setSearchOpen(true)}
                 className={cn(
-                  "relative flex h-full w-full items-center bg-transparent px-4 pr-10 text-left text-[0.875rem] outline-none transition-opacity hover:opacity-80",
-                  isOverlayLight
-                    ? "border border-white/80 text-white"
-                    : "border border-black/80 text-black"
+                  "relative flex h-full w-full items-center border border-current/80 bg-transparent px-4 pr-10 text-left text-[0.875rem] text-current outline-none transition-[color,border-color,opacity] duration-300 ease-out hover:opacity-80"
                 )}
               >
                 <span
-                  className={cn(
-                    "block truncate",
-                    isOverlayLight ? "text-white/80" : "text-black/80"
-                  )}
+                  className="block truncate text-current/80"
                 >
                   What are you looking for?
                 </span>
               </button>
               <Search
                 aria-hidden="true"
-                className={cn(
-                  "pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 stroke-[1.75]",
-                  tone === "light" ? "text-white" : "text-black"
-                )}
+                className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 stroke-[1.75] text-current transition-colors duration-300 ease-out"
               />
             </div>
 
             <Link
               href="/#contact"
               className={cn(
-                "shrink-0 whitespace-nowrap text-[0.875rem] uppercase tracking-[0.12em] transition-opacity hover:opacity-60",
-                tone === "light" ? "text-white" : "text-black"
+                "shrink-0 whitespace-nowrap text-[0.875rem] uppercase tracking-[0.12em] text-current transition-[color,opacity] duration-300 ease-out hover:opacity-60"
               )}
             >
               Contact Us
@@ -535,7 +465,7 @@ export function Navbar({
                 height={102}
                 priority
                 className={cn(
-                  "block h-auto w-[8.75rem] max-w-none",
+                  "block h-auto w-[8.75rem] max-w-none transition-[filter] duration-300 ease-out",
                   isOverlayLight && "invert"
                 )}
               />
@@ -554,8 +484,7 @@ export function Navbar({
           <nav
             aria-label="Primary"
             className={cn(
-              "flex items-center gap-6 overflow-x-auto pb-1 text-[0.75rem] uppercase tracking-[0.18em] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
-              tone === "light" ? "text-white" : "text-black"
+              "flex items-center gap-6 overflow-x-auto pb-1 text-[0.75rem] uppercase tracking-[0.18em] text-current transition-[color,opacity] duration-300 ease-out [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             )}
           >
             {primaryNav.map((item) => (
@@ -565,7 +494,6 @@ export function Navbar({
                 active={selectedNav === item.key}
                 selected={selectedNav === item.key}
                 mobile
-                tone={tone}
                 onClick={() => setSelectedNav(item.key)}
               >
                 {item.label}
@@ -574,8 +502,7 @@ export function Navbar({
             <Link
               href="/#contact"
               className={cn(
-                "flex-none whitespace-nowrap text-[0.75rem] uppercase tracking-[0.18em] transition-opacity hover:opacity-60",
-                tone === "light" ? "text-white" : "text-black"
+                "flex-none whitespace-nowrap text-[0.75rem] uppercase tracking-[0.18em] text-current transition-[color,opacity] duration-300 ease-out hover:opacity-60"
               )}
             >
               Contact Us
