@@ -16,39 +16,39 @@ type DenimSlide = {
 const denimSlides: DenimSlide[] = [
   {
     title: "SKINNY DENIMS",
-    image: "/images/products/product5.png",
+    image: "/images/products/product5-white.png",
     alt: "Model wearing skinny denim",
   },
   {
     title: "BOOTCUT DENIMS",
-    image: "/images/products/product5.png",
+    image: "/images/products/product5-white.png",
     alt: "Model wearing bootcut denim",
   },
   {
     title: "LOW-RISE DENIMS",
-    image: "/images/products/product5.png",
+    image: "/images/products/product5-white.png",
     alt: "Model wearing low-rise denim",
   },
   {
     title: "STRAIGHT DENIMS",
-    image: "/images/products/product5.png",
+    image: "/images/products/product5-white.png",
     alt: "Model wearing straight denim",
   },
   {
     title: "RELAXED DENIMS",
-    image: "/images/products/product5.png",
+    image: "/images/products/product5-white.png",
     alt: "Model wearing relaxed denim",
   },
 ]
 
 function DenimSlideCard({ slide }: { slide: DenimSlide }) {
   return (
-    <article className="relative h-[500px] overflow-hidden bg-white sm:h-[580px] md:h-[640px] lg:h-[700px]">
+    <article className="relative h-[500px] w-full overflow-hidden bg-white sm:h-[580px] md:h-[640px] lg:h-[700px]">
       <Image
         src={slide.image}
         alt={slide.alt}
         fill
-        sizes="(max-width: 640px) 92vw, (max-width: 1024px) 64vw, 49vw"
+        sizes="(max-width: 640px) 92vw, (max-width: 1024px) 64vw, 627px"
         className="object-contain object-center"
         priority={false}
       />
@@ -84,7 +84,7 @@ export function DenimCarousel() {
           {denimSlides.map((slide) => (
             <CarouselItem
               key={slide.title}
-              className="basis-[92%] sm:basis-[72%] md:basis-[58%] lg:basis-[46.5%]"
+              className="basis-[92%] sm:basis-[72%] md:basis-[58%] lg:basis-[calc(627px+1rem)]"
             >
               <DenimSlideCard slide={slide} />
             </CarouselItem>

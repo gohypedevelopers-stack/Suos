@@ -53,7 +53,7 @@ const lookbookSlides: LookbookSlide[] = [
   },
   {
     id: "lookbook-7",
-    image: "/images/products/product5.png",
+    image: "/images/products/product5-white.png",
     alt: "Model in denim seated beside greenery",
     imageClassName: "object-[center_32%]",
   },
