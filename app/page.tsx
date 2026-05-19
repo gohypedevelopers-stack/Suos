@@ -3,8 +3,6 @@ import { DenimCarousel } from "@/components/home/DenimCarousel"
 import { DenimEditorialSection } from "@/components/home/DenimEditorialSection"
 import { MotionBannerSection } from "@/components/home/MotionBannerSection"
 import { LookbookCarousel } from "@/components/home/LookbookCarousel"
-import { SustainabilityMarquee } from "@/components/home/SustainabilityMarquee"
-import { FooterSection } from "@/components/home/FooterSection"
 import { LaunchOfferBar } from "@/components/home/LaunchOfferBar"
 import { EditsCarousel } from "@/components/home/EditsCarousel"
 import { TrendingSection } from "@/components/home/TrendingSection"
@@ -22,8 +20,6 @@ export default function Home() {
       <DenimEditorialSection />
       <LookbookCarousel />
       <MotionBannerSection />
-      <SustainabilityMarquee />
-      <FooterSection />
     </main>
   )
 }

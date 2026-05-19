@@ -119,12 +119,12 @@ function ProductCardView({ product }: { product: ProductCard }) {
 
         <div
           className={cn(
-            "absolute inset-x-3 bottom-3 z-10 overflow-hidden bg-white px-3 py-2 text-black shadow-[0_8px_18px_rgba(0,0,0,0.12)] transition-[height,padding] duration-300 ease-out",
-            "h-[48px] group-hover:h-[118px] group-hover:py-2.5"
+            "absolute inset-x-3 bottom-3 z-10 overflow-hidden bg-white text-black shadow-[0_8px_18px_rgba(0,0,0,0.12)] transition-[height,padding] duration-300 ease-out",
+            "h-[52px] group-hover:h-[120px]"
           )}
         >
           <div
-            className="flex items-end justify-between gap-3 transition-opacity duration-200 group-hover:opacity-0"
+            className="flex h-full items-start justify-between gap-3 p-3 transition-opacity duration-200 group-hover:opacity-0"
           >
             <div className="min-w-0">
               <p className="text-[0.58rem] font-medium uppercase leading-tight tracking-[0.08em]">
@@ -138,7 +138,7 @@ function ProductCardView({ product }: { product: ProductCard }) {
             <ColorSwatches swatches={product.swatches} />
           </div>
 
-          <div className="pointer-events-none absolute inset-x-3 bottom-2.5 flex translate-y-2 flex-col gap-2 opacity-0 transition-all duration-300 ease-out group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100">
+          <div className="pointer-events-none absolute inset-3 flex translate-y-2 flex-col justify-between opacity-0 transition-all duration-300 ease-out group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-[0.58rem] font-medium uppercase leading-tight tracking-[0.08em]">
@@ -152,18 +152,20 @@ function ProductCardView({ product }: { product: ProductCard }) {
               <ColorSwatches swatches={product.swatches} />
             </div>
 
-            <div className="flex items-center gap-1.5 text-[0.5rem] uppercase tracking-[0.18em] text-black/75">
-              {hoverSizes.map((size) => (
-                <span key={size}>{size}</span>
-              ))}
-            </div>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-1.5 text-[0.5rem] uppercase tracking-[0.18em] text-black/75">
+                {hoverSizes.map((size) => (
+                  <span key={size}>{size}</span>
+                ))}
+              </div>
 
-            <button
-              type="button"
-              className="flex h-7 w-full items-center justify-center border border-black bg-white text-[0.52rem] uppercase tracking-[0.14em] transition-colors hover:bg-black hover:text-white"
-            >
-              Add To Cart
-            </button>
+              <button
+                type="button"
+                className="flex h-7 w-full items-center justify-center border border-black bg-white text-[0.52rem] uppercase tracking-[0.14em] transition-colors hover:bg-black hover:text-white"
+              >
+                Add To Cart
+              </button>
+            </div>
           </div>
         </div>
       </div>

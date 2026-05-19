@@ -1,9 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
 
-import { Navbar } from "@/components/Navbar"
-import { ShippingAnnouncementBar } from "@/components/home/ShippingAnnouncementBar"
-
 const heroPages = [
   { label: "1/4", active: false },
   { label: "2/4", active: true },
@@ -13,7 +10,7 @@ const heroPages = [
 
 export function Hero() {
   return (
-    <section className="relative min-h-[100svh] overflow-hidden bg-[#d4cdc1] text-white">
+    <section className="relative -mt-[var(--header-stack-height)] min-h-[100svh] overflow-hidden bg-[#d4cdc1] pt-[var(--header-stack-height)] text-white">
       <div className="absolute inset-0 grid grid-rows-2 lg:grid-cols-2 lg:grid-rows-1">
         <div className="relative min-h-[50svh] lg:min-h-0">
           <Image
@@ -38,9 +35,6 @@ export function Hero() {
 
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/8 via-transparent to-black/10" />
       </div>
-
-      <ShippingAnnouncementBar />
-      <Navbar variant="overlay" className="pointer-events-auto" />
 
       <div className="relative z-10 flex min-h-[calc(100svh-var(--header-stack-height))] items-end justify-center px-5 pb-20 sm:px-6 lg:pb-[7rem]">
         <div className="flex flex-col items-center gap-5 text-center">
