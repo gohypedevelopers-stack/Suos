@@ -104,7 +104,7 @@ function ProductCardView({ product }: { product: ProductCard }) {
         />
 
         {product.badge ? (
-          <span className="absolute left-2 top-2 z-10 bg-black px-2.5 py-1 text-[0.5rem] font-semibold uppercase leading-none tracking-[0.16em] text-white">
+          <span className="absolute left-2 top-2 z-10 bg-black px-2.5 py-1 text-[12px] font-light uppercase leading-none tracking-[0.16em] text-white">
             {product.badge}
           </span>
         ) : null}
