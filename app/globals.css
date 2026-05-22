@@ -208,29 +208,11 @@
 }
 
 .main-navbar {
-  position: relative;
-  top: auto;
-  left: auto;
-  width: 100%;
-  z-index: 1000;
-}
-
-.main-navbar.is-scrolled {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   z-index: 9999;
-  background-color: #ffffff;
-  color: #000000;
-  border-color: rgba(0, 0, 0, 0.08);
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
-}
-
-.main-navbar.is-hidden {
-  transform: translate3d(0, -100%, 0);
-  opacity: 0;
-  pointer-events: none;
 }
 
 .navbar-shell.is-scrolled {

@@ -240,7 +240,6 @@ export function Navbar({
   const pathname = usePathname()
   const isOverlay = pathname === "/"
   const [isScrolled, setIsScrolled] = useState(false)
-  const [isHidden, setIsHidden] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [selectedNav, setSelectedNav] = useState<NavKey>(defaultNavKey)
   const [activeMenu, setActiveMenu] = useState<NavKey | null>(null)
@@ -248,8 +247,6 @@ export function Navbar({
   const scrollFrameRef = useRef<number | null>(null)
   const headerRef = useRef<HTMLElement | null>(null)
   const announcementHeightRef = useRef(0)
-  const lastScrollYRef = useRef(0)
-  const hiddenRef = useRef(false)
   const hasOpenMenu = Boolean(activeMenu)
   const isInteractiveSurface = isHovered || hasOpenMenu
   const isLightSurface = !isOverlay || isScrolled || isInteractiveSurface
@@ -293,35 +290,15 @@ export function Navbar({
     const updateScrollState = () => {
       scrollFrameRef.current = null
 
-      const currentScrollY = window.scrollY
-      const previousScrollY = lastScrollYRef.current
-      const scrollDelta = currentScrollY - previousScrollY
-      const nextIsScrolled = currentScrollY > announcementHeightRef.current
-      let nextIsHidden = false
-
-      if (nextIsScrolled) {
-        if (scrollDelta > 4) {
-          nextIsHidden = true
-        } else if (scrollDelta < -4) {
-          nextIsHidden = false
-        } else {
-          nextIsHidden = hiddenRef.current
-        }
-      }
-
-      lastScrollYRef.current = currentScrollY
+      const nextIsScrolled = window.scrollY > announcementHeightRef.current
 
       setIsScrolled((current) =>
         current === nextIsScrolled ? current : nextIsScrolled
       )
-      hiddenRef.current = nextIsHidden
-      setIsHidden((current) => (current === nextIsHidden ? current : nextIsHidden))
     }
 
     const syncScrollState = () => {
       syncHeaderMetrics()
-      lastScrollYRef.current = window.scrollY
-      hiddenRef.current = false
       updateScrollState()
     }
 
@@ -362,6 +339,7 @@ export function Navbar({
       }}
       className={cn(
         "main-navbar navbar-shell border-b",
+        isScrolled ? "translate-y-0" : "translate-y-[var(--announcement-height)]",
         isOverlay ? "h-[98px]" : "lg:h-[98px]",
         isInteractiveSurface
           ? "bg-white text-black border-transparent shadow-none"
@@ -369,7 +347,6 @@ export function Navbar({
             ? "bg-white text-black border-black/10 shadow-[0_1px_0_rgba(0,0,0,0.08)]"
             : "bg-transparent text-white border-transparent shadow-none",
         isScrolled && "is-scrolled",
-        isScrolled && isHidden && "is-hidden",
         className
       )}
     >
