@@ -69,7 +69,6 @@ function NavLink({
   selected = false,
   mobile = false,
   onMouseEnter,
-  onMouseLeave,
   onFocus,
   onBlur,
   onClick,
@@ -82,7 +81,6 @@ function NavLink({
   selected?: boolean
   mobile?: boolean
   onMouseEnter?: MouseEventHandler<HTMLAnchorElement>
-  onMouseLeave?: MouseEventHandler<HTMLAnchorElement>
   onFocus?: FocusEventHandler<HTMLAnchorElement>
   onBlur?: FocusEventHandler<HTMLAnchorElement>
   onClick?: MouseEventHandler<HTMLAnchorElement>
@@ -98,7 +96,6 @@ function NavLink({
       aria-haspopup={ariaHaspopup}
       aria-expanded={ariaExpanded}
       onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
       onFocus={onFocus}
       onBlur={onBlur}
       onClick={onClick}
@@ -247,33 +244,20 @@ export function Navbar({
   const [searchOpen, setSearchOpen] = useState(false)
   const [selectedNav, setSelectedNav] = useState<NavKey>(defaultNavKey)
   const [activeMenu, setActiveMenu] = useState<NavKey | null>(null)
+  const [isHovered, setIsHovered] = useState(false)
   const scrollFrameRef = useRef<number | null>(null)
-  const menuCloseTimerRef = useRef<number | null>(null)
+  const headerRef = useRef<HTMLElement | null>(null)
   const announcementHeightRef = useRef(0)
   const lastScrollYRef = useRef(0)
   const hiddenRef = useRef(false)
-  const isOverlayLight = isOverlay && !isScrolled
-  const tone: "dark" | "light" = isOverlayLight ? "light" : "dark"
+  const hasOpenMenu = Boolean(activeMenu)
+  const isLightSurface =
+    !isOverlay || isScrolled || isHovered || Boolean(activeMenu)
+  const tone: "dark" | "light" = isLightSurface ? "dark" : "light"
   const visualActiveMenu = activeMenu ?? selectedNav
 
-  const clearMenuCloseTimer = () => {
-    if (menuCloseTimerRef.current !== null) {
-      window.clearTimeout(menuCloseTimerRef.current)
-      menuCloseTimerRef.current = null
-    }
-  }
-
   const openMenu = (menu: NavKey) => {
-    clearMenuCloseTimer()
     setActiveMenu(menu)
-  }
-
-  const scheduleMenuClose = () => {
-    clearMenuCloseTimer()
-    menuCloseTimerRef.current = window.setTimeout(() => {
-      setActiveMenu(null)
-      menuCloseTimerRef.current = null
-    }, 180)
   }
 
   useEffect(() => {
@@ -368,21 +352,22 @@ export function Navbar({
     }
   }, [isOverlay])
 
-  useEffect(() => {
-    return () => {
-      if (menuCloseTimerRef.current !== null) {
-        window.clearTimeout(menuCloseTimerRef.current)
-      }
-    }
-  }, [])
-
   const headerContent = (
     <header
+      ref={headerRef}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => {
+        setIsHovered(false)
+        setActiveMenu(null)
+      }}
       className={cn(
-        "main-navbar navbar-shell border-b border-transparent",
-        isOverlay
-          ? "bg-transparent text-white h-[98px]"
-          : "bg-white text-black lg:h-[98px]",
+        "main-navbar navbar-shell",
+        isOverlay ? "h-[98px]" : "lg:h-[98px]",
+        hasOpenMenu
+          ? "bg-white text-black border-transparent shadow-none"
+          : isLightSurface
+            ? "bg-white text-black border-b border-black/10 shadow-[0_1px_0_rgba(0,0,0,0.08)]"
+            : "bg-transparent text-white border-transparent",
         isScrolled && "is-scrolled",
         isScrolled && isHidden && "is-hidden",
         className
@@ -403,13 +388,15 @@ export function Navbar({
                 ariaHaspopup="menu"
                 ariaExpanded={activeMenu === item.key}
                 onMouseEnter={() => openMenu(item.key)}
-                onMouseLeave={scheduleMenuClose}
                 onFocus={() => openMenu(item.key)}
                 onBlur={(event) => {
                   const nextTarget = event.relatedTarget as Node | null
 
-                  if (!nextTarget || !event.currentTarget.contains(nextTarget)) {
-                    scheduleMenuClose()
+                  if (
+                    !nextTarget ||
+                    !headerRef.current?.contains(nextTarget)
+                  ) {
+                    setActiveMenu(null)
                   }
                 }}
                 onClick={() => {
@@ -435,7 +422,7 @@ export function Navbar({
               priority
               className={cn(
                 "block h-auto w-[9.5rem] max-w-none transition-[filter] duration-300 ease-out",
-                isOverlayLight && "invert"
+                isOverlay && !isLightSurface && "invert"
               )}
             />
           </Link>
@@ -507,7 +494,7 @@ export function Navbar({
                 priority
                 className={cn(
                   "block h-auto w-[8.75rem] max-w-none transition-[filter] duration-300 ease-out",
-                  isOverlayLight && "invert"
+                  isOverlay && !isLightSurface && "invert"
                 )}
               />
             </Link>
@@ -555,13 +542,11 @@ export function Navbar({
       <div
         aria-hidden={!activeMenu}
         className={cn(
-          "absolute left-0 top-full hidden w-full border-t border-black/10 bg-white text-black shadow-[0_24px_60px_rgba(0,0,0,0.08)] transition-[opacity,transform] duration-200 ease-out lg:block lg:h-[460px] lg:overflow-hidden",
+          "absolute left-0 top-full hidden w-full bg-white text-black shadow-[0_24px_60px_rgba(0,0,0,0.08)] transition-opacity duration-150 ease-out lg:block lg:h-[460px] lg:overflow-hidden",
           activeMenu
-            ? "pointer-events-auto translate-y-0 opacity-100"
-            : "pointer-events-none -translate-y-2 opacity-0"
+            ? "pointer-events-auto -mt-px opacity-100"
+            : "pointer-events-none opacity-0"
         )}
-        onMouseEnter={clearMenuCloseTimer}
-        onMouseLeave={scheduleMenuClose}
       >
         <div className="grid h-full w-full gap-x-14 gap-y-8 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(10rem,12rem)_minmax(14rem,18rem)_minmax(0,1fr)] lg:px-8">
           <MenuSection
