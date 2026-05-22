@@ -1,6 +1,9 @@
+"use client"
+
+import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Plus } from "lucide-react"
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -12,6 +15,7 @@ export type ProductCard = {
   featured?: boolean
   sizes?: string[]
   swatches: string[]
+  gallery?: string[]
 }
 
 const tabs = [
@@ -29,12 +33,24 @@ const products: ProductCard[] = [
     alt: "Model wearing a blue denim outfit",
     badge: "NEW ARRIVAL",
     swatches: ["#0a1a2b", "#15436b", "#d1d9e2"],
+    gallery: [
+      "/images/products/product1.png",
+      "/images/products/product5.png",
+      "/images/products/product9.png",
+      "/images/products/product13.png",
+    ],
   },
   {
     id: "product-2",
     image: "/images/products/product2.png",
     alt: "Model wearing a denim jacket in monochrome",
     swatches: ["#0a1a2b", "#15436b", "#d1d9e2"],
+    gallery: [
+      "/images/products/product2.png",
+      "/images/products/product6.png",
+      "/images/products/product10.png",
+      "/images/products/product14.png",
+    ],
   },
   {
     id: "product-3",
@@ -42,12 +58,24 @@ const products: ProductCard[] = [
     alt: "Model seated in a black tailored look",
     badge: "BESTSELLER",
     swatches: ["#0a1a2b", "#15436b", "#d1d9e2"],
+    gallery: [
+      "/images/products/product3.png",
+      "/images/products/product7.png",
+      "/images/products/product11.png",
+      "/images/products/product15.png",
+    ],
   },
   {
     id: "product-4",
     image: "/images/products/product4.png",
     alt: "Model wearing an all-black outfit",
     swatches: ["#0a1a2b", "#15436b", "#d1d9e2"],
+    gallery: [
+      "/images/products/product4.png",
+      "/images/products/product8.png",
+      "/images/products/product12.png",
+      "/images/products/product5-white.png",
+    ],
   },
   {
     id: "product-5-featured",
@@ -56,24 +84,48 @@ const products: ProductCard[] = [
     featured: true,
     sizes: ["28", "32", "36", "42"],
     swatches: ["#0a1a2b", "#15436b", "#d1d9e2"],
+    gallery: [
+      "/images/products/product4.png",
+      "/images/products/product8.png",
+      "/images/products/product12.png",
+      "/images/products/product5-white.png",
+    ],
   },
   {
     id: "product-6",
     image: "/images/products/product3.png",
     alt: "Model seated in a black tailored look",
     swatches: ["#0a1a2b", "#15436b", "#d1d9e2"],
+    gallery: [
+      "/images/products/product3.png",
+      "/images/products/product7.png",
+      "/images/products/product11.png",
+      "/images/products/product15.png",
+    ],
   },
   {
     id: "product-7",
     image: "/images/products/product1.png",
     alt: "Model wearing a blue denim outfit",
     swatches: ["#0a1a2b", "#15436b", "#d1d9e2"],
+    gallery: [
+      "/images/products/product1.png",
+      "/images/products/product5.png",
+      "/images/products/product9.png",
+      "/images/products/product13.png",
+    ],
   },
   {
     id: "product-8",
     image: "/images/products/product2.png",
     alt: "Model wearing a denim jacket in monochrome",
     swatches: ["#0a1a2b", "#15436b", "#d1d9e2"],
+    gallery: [
+      "/images/products/product2.png",
+      "/images/products/product6.png",
+      "/images/products/product10.png",
+      "/images/products/product14.png",
+    ],
   },
 ]
 
@@ -92,11 +144,28 @@ function ColorSwatches({ swatches }: { swatches: string[] }) {
 }
 
 export function ProductCardView({ product }: { product: ProductCard }) {
+  const gallery = product.gallery?.length ? product.gallery : [product.image]
+  const [activeImageIndex, setActiveImageIndex] = useState(0)
+
+  const activeImage = gallery[activeImageIndex] ?? product.image
+  const hasGalleryControls = gallery.length > 1
+
+  const handlePreviousImage = () => {
+    setActiveImageIndex(
+      (currentIndex) => (currentIndex - 1 + gallery.length) % gallery.length
+    )
+  }
+
+  const handleNextImage = () => {
+    setActiveImageIndex((currentIndex) => (currentIndex + 1) % gallery.length)
+  }
+
   return (
     <article className="group relative overflow-hidden bg-black shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
       <div className="relative aspect-[330/479]">
         <Image
-          src={product.image}
+          key={`${product.id}-${activeImageIndex}`}
+          src={activeImage}
           alt={product.alt}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
@@ -116,6 +185,28 @@ export function ProductCardView({ product }: { product: ProductCard }) {
         >
           <Plus className="size-3.5 stroke-[2.1]" />
         </button>
+
+        {hasGalleryControls ? (
+          <div className="pointer-events-none absolute inset-x-3 top-1/2 z-20 flex -translate-y-1/2 items-center justify-between opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100">
+            <button
+              type="button"
+              aria-label="Previous product image"
+              onClick={handlePreviousImage}
+              className="pointer-events-auto inline-flex size-9 items-center justify-center rounded-full text-white/90 transition-colors duration-200 hover:bg-white/15 hover:text-white"
+            >
+              <ChevronLeft className="size-5" strokeWidth={2.25} />
+            </button>
+
+            <button
+              type="button"
+              aria-label="Next product image"
+              onClick={handleNextImage}
+              className="pointer-events-auto inline-flex size-9 items-center justify-center rounded-full text-white/90 transition-colors duration-200 hover:bg-white/15 hover:text-white"
+            >
+              <ChevronRight className="size-5" strokeWidth={2.25} />
+            </button>
+          </div>
+        ) : null}
 
         <div
           className={cn(
