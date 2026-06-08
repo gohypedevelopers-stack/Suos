@@ -15,6 +15,17 @@ export type DeliveryPerk = {
   icon: "truck" | "exchange" | "shield" | "card"
 }
 
+export type ProductCard = {
+  id: string
+  image: string
+  alt: string
+  badge?: string
+  featured?: boolean
+  sizes?: string[]
+  swatches: string[]
+  gallery?: string[]
+}
+
 export type ProductDetail = {
   slug: string
   editLabel: string
@@ -38,6 +49,109 @@ export type ProductDetail = {
   deliveryPerks: DeliveryPerk[]
   completeLook: ProductImage[]
 }
+
+export const trendingProducts: ProductCard[] = [
+  {
+    id: "product-1",
+    image: "/images/products/product1.png",
+    alt: "Model wearing a blue denim outfit",
+    badge: "NEW ARRIVAL",
+    swatches: ["#0a1a2b", "#15436b", "#d1d9e2"],
+    gallery: [
+      "/images/products/product1.png",
+      "/images/products/product5.png",
+      "/images/products/product9.png",
+      "/images/products/product13.png",
+    ],
+  },
+  {
+    id: "product-2",
+    image: "/images/products/product2.png",
+    alt: "Model wearing a denim jacket in monochrome",
+    swatches: ["#0a1a2b", "#15436b", "#d1d9e2"],
+    gallery: [
+      "/images/products/product2.png",
+      "/images/products/product6.png",
+      "/images/products/product10.png",
+      "/images/products/product14.png",
+    ],
+  },
+  {
+    id: "product-3",
+    image: "/images/products/product3.png",
+    alt: "Model seated in a black tailored look",
+    badge: "BESTSELLER",
+    swatches: ["#0a1a2b", "#15436b", "#d1d9e2"],
+    gallery: [
+      "/images/products/product3.png",
+      "/images/products/product7.png",
+      "/images/products/product11.png",
+      "/images/products/product15.png",
+    ],
+  },
+  {
+    id: "product-4",
+    image: "/images/products/product4.png",
+    alt: "Model wearing an all-black outfit",
+    swatches: ["#0a1a2b", "#15436b", "#d1d9e2"],
+    gallery: [
+      "/images/products/product4.png",
+      "/images/products/product8.png",
+      "/images/products/product12.png",
+      "/images/products/product5-white.png",
+    ],
+  },
+  {
+    id: "product-5-featured",
+    image: "/images/products/product4.png",
+    alt: "Model wearing an all-black outfit",
+    featured: true,
+    sizes: ["28", "32", "36", "42"],
+    swatches: ["#0a1a2b", "#15436b", "#d1d9e2"],
+    gallery: [
+      "/images/products/product4.png",
+      "/images/products/product8.png",
+      "/images/products/product12.png",
+      "/images/products/product5-white.png",
+    ],
+  },
+  {
+    id: "product-6",
+    image: "/images/products/product3.png",
+    alt: "Model seated in a black tailored look",
+    swatches: ["#0a1a2b", "#15436b", "#d1d9e2"],
+    gallery: [
+      "/images/products/product3.png",
+      "/images/products/product7.png",
+      "/images/products/product11.png",
+      "/images/products/product15.png",
+    ],
+  },
+  {
+    id: "product-7",
+    image: "/images/products/product1.png",
+    alt: "Model wearing a blue denim outfit",
+    swatches: ["#0a1a2b", "#15436b", "#d1d9e2"],
+    gallery: [
+      "/images/products/product1.png",
+      "/images/products/product5.png",
+      "/images/products/product9.png",
+      "/images/products/product13.png",
+    ],
+  },
+  {
+    id: "product-8",
+    image: "/images/products/product2.png",
+    alt: "Model wearing a denim jacket in monochrome",
+    swatches: ["#0a1a2b", "#15436b", "#d1d9e2"],
+    gallery: [
+      "/images/products/product2.png",
+      "/images/products/product6.png",
+      "/images/products/product10.png",
+      "/images/products/product14.png",
+    ],
+  },
+]
 
 const sharedChairPose = {
   src: "/images/products/product4.png",

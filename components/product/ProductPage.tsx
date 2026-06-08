@@ -1,8 +1,10 @@
 import Link from "next/link"
 import { ChevronRight } from "lucide-react"
 
+import { LookbookCarousel } from "@/components/home/LookbookCarousel"
 import { ProductGallery } from "@/components/product/ProductGallery"
 import { ProductSummary } from "@/components/product/ProductSummary"
+import { YouMayAlsoLikeSection } from "@/components/product/YouMayAlsoLikeSection"
 import type { ProductDetail } from "@/components/product/productData"
 
 export function ProductPage({
@@ -29,7 +31,7 @@ export function ProductPage({
                         {crumb.label}
                       </Link>
                     ) : (
-                      <span className={isLast ? "text-black/62" : ""}>
+                      <span className={isLast ? "text-black" : ""}>
                         {crumb.label}
                       </span>
                     )}
@@ -49,6 +51,8 @@ export function ProductPage({
           </div>
         </div>
       </section>
+      <YouMayAlsoLikeSection />
+      <LookbookCarousel />
     </main>
   )
 }
