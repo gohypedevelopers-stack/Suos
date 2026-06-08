@@ -3,7 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Heart, Search, UserRound } from "lucide-react"
+import { Heart, Search, ShoppingBag, UserRound } from "lucide-react"
 import {
   useEffect,
   useLayoutEffect,
@@ -15,6 +15,7 @@ import {
 } from "react"
 
 import { cn } from "@/lib/utils"
+import { CartSidebar } from "@/components/cart/CartSidebar"
 import { SearchSidebar } from "@/components/home/SearchSidebar"
 
 type NavKey = "women" | "men" | "bestsellers"
@@ -241,6 +242,7 @@ export function Navbar({
   const isOverlay = pathname === "/"
   const [isScrolled, setIsScrolled] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
+  const [cartOpen, setCartOpen] = useState(false)
   const [selectedNav, setSelectedNav] = useState<NavKey>(defaultNavKey)
   const [activeMenu, setActiveMenu] = useState<NavKey | null>(null)
   const [isHovered, setIsHovered] = useState(false)
@@ -428,14 +430,13 @@ export function Navbar({
               />
             </div>
 
-            <Link
-              href="/#contact"
-              className={cn(
-                "shrink-0 whitespace-nowrap text-[0.875rem] uppercase tracking-[0.12em] text-current transition-[color,opacity] duration-300 ease-out hover:opacity-60"
-              )}
+            <IconButton
+              label="Cart"
+              tone={tone}
+              onClick={() => setCartOpen(true)}
             >
-              Contact Us
-            </Link>
+              <ShoppingBag className="size-[18px] stroke-[1.7]" />
+            </IconButton>
 
             <div className="flex shrink-0 items-center gap-4">
               <IconButton label="Wishlist" tone={tone}>
@@ -480,6 +481,13 @@ export function Navbar({
               <IconButton label="Wishlist" tone={tone}>
                 <Heart className="size-[18px] stroke-[1.7]" />
               </IconButton>
+              <IconButton
+                label="Cart"
+                tone={tone}
+                onClick={() => setCartOpen(true)}
+              >
+                <ShoppingBag className="size-[18px] stroke-[1.7]" />
+              </IconButton>
               <IconButton label="Account" tone={tone}>
                 <UserRound className="size-[18px] stroke-[1.7]" />
               </IconButton>
@@ -504,14 +512,6 @@ export function Navbar({
                 {item.label}
               </NavLink>
             ))}
-            <Link
-              href="/#contact"
-              className={cn(
-                "flex-none whitespace-nowrap text-[0.75rem] uppercase tracking-[0.18em] text-current transition-[color,opacity] duration-300 ease-out hover:opacity-60"
-              )}
-            >
-              Contact Us
-            </Link>
           </nav>
         </div>
       </div>
@@ -555,6 +555,7 @@ export function Navbar({
       </div>
 
       <SearchSidebar open={searchOpen} onOpenChange={setSearchOpen} />
+      <CartSidebar open={cartOpen} onOpenChange={setCartOpen} />
     </header>
   )
 
