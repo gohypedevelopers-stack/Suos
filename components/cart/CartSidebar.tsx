@@ -130,7 +130,7 @@ function CartItemRow({ item }: { item: CartItem }) {
 
 function PromoMarqueeRow() {
   return (
-    <div className="flex shrink-0 items-center gap-10 pr-10 whitespace-nowrap text-[0.72rem] tracking-[0.04em]">
+    <div className="flex shrink-0 items-center gap-10 whitespace-nowrap pr-10 text-[14px] font-normal uppercase tracking-[0.04em]">
       {Array.from({ length: 4 }).map((_, index) => (
         <span key={`promo-${index}`} className="whitespace-nowrap">
           {promoStripText}

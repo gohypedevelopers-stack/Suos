@@ -152,7 +152,7 @@ export default function CartPage() {
         </section>
 
         <div className="mt-5 overflow-hidden bg-white px-3 py-2 text-black">
-          <div className="whitespace-nowrap text-[0.72rem] uppercase tracking-[0.04em]">
+          <div className="whitespace-nowrap text-[14px] font-normal uppercase tracking-[0.04em]">
             Additional Discount on Pre-paid | Free Return and Exchange |
             Additional Discount on Pre-paid | Free Return and Exchange
           </div>

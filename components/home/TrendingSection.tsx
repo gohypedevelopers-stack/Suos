@@ -6,7 +6,9 @@ import Link from "next/link"
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { ProductQuickViewModal } from "@/components/product/ProductQuickViewModal"
 import {
+  featuredProduct,
   trendingProducts,
   type ProductCard,
 } from "@/components/product/productData"
@@ -28,7 +30,7 @@ function ColorSwatches({ swatches }: { swatches: string[] }) {
           className="group/swatch relative inline-flex flex-col items-center pb-0.5"
         >
           <span
-            className="size-2.5 border border-black/10"
+            className="size-[15px] border border-black/10"
             style={{ backgroundColor: swatch }}
           />
           <span
@@ -62,6 +64,7 @@ export function ProductCardView({
 }) {
   const gallery = product.gallery?.length ? product.gallery : [product.image]
   const [activeImageIndex, setActiveImageIndex] = useState(0)
+  const [quickViewOpen, setQuickViewOpen] = useState(false)
 
   const activeImage = gallery[activeImageIndex] ?? product.image
   const hasGalleryControls = gallery.length > 1
@@ -94,36 +97,41 @@ export function ProductCardView({
           </span>
         ) : null}
 
-        <button
-          type="button"
-          aria-label="Expand product"
+        <div
+          aria-hidden="true"
           className={cn(
             "absolute right-3 top-3 z-10 inline-flex size-5 items-center justify-center border border-black/10 bg-white text-black opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100",
             expanded && "translate-y-0 opacity-100"
           )}
         >
           <Plus className="size-3.5 stroke-[2.1]" />
-        </button>
+        </div>
 
         {hasGalleryControls ? (
           <div className="pointer-events-none absolute inset-x-3 top-1/2 z-20 flex -translate-y-1/2 items-center justify-between opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100">
-            <button
-              type="button"
-              aria-label="Previous product image"
-              onClick={handlePreviousImage}
-              className="pointer-events-auto inline-flex size-9 items-center justify-center rounded-none text-white/90 transition-colors duration-200 hover:bg-white/15 hover:text-white"
-            >
-              <ChevronLeft className="size-5" strokeWidth={2.25} />
-            </button>
+              <button
+                type="button"
+                aria-label="Previous product image"
+                onClick={(event) => {
+                  event.stopPropagation()
+                  handlePreviousImage()
+                }}
+                className="pointer-events-auto inline-flex size-9 items-center justify-center rounded-none text-white/90 transition-colors duration-200 hover:bg-white/15 hover:text-white"
+              >
+                <ChevronLeft className="size-5" strokeWidth={2.25} />
+              </button>
 
-            <button
-              type="button"
-              aria-label="Next product image"
-              onClick={handleNextImage}
-              className="pointer-events-auto inline-flex size-9 items-center justify-center rounded-none text-white/90 transition-colors duration-200 hover:bg-white/15 hover:text-white"
-            >
-              <ChevronRight className="size-5" strokeWidth={2.25} />
-            </button>
+              <button
+                type="button"
+                aria-label="Next product image"
+                onClick={(event) => {
+                  event.stopPropagation()
+                  handleNextImage()
+                }}
+                className="pointer-events-auto inline-flex size-9 items-center justify-center rounded-none text-white/90 transition-colors duration-200 hover:bg-white/15 hover:text-white"
+              >
+                <ChevronRight className="size-5" strokeWidth={2.25} />
+              </button>
           </div>
         ) : null}
 
@@ -170,10 +178,26 @@ export function ProductCardView({
             </div>
 
             <div className="flex flex-col gap-2.5">
-              <div className="flex items-start gap-1.5 text-[14px] uppercase tracking-[0.18em] text-black/75">
-                {hoverSizes.map((size) => (
-                  <SizeMarker key={size} size={size} />
-                ))}
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex flex-wrap items-start gap-1.5 text-[14px] font-normal uppercase leading-tight tracking-[0.08em] text-black/75">
+                  {hoverSizes.map((size) => (
+                    <SizeMarker key={size} size={size} />
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  aria-label={`Quick view ${product.alt}`}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    setQuickViewOpen(true)
+                  }}
+                  className="group/quickview shrink-0 whitespace-nowrap text-[14px] font-normal uppercase leading-tight tracking-[0.08em] text-black"
+                >
+                  <span className="inline-block bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_1px] bg-left-bottom bg-no-repeat transition-[background-size] duration-200 group-hover/quickview:bg-[length:100%_1px]">
+                    Quick View
+                  </span>
+                </button>
               </div>
 
               <button
@@ -186,6 +210,15 @@ export function ProductCardView({
           </div>
         </div>
       </div>
+
+      <ProductQuickViewModal
+        key={`${product.id}-${quickViewOpen ? "open" : "closed"}-${activeImageIndex}`}
+        open={quickViewOpen}
+        onOpenChange={setQuickViewOpen}
+        product={featuredProduct}
+        gallery={gallery}
+        initialImageIndex={activeImageIndex}
+      />
     </article>
   )
 }
@@ -205,11 +238,14 @@ export function TrendingSection() {
               type="button"
               aria-pressed={tab.active}
               className={cn(
-                "pb-1 text-[0.75rem] font-medium uppercase tracking-[0.12em] transition-opacity hover:opacity-70 sm:text-[0.875rem]",
-                tab.active && "border-b border-black"
+                "group inline-flex flex-col items-start pb-0.5 text-[0.75rem] font-medium uppercase leading-none tracking-[0.12em] transition-opacity hover:opacity-70 sm:text-[0.875rem]"
               )}
             >
-              {tab.label}
+              <span>{tab.label}</span>
+              <span
+                aria-hidden="true"
+                className="mt-[2px] h-px w-full origin-left scale-x-0 bg-black transition-transform duration-200 group-hover:scale-x-100"
+              />
             </button>
           ))}
         </div>

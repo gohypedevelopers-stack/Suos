@@ -71,6 +71,7 @@ function NavLink({
   selected = false,
   mobile = false,
   onMouseEnter,
+  onMouseLeave,
   onFocus,
   onBlur,
   onClick,
@@ -83,14 +84,13 @@ function NavLink({
   selected?: boolean
   mobile?: boolean
   onMouseEnter?: MouseEventHandler<HTMLAnchorElement>
+  onMouseLeave?: MouseEventHandler<HTMLAnchorElement>
   onFocus?: FocusEventHandler<HTMLAnchorElement>
   onBlur?: FocusEventHandler<HTMLAnchorElement>
   onClick?: MouseEventHandler<HTMLAnchorElement>
   ariaHaspopup?: "menu"
   ariaExpanded?: boolean
 }) {
-  const isEmphasized = active
-
   return (
     <Link
       href={href}
@@ -98,20 +98,28 @@ function NavLink({
       aria-haspopup={ariaHaspopup}
       aria-expanded={ariaExpanded}
       onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       onFocus={onFocus}
       onBlur={onBlur}
       onClick={onClick}
       className={cn(
-        "relative whitespace-nowrap uppercase text-current transition-[color,opacity] duration-300 ease-out",
+        "group/link inline-flex flex-col items-start whitespace-nowrap uppercase pb-0.5 text-current transition-[color,opacity] duration-300 ease-out",
         mobile
           ? "flex-none text-[0.75rem] tracking-[0.18em]"
           : "text-[0.875rem] tracking-[0.12em]",
-        isEmphasized ? "opacity-100" : "hover:opacity-60",
-        isEmphasized &&
-          "after:absolute after:left-0 after:top-full after:mt-1.5 after:h-px after:w-full after:bg-current after:content-['']"
+        active ? "opacity-100" : "hover:opacity-60"
       )}
     >
-      {children}
+      <span className="leading-none">{children}</span>
+      <span
+        aria-hidden="true"
+        className={cn(
+          "mt-[1px] h-px w-full origin-left bg-current transition-transform duration-200",
+          active
+            ? "scale-x-100"
+            : "scale-x-0 group-hover/link:scale-x-100 group-focus-visible/link:scale-x-100"
+        )}
+      />
     </Link>
   )
 }
@@ -174,9 +182,13 @@ function MenuSection({
               type="button"
               tabIndex={open ? 0 : -1}
               onClick={onClose}
-              className="block text-left text-[0.95rem] leading-[1.55] tracking-[0.01em] transition-opacity hover:opacity-70 focus-visible:outline-none focus-visible:opacity-70"
+              className="group/item inline-flex flex-col items-start text-left text-[0.95rem] leading-none tracking-[0.01em] text-black focus-visible:outline-none hover:text-black"
             >
-              {item}
+              <span className="leading-none">{item}</span>
+              <span
+                aria-hidden="true"
+                className="mt-[1px] h-px w-full origin-left scale-x-0 bg-current transition-transform duration-200 group-hover/item:scale-x-100 group-focus-visible/item:scale-x-100"
+              />
             </button>
           </li>
         ))}
@@ -281,18 +293,52 @@ export function Navbar({
   const [activeMenu, setActiveMenu] = useState<ActiveMenu | null>(null)
   const [isHovered, setIsHovered] = useState(false)
   const scrollFrameRef = useRef<number | null>(null)
+  const menuCloseTimeoutRef = useRef<number | null>(null)
   const headerRef = useRef<HTMLElement | null>(null)
   const announcementHeightRef = useRef(0)
   const hasOpenMenu = Boolean(activeMenu)
   const isInteractiveSurface = isHovered || hasOpenMenu
   const isLightSurface = !isOverlay || isScrolled || isInteractiveSurface
   const tone: "dark" | "light" = isLightSurface ? "dark" : "light"
-  const visualActiveMenu =
-    activeMenu && activeMenu !== "wishlist" ? activeMenu : selectedNav
   const isWishlistOpen = activeMenu === "wishlist"
 
   const openMenu = (menu: NavKey) => {
+    if (menuCloseTimeoutRef.current !== null) {
+      window.clearTimeout(menuCloseTimeoutRef.current)
+      menuCloseTimeoutRef.current = null
+    }
+
+    setIsHovered(true)
     setActiveMenu(menu)
+  }
+
+  const closeMenu = () => {
+    if (menuCloseTimeoutRef.current !== null) {
+      window.clearTimeout(menuCloseTimeoutRef.current)
+      menuCloseTimeoutRef.current = null
+    }
+
+    setIsHovered(false)
+    setActiveMenu(null)
+  }
+
+  const scheduleMenuClose = () => {
+    if (menuCloseTimeoutRef.current !== null) {
+      window.clearTimeout(menuCloseTimeoutRef.current)
+    }
+
+    menuCloseTimeoutRef.current = window.setTimeout(() => {
+      closeMenu()
+    }, 90)
+  }
+
+  const cancelMenuClose = () => {
+    if (menuCloseTimeoutRef.current !== null) {
+      window.clearTimeout(menuCloseTimeoutRef.current)
+      menuCloseTimeoutRef.current = null
+    }
+
+    setIsHovered(true)
   }
 
   const toggleWishlist = () => {
@@ -309,6 +355,10 @@ export function Navbar({
     window.addEventListener("popstate", updateSelectedNav)
 
     return () => {
+      if (menuCloseTimeoutRef.current !== null) {
+        window.clearTimeout(menuCloseTimeoutRef.current)
+        menuCloseTimeoutRef.current = null
+      }
       window.removeEventListener("hashchange", updateSelectedNav)
       window.removeEventListener("popstate", updateSelectedNav)
     }
@@ -374,11 +424,6 @@ export function Navbar({
   const headerContent = (
     <header
       ref={headerRef}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => {
-        setIsHovered(false)
-        setActiveMenu(null)
-      }}
       className={cn(
         "main-navbar navbar-shell border-b",
         isScrolled ? "translate-y-0" : "translate-y-[var(--announcement-height)]",
@@ -392,17 +437,19 @@ export function Navbar({
         className
       )}
     >
-      <div className="h-full w-full px-4 sm:px-6 lg:px-8">
+      <div className="relative h-full w-full px-4 sm:px-6 lg:px-8">
         <div className="hidden h-full lg:grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-0">
           <nav
             aria-label="Primary"
             className="flex items-center gap-10 justify-self-start"
+            onMouseEnter={cancelMenuClose}
+            onMouseLeave={scheduleMenuClose}
           >
             {primaryNav.map((item) => (
               <NavLink
                 key={item.key}
                 href={item.href}
-                active={visualActiveMenu === item.key}
+                active={activeMenu === item.key}
                 selected={selectedNav === item.key}
                 ariaHaspopup="menu"
                 ariaExpanded={activeMenu === item.key}
@@ -566,48 +613,50 @@ export function Navbar({
             ))}
           </nav>
         </div>
-      </div>
 
-      <div
-        aria-hidden={!activeMenu}
-        className={cn(
-          "absolute left-0 top-full hidden w-full bg-white text-black shadow-[0_24px_60px_rgba(0,0,0,0.08)] transition-opacity duration-150 ease-out lg:block lg:h-[460px] lg:overflow-hidden",
-        activeMenu
-          ? "pointer-events-auto opacity-100"
-          : "pointer-events-none opacity-0"
-      )}
-    >
-        {activeMenu === "wishlist" ? (
-          <WishlistPanel />
-        ) : (
-          <div className="grid h-full w-full gap-x-14 gap-y-8 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(10rem,12rem)_minmax(14rem,18rem)_minmax(0,1fr)] lg:px-8">
-            <MenuSection
-              title="Featured"
-              items={megaMenuFeatured}
-              open={Boolean(activeMenu)}
-              onClose={() => setActiveMenu(null)}
-            />
+        <div
+          aria-hidden={!activeMenu}
+          className={cn(
+            "absolute left-0 top-full hidden w-full bg-white text-black shadow-[0_24px_60px_rgba(0,0,0,0.08)] transition-opacity duration-150 ease-out lg:block lg:h-[460px] lg:overflow-hidden",
+            activeMenu
+              ? "pointer-events-auto opacity-100"
+              : "pointer-events-none opacity-0"
+          )}
+          onMouseEnter={cancelMenuClose}
+          onMouseLeave={scheduleMenuClose}
+        >
+          {activeMenu === "wishlist" ? (
+            <WishlistPanel />
+          ) : (
+            <div className="grid h-full w-full gap-x-14 gap-y-8 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(10rem,12rem)_minmax(14rem,18rem)_minmax(0,1fr)] lg:px-8">
+              <MenuSection
+                title="Featured"
+                items={megaMenuFeatured}
+                open={Boolean(activeMenu)}
+                onClose={closeMenu}
+              />
 
-            <MenuSection
-              title="Categories"
-              items={megaMenuCategories}
-              open={Boolean(activeMenu)}
-              onClose={() => setActiveMenu(null)}
-            />
+              <MenuSection
+                title="Categories"
+                items={megaMenuCategories}
+                open={Boolean(activeMenu)}
+                onClose={closeMenu}
+              />
 
-            <div className="grid w-full max-w-[652px] min-w-0 grid-cols-2 gap-6 justify-self-end">
-              {megaMenuCards.map((card) => (
-                <MenuCard
-                  key={card.src}
-                  src={card.src}
-                  alt={card.alt}
-                  eyebrow={card.eyebrow}
-                  titleLines={card.titleLines}
-                />
-              ))}
+              <div className="grid w-full max-w-[652px] min-w-0 grid-cols-2 gap-6 justify-self-end">
+                {megaMenuCards.map((card) => (
+                  <MenuCard
+                    key={card.src}
+                    src={card.src}
+                    alt={card.alt}
+                    eyebrow={card.eyebrow}
+                    titleLines={card.titleLines}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <SearchSidebar open={searchOpen} onOpenChange={setSearchOpen} />
