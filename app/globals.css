@@ -180,6 +180,62 @@
   }
 }
 
+@keyframes recommendation-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(calc(-50% - 0.5rem));
+  }
+}
+
+.recommendation-viewport {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.recommendation-viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.quick-view-gallery {
+  scrollbar-width: none;
+}
+
+.quick-view-gallery::-webkit-scrollbar {
+  display: none;
+}
+
+.recommendation-track {
+  display: flex;
+  width: max-content;
+  gap: 1rem;
+  animation: recommendation-scroll 34s linear infinite;
+}
+
+.recommendation-viewport:hover .recommendation-track,
+.recommendation-viewport:focus-visible .recommendation-track {
+  animation-play-state: paused;
+}
+
+.recommendation-card {
+  width: clamp(9rem, calc((100vw - 9rem) / 6), 18rem);
+  flex: 0 0 auto;
+}
+
+@media (max-width: 640px) {
+  .recommendation-card {
+    width: 42vw;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recommendation-track {
+    animation: none;
+  }
+}
+
 .cart-item-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
@@ -213,6 +269,23 @@
 
 .cart-item-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: rgba(255, 255, 255, 0.42);
+}
+
+.filters-panel-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.42) transparent;
+}
+
+.filters-panel-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.filters-panel-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.filters-panel-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.42);
 }
 
 .navbar-shell {

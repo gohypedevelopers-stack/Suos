@@ -94,7 +94,7 @@ function TabLabel({
       type="button"
       aria-pressed={active}
       className={cn(
-        "group inline-flex flex-col items-start pb-0.5 text-[0.75rem] font-medium uppercase leading-none tracking-[0.12em] transition-opacity hover:opacity-70 sm:text-[0.875rem]"
+        "group inline-flex flex-col items-start pb-0.5 text-[22px] font-[500] uppercase leading-none tracking-normal transition-opacity hover:opacity-70"
       )}
     >
       <span>{label}</span>
@@ -110,7 +110,7 @@ export function EditsCarousel() {
   return (
     <section className="w-full bg-white px-4 py-14 text-black sm:px-6 lg:px-8 md:py-16">
       <div className="flex w-full flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-        <h2 className="font-heading text-[clamp(1.7rem,2.2vw,2.6rem)] font-semibold uppercase leading-none tracking-[-0.04em]">
+        <h2 className="font-heading text-[40px] font-[400] uppercase leading-none tracking-[-0.04em]">
           Edits
         </h2>
 

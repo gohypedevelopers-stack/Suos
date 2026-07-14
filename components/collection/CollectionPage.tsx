@@ -1,6 +1,7 @@
 import { CollectionGrid } from "@/components/collection/CollectionGrid"
 import { CollectionBenefitsBar } from "@/components/collection/CollectionBenefitsBar"
 import { CollectionHeader } from "@/components/collection/CollectionHeader"
+import { CollectionRecommendations } from "@/components/collection/CollectionRecommendations"
 
 export function CollectionPage() {
   return (
@@ -12,6 +13,7 @@ export function CollectionPage() {
           <CollectionGrid />
         </div>
 
+        <CollectionRecommendations />
         <CollectionBenefitsBar />
       </section>
     </main>

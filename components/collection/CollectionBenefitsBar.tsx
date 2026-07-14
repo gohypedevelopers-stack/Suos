@@ -22,7 +22,7 @@ export function CollectionBenefitsBar() {
   return (
     <section
       aria-label="Store benefits"
-      className="mt-10 -mx-4 bg-accent px-4 py-7 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"
+      className="-mx-4 bg-accent px-4 py-7 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"
     >
       <ul className="mx-auto grid max-w-[980px] gap-6 sm:grid-cols-3 sm:gap-8">
         {benefits.map(({ icon: Icon, title, description }) => (

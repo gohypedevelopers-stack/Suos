@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { ChevronLeft, ChevronRight, Star, X } from "lucide-react"
+import { Star, X } from "lucide-react"
 import { useEffect, useState } from "react"
 import type { ButtonHTMLAttributes } from "react"
 
@@ -75,9 +75,9 @@ function QuickViewSizeButton({
       type="button"
       aria-pressed={active}
       className={cn(
-        "inline-flex h-10 items-center justify-center border text-[22px] font-medium leading-none transition-[background-color,border-color,color,transform] duration-200 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45",
+        "inline-flex h-[34px] items-center justify-center border text-[22px] font-medium leading-none transition-[background-color,border-color,color,transform] duration-200 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45",
         active
-          ? "border-black bg-black text-white"
+          ? "border-black bg-[#ededed] text-black"
           : "border-black/10 bg-white text-black hover:border-black hover:bg-black/[0.04]",
         "min-w-0 px-3"
       )}
@@ -95,7 +95,7 @@ export function ProductQuickViewModal({
   gallery,
   initialImageIndex = 0,
 }: ProductQuickViewModalProps) {
-  const [activeImageIndex, setActiveImageIndex] = useState(() =>
+  const [activeImageIndex] = useState(() =>
     Math.min(initialImageIndex, Math.max(gallery.length - 1, 0))
   )
   const [selectedColor, setSelectedColor] = useState(product.colorName)
@@ -133,24 +133,10 @@ export function ProductQuickViewModal({
   const activeImage =
     galleryImages[activeImageIndex] ?? galleryImages[0] ?? product.gallery[0]?.src
 
-  const handlePreviousImage = () => {
-    if (galleryImages.length === 0) {
-      return
-    }
-
-    setActiveImageIndex(
-      (currentIndex) =>
-        (currentIndex - 1 + galleryImages.length) % galleryImages.length
-    )
-  }
-
-  const handleNextImage = () => {
-    if (galleryImages.length === 0) {
-      return
-    }
-
-    setActiveImageIndex((currentIndex) => (currentIndex + 1) % galleryImages.length)
-  }
+  const scrollableGallery = [
+    activeImage,
+    ...galleryImages.filter((_, index) => index !== activeImageIndex),
+  ].filter((image): image is string => Boolean(image))
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -159,73 +145,58 @@ export function ProductQuickViewModal({
         overlayClassName="bg-black/80 backdrop-blur-[1px]"
         onClick={(event) => event.stopPropagation()}
         onPointerDown={(event) => event.stopPropagation()}
-        className="!gap-0 !w-[min(96vw,956px)] !max-w-none max-h-[calc(100dvh-1.25rem)] overflow-hidden rounded-none border-0 bg-white p-0 text-black ring-0 sm:max-w-none"
+        className="!w-[min(96vw,908px)] !max-w-none max-h-[calc(100dvh-1.25rem)] overflow-hidden rounded-none border-0 bg-white p-0 text-black ring-0 sm:max-w-none"
       >
         <DialogTitle className="sr-only">{product.title} quick view</DialogTitle>
         <DialogDescription className="sr-only">
           Quick view dialog for {product.title}
         </DialogDescription>
 
-        <div className="grid h-[min(88dvh,520px)] grid-cols-1 lg:grid-cols-[minmax(0,0.94fr)_minmax(0,1.06fr)]">
-          <div className="relative min-h-[360px] bg-[#111] lg:min-h-0">
-            <Image
-              key={`${activeImage ?? ""}-${activeImageIndex}`}
-              src={activeImage ?? product.gallery[0]?.src ?? ""}
-              alt={product.title}
-              fill
-              priority
-              sizes="(max-width: 1024px) 100vw, 46vw"
-              className="object-cover object-center"
-            />
-
-            {galleryImages.length > 1 ? (
-              <div className="absolute inset-x-0 top-1/2 flex -translate-y-1/2 items-center justify-between px-3 text-white">
-                <button
-                    type="button"
-                    aria-label="Previous image"
-                    onClick={handlePreviousImage}
-                    className="inline-flex size-10 items-center justify-center text-white/90 transition-opacity hover:opacity-70"
+        <div className="grid h-[min(94dvh,598px)] grid-cols-1 gap-0 p-3 lg:grid-cols-[353px_minmax(0,1fr)] lg:gap-10">
+          <div
+            aria-label={`${product.title} image gallery`}
+            className="quick-view-gallery min-h-0 overflow-y-auto bg-[#111]"
+            tabIndex={0}
+          >
+            <div className="flex flex-col gap-1">
+              {scrollableGallery.map((image, index) => (
+                  <figure
+                    key={`${image}-${index}`}
+                    className="relative aspect-[353/452] shrink-0 overflow-hidden bg-[#111]"
                   >
-                  <ChevronLeft className="size-7 stroke-[1.8]" />
-                </button>
-
-                <button
-                  type="button"
-                  aria-label="Next image"
-                  onClick={handleNextImage}
-                  className="inline-flex size-10 items-center justify-center text-white/90 transition-opacity hover:opacity-70"
-                >
-                  <ChevronRight className="size-7 stroke-[1.8]" />
-                </button>
-              </div>
-            ) : null}
-
-            <div className="absolute bottom-3 left-3 bg-white/75 px-2 py-1 text-[0.85rem] font-medium text-black">
-              {galleryImages.length > 0 ? activeImageIndex + 1 : 1}/
-              {galleryImages.length || 1}
+                    <Image
+                      src={image}
+                      alt={`${product.title} view ${index + 1}`}
+                      fill
+                      priority={index === 0}
+                      sizes="348px"
+                      className="object-cover object-center"
+                    />
+                  </figure>
+                ))}
             </div>
           </div>
 
-          <div className="relative min-h-0 overflow-hidden px-5 py-3.5 sm:px-6 sm:py-3.5 lg:px-7 lg:py-4">
+          <div className="relative min-h-0 overflow-hidden px-0 pb-3 pt-5 lg:pr-2">
             <DialogClose asChild>
               <button
                 type="button"
                 aria-label="Close quick view"
-                className="absolute right-4 top-3 inline-flex size-8 items-center justify-center text-[1.1rem] font-semibold leading-none text-black transition-opacity hover:opacity-70"
+                className="absolute right-0 top-0 inline-flex size-6 items-center justify-center text-[1.1rem] font-semibold leading-none text-black transition-opacity hover:opacity-70"
               >
                 <X className="size-5 stroke-[2.1]" />
               </button>
             </DialogClose>
 
-            <div className="space-y-2.5 pr-3">
-              <p className="text-[14px] font-normal uppercase tracking-[0.22em] text-black/45">
+            <div className="pr-0">
+              <p className="text-[14px] font-normal uppercase leading-[17px] tracking-normal text-black/45">
                 {product.editLabel}
               </p>
-              <h2 className="font-heading text-[40px] font-normal uppercase leading-[0.95] tracking-[-0.06em]">
+              <h2 className="mt-1 font-heading text-[40px] font-[400] uppercase leading-[0.95] tracking-[-0.06em]">
                 {product.title}
               </h2>
 
-              <div className="flex flex-wrap items-end justify-between gap-3">
+              <div className="mt-5 flex flex-wrap items-end justify-between gap-3">
                 <div className="flex items-end gap-3">
                   <span className="text-[18px] font-normal leading-none text-black/45 line-through">
                     {product.originalPrice}
@@ -247,7 +218,7 @@ export function ProductQuickViewModal({
                 </div>
               </div>
 
-              <p className="max-w-[36rem] font-sans text-[16px] font-normal leading-[1.5] text-black/65">
+              <p className="mt-5 max-w-[28rem] font-sans text-[16px] font-normal leading-[1.35] text-black/65">
                 {product.description}{" "}
                 <Link
                   href="/products#details"
@@ -257,7 +228,7 @@ export function ProductQuickViewModal({
                 </Link>
               </p>
 
-              <section className="space-y-3">
+              <section className="mt-[54px] space-y-3">
                 <p className="text-[22px] font-medium text-black/45">
                   Color:{" "}
                   <span className="font-medium text-black">{selectedColor}</span>
@@ -270,7 +241,7 @@ export function ProductQuickViewModal({
                 />
               </section>
 
-              <section className="space-y-3">
+              <section className="mt-5 space-y-3">
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-[18px] font-normal text-black/45">
                     Size:{" "}
@@ -299,12 +270,12 @@ export function ProductQuickViewModal({
 
               <button
                 type="button"
-                className="flex h-12 w-full items-center justify-center bg-black text-[22px] font-medium uppercase tracking-[0.14em] text-white transition-opacity hover:opacity-90"
+                className="mt-12 flex h-10 w-full items-center justify-center bg-black text-[22px] font-medium uppercase tracking-[0.14em] text-white transition-opacity hover:opacity-90"
               >
                 Add To Cart
               </button>
 
-              <div className="pt-0 text-center">
+              <div className="mt-3 text-center">
                 <Link
                   href="/products"
                   className="text-[16px] font-normal uppercase tracking-[0.08em] text-black/55 underline underline-offset-4 transition-opacity hover:opacity-70"

@@ -43,24 +43,23 @@ const denimSlides: DenimSlide[] = [
 
 function DenimSlideCard({ slide }: { slide: DenimSlide }) {
   return (
-    <article className="relative h-[500px] w-full overflow-hidden bg-white sm:h-[580px] md:h-[640px] lg:h-[700px]">
+    <article className="relative h-[460px] w-full overflow-hidden bg-white sm:h-[530px] md:h-[590px] lg:h-[640px]">
       <Image
         src={slide.image}
         alt={slide.alt}
         fill
         sizes="(max-width: 640px) 92vw, (max-width: 1024px) 64vw, 627px"
         className="object-contain object-center"
-        priority={false}
       />
 
-      <div className="absolute inset-x-5 bottom-5 z-10 max-w-[11rem] text-black">
-        <h3 className="text-[0.875rem] font-semibold uppercase leading-none tracking-[-0.02em]">
+      <div className="absolute inset-x-5 bottom-5 z-10 w-fit max-w-none text-black">
+        <h3 className="whitespace-nowrap text-[22px] font-[500] uppercase leading-none tracking-[-0.02em]">
           {slide.title}
         </h3>
 
         <Link
           href="/collections"
-          className="mt-2 inline-flex h-7 items-center justify-center border border-black px-3 text-[0.5rem] uppercase tracking-[0.12em] transition-colors hover:bg-black hover:text-white"
+          className="mt-2 inline-flex h-[42px] w-full items-center justify-center border border-black px-3 text-[16px] uppercase tracking-normal transition-colors hover:bg-black hover:text-white"
         >
           Explore Collection
         </Link>
@@ -71,7 +70,7 @@ function DenimSlideCard({ slide }: { slide: DenimSlide }) {
 
 export function DenimCarousel() {
   return (
-    <section className="w-full bg-white px-4 pb-16 pt-4 text-black sm:px-6 lg:px-8 md:pb-20">
+    <section className="w-full bg-white px-4 pb-12 pt-4 text-black sm:px-6 md:pb-16 lg:px-8">
       <Carousel
         opts={{
           align: "start",

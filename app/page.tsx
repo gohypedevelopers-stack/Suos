@@ -2,6 +2,7 @@ import { Hero } from "@/components/home/Hero"
 import { DenimCarousel } from "@/components/home/DenimCarousel"
 import { DenimEditorialSection } from "@/components/home/DenimEditorialSection"
 import { MotionBannerSection } from "@/components/home/MotionBannerSection"
+import { ProductBannerSection } from "@/components/home/ProductBannerSection"
 import { LookbookCarousel } from "@/components/home/LookbookCarousel"
 import { LaunchOfferBar } from "@/components/home/LaunchOfferBar"
 import { EditsCarousel } from "@/components/home/EditsCarousel"
@@ -20,6 +21,7 @@ export default function Home() {
       <EditsCarousel />
       <DenimEditorialSection />
       <LookbookCarousel />
+      <ProductBannerSection />
     </main>
   )
 }
