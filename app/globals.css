@@ -168,6 +168,29 @@
   *::-webkit-scrollbar-thumb:hover {
     background: var(--brand-black);
   }
+
+  @media print {
+    html,
+    body {
+      overflow: visible !important;
+      scrollbar-width: none !important;
+    }
+
+    *,
+    *::before,
+    *::after {
+      scrollbar-width: none !important;
+    }
+
+    *::-webkit-scrollbar,
+    *::-webkit-scrollbar-track,
+    *::-webkit-scrollbar-thumb {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+      background: transparent !important;
+    }
+  }
 }
 
 @keyframes marquee {

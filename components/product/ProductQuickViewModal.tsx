@@ -188,7 +188,7 @@ export function ProductQuickViewModal({
               </button>
             </DialogClose>
 
-            <div className="pr-0">
+            <div className="pr-5">
               <p className="text-[14px] font-normal uppercase leading-[17px] tracking-normal text-black/45">
                 {product.editLabel}
               </p>
@@ -218,7 +218,7 @@ export function ProductQuickViewModal({
                 </div>
               </div>
 
-              <p className="mt-5 max-w-[28rem] font-sans text-[16px] font-normal leading-[1.35] text-black/65">
+              <p className="mt-5 max-w-none font-sans text-[16px] font-normal leading-[1.35] text-black/65">
                 {product.description}{" "}
                 <Link
                   href="/products#details"
@@ -228,7 +228,7 @@ export function ProductQuickViewModal({
                 </Link>
               </p>
 
-              <section className="mt-[54px] space-y-3">
+              <section className="mt-[34px] space-y-3">
                 <p className="text-[22px] font-medium text-black/45">
                   Color:{" "}
                   <span className="font-medium text-black">{selectedColor}</span>
@@ -270,7 +270,7 @@ export function ProductQuickViewModal({
 
               <button
                 type="button"
-                className="mt-12 flex h-10 w-full items-center justify-center bg-black text-[22px] font-medium uppercase tracking-[0.14em] text-white transition-opacity hover:opacity-90"
+                className="mt-12 flex h-10 w-full items-center justify-center bg-black text-[22px] font-[500] uppercase tracking-normal text-white transition-opacity hover:opacity-90"
               >
                 Add To Cart
               </button>
@@ -278,7 +278,7 @@ export function ProductQuickViewModal({
               <div className="mt-3 text-center">
                 <Link
                   href="/products"
-                  className="text-[16px] font-normal uppercase tracking-[0.08em] text-black/55 underline underline-offset-4 transition-opacity hover:opacity-70"
+                  className="text-[16px] font-normal uppercase tracking-normal text-black/55 underline decoration-current decoration-1 underline-offset-4 transition-opacity hover:opacity-70"
                 >
                   View Full Details
                 </Link>

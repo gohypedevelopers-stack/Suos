@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { akzidenzGrotesk, georgia, holiday } from "@/lib/fonts";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
+import { SiteChrome } from "@/components/SiteChrome";
 
 export const metadata: Metadata = {
   title: "SUOS",
@@ -32,11 +31,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-white text-black">
         <div className="relative flex flex-1 flex-col overflow-x-hidden">
-          <SiteHeader />
-          <div className="flex flex-1 flex-col pt-[var(--header-stack-height)]">
-            {children}
-          </div>
-          <SiteFooter />
+          <SiteChrome>{children}</SiteChrome>
         </div>
       </body>
     </html>
