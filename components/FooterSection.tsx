@@ -14,14 +14,14 @@ const companyLinks = [
 
 const quickLinks = [
   { label: "My Account", href: "/#account" },
-  { label: "Returns/ Exchange", href: "/#returns" },
-  { label: "Order Tracking", href: "/#tracking" },
+  { label: "Returns/ Exchange", href: "/returns" },
+  { label: "Order Tracking", href: "/track-order" },
 ] as const
 
 const bottomLinks = [
   { label: "Privacy Policy", href: "/#privacy" },
   { label: "Terms of Use", href: "/#terms" },
-  { label: "Returns", href: "/#returns" },
+  { label: "Returns", href: "/returns" },
 ] as const
 
 function FooterLink({

@@ -517,6 +517,13 @@ export function Navbar({
               />
             </div>
 
+            <Link
+              href="/contact"
+              className="shrink-0 text-[0.875rem] uppercase tracking-[0.04em] transition-opacity hover:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current/30"
+            >
+              Contact us
+            </Link>
+
             <IconButton
               label="Cart"
               tone={tone}
@@ -535,9 +542,13 @@ export function Navbar({
               >
                 <Heart className="size-[18px] stroke-[1.7]" />
               </IconButton>
-              <IconButton label="Account" tone={tone}>
+              <Link
+                href="/login"
+                aria-label="Account"
+                className="inline-flex size-9 items-center justify-center text-current transition-[color,opacity] duration-300 ease-out hover:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current/30"
+              >
                 <UserRound className="size-[18px] stroke-[1.7]" />
-              </IconButton>
+              </Link>
             </div>
           </div>
         </div>
@@ -587,9 +598,13 @@ export function Navbar({
               >
                 <ShoppingBag className="size-[18px] stroke-[1.7]" />
               </IconButton>
-              <IconButton label="Account" tone={tone}>
+              <Link
+                href="/login"
+                aria-label="Account"
+                className="inline-flex size-9 items-center justify-center text-current transition-[color,opacity] duration-300 ease-out hover:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current/30"
+              >
                 <UserRound className="size-[18px] stroke-[1.7]" />
-              </IconButton>
+              </Link>
             </div>
           </div>
 
