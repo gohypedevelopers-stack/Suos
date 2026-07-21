@@ -10,6 +10,8 @@ import {
 } from "lucide-react"
 
 import { AppSidebar } from "@/components/admin-dashboard/app-sidebar"
+import { customers } from "@/components/admin-dashboard/customer-data"
+import { CustomerTableRows } from "@/components/admin-dashboard/customer-table-rows"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { TooltipProvider } from "@/components/ui/tooltip"
 
@@ -17,23 +19,6 @@ export const metadata: Metadata = {
   title: "Customers | SUOS Admin",
   description: "Review customer profiles, orders, and spending in SUOS.",
 }
-
-const customers = [
-  {
-    name: "MOHD KAIF",
-    emailSubscription: "Not subscribed",
-    location: "New Delhi DL, India",
-    orders: 0,
-    amountSpent: "₹0.00",
-  },
-  {
-    name: "HARDEEP HARNAL",
-    emailSubscription: "Subscribed",
-    location: "MOHALI PB, India",
-    orders: 1,
-    amountSpent: "₹8,258.82",
-  },
-]
 
 export default function CustomersPage() {
   return (
@@ -123,41 +108,7 @@ export default function CustomersPage() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {customers.map((customer) => (
-                      <tr key={customer.name} className="hover:bg-black/[0.02]">
-                        <td className="border-b border-black/10 px-3 py-2">
-                          <input
-                            type="checkbox"
-                            aria-label={`Select ${customer.name}`}
-                          />
-                        </td>
-                        <td className="border-b border-black/10 px-3 py-2">
-                          <span className="font-medium">{customer.name}</span>
-                        </td>
-                        <td className="border-b border-black/10 px-3 py-2">
-                          <span
-                            className={`rounded-full px-2 py-1 ${
-                              customer.emailSubscription === "Not subscribed"
-                                ? "bg-black/5 text-black/70"
-                                : "bg-emerald-100 text-emerald-800"
-                            }`}
-                          >
-                            {customer.emailSubscription}
-                          </span>
-                        </td>
-                        <td className="border-b border-black/10 px-3 py-2">
-                          {customer.location}
-                        </td>
-                        <td className="border-b border-black/10 px-3 py-2 text-right">
-                          {customer.orders}
-                        </td>
-                        <td className="border-b border-black/10 px-3 py-2 text-right">
-                          {customer.amountSpent}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
+                  <tbody><CustomerTableRows customers={customers} /></tbody>
                 </table>
               </div>
             </section>

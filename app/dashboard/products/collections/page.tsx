@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Image from "next/image"
+import Link from "next/link"
 import {
   ChevronsUpDown,
   Columns3,
@@ -24,7 +25,7 @@ const collections = [
   ["SANDALS", "product4.png", "37"],
   ["LOAFERS", "product5.png", "22"],
   ["BOOTS", "product6.png", "12"],
-  ["MORE FROM EVRYDAE", "product7.png", "6"],
+  ["MORE FROM SUOS", "product7.png", "6"],
   ["NEW DROP", "product8.png", "13"],
   ["BEST SELLERS", "product9.png", "13"],
   ["JEANS", "product10.png", "2"],
@@ -47,13 +48,13 @@ export default function CollectionsPage() {
                 Collections
               </h1>
 
-              <button
-                type="button"
+              <Link
+                href="/dashboard/products/collections/new"
                 className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-black px-3 text-xs font-medium text-white hover:bg-black/80"
               >
                 <Plus className="size-3.5" />
                 Add collection
-              </button>
+              </Link>
             </div>
 
             <section className="mt-3 overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm">

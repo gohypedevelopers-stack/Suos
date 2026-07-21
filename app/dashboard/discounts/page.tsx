@@ -12,6 +12,7 @@ import {
 } from "lucide-react"
 
 import { AppSidebar } from "@/components/admin-dashboard/app-sidebar"
+import { CreateDiscountDialog } from "@/components/admin-dashboard/create-discount-dialog"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { TooltipProvider } from "@/components/ui/tooltip"
 
@@ -71,12 +72,7 @@ export default function DiscountsPage() {
                   <Download className="size-3.5" />
                   Export
                 </button>
-                <button
-                  type="button"
-                  className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-black px-3 text-xs font-medium text-white hover:bg-black/80"
-                >
-                  Create discount
-                </button>
+                <CreateDiscountDialog />
               </div>
             </div>
 

@@ -86,7 +86,7 @@ export default function OrdersPage() {
                         <td className="border-b border-black/10 px-3 py-2.5 font-medium">{order}</td>
                         <td className="border-b border-black/10 px-3 py-2.5">{date}</td>
                         <td className="border-b border-black/10 px-3 py-2.5">{customer}</td>
-                        <td className="border-b border-black/10 px-3 py-2.5">EVRYDAE</td>
+                        <td className="border-b border-black/10 px-3 py-2.5">SUOS</td>
                         <td className="border-b border-black/10 px-3 py-2.5 text-right">{total}</td>
                         <td className="border-b border-black/10 px-3 py-2.5"><span className={`rounded-md px-2 py-1 ${payment === "Paid" ? "bg-black/10" : "bg-amber-200"}`}>{payment}</span></td>
                         <td className="border-b border-black/10 px-3 py-2.5"><span className="rounded-md bg-yellow-200 px-2 py-1">Unfulfilled</span></td>

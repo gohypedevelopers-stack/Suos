@@ -138,7 +138,7 @@ export default async function AbandonedCheckoutDetailPage({
                 <div className="space-y-4">
                   <DetailCard title="Checkout details">
                     <div className="flex items-center justify-between gap-3">
-                      <p className="text-sm text-black/75">From EVRYDAE</p>
+                      <p className="text-sm text-black/75">From SUOS</p>
                       <button
                         type="button"
                         className="inline-flex items-center gap-1.5 rounded-lg border border-black/15 px-3 py-1.5 text-xs font-medium hover:bg-black/[0.03]"
@@ -154,7 +154,7 @@ export default async function AbandonedCheckoutDetailPage({
                           <Package className="size-4 text-black/65" />
                         </div>
                         <a href="#" className="min-w-0 flex-1 truncate text-black/75 underline underline-offset-2">
-                          EVRYDAE VARSITY MESH POLO
+                          SUOS VARSITY MESH POLO
                         </a>
                         <span className="text-black/75 line-through">₹2,499.00</span>
                         <span className="text-black/75">₹2,249.10×2</span>
