@@ -64,7 +64,7 @@ export function ProductSummary({
   )
 
   return (
-    <aside className="self-start">
+    <aside className="self-start xl:sticky xl:top-[calc(var(--main-navbar-height)+1.5rem)]">
       <div className="space-y-5 text-black xl:w-[573px] xl:max-w-[573px] xl:justify-self-end">
         <div className="space-y-1">
           <p className="text-[14px] font-medium uppercase tracking-[0.22em] text-black/45">
@@ -179,7 +179,7 @@ export function ProductSummary({
 
         <button
           type="button"
-          className="flex h-12 w-full items-center justify-center border border-black bg-white text-[22px] font-medium uppercase tracking-[0.14em] transition-[background-color,color] duration-200 ease-out hover:bg-black hover:text-white"
+          className="flex h-12 w-full items-center justify-center border border-black bg-white text-[22px] font-medium uppercase transition-[background-color,color] duration-200 ease-out hover:bg-black hover:text-white"
         >
           Add To Cart
         </button>

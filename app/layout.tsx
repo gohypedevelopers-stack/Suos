@@ -30,7 +30,7 @@ export default function RootLayout({
       )}
     >
       <body className="min-h-full flex flex-col bg-white text-black">
-        <div className="relative flex flex-1 flex-col overflow-x-hidden">
+        <div className="relative flex flex-1 flex-col overflow-x-clip">
           <SiteChrome>{children}</SiteChrome>
         </div>
       </body>
