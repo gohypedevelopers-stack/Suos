@@ -213,6 +213,16 @@
   }
 }
 
+@keyframes denim-carousel-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(calc(-50% - 0.5rem));
+  }
+}
+
 .recommendation-viewport {
   overflow-x: auto;
   scrollbar-width: none;
@@ -242,6 +252,24 @@
   animation-play-state: paused;
 }
 
+.continuous-carousel-viewport {
+  overflow: hidden;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.continuous-carousel-track {
+  display: flex;
+  width: max-content;
+  gap: 1rem;
+  will-change: transform;
+}
+
+.continuous-carousel-viewport[data-dragging="true"] {
+  cursor: grabbing;
+}
+
 .recommendation-card {
   width: clamp(9rem, calc((100vw - 9rem) / 6), 18rem);
   flex: 0 0 auto;
@@ -257,6 +285,7 @@
   .recommendation-track {
     animation: none;
   }
+
 }
 
 .cart-item-scrollbar {

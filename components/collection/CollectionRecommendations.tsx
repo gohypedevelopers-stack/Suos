@@ -1,10 +1,25 @@
+"use client"
+
 import Image from "next/image"
 import Link from "next/link"
 
 import { trendingProducts } from "@/components/product/productData"
+import { useContinuousDraggableCarousel } from "@/components/home/useContinuousDraggableCarousel"
 
 export function CollectionRecommendations() {
   const products = trendingProducts.slice(0, 6)
+  const {
+    viewportRef,
+    trackRef,
+    onPointerEnter,
+    onPointerLeave,
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
+    onPointerCancel,
+  } = useContinuousDraggableCarousel({
+    slideCount: products.length,
+  })
 
   return (
     <section
@@ -15,7 +30,7 @@ export function CollectionRecommendations() {
         <div className="flex items-end justify-between gap-6">
           <h2
             id="collection-recommendations-heading"
-            className="font-heading text-[clamp(1.5rem,2.4vw,2.35rem)] font-semibold uppercase leading-none tracking-[-0.04em]"
+            className="font-heading text-[40px] font-normal uppercase leading-none tracking-[-0.04em]"
           >
             You May Also Like
           </h2>
@@ -28,14 +43,26 @@ export function CollectionRecommendations() {
           </Link>
         </div>
 
-        <div className="recommendation-viewport mt-7" tabIndex={0}>
-          <div className="recommendation-track">
-            {[...products, ...products].map((product, index) => (
+        <div
+          ref={viewportRef}
+          className="continuous-carousel-viewport mt-7"
+          tabIndex={0}
+          onPointerEnter={onPointerEnter}
+          onPointerLeave={onPointerLeave}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerCancel}
+        >
+          <div ref={trackRef} className="continuous-carousel-track">
+            {[...products, ...products, ...products].map((product, index) => (
               <Link
                 key={`${product.id}-${index}`}
                 href="/products"
                 className="recommendation-card group"
                 aria-label={`View ${product.alt}`}
+                aria-hidden={index >= products.length}
+                tabIndex={index >= products.length ? -1 : undefined}
               >
                 <div className="relative aspect-[4/5] overflow-hidden bg-[#e7e7e4]">
                   <Image

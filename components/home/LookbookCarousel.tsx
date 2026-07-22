@@ -1,11 +1,9 @@
+"use client"
+
 import Image from "next/image"
 
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel"
 import { cn } from "@/lib/utils"
+import { useContinuousDraggableCarousel } from "./useContinuousDraggableCarousel"
 
 type LookbookSlide = {
   id: string
@@ -65,6 +63,8 @@ const lookbookSlides: LookbookSlide[] = [
   },
 ]
 
+const loopingLookbookSlides = [...lookbookSlides, ...lookbookSlides, ...lookbookSlides]
+
 function PlayBadge() {
   return (
     <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
@@ -77,7 +77,7 @@ function PlayBadge() {
 
 function LookbookCard({ slide }: { slide: LookbookSlide }) {
   return (
-    <div className="bg-black/70 p-px">
+    <div className="w-[82vw] shrink-0 bg-black/70 p-px sm:w-[40vw] md:w-[28vw] lg:w-[16.2vw]">
       <article className="group relative aspect-[7/12] overflow-hidden bg-[#e6e8eb]">
         <Image
           src={slide.image}
@@ -85,7 +85,7 @@ function LookbookCard({ slide }: { slide: LookbookSlide }) {
           fill
           sizes="(max-width: 640px) 82vw, (max-width: 1024px) 36vw, (max-width: 1280px) 18vw, 16vw"
           className={cn(
-            "object-cover transition-transform duration-500 group-hover:scale-[1.015]",
+            "pointer-events-none object-cover transition-transform duration-500 group-hover:scale-[1.015]",
             slide.imageClassName
           )}
         />
@@ -97,30 +97,42 @@ function LookbookCard({ slide }: { slide: LookbookSlide }) {
 }
 
 export function LookbookCarousel() {
+  const {
+    viewportRef,
+    trackRef,
+    onPointerEnter,
+    onPointerLeave,
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
+    onPointerCancel,
+  } = useContinuousDraggableCarousel({
+    slideCount: lookbookSlides.length,
+  })
+
   return (
-    <section className="w-full bg-white px-4 py-10 text-black sm:px-6 lg:px-8">
+    <section className="w-full bg-white py-10 text-black">
       <h2 className="sr-only">Lookbook carousel</h2>
 
-      <Carousel
-        opts={{
-          align: "start",
-          loop: false,
-          dragFree: true,
-        }}
-        className="w-full select-none cursor-grab active:cursor-grabbing"
+      <div
+        ref={viewportRef}
+        className="continuous-carousel-viewport"
         aria-label="Lookbook carousel"
+        onPointerEnter={onPointerEnter}
+        onPointerLeave={onPointerLeave}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerCancel}
       >
-        <CarouselContent>
-          {lookbookSlides.map((slide) => (
-            <CarouselItem
-              key={slide.id}
-              className="basis-[82%] sm:basis-[40%] md:basis-[28%] lg:basis-[16.2%]"
-            >
+        <div ref={trackRef} className="continuous-carousel-track">
+          {loopingLookbookSlides.map((slide, index) => (
+            <div key={`${slide.id}-${index}`} aria-hidden={index >= lookbookSlides.length}>
               <LookbookCard slide={slide} />
-            </CarouselItem>
+            </div>
           ))}
-        </CarouselContent>
-      </Carousel>
+        </div>
+      </div>
     </section>
   )
 }

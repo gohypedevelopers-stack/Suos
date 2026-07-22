@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 
 const companyLinks = [
   { label: "About Us", href: "/#about" },
+  { label: "Contact Us", href: "/contact" },
   { label: "Help", href: "/#help" },
   { label: "Chat With Us", href: "/#chat" },
   { label: "Privacy Policy", href: "/#privacy" },

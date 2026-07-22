@@ -27,7 +27,7 @@ function ColorSwatches({ swatches }: { swatches: string[] }) {
       {swatches.map((swatch) => (
         <span
           key={swatch}
-          className="group/swatch relative inline-flex flex-col items-center pb-0.5"
+          className="group/swatch relative inline-flex cursor-pointer flex-col items-center pb-0.5"
         >
           <span
             className="size-[15px] border border-black/10"
@@ -45,7 +45,7 @@ function ColorSwatches({ swatches }: { swatches: string[] }) {
 
 function SizeMarker({ size }: { size: string }) {
   return (
-    <span className="group/size relative inline-flex flex-col items-center pb-0.5">
+    <span className="group/size relative inline-flex cursor-pointer flex-col items-center pb-0.5">
       <span className="leading-none">{size}</span>
       <span
         aria-hidden="true"
@@ -97,15 +97,19 @@ export function ProductCardView({
           </span>
         ) : null}
 
-        <div
-          aria-hidden="true"
+        <button
+          type="button"
+          aria-label={`Quick view ${product.alt}`}
+          onClick={(event) => {
+            event.stopPropagation()
+            setQuickViewOpen(true)
+          }}
           className={cn(
-            "absolute right-3 top-3 z-10 inline-flex size-5 items-center justify-center border border-black/10 bg-white text-black opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100",
-            expanded && "translate-y-0 opacity-100"
+            "absolute right-3 top-3 z-10 inline-flex size-5 translate-y-0 cursor-pointer items-center justify-center border border-black/20 bg-white text-black opacity-100 transition-colors duration-200 hover:bg-[#e5e5e5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
           )}
         >
           <Plus className="size-3.5 stroke-[2.1]" />
-        </div>
+        </button>
 
         {hasGalleryControls ? (
           <div className="pointer-events-none absolute inset-x-3 top-1/2 z-20 flex -translate-y-1/2 items-center justify-between opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100">
@@ -178,31 +182,17 @@ export function ProductCardView({
             </div>
 
             <div className="flex flex-col gap-2.5">
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
                 <div className="flex flex-wrap items-start gap-1.5 text-[14px] font-normal uppercase leading-tight tracking-[0.08em] text-black/75">
                   {hoverSizes.map((size) => (
                     <SizeMarker key={size} size={size} />
                   ))}
                 </div>
-
-                <button
-                  type="button"
-                  aria-label={`Quick view ${product.alt}`}
-                  onClick={(event) => {
-                    event.stopPropagation()
-                    setQuickViewOpen(true)
-                  }}
-                  className="group/quickview shrink-0 whitespace-nowrap text-[14px] font-normal uppercase leading-tight tracking-[0.08em] text-black"
-                >
-                  <span className="inline-block bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_1px] bg-left-bottom bg-no-repeat transition-[background-size] duration-200 group-hover/quickview:bg-[length:100%_1px]">
-                    Quick View
-                  </span>
-                </button>
               </div>
 
               <button
                 type="button"
-                className="flex h-10 w-full items-center justify-center border border-black bg-white text-[14px] uppercase tracking-[0.14em] transition-colors hover:bg-black hover:text-white"
+                className="flex h-10 w-full cursor-pointer items-center justify-center border border-black bg-white text-[14px] uppercase tracking-[0.14em] transition-colors hover:bg-black hover:text-white"
               >
                 Add To Cart
               </button>
@@ -238,7 +228,7 @@ export function TrendingSection() {
               type="button"
               aria-pressed={tab.active}
               className={cn(
-                "group inline-flex flex-col items-start pb-0.5 text-[22px] font-[500] uppercase leading-none tracking-normal transition-opacity hover:opacity-70"
+                "group inline-flex flex-col items-start pb-0.5 text-[0.875rem] font-[500] uppercase leading-none tracking-normal transition-opacity hover:opacity-70"
               )}
             >
               <span>{tab.label}</span>

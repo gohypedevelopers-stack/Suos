@@ -82,21 +82,16 @@ export function Hero() {
           )
         })}
 
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/8 via-transparent to-black/10" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/8 via-transparent to-black/10" />
       </div>
 
       <div className="relative z-10 flex min-h-[calc(100svh-var(--header-stack-height))] items-end justify-center px-5 pb-20 sm:px-6 lg:pb-[7rem]">
-        <div className="flex flex-col items-center gap-5 text-center">
-          <h1 className="font-heading text-[clamp(2.5rem,5.2vw,5.4rem)] font-semibold uppercase leading-none tracking-[-0.045em] drop-shadow-[0_2px_10px_rgba(0,0,0,0.18)]">
-            Refine Your Style
-          </h1>
-          <Link
-            href="/collections"
-            className="inline-flex items-center justify-center border border-white/85 px-5 py-2.5 text-[0.875rem] uppercase tracking-[0.12em] transition-colors hover:bg-white/10"
-          >
-            Explore Collection
-          </Link>
-        </div>
+        <Link
+          href="/collections"
+          className="inline-flex cursor-pointer items-center justify-center border border-white/85 px-5 py-2.5 text-[0.875rem] uppercase tracking-[0.12em] transition-colors hover:bg-white/10"
+        >
+          Explore Collection
+        </Link>
       </div>
 
       <div className="absolute bottom-6 right-7 z-20 flex items-center gap-2 text-white/85">

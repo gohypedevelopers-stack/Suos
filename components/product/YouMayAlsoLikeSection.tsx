@@ -9,7 +9,7 @@ export function YouMayAlsoLikeSection() {
   return (
     <section className="w-full bg-white px-4 pb-14 pt-10 text-black sm:px-6 lg:px-8">
       <div className="w-full">
-        <h2 className="font-heading text-[40px] font-bold uppercase leading-none tracking-normal">
+        <h2 className="font-heading text-[40px] font-normal uppercase leading-none tracking-[-0.04em]">
           You May Also Like
         </h2>
 

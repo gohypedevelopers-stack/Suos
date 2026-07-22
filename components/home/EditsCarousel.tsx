@@ -94,7 +94,7 @@ function TabLabel({
       type="button"
       aria-pressed={active}
       className={cn(
-        "group inline-flex flex-col items-start pb-0.5 text-[22px] font-[500] uppercase leading-none tracking-normal transition-opacity hover:opacity-70"
+        "group inline-flex flex-col items-start pb-0.5 text-[0.875rem] font-[500] uppercase leading-none tracking-normal transition-opacity hover:opacity-70"
       )}
     >
       <span>{label}</span>

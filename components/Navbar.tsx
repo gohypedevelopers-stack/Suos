@@ -103,10 +103,10 @@ function NavLink({
       onBlur={onBlur}
       onClick={onClick}
       className={cn(
-        "group/link inline-flex flex-col items-start whitespace-nowrap uppercase pb-0.5 text-current transition-[color,opacity] duration-300 ease-out",
+        "group/link inline-flex flex-col items-start whitespace-nowrap pb-0.5 font-[500] uppercase text-current transition-[color,opacity] duration-300 ease-out",
         mobile
           ? "flex-none text-[0.75rem] tracking-[0.18em]"
-          : "text-[0.875rem] tracking-[0.12em]",
+          : "text-[0.875rem] tracking-normal",
         active ? "opacity-100" : "hover:opacity-60"
       )}
     >
@@ -182,13 +182,9 @@ function MenuSection({
               type="button"
               tabIndex={open ? 0 : -1}
               onClick={onClose}
-              className="group/item inline-flex flex-col items-start text-left text-[0.95rem] leading-none tracking-[0.01em] text-black focus-visible:outline-none hover:text-black"
+              className="inline-flex cursor-pointer items-start text-left text-[0.95rem] uppercase leading-none tracking-[0.01em] text-black/55 transition-colors duration-200 hover:text-black focus-visible:text-black focus-visible:outline-none"
             >
-              <span className="leading-none">{item}</span>
-              <span
-                aria-hidden="true"
-                className="mt-[1px] h-px w-full origin-left scale-x-0 bg-current transition-transform duration-200 group-hover/item:scale-x-100 group-focus-visible/item:scale-x-100"
-              />
+              {item}
             </button>
           </li>
         ))}
@@ -298,7 +294,8 @@ export function Navbar({
   const announcementHeightRef = useRef(0)
   const hasOpenMenu = Boolean(activeMenu)
   const isInteractiveSurface = isHovered || hasOpenMenu
-  const isLightSurface = !isOverlay || isScrolled || isInteractiveSurface
+  const isHeroTransparent = isOverlay && !isScrolled && !isInteractiveSurface
+  const isLightSurface = !isHeroTransparent
   const tone: "dark" | "light" = isLightSurface ? "dark" : "light"
   const isWishlistOpen = activeMenu === "wishlist"
 
@@ -429,10 +426,10 @@ export function Navbar({
         isScrolled ? "translate-y-0" : "translate-y-[var(--announcement-height)]",
         isOverlay ? "h-[98px]" : "lg:h-[98px]",
         isInteractiveSurface
-          ? "bg-white text-black border-transparent shadow-none"
+          ? "!bg-white text-black border-transparent shadow-none"
           : isLightSurface
-            ? "bg-white text-black border-black/10 shadow-[0_1px_0_rgba(0,0,0,0.08)]"
-            : "bg-transparent text-white border-transparent shadow-none",
+            ? "!bg-white text-black border-black/10 shadow-[0_1px_0_rgba(0,0,0,0.08)]"
+            : "!bg-transparent text-white border-transparent shadow-none",
         isScrolled && "is-scrolled",
         className
       )}
@@ -516,13 +513,6 @@ export function Navbar({
                 className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 stroke-[1.75] text-current transition-colors duration-300 ease-out"
               />
             </div>
-
-            <Link
-              href="/contact"
-              className="shrink-0 text-[0.875rem] uppercase tracking-[0.04em] transition-opacity hover:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current/30"
-            >
-              Contact us
-            </Link>
 
             <IconButton
               label="Cart"
@@ -632,7 +622,7 @@ export function Navbar({
         <div
           aria-hidden={!activeMenu}
           className={cn(
-            "absolute left-0 top-full hidden w-full bg-white text-black shadow-[0_24px_60px_rgba(0,0,0,0.08)] transition-opacity duration-150 ease-out lg:block lg:h-[460px] lg:overflow-hidden",
+            "absolute left-0 top-full hidden w-full !bg-white text-black shadow-[0_24px_60px_rgba(0,0,0,0.08)] transition-opacity duration-150 ease-out lg:block lg:h-[460px] lg:overflow-hidden",
             activeMenu
               ? "pointer-events-auto opacity-100"
               : "pointer-events-none opacity-0"
