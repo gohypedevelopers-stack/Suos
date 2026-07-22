@@ -10,6 +10,11 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const isAdminDashboard =
     pathname === "/dashboard" || pathname.startsWith("/dashboard/")
+  const isAuthenticationRoute =
+    pathname === "/signin" ||
+    pathname.startsWith("/signin/") ||
+    pathname === "/login" ||
+    pathname.startsWith("/login/")
 
   return (
     <>
@@ -22,7 +27,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
       >
         {children}
       </div>
-      {isAdminDashboard ? null : <SiteFooter />}
+      {isAdminDashboard || isAuthenticationRoute ? null : <SiteFooter />}
     </>
   )
 }

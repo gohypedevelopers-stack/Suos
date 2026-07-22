@@ -136,7 +136,7 @@ export default function LoginPage() {
 
             <p className="mt-5 text-center text-[16px] uppercase">
               New to SUOS?{" "}
-              <Link href="/account/create" className="font-bold underline underline-offset-2">
+              <Link href="/signin" className="font-bold underline underline-offset-2">
                 Create account
               </Link>
             </p>
