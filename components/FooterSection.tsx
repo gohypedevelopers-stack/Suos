@@ -155,7 +155,7 @@ export function FooterSection() {
         </div>
 
         <div className="border-t border-black/55 py-4">
-          <div className="grid gap-3 text-[0.77rem] uppercase tracking-[0.04em] sm:grid-cols-2 lg:grid-cols-4 lg:gap-4">
+          <div className="grid gap-3 text-[13px] font-normal uppercase tracking-[0.04em] sm:grid-cols-2 lg:grid-cols-4 lg:gap-4">
             {bottomLinks.map((link) => (
               <FooterLink key={link.label} href={link.href}>
                 {link.label}
