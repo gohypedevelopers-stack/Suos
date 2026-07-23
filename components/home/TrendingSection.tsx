@@ -92,7 +92,7 @@ export function ProductCardView({
         />
 
         {product.badge ? (
-          <span className="absolute left-3 top-3 z-10 bg-black px-2.5 py-1 text-[12px] font-light uppercase leading-none tracking-[0.16em] text-white">
+          <span className="absolute left-3 top-3 z-10 bg-black px-2.5 py-1 text-[13px] font-light uppercase leading-none tracking-normal text-white">
             {product.badge}
           </span>
         ) : null}
@@ -148,10 +148,10 @@ export function ProductCardView({
           {!expanded ? (
             <div className="flex h-full items-start justify-between gap-2.5 p-3 transition-opacity duration-200 group-hover:opacity-0">
               <div className="min-w-0">
-                <p className="text-[14px] font-normal uppercase leading-tight tracking-[0.08em]">
+                <p className="text-[13px] font-normal uppercase leading-tight tracking-normal">
                   NAME OF THE PRODUCT
                 </p>
-                <p className="mt-0.5 text-[14px] uppercase leading-tight tracking-[0.08em]">
+                <p className="mt-0.5 text-[13px] uppercase leading-tight tracking-normal">
                   PRICE
                 </p>
               </div>
@@ -170,10 +170,10 @@ export function ProductCardView({
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-[14px] font-normal uppercase leading-tight tracking-[0.08em]">
+                <p className="text-[13px] font-normal uppercase leading-tight tracking-normal">
                   NAME OF THE PRODUCT
                 </p>
-                <p className="mt-0.5 text-[14px] uppercase leading-tight tracking-[0.08em]">
+                <p className="mt-0.5 text-[13px] uppercase leading-tight tracking-normal">
                   PRICE
                 </p>
               </div>
@@ -183,7 +183,7 @@ export function ProductCardView({
 
             <div className="flex flex-col gap-2.5">
               <div className="flex items-center gap-3">
-                <div className="flex flex-wrap items-start gap-1.5 text-[14px] font-normal uppercase leading-tight tracking-[0.08em] text-black/75">
+                <div className="flex flex-wrap items-start gap-1.5 text-[13px] font-normal uppercase leading-tight tracking-normal text-black/75">
                   {hoverSizes.map((size) => (
                     <SizeMarker key={size} size={size} />
                   ))}
@@ -192,7 +192,7 @@ export function ProductCardView({
 
               <button
                 type="button"
-                className="flex h-10 w-full cursor-pointer items-center justify-center border border-black bg-white text-[14px] uppercase tracking-[0.14em] transition-colors hover:bg-black hover:text-white"
+                className="flex h-10 w-full cursor-pointer items-center justify-center border border-black bg-white text-[13px] uppercase tracking-normal transition-colors hover:bg-black hover:text-white"
               >
                 Add To Cart
               </button>
@@ -217,7 +217,7 @@ export function TrendingSection() {
   return (
     <section className="w-full bg-white px-4 py-14 text-black sm:px-6 lg:px-8 md:py-16">
       <div className="flex w-full flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-        <h2 className="font-heading text-[40px] font-[400] uppercase leading-none tracking-[-0.04em]">
+        <h2 className="font-heading text-[40px] font-normal uppercase leading-none tracking-[-0.04em]">
           Trending
         </h2>
 
@@ -228,7 +228,7 @@ export function TrendingSection() {
               type="button"
               aria-pressed={tab.active}
               className={cn(
-                "group inline-flex flex-col items-start pb-0.5 text-[0.875rem] font-[500] uppercase leading-none tracking-normal transition-opacity hover:opacity-70"
+                "group inline-flex flex-col items-start pb-0.5 text-[13px] font-normal uppercase leading-none tracking-normal transition-opacity hover:opacity-70"
               )}
             >
               <span>{tab.label}</span>
@@ -251,7 +251,7 @@ export function TrendingSection() {
       <div className="mt-8 flex justify-center">
         <Link
           href="/collections"
-          className="inline-flex h-9 items-center justify-center border border-black px-5 text-[0.6875rem] uppercase tracking-[0.12em] transition-colors hover:bg-black hover:text-white"
+          className="inline-flex h-9 items-center justify-center border border-black px-5 text-[13px] font-normal uppercase tracking-normal transition-colors hover:bg-black hover:text-white"
         >
           View All
         </Link>

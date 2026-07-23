@@ -88,7 +88,7 @@ export function Hero() {
       <div className="relative z-10 flex min-h-[calc(100svh-var(--header-stack-height))] items-end justify-center px-5 pb-20 sm:px-6 lg:pb-[7rem]">
         <Link
           href="/collections"
-          className="inline-flex cursor-pointer items-center justify-center border border-white/85 px-5 py-2.5 text-[0.875rem] uppercase tracking-[0.12em] transition-colors hover:bg-white/10"
+          className="inline-flex cursor-pointer items-center justify-center border border-white/85 px-5 py-2.5 text-[13px] font-normal uppercase tracking-normal transition-colors hover:bg-white/10"
         >
           Explore Collection
         </Link>

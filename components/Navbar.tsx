@@ -103,10 +103,10 @@ function NavLink({
       onBlur={onBlur}
       onClick={onClick}
       className={cn(
-        "group/link inline-flex flex-col items-start whitespace-nowrap pb-0.5 font-[500] uppercase text-current transition-[color,opacity] duration-300 ease-out",
+        "group/link inline-flex flex-col items-start whitespace-nowrap pb-0.5 font-[400] uppercase text-current transition-[color,opacity] duration-300 ease-out",
         mobile
           ? "flex-none text-[0.75rem] tracking-[0.18em]"
-          : "text-[0.875rem] tracking-normal",
+          : "text-[13px] tracking-normal",
         active ? "opacity-100" : "hover:opacity-60"
       )}
     >
@@ -171,18 +171,18 @@ function MenuSection({
 }) {
   return (
     <section className="min-w-0">
-      <p className="text-[1rem] font-semibold uppercase tracking-[0.08em] text-black">
+      <p className="text-[13px] font-[400] uppercase tracking-[0.08em] text-black">
         {title}
       </p>
 
-      <ul className="mt-7 space-y-4">
+      <ul className="mt-4 space-y-4">
         {items.map((item) => (
           <li key={item}>
             <button
               type="button"
               tabIndex={open ? 0 : -1}
               onClick={onClose}
-              className="inline-flex cursor-pointer items-start text-left text-[0.95rem] uppercase leading-none tracking-[0.01em] text-black/55 transition-colors duration-200 hover:text-black focus-visible:text-black focus-visible:outline-none"
+              className="inline-flex cursor-pointer items-start text-left text-[13px] font-[400] uppercase leading-none tracking-[0.01em] text-black/55 transition-colors duration-200 hover:text-black focus-visible:text-black focus-visible:outline-none"
             >
               {item}
             </button>

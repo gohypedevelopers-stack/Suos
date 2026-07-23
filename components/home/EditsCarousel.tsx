@@ -74,7 +74,7 @@ function EditCard({ slide }: { slide: EditSlide }) {
       />
 
       <div className="absolute inset-x-3 bottom-3 z-10">
-        <p className="inline-block bg-white/0 px-1 py-0.5 text-[14px] uppercase tracking-[0.08em] text-black">
+        <p className="inline-block bg-white/0 px-1 py-0.5 text-[13px] font-normal uppercase tracking-normal text-black">
           Edit Name
         </p>
       </div>
@@ -94,7 +94,7 @@ function TabLabel({
       type="button"
       aria-pressed={active}
       className={cn(
-        "group inline-flex flex-col items-start pb-0.5 text-[0.875rem] font-[500] uppercase leading-none tracking-normal transition-opacity hover:opacity-70"
+        "group inline-flex flex-col items-start pb-0.5 text-[13px] font-normal uppercase leading-none tracking-normal transition-opacity hover:opacity-70"
       )}
     >
       <span>{label}</span>
@@ -110,7 +110,7 @@ export function EditsCarousel() {
   return (
     <section className="w-full bg-white px-4 py-14 text-black sm:px-6 lg:px-8 md:py-16">
       <div className="flex w-full flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-        <h2 className="font-heading text-[40px] font-[400] uppercase leading-none tracking-[-0.04em]">
+        <h2 className="font-heading text-[24px] font-[500] uppercase leading-none tracking-[-0.04em]">
           Edits
         </h2>
 

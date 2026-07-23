@@ -17,7 +17,7 @@ function MarqueeStrip() {
 
 export function SustainabilityMarquee() {
   return (
-    <section className="w-full overflow-hidden bg-black py-3 text-white">
+    <section className="w-full overflow-hidden bg-black py-3 text-[13px] font-normal text-white">
       <h2 className="sr-only">Sustainability marquee</h2>
 
       <div

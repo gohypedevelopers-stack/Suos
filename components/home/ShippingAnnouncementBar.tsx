@@ -1,7 +1,7 @@
 export function ShippingAnnouncementBar() {
   return (
     <section className="announcement-bar bg-black text-white">
-      <div className="grid h-full w-full grid-cols-3 items-center px-4 text-[14px] font-normal leading-none sm:px-6 md:px-8">
+      <div className="grid h-full w-full grid-cols-3 items-center px-4 text-[13px] font-normal uppercase leading-none sm:px-6 md:px-8">
         <p className="justify-self-start whitespace-nowrap">
           International Shipping Available
         </p>

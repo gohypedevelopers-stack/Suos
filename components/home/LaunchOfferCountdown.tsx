@@ -78,10 +78,10 @@ export function LaunchOfferCountdown({
             </span>
           ) : null}
           <div className="flex min-w-[2.25rem] flex-col items-center text-center sm:min-w-[2.75rem] md:min-w-[3.5rem]">
-            <span className="text-[0.5625rem] font-medium leading-none sm:text-[0.6875rem] md:text-[0.875rem]">
+            <span className="text-[0.5625rem] font-normal leading-none sm:text-[0.6875rem] md:text-[0.875rem]">
               {formatValue(item.value)}
             </span>
-            <span className="mt-0.5 text-[0.375rem] uppercase tracking-[0.12em] text-white/70 sm:text-[0.5rem] md:text-[0.625rem]">
+            <span className="mt-0.5 text-[0.375rem] font-normal uppercase tracking-[0.12em] text-white/70 sm:text-[0.5rem] md:text-[0.625rem]">
               {item.label}
             </span>
           </div>

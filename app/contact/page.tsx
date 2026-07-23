@@ -59,7 +59,7 @@ export default function ContactPage() {
             id="contact-heading"
             className="mt-8 max-w-[32rem] text-[70px] font-normal uppercase leading-[1.02] tracking-[-0.055em]"
           >
-            Let&apos;s
+            Let’s
             <br />
             connect.
           </h1>
