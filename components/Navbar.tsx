@@ -289,6 +289,7 @@ export function Navbar({
   const [activeMenu, setActiveMenu] = useState<ActiveMenu | null>(null)
   const [isHovered, setIsHovered] = useState(false)
   const scrollFrameRef = useRef<number | null>(null)
+  const isScrolledRef = useRef(false)
   const menuCloseTimeoutRef = useRef<number | null>(null)
   const headerRef = useRef<HTMLElement | null>(null)
   const announcementHeightRef = useRef(0)
@@ -379,11 +380,22 @@ export function Navbar({
     const updateScrollState = () => {
       scrollFrameRef.current = null
 
-      const nextIsScrolled = window.scrollY > announcementHeightRef.current
-
-      setIsScrolled((current) =>
-        current === nextIsScrolled ? current : nextIsScrolled
+      const announcementHeight = announcementHeightRef.current
+      const navbarScrollOffset = Math.min(
+        announcementHeight,
+        Math.max(0, window.scrollY)
       )
+      const nextIsScrolled = navbarScrollOffset >= announcementHeight
+      const navbarTranslateY = -navbarScrollOffset
+
+      if (headerRef.current) {
+        headerRef.current.style.transform = `translate3d(0, ${navbarTranslateY}px, 0)`
+      }
+
+      if (isScrolledRef.current !== nextIsScrolled) {
+        isScrolledRef.current = nextIsScrolled
+        setIsScrolled(nextIsScrolled)
+      }
     }
 
     const syncScrollState = () => {
@@ -423,7 +435,6 @@ export function Navbar({
       ref={headerRef}
       className={cn(
         "main-navbar navbar-shell border-b",
-        isScrolled ? "translate-y-0" : "translate-y-[var(--announcement-height)]",
         isOverlay ? "h-[98px]" : "lg:h-[98px]",
         isInteractiveSurface
           ? "!bg-white text-black border-transparent shadow-none"
