@@ -4,6 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Heart, Search, ShoppingBag, UserRound } from "lucide-react"
+import { AnimatePresence, motion, useReducedMotion, type Transition } from "motion/react"
 import {
   useEffect,
   useLayoutEffect,
@@ -60,6 +61,35 @@ const megaMenuCards = [
     titleLines: ["Country", "Edit"],
   },
 ]
+
+const megaMenuRevealTransition: Transition = {
+  type: "spring",
+  stiffness: 145,
+  damping: 24,
+  mass: 0.8,
+  bounce: 0,
+}
+
+const megaMenuCloseTransition: Transition = {
+  duration: 0.16,
+  ease: [0.4, 0, 1, 1],
+}
+
+const megaMenuContentTransition: Transition = {
+  type: "tween",
+  duration: 0.56,
+  ease: [0.16, 1, 0.3, 1],
+}
+
+const megaMenuContentVariants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? "100%" : "-100%",
+  }),
+  center: { x: 0 },
+  exit: (direction: number) => ({
+    x: direction > 0 ? "-100%" : "100%",
+  }),
+}
 
 const useIsomorphicLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect
@@ -288,6 +318,8 @@ export function Navbar({
   const [selectedNav, setSelectedNav] = useState<NavKey>(defaultNavKey)
   const [activeMenu, setActiveMenu] = useState<ActiveMenu | null>(null)
   const [isHovered, setIsHovered] = useState(false)
+  const [menuSlideDirection, setMenuSlideDirection] = useState(1)
+  const prefersReducedMotion = useReducedMotion()
   const scrollFrameRef = useRef<number | null>(null)
   const isScrolledRef = useRef(false)
   const menuCloseTimeoutRef = useRef<number | null>(null)
@@ -307,6 +339,15 @@ export function Navbar({
     }
 
     setIsHovered(true)
+    const currentMenuIndex = primaryNav.findIndex(
+      (item) => item.key === activeMenu
+    )
+    const nextMenuIndex = primaryNav.findIndex((item) => item.key === menu)
+
+    if (currentMenuIndex !== -1 && currentMenuIndex !== nextMenuIndex) {
+      setMenuSlideDirection(nextMenuIndex > currentMenuIndex ? 1 : -1)
+    }
+
     setActiveMenu(menu)
   }
 
@@ -630,49 +671,85 @@ export function Navbar({
           </nav>
         </div>
 
-        <div
-          aria-hidden={!activeMenu}
-          className={cn(
-            "absolute left-0 top-full hidden w-full !bg-white text-black shadow-[0_24px_60px_rgba(0,0,0,0.08)] transition-opacity duration-150 ease-out lg:block lg:h-[460px] lg:overflow-hidden",
-            activeMenu
-              ? "pointer-events-auto opacity-100"
-              : "pointer-events-none opacity-0"
-          )}
-          onMouseEnter={cancelMenuClose}
-          onMouseLeave={scheduleMenuClose}
-        >
-          {activeMenu === "wishlist" ? (
-            <WishlistPanel />
-          ) : (
-            <div className="grid h-full w-full gap-x-14 gap-y-8 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(10rem,12rem)_minmax(14rem,18rem)_minmax(0,1fr)] lg:px-8">
-              <MenuSection
-                title="Featured"
-                items={megaMenuFeatured}
-                open={Boolean(activeMenu)}
-                onClose={closeMenu}
-              />
+        <AnimatePresence>
+          {activeMenu && (
+            <motion.div
+              aria-hidden={false}
+              initial={
+                prefersReducedMotion
+                  ? false
+                  : { clipPath: "inset(0 0 100% 0)" }
+              }
+              animate={{ clipPath: "inset(0 0 0% 0)" }}
+              exit={
+                prefersReducedMotion
+                  ? undefined
+                  : {
+                      clipPath: "inset(0 0 100% 0)",
+                      transition: megaMenuCloseTransition,
+                    }
+              }
+              transition={
+                prefersReducedMotion ? { duration: 0 } : megaMenuRevealTransition
+              }
+              className="absolute left-0 top-full hidden h-[460px] w-full overflow-hidden !bg-white text-black shadow-[0_24px_60px_rgba(0,0,0,0.08)] [will-change:clip-path] lg:block"
+              onMouseEnter={cancelMenuClose}
+              onMouseLeave={scheduleMenuClose}
+            >
+              <AnimatePresence
+                initial={false}
+                custom={menuSlideDirection}
+              >
+                <motion.div
+                  key={activeMenu}
+                  custom={menuSlideDirection}
+                  variants={megaMenuContentVariants}
+                  initial={prefersReducedMotion ? false : "enter"}
+                  animate="center"
+                  exit={prefersReducedMotion ? undefined : "exit"}
+                  transition={
+                    prefersReducedMotion
+                      ? { duration: 0 }
+                      : megaMenuContentTransition
+                  }
+                  className="absolute inset-0"
+                >
+                  {activeMenu === "wishlist" ? (
+                    <WishlistPanel />
+                  ) : (
+                    <div className="grid h-full w-full gap-x-14 gap-y-8 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(10rem,12rem)_minmax(14rem,18rem)_minmax(0,1fr)] lg:px-8">
+                      <MenuSection
+                        title="Featured"
+                        items={megaMenuFeatured}
+                        open={Boolean(activeMenu)}
+                        onClose={closeMenu}
+                      />
 
-              <MenuSection
-                title="Categories"
-                items={megaMenuCategories}
-                open={Boolean(activeMenu)}
-                onClose={closeMenu}
-              />
+                      <MenuSection
+                        title="Categories"
+                        items={megaMenuCategories}
+                        open={Boolean(activeMenu)}
+                        onClose={closeMenu}
+                      />
 
-              <div className="grid w-full max-w-[652px] min-w-0 grid-cols-2 gap-6 justify-self-end">
-                {megaMenuCards.map((card) => (
-                  <MenuCard
-                    key={card.src}
-                    src={card.src}
-                    alt={card.alt}
-                    eyebrow={card.eyebrow}
-                    titleLines={card.titleLines}
-                  />
-                ))}
-              </div>
-            </div>
+                      <div className="grid w-full max-w-[652px] min-w-0 grid-cols-2 gap-6 justify-self-end">
+                        {megaMenuCards.map((card) => (
+                          <MenuCard
+                            key={card.src}
+                            src={card.src}
+                            alt={card.alt}
+                            eyebrow={card.eyebrow}
+                            titleLines={card.titleLines}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </motion.div>
           )}
-        </div>
+        </AnimatePresence>
       </div>
 
       <SearchSidebar open={searchOpen} onOpenChange={setSearchOpen} />

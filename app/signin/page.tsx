@@ -1,9 +1,9 @@
 import Image from "next/image"
 
-import { LoginPanel } from "@/components/auth/LoginPanel"
+import { SignUpPanel } from "@/components/auth/SignUpPanel"
 
 export const metadata = {
-  title: "Sign in | SUOS",
+  title: "Create account | SUOS",
 }
 
 export default function SignInPage() {
@@ -21,8 +21,8 @@ export default function SignInPage() {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.03),rgba(0,0,0,0.14))]" />
       </section>
 
-      <section className="flex min-h-full justify-center bg-white lg:justify-start lg:pl-[clamp(3.5rem,12vw,15rem)]">
-        <LoginPanel />
+      <section className="flex min-h-full justify-center bg-white lg:justify-start lg:pl-[clamp(3.5rem,10vw,12rem)]">
+        <SignUpPanel />
       </section>
     </main>
   )

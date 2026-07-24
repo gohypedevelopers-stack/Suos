@@ -2,18 +2,17 @@ import type { Metadata } from "next"
 import {
   ChevronDown,
   ChevronRight,
-  CirclePlus,
   Pencil,
   Tag,
 } from "lucide-react"
 
 import { AppSidebar } from "@/components/admin-dashboard/app-sidebar"
 import { ProductAdditionalDetailsSection } from "@/components/admin-dashboard/product-additional-details-section"
+import { ProductOrganizationFields } from "@/components/admin-dashboard/product-organization-fields"
 import { ProductVariantsSection } from "@/components/admin-dashboard/product-variants-section"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { TooltipProvider } from "@/components/ui/tooltip"
-import { cn } from "@/lib/utils"
 
 export const metadata: Metadata = {
   title: "Add product | SUOS Admin",
@@ -72,10 +71,6 @@ function StatusSelect() {
       </SelectContent>
     </Select>
   )
-}
-
-function Pill({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <span className={cn("inline-flex items-center gap-1 rounded-lg bg-black/[0.07] px-2.5 py-1.5 text-sm text-black/65", className)}>{children}</span>
 }
 
 function DescriptionEditor() {
@@ -187,7 +182,7 @@ export default function AddProductPage() {
 
                 <aside className="space-y-4">
                   <Card title="Status"><div className="px-4 pb-4"><StatusSelect /></div></Card>
-                  <Card title="Product organization"><div className="space-y-4 px-4 pb-4"><label className="grid gap-1.5 text-sm text-black/75"><span>Collections</span><div className="flex h-9 items-center rounded-lg border border-black/25 px-1.5"><Pill className="h-6 px-2 py-0"><CirclePlus className="size-3" />Add collections</Pill></div></label><label className="grid gap-1.5 text-sm text-black/75"><span>Tags</span><div className="flex h-9 items-center rounded-lg border border-black/25 px-1.5"><Pill className="h-6 px-2 py-0"><CirclePlus className="size-3" />Add tags</Pill></div></label></div></Card>
+                  <Card title="Product organization"><ProductOrganizationFields /></Card>
                 </aside>
               </div>
             </div>
