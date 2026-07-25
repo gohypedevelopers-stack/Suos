@@ -76,15 +76,15 @@ function CartItemRow({ item }: { item: CartItem }) {
       <div className="flex min-w-0 flex-col justify-between py-1">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h3 className="truncate text-[0.95rem] font-normal uppercase leading-[1.15] tracking-[0.06em] text-white/95">
+            <h3 className="truncate text-[13px] font-normal uppercase leading-[1.15] tracking-[0.06em] text-white/95">
               {item.title}
             </h3>
 
             <div className="mt-3 flex items-center gap-4 text-[0.8rem] uppercase tracking-[0.04em] text-white/68">
-              <span>{item.size}</span>
+              <span className="text-[13px] font-normal text-white">{item.size}</span>
               <button
                 type="button"
-                className="transition-opacity hover:opacity-70"
+                className="text-[10px] font-normal transition-opacity hover:opacity-70"
               >
                 Edit Size
               </button>
@@ -94,14 +94,14 @@ function CartItemRow({ item }: { item: CartItem }) {
           <button
             type="button"
             aria-label={`Remove ${item.title}`}
-            className="mt-0.5 text-[0.95rem] uppercase leading-none text-white/92 transition-opacity hover:opacity-70"
+            className="-translate-y-px shrink-0 text-white/92 transition-opacity hover:opacity-70"
           >
-            X
+            <X aria-hidden="true" className="size-4 stroke-2" />
           </button>
         </div>
 
         <div className="mt-8 flex items-end justify-between">
-          <div className="flex items-center gap-2 text-[1.05rem] leading-none">
+          <div className="flex items-center gap-2 text-[13px] font-normal leading-none">
             <button
               type="button"
               aria-label="Decrease quantity"
@@ -119,7 +119,7 @@ function CartItemRow({ item }: { item: CartItem }) {
             </button>
           </div>
 
-          <p className="text-[0.9rem] uppercase tracking-[0.08em] text-white/94">
+          <p className="text-[13px] font-normal uppercase text-white/94">
             PRICE
           </p>
         </div>
@@ -130,7 +130,7 @@ function CartItemRow({ item }: { item: CartItem }) {
 
 function PromoMarqueeRow() {
   return (
-    <div className="flex shrink-0 items-center gap-10 whitespace-nowrap pr-10 text-[14px] font-normal uppercase tracking-[0.04em]">
+    <div className="flex shrink-0 items-center gap-10 whitespace-nowrap pr-10 text-[13px] font-normal uppercase tracking-[0.04em]">
       {Array.from({ length: 4 }).map((_, index) => (
         <span key={`promo-${index}`} className="whitespace-nowrap">
           {promoStripText}
@@ -156,8 +156,8 @@ export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
         style={{ width: "min(100vw, 420px)", maxWidth: "none" }}
       >
         <div className="flex h-full min-h-0 flex-col overflow-hidden">
-          <div className="flex items-center justify-between border-b border-white/10 px-5 py-5">
-            <div className="flex items-center gap-2 text-[0.75rem] font-medium uppercase tracking-[0.18em] text-white">
+          <div className="flex items-center justify-between px-5 py-5">
+            <div className="flex items-center gap-2 text-[15px] font-normal uppercase text-white">
               <Check className="size-4 stroke-[2.4]" />
               <span>2 ITEM ADDED</span>
             </div>
@@ -165,10 +165,10 @@ export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
             <SheetClose asChild>
               <button
                 type="button"
-                className="inline-flex items-center gap-2 text-[0.75rem] font-medium uppercase tracking-[0.18em] text-white/90 transition-opacity hover:opacity-60"
+                className="inline-flex items-center gap-2 text-[15px] font-normal uppercase text-white/90 transition-opacity hover:opacity-60"
               >
                 <span>CLOSE</span>
-                <X className="size-4 stroke-[1.8]" />
+                <X aria-hidden="true" className="size-5 stroke-2" />
               </button>
             </SheetClose>
           </div>
@@ -192,7 +192,7 @@ export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
 
           <div className="flex-none">
             <div className="overflow-hidden bg-white px-3 py-2 text-black">
-              <div className="flex w-max items-center animate-[marquee_18s_linear_infinite] motion-reduce:animate-none [will-change:transform]">
+              <div className="flex w-max transform-gpu items-center animate-[marquee_30s_linear_infinite] motion-reduce:animate-none [will-change:transform]">
                 <PromoMarqueeRow />
                 <PromoMarqueeRow />
               </div>
@@ -204,14 +204,14 @@ export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
               <div className="mt-6 pb-2">
                 <button
                   type="button"
-                  className="flex h-12 w-full items-center justify-center bg-white text-[1rem] font-semibold uppercase tracking-[0.08em] text-black transition-opacity hover:opacity-90"
+                  className="flex h-12 w-full items-center justify-center bg-white text-[15px] font-normal uppercase text-black transition-opacity hover:opacity-90"
                 >
                   Checkout
                 </button>
 
                 <Link
                   href="/cart"
-                  className="mt-3 block text-center text-[0.85rem] uppercase tracking-[0.08em] text-white underline underline-offset-4 transition-opacity hover:opacity-70"
+                  className="mt-3 block text-center text-[15px] font-normal uppercase text-white underline underline-offset-4 transition-opacity hover:opacity-70"
                 >
                   View Shopping Cart
                 </Link>

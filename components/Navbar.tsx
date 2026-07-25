@@ -555,7 +555,7 @@ export function Navbar({
                 )}
               >
                 <span
-                  className="block truncate text-current/80"
+                  className="block truncate text-[13px] font-normal text-current/80"
                 >
                   What are you looking for?
                 </span>
@@ -574,7 +574,7 @@ export function Navbar({
               <ShoppingBag className="size-[18px] stroke-[1.7]" />
             </IconButton>
 
-            <div className="flex shrink-0 items-center gap-4">
+            <div className="flex shrink-0 items-center gap-4 xl:gap-6">
               <IconButton
                 label="Wishlist"
                 tone={tone}

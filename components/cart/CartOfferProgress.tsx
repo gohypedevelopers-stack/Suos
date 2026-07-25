@@ -9,8 +9,8 @@ const offerMilestones = [
 export function CartOfferProgress() {
   return (
     <section className="mx-auto w-full max-w-[360px] text-center">
-      <h2 className="whitespace-nowrap text-[18px] font-normal uppercase leading-none tracking-[-0.02em] text-white">
-        SHOP FOR <span className="font-semibold">₹2000</span> TO GET 10% OFF
+      <h2 className="whitespace-nowrap text-[15px] font-normal uppercase leading-none tracking-[-0.02em] text-white">
+        SHOP FOR <span className="font-bold">₹2000</span> TO GET 10% OFF
       </h2>
 
       <div className="relative mt-6 h-[4rem]">
@@ -24,7 +24,7 @@ export function CartOfferProgress() {
             style={{ left: item.position }}
           >
             <span className="block size-4 rounded-full border-[1.5px] border-white bg-black" />
-            <span className="absolute left-1/2 top-[1.45rem] -translate-x-1/2 whitespace-nowrap text-[10px] uppercase tracking-[0.03em] text-white/80 sm:text-[11px]">
+            <span className="absolute left-1/2 top-[1.45rem] -translate-x-1/2 whitespace-nowrap text-[10px] font-normal uppercase tracking-[0.03em] text-white/80 sm:text-[11px]">
               {item.label}
             </span>
           </div>

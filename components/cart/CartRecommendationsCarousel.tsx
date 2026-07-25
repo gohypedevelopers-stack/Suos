@@ -28,7 +28,7 @@ function RecommendationCard({ image, alt }: CartRecommendation) {
         className="object-cover object-center"
       />
 
-      <span className="absolute left-1.5 top-1.5 bg-black px-1.5 py-0.5 text-[0.4rem] uppercase tracking-[0.14em] text-white">
+      <span className="absolute left-1.5 top-1.5 bg-black px-1.5 py-0.5 text-[0.4rem] font-normal uppercase tracking-[0.14em] text-white">
         NEW ARRIVAL
       </span>
     </article>
@@ -42,7 +42,7 @@ export function CartRecommendationsCarousel({
 
   return (
     <section>
-      <h3 className="text-[1rem] font-medium uppercase leading-none tracking-[0.08em]">
+      <h3 className="text-[15px] font-normal uppercase leading-none tracking-[0.08em]">
         You May Also Like
       </h3>
 
