@@ -19,18 +19,34 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { authClient } from "@/lib/auth-client"
 import { ChevronsUpDownIcon, LogOutIcon } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string
-    email: string
-    avatar: string
-  }
-}) {
+export function NavUser() {
   const { isMobile } = useSidebar()
+  const router = useRouter()
+  const { data: session } = authClient.useSession()
+  const [isSigningOut, setIsSigningOut] = useState(false)
+  const user = {
+    name: session?.user.name ?? "SUOS Admin",
+    email: session?.user.email ?? "",
+    avatar: session?.user.image ?? "",
+  }
+  const initials = user.name
+    .split(/\s+/)
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase()
+
+  async function handleSignOut() {
+    setIsSigningOut(true)
+    await authClient.signOut()
+    router.replace("/login")
+    router.refresh()
+  }
 
   return (
     <SidebarMenu>
@@ -43,7 +59,7 @@ export function NavUser({
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
@@ -62,7 +78,7 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
@@ -71,10 +87,16 @@ export function NavUser({
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              disabled={isSigningOut}
+              onSelect={(event) => {
+                event.preventDefault()
+                void handleSignOut()
+              }}
+            >
               <LogOutIcon
               />
-              Log out
+              {isSigningOut ? "Logging out…" : "Log out"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

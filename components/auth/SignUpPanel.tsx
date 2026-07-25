@@ -2,7 +2,10 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { FormEvent, useState } from "react"
+import { useRouter } from "next/navigation"
+import { type FormEvent, useState } from "react"
+
+import { authClient } from "@/lib/auth-client"
 
 type SubmissionState =
   | { type: "idle" }
@@ -10,14 +13,23 @@ type SubmissionState =
   | { type: "success"; message: string }
 
 export function SignUpPanel() {
+  const router = useRouter()
   const [submission, setSubmission] = useState<SubmissionState>({ type: "idle" })
+  const [isPending, setIsPending] = useState(false)
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     const formData = new FormData(event.currentTarget)
+    const fullName = String(formData.get("fullName") ?? "").trim()
+    const email = String(formData.get("email") ?? "").trim().toLowerCase()
     const password = String(formData.get("password") ?? "")
     const confirmPassword = String(formData.get("confirmPassword") ?? "")
+
+    if (fullName.length < 2) {
+      setSubmission({ type: "error", message: "Enter your full name." })
+      return
+    }
 
     if (password.length < 8) {
       setSubmission({ type: "error", message: "Use at least 8 characters for your password." })
@@ -29,10 +41,27 @@ export function SignUpPanel() {
       return
     }
 
-    setSubmission({
-      type: "success",
-      message: "Your account details are ready to be submitted.",
+    setIsPending(true)
+    setSubmission({ type: "idle" })
+
+    const result = await authClient.signUp.email({
+      name: fullName,
+      email,
+      password,
     })
+
+    if (result.error) {
+      setIsPending(false)
+      setSubmission({
+        type: "error",
+        message: "We couldn’t create this account. Check your details or try logging in.",
+      })
+      return
+    }
+
+    setSubmission({ type: "success", message: "Your account has been created." })
+    router.replace("/")
+    router.refresh()
   }
 
   return (
@@ -153,9 +182,10 @@ export function SignUpPanel() {
 
         <button
           type="submit"
-          className="flex h-14 w-full items-center justify-between bg-black px-5 text-[0.875rem] font-medium uppercase text-white transition-colors hover:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+          disabled={isPending}
+          className="flex h-14 w-full items-center justify-between bg-black px-5 text-[0.875rem] font-medium uppercase text-white transition-colors hover:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:cursor-wait disabled:bg-black/60"
         >
-          <span>Create account</span>
+          <span>{isPending ? "Creating account…" : "Create account"}</span>
           <span aria-hidden="true">↗</span>
         </button>
       </form>
