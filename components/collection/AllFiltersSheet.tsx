@@ -8,7 +8,7 @@ import {
   useRef,
   useState,
 } from "react"
-import { ChevronDown, SlidersHorizontal } from "lucide-react"
+import { ChevronDown, SlidersHorizontal, X } from "lucide-react"
 
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -106,24 +106,6 @@ const quickFilterGroups = {
   SIZE: { ...filterGroups[2], defaultOpen: true },
 } satisfies Record<string, FilterGroup>
 
-function FilterCloseIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-[10px] w-[9px] shrink-0 -translate-y-px"
-      fill="none"
-      viewBox="0 0 9 10"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M0.5 0.5L8.5 9.5M8.5 0.5L0.5 9.5"
-        stroke="currentColor"
-        strokeWidth="1"
-      />
-    </svg>
-  )
-}
-
 function FilterGroupSection({
   group,
   selectedFilters,
@@ -142,7 +124,7 @@ function FilterGroupSection({
       onToggle={(event) => setIsOpen(event.currentTarget.open)}
     >
       <summary
-        className="flex h-[82px] cursor-pointer list-none items-center justify-between px-[30px] text-[16px] font-normal uppercase leading-5 outline-none transition-colors hover:bg-white/[0.04] focus-visible:bg-white/[0.08] [&::-webkit-details-marker]:hidden"
+        className="flex h-[72px] cursor-pointer list-none items-center justify-between px-5 text-[15px] font-normal uppercase leading-5 outline-none transition-colors hover:bg-white/[0.04] focus-visible:bg-white/[0.08] [&::-webkit-details-marker]:hidden"
       >
         <span>{group.label}</span>
         <ChevronDown
@@ -151,7 +133,7 @@ function FilterGroupSection({
         />
       </summary>
 
-      <div className="space-y-[12px] px-[30px] pb-[39px]">
+      <div className="space-y-3 px-5 pb-8">
         {group.options.map((option) => {
           const checkboxId = `filter-${option.value}`
 
@@ -159,7 +141,7 @@ function FilterGroupSection({
             <label
               key={option.value}
               htmlFor={checkboxId}
-              className="flex w-fit cursor-pointer items-center gap-[13px] text-[16px] leading-5 text-white"
+              className="flex w-fit cursor-pointer items-center gap-3 text-[13px] font-normal leading-5 text-white"
             >
               <Checkbox
                 id={checkboxId}
@@ -233,10 +215,11 @@ function FilterSheet({ groups, trigger }: FilterSheetProps) {
         side="right"
         showCloseButton={false}
         overlayClassName="bg-black/55 supports-backdrop-filter:backdrop-blur-[2px]"
-        className="gap-0 border-0 bg-black p-0 text-white shadow-[-18px_0_50px_rgba(0,0,0,0.18)] data-[side=right]:w-full data-[side=right]:border-l-0 data-[side=right]:sm:max-w-[439px]"
+        className="gap-0 overflow-hidden border-l border-white/10 bg-black p-0 text-white shadow-[0_0_80px_rgba(0,0,0,0.45)]"
+        style={{ width: "min(100vw, 420px)", maxWidth: "none" }}
       >
-        <div className="flex h-[82px] shrink-0 items-center justify-between border-b border-white/35 px-7">
-          <SheetTitle className="text-[16px] font-normal leading-5 text-white">
+        <div className="flex shrink-0 items-center justify-between px-5 py-5">
+          <SheetTitle className="text-[15px] font-normal uppercase text-white">
             FILTER
           </SheetTitle>
           <SheetDescription className="sr-only">
@@ -246,15 +229,15 @@ function FilterSheet({ groups, trigger }: FilterSheetProps) {
           <SheetClose asChild>
             <button
               type="button"
-              className="inline-flex min-h-11 items-center gap-2 text-[16px] font-normal leading-5 text-white transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+              className="inline-flex items-center gap-2 text-[15px] font-normal uppercase text-white/90 transition-opacity hover:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
             >
               <span>CLOSE</span>
-              <FilterCloseIcon />
+              <X aria-hidden="true" className="size-5 stroke-2" />
             </button>
           </SheetClose>
         </div>
 
-        <div className="filters-panel-scrollbar min-h-0 flex-1 overflow-y-auto px-7">
+        <div className="filters-panel-scrollbar min-h-0 flex-1 overflow-y-auto px-5">
           {groups.map((group) => (
             <FilterGroupSection
               key={group.id}
@@ -269,7 +252,7 @@ function FilterSheet({ groups, trigger }: FilterSheetProps) {
           <SheetClose asChild>
             <button
               type="button"
-              className="flex h-[38px] w-full items-center justify-center bg-white px-4 text-[22px] font-[400] leading-[26px] text-black transition-colors hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              className="flex h-12 w-full items-center justify-center bg-white px-4 text-[15px] font-normal uppercase text-black transition-colors hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               VIEW 190 ITEMS
             </button>
@@ -278,7 +261,7 @@ function FilterSheet({ groups, trigger }: FilterSheetProps) {
           <button
             type="button"
             onClick={() => setSelectedFilters(new Set())}
-            className="mt-3 min-h-4 text-[16px] leading-5 text-white underline underline-offset-2 transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-40"
+            className="mt-3 min-h-4 text-[15px] font-normal uppercase leading-5 text-white underline underline-offset-2 transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-40"
             disabled={selectedFilters.size === 0}
           >
             CLEAR ALL

@@ -85,18 +85,18 @@ export function SearchSidebar({ open, onOpenChange }: SearchSidebarProps) {
         style={{ width: "min(100vw, 420px)", maxWidth: "none" }}
       >
         <div className="flex h-full flex-col">
-          <div className="flex items-center justify-between border-b border-white/10 px-5 py-5">
-            <SheetTitle className="text-[0.75rem] font-medium uppercase tracking-[0.18em] text-white">
+          <div className="flex items-center justify-between px-5 py-5">
+            <SheetTitle className="text-[15px] font-normal uppercase text-white">
               Search
             </SheetTitle>
 
             <SheetClose asChild>
               <button
                 type="button"
-                className="inline-flex items-center gap-2 text-[0.75rem] font-medium uppercase tracking-[0.18em] text-white/90 transition-opacity hover:opacity-60"
+                className="inline-flex items-center gap-2 text-[15px] font-normal uppercase text-white/90 transition-opacity hover:opacity-60"
               >
                 <span>Close</span>
-                <X className="size-4 stroke-[1.8]" />
+                <X aria-hidden="true" className="size-5 stroke-2" />
               </button>
             </SheetClose>
           </div>
@@ -105,7 +105,7 @@ export function SearchSidebar({ open, onOpenChange }: SearchSidebarProps) {
             Search products, browse trending searches, and view featured best sellers.
           </SheetDescription>
 
-          <div className="flex-1 overflow-y-auto px-5 py-6">
+          <div className="flex-1 overflow-y-auto px-5 py-5">
             <div className="relative">
               <input
                 type="search"
@@ -113,7 +113,7 @@ export function SearchSidebar({ open, onOpenChange }: SearchSidebarProps) {
                 aria-label="Search anything"
                 placeholder="Search anything....."
                 className={cn(
-                  "h-11 w-full border border-white/70 bg-transparent px-4 pr-10 text-[0.72rem] uppercase tracking-[0.14em] text-white outline-none placeholder:text-white/60"
+                  "h-11 w-full border border-white/70 bg-transparent px-4 pr-10 text-[13px] font-normal uppercase text-white outline-none placeholder:text-white/60"
                 )}
               />
               <Search
@@ -123,7 +123,7 @@ export function SearchSidebar({ open, onOpenChange }: SearchSidebarProps) {
             </div>
 
             <section className="mt-10">
-              <p className="text-[0.72rem] uppercase tracking-[0.16em] text-white/40">
+              <p className="text-[13px] font-normal uppercase text-white/40">
                 Trending Searches
               </p>
 
@@ -132,7 +132,7 @@ export function SearchSidebar({ open, onOpenChange }: SearchSidebarProps) {
                   <button
                     key={term}
                     type="button"
-                    className="block text-left text-[0.82rem] uppercase tracking-[0.08em] text-white transition-opacity hover:opacity-70"
+                    className="block text-left text-[13px] font-normal uppercase text-white transition-opacity hover:opacity-70"
                   >
                     {term}
                   </button>
@@ -141,7 +141,7 @@ export function SearchSidebar({ open, onOpenChange }: SearchSidebarProps) {
             </section>
 
             <section className="mt-12">
-              <p className="text-[0.72rem] uppercase tracking-[0.16em] text-white/40">
+              <p className="text-[13px] font-normal uppercase text-white/40">
                 Featured Best Sellers
               </p>
 
