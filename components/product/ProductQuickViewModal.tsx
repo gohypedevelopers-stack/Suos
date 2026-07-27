@@ -46,7 +46,7 @@ function QuickViewColorSwatches({
             aria-label={`Select ${color.name}`}
             onClick={() => onSelectColor(color.name)}
             className={cn(
-              "flex h-[40px] w-[75px] items-stretch justify-stretch bg-white transition-[box-shadow] duration-200 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45",
+              "flex h-[40px] w-[75px] cursor-pointer items-stretch justify-stretch bg-white transition-[box-shadow] duration-200 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45",
               isSelected
                 ? "border-[2px] border-black p-[4px]"
                 : "border-0 p-0"
@@ -75,9 +75,9 @@ function QuickViewSizeButton({
       type="button"
       aria-pressed={active}
       className={cn(
-        "inline-flex h-[34px] items-center justify-center border text-[22px] font-medium leading-none transition-[background-color,border-color,color,transform] duration-200 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45",
+        "inline-flex h-[34px] cursor-pointer items-center justify-center border text-[13px] font-normal leading-none transition-[background-color,border-color,color,transform,font-weight] duration-200 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45",
         active
-          ? "border-black bg-[#ededed] text-black"
+          ? "border-black bg-[#ededed] font-[500] text-black"
           : "border-black/10 bg-white text-black hover:border-black hover:bg-black/[0.04]",
         "min-w-0 px-3"
       )}
@@ -152,7 +152,7 @@ export function ProductQuickViewModal({
           Quick view dialog for {product.title}
         </DialogDescription>
 
-        <div className="grid h-[min(94dvh,598px)] grid-cols-1 gap-0 p-3 lg:grid-cols-[353px_minmax(0,1fr)] lg:gap-10">
+        <div className="grid h-[min(88dvh,540px)] grid-cols-1 gap-0 p-3 lg:grid-cols-[353px_minmax(0,1fr)] lg:gap-10">
           <div
             aria-label={`${product.title} image gallery`}
             className="quick-view-gallery min-h-0 overflow-y-auto bg-[#111]"
@@ -177,61 +177,61 @@ export function ProductQuickViewModal({
             </div>
           </div>
 
-          <div className="relative min-h-0 overflow-hidden px-0 pb-3 pt-5 lg:pr-2">
+          <div className="quick-view-details relative min-h-0 overflow-y-auto px-0 pb-3 pt-5 lg:pr-2">
             <DialogClose asChild>
               <button
                 type="button"
                 aria-label="Close quick view"
-                className="absolute right-0 top-0 inline-flex size-6 items-center justify-center text-[1.1rem] font-semibold leading-none text-black transition-opacity hover:opacity-70"
+                className="absolute right-0 top-0 inline-flex size-5 items-center justify-center leading-none text-black transition-opacity hover:opacity-70"
               >
-                <X className="size-5 stroke-[2.1]" />
+                <X className="size-5 stroke-2" />
               </button>
             </DialogClose>
 
             <div className="pr-5">
-              <p className="text-[14px] font-normal uppercase leading-[17px] tracking-normal text-black/45">
+  <p className="w-fit text-[13px] font-normal uppercase leading-[17px] tracking-normal text-black/45">
                 {product.editLabel}
               </p>
-              <h2 className="mt-1 font-heading text-[40px] font-[400] uppercase leading-[0.95] tracking-[-0.06em]">
+              <h2 className="mt-1 font-heading text-[24px] font-normal uppercase leading-[0.95] tracking-[-0.06em]">
                 {product.title}
               </h2>
 
               <div className="mt-5 flex flex-wrap items-end justify-between gap-3">
                 <div className="flex items-end gap-3">
-                  <span className="text-[18px] font-normal leading-none text-black/45 line-through">
+      <span className="text-[17px] font-normal leading-[20px] text-black/45 line-through">
                     {product.originalPrice}
                   </span>
-                  <span className="font-heading text-[22px] font-medium leading-none tracking-[-0.04em]">
+      <span className="font-sans text-[17px] font-[500] leading-[20px] tracking-normal">
                     {product.price}
                   </span>
                 </div>
 
                 <div className="flex items-end gap-2 text-black">
-                  <span className="text-[16px] font-normal leading-none text-black/45">
+      <span className="text-[17px] font-normal uppercase leading-[20px] text-black/45">
                     {product.sold}
                   </span>
-                  <span className="text-black/25">•</span>
-                  <span className="inline-flex items-center gap-1 text-[22px] font-medium leading-none text-black">
+      <span className="text-[17px] font-normal leading-[20px] text-black/25">•</span>
+      <span className="inline-flex items-end gap-1 text-[17px] font-[500] leading-[20px] text-black">
                     <Star className="size-5 fill-[#f2a33c] text-[#f2a33c]" />
                     {product.rating}
                   </span>
                 </div>
               </div>
 
-              <p className="mt-5 max-w-none font-sans text-[16px] font-normal leading-[1.35] text-black/65">
+              <p className="mt-5 max-w-none text-justify font-sans text-[13px] font-normal uppercase leading-[1.35] text-black/65">
                 {product.description}{" "}
                 <Link
                   href="/products#details"
-                  className="font-medium text-black"
+                  className="font-[500] text-black"
                 >
                   See More....
                 </Link>
               </p>
 
               <section className="mt-[34px] space-y-3">
-                <p className="text-[22px] font-medium text-black/45">
-                  Color:{" "}
-                  <span className="font-medium text-black">{selectedColor}</span>
+                <p className="text-[13px] font-normal uppercase text-black/45">
+                  Color{" "}
+                  <span className="font-[500] text-black">{selectedColor}</span>
                 </p>
 
                 <QuickViewColorSwatches
@@ -243,15 +243,19 @@ export function ProductQuickViewModal({
 
               <section className="mt-5 space-y-3">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-[18px] font-normal text-black/45">
-                    Size:{" "}
-                    <span className="font-normal text-black">{selectedSize}</span>
+                  <p className="text-[13px] font-normal uppercase text-black/45">
+                    Size{" "}
+                    <span className="font-[500] text-black">{selectedSize}</span>
                   </p>
                   <Link
                     href="/products#size-guide"
-                    className="text-[18px] font-normal text-black/45 underline underline-offset-4 transition-opacity hover:opacity-70"
+                    className="group inline-flex flex-col items-start pb-0.5 text-[13px] font-normal uppercase leading-none text-black/45 transition-colors duration-200 hover:text-black focus-visible:text-black"
                   >
-                    View Size Chart
+                    <span>View Size Chart</span>
+                    <span
+                      aria-hidden="true"
+                      className="mt-[2px] h-px w-full origin-left scale-x-0 bg-black transition-transform duration-200 group-hover:scale-x-100 group-focus-visible:scale-x-100"
+                    />
                   </Link>
                 </div>
 
@@ -270,7 +274,7 @@ export function ProductQuickViewModal({
 
               <button
                 type="button"
-                className="mt-12 flex h-10 w-full items-center justify-center bg-black text-[22px] font-[500] uppercase tracking-normal text-white transition-opacity hover:opacity-90"
+                className="mt-12 flex h-10 w-full cursor-pointer items-center justify-center bg-black text-[13px] font-normal uppercase tracking-normal text-white transition-opacity hover:opacity-90"
               >
                 Add To Cart
               </button>
@@ -278,9 +282,13 @@ export function ProductQuickViewModal({
               <div className="mt-3 text-center">
                 <Link
                   href="/products"
-                  className="text-[16px] font-normal uppercase tracking-normal text-black/55 underline decoration-current decoration-1 underline-offset-4 transition-opacity hover:opacity-70"
+                  className="group inline-flex flex-col items-start pb-0.5 text-[13px] font-normal uppercase leading-none tracking-normal text-black/55 transition-colors duration-200 hover:text-black focus-visible:text-black"
                 >
-                  View Full Details
+                  <span>View Full Details</span>
+                  <span
+                    aria-hidden="true"
+                    className="mt-[2px] h-px w-full origin-left scale-x-0 bg-black transition-transform duration-200 group-hover:scale-x-100 group-focus-visible:scale-x-100"
+                  />
                 </Link>
               </div>
             </div>

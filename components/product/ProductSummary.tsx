@@ -40,9 +40,9 @@ function OptionButton({
       type="button"
       aria-pressed={active}
       className={cn(
-        "inline-flex items-center justify-center border text-[22px] font-medium leading-none transition-[background-color,border-color,color,transform] duration-200 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45",
+        "inline-flex cursor-pointer items-center justify-center border text-[22px] font-normal leading-none transition-[background-color,border-color,color,transform,font-weight] duration-200 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45",
         active
-          ? "border-black bg-black text-white"
+          ? "border-black bg-black font-[500] text-white"
           : "border-black/15 bg-white text-black hover:border-black hover:bg-black/4",
         className
       )}
@@ -67,10 +67,10 @@ export function ProductSummary({
     <aside className="self-start xl:sticky xl:top-[calc(var(--main-navbar-height)+1.5rem)]">
       <div className="space-y-5 text-black xl:w-[573px] xl:max-w-[573px] xl:justify-self-end">
         <div className="space-y-1">
-          <p className="text-[14px] font-medium uppercase tracking-[0.22em] text-black/45">
+      <p className="w-fit text-[13px] font-normal uppercase leading-[17px] tracking-normal text-black/45">
             {product.editLabel}
           </p>
-          <h1 className="font-heading text-[40px] font-normal uppercase leading-[0.9] tracking-[-0.06em]">
+          <h1 className="font-heading text-[24px] font-normal uppercase leading-[0.9] tracking-[-0.06em]">
             {product.title}
           </h1>
         </div>
@@ -78,21 +78,21 @@ export function ProductSummary({
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div className="space-y-1">
             <div className="flex items-end gap-3">
-              <span className="text-[18px] leading-none text-black/45 line-through">
+          <span className="text-[17px] font-normal leading-[20px] text-black/45 line-through">
                 {product.originalPrice}
               </span>
-              <span className="font-heading text-[22px] font-medium leading-none tracking-[-0.04em]">
+          <span className="font-sans text-[17px] font-[500] leading-[20px] tracking-normal">
                 {product.price}
               </span>
             </div>
           </div>
 
           <div className="flex items-end gap-2 text-black">
-            <span className="text-[16px] font-normal leading-none text-black/45">
+        <span className="text-[17px] font-normal uppercase leading-[20px] text-black/45">
               {product.sold}
             </span>
-            <span className="text-black/25">|</span>
-            <span className="inline-flex items-center gap-1 text-[22px] font-medium leading-none text-black">
+        <span className="text-[17px] font-normal leading-[20px] text-black/25">|</span>
+        <span className="inline-flex items-end gap-1 text-[17px] font-[500] leading-[20px] text-black">
               <Star className="h-24px w-24px fill-[#d08b21] text-[#d08b21]" />
               {product.rating}
             </span>
@@ -103,11 +103,11 @@ export function ProductSummary({
           <p className="text-[22px] font-medium">
             Description:
           </p>
-          <p className="max-w-[36rem] font-sans text-[16px] font-normal leading-[1.75] text-black/68">
+          <p className="max-w-[36rem] text-justify font-sans text-[13px] font-normal uppercase leading-[1.75] text-black/68">
             {product.description}{" "}
             <Link
               href="#details"
-              className="font-medium text-black underline underline-offset-4 transition-opacity hover:opacity-70"
+              className="font-[500] text-black underline underline-offset-4 transition-opacity hover:opacity-70"
             >
               See More...
             </Link>
@@ -116,9 +116,9 @@ export function ProductSummary({
 
         <section className="space-y-3">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-[22px] font-medium text-black/45">
-              Color:{" "}
-              <span className="font-medium text-black">{selectedColor}</span>
+            <p className="text-[13px] font-normal uppercase text-black/45">
+              Color{" "}
+              <span className="font-[500] text-black">{selectedColor}</span>
             </p>
           </div>
 
@@ -134,7 +134,7 @@ export function ProductSummary({
                   aria-label={`Select ${color.name}`}
                   onClick={() => setSelectedColor(color.name)}
                   className={cn(
-                    "flex h-[40px] w-[75px] items-stretch justify-stretch bg-white transition-[box-shadow] duration-200 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45",
+                    "flex h-[40px] w-[75px] cursor-pointer items-stretch justify-stretch bg-white transition-[box-shadow] duration-200 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45",
                     isSelected
                       ? "border-[2px] border-black p-[4px]"
                       : "border-0 p-0"
@@ -152,14 +152,18 @@ export function ProductSummary({
 
         <section className="space-y-3">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-[18px] font-normal text-black/45">
-              Size: <span className="font-normal text-black">{selectedSize}</span>
+            <p className="text-[13px] font-normal uppercase text-black/45">
+              Size <span className="font-[500] text-black">{selectedSize}</span>
             </p>
             <Link
               href="#size-guide"
-              className="text-[18px] font-normal text-black/45 underline underline-offset-4 transition-opacity hover:opacity-70"
+              className="group inline-flex flex-col items-start pb-0.5 text-[13px] font-normal uppercase leading-none text-black/45 transition-colors duration-200 hover:text-black focus-visible:text-black"
             >
-              View Size Chart
+              <span>View Size Chart</span>
+              <span
+                aria-hidden="true"
+                className="mt-[2px] h-px w-full origin-left scale-x-0 bg-black transition-transform duration-200 group-hover:scale-x-100 group-focus-visible:scale-x-100"
+              />
             </Link>
           </div>
 
@@ -179,7 +183,7 @@ export function ProductSummary({
 
         <button
           type="button"
-          className="flex h-12 w-full items-center justify-center border border-black bg-white text-[22px] font-medium uppercase transition-[background-color,color] duration-200 ease-out hover:bg-black hover:text-white"
+          className="flex h-12 w-full cursor-pointer items-center justify-center border border-black bg-white text-[22px] font-medium uppercase transition-[background-color,color] duration-200 ease-out hover:bg-black hover:text-white"
         >
           Add To Cart
         </button>

@@ -34,10 +34,10 @@ export function CollectionBenefitsBar() {
               />
 
               <div className="min-w-0">
-                <p className="text-[0.95rem] font-medium uppercase leading-tight tracking-[0.01em]">
+                <p className="text-[13px] font-medium uppercase leading-tight tracking-[0.01em]">
                   {title}
                 </p>
-                <p className="text-[0.9rem] leading-tight text-black/90">
+                <p className="text-[12px] leading-tight text-black/90">
                   {description}
                 </p>
               </div>

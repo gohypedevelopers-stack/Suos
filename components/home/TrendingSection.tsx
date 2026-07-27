@@ -217,7 +217,7 @@ export function TrendingSection() {
   return (
     <section className="w-full bg-white px-4 py-14 text-black sm:px-6 lg:px-8 md:py-16">
       <div className="flex w-full flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-        <h2 className="font-heading text-[40px] font-normal uppercase leading-none tracking-[-0.04em]">
+        <h2 className="font-heading text-[24px] font-normal uppercase leading-none tracking-[-0.04em]">
           Trending
         </h2>
 

@@ -178,7 +178,7 @@ function FilterTrigger({
     <button
       {...buttonProps}
       type="button"
-      className={`inline-flex h-[42px] items-center justify-between gap-3 border border-black bg-white px-4 text-[16px] uppercase tracking-[0.08em] transition-colors hover:bg-black hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black${className ? ` ${className}` : ""}`}
+      className={`inline-flex h-[42px] items-center justify-between gap-3 border border-black bg-white px-4 text-[13px] font-normal uppercase tracking-[0.08em] transition-colors hover:bg-black hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black${className ? ` ${className}` : ""}`}
     >
       <span>{label}</span>
       <Icon className="size-4 shrink-0 stroke-[1.9]" />
@@ -343,9 +343,9 @@ export function CollectionFilterDropdown({
         <div
           role="menu"
           aria-label={`${group.label} filters`}
-          className="absolute left-0 top-[calc(100%+8px)] z-40 min-w-[250px] border border-black bg-white p-4 text-black shadow-[0_12px_28px_rgba(0,0,0,0.16)]"
+          className="absolute left-0 top-[calc(100%+8px)] z-40 min-w-[250px] border border-black bg-white p-4 text-[13px] font-normal text-black shadow-[0_12px_28px_rgba(0,0,0,0.16)]"
         >
-          <div className="mb-3 flex items-center justify-between border-b border-black/15 pb-3 text-[12px] uppercase tracking-[0.08em]">
+          <div className="mb-3 flex items-center justify-between border-b border-black/15 pb-3 font-normal uppercase tracking-[0.08em]">
             <span>{group.label}</span>
             <button
               type="button"
@@ -365,7 +365,7 @@ export function CollectionFilterDropdown({
                 <label
                   key={option.value}
                   htmlFor={checkboxId}
-                  className="flex cursor-pointer items-center gap-3 text-[14px] leading-5"
+                  className="flex cursor-pointer items-center gap-3 font-normal leading-5"
                 >
                   <Checkbox
                     id={checkboxId}

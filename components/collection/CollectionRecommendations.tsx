@@ -27,19 +27,23 @@ export function CollectionRecommendations() {
       className="w-full overflow-hidden border-t border-black/10 bg-white py-12 text-black sm:py-14"
     >
       <div>
-        <div className="flex items-end justify-between gap-6">
+        <div className="flex items-center justify-between gap-6">
           <h2
             id="collection-recommendations-heading"
-            className="font-heading text-[40px] font-normal uppercase leading-none tracking-[-0.04em]"
+            className="font-heading text-[24px] font-normal uppercase leading-none tracking-[-0.04em]"
           >
             You May Also Like
           </h2>
 
           <Link
             href="/collections"
-            className="hidden border-b border-black pb-0.5 text-[0.7rem] uppercase tracking-[0.14em] transition-opacity hover:opacity-55 sm:inline-flex"
+            className="group hidden flex-col items-start pb-0.5 text-[13px] font-normal uppercase leading-none tracking-normal transition-opacity hover:opacity-70 sm:inline-flex"
           >
-            View all
+            <span>View all</span>
+            <span
+              aria-hidden="true"
+              className="mt-[2px] h-px w-full origin-left scale-x-0 bg-black transition-transform duration-200 group-hover:scale-x-100"
+            />
           </Link>
         </div>
 
@@ -64,22 +68,14 @@ export function CollectionRecommendations() {
                 aria-hidden={index >= products.length}
                 tabIndex={index >= products.length ? -1 : undefined}
               >
-                <div className="relative aspect-[4/5] overflow-hidden bg-[#e7e7e4]">
+                <div className="relative aspect-[330/479] overflow-hidden bg-[#e7e7e4]">
                   <Image
                     src={product.image}
                     alt={product.alt}
                     fill
                     sizes="(max-width: 640px) 42vw, (max-width: 1024px) 20vw, 12vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                    className="object-cover"
                   />
-                </div>
-                <div className="flex items-start justify-between gap-2 pt-2.5">
-                  <span className="min-w-0 truncate text-[0.68rem] uppercase tracking-[0.08em]">
-                    {product.badge ?? "SUOS EDIT"}
-                  </span>
-                  <span className="shrink-0 text-[0.68rem] uppercase tracking-[0.08em] text-black/55">
-                    ₹2,800
-                  </span>
                 </div>
               </Link>
             ))}
@@ -89,7 +85,7 @@ export function CollectionRecommendations() {
         <div className="mt-7 flex justify-center sm:hidden">
           <Link
             href="/collections"
-            className="inline-flex h-9 min-w-[102px] items-center justify-center border border-black px-6 text-[0.7rem] uppercase tracking-[0.12em] transition-colors hover:bg-black hover:text-white"
+            className="inline-flex h-9 min-w-[102px] items-center justify-center border border-black px-6 text-[13px] font-normal uppercase leading-none tracking-normal transition-colors hover:bg-black hover:text-white"
           >
             View all
           </Link>

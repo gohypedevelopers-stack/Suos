@@ -232,11 +232,13 @@
   display: none;
 }
 
-.quick-view-gallery {
+.quick-view-gallery,
+.quick-view-details {
   scrollbar-width: none;
 }
 
-.quick-view-gallery::-webkit-scrollbar {
+.quick-view-gallery::-webkit-scrollbar,
+.quick-view-details::-webkit-scrollbar {
   display: none;
 }
 

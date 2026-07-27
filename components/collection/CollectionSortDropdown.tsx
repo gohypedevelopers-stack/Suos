@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { ChevronDown } from "lucide-react"
+import { Check, ChevronDown } from "lucide-react"
 
 const sortOptions = [
   "BESTSELLER",
@@ -45,10 +45,10 @@ export function CollectionSortDropdown() {
         aria-expanded={isOpen}
         aria-haspopup="menu"
         onClick={() => setIsOpen((open) => !open)}
-        className="inline-flex items-center gap-1.5 text-[14px] font-normal uppercase tracking-[0.08em] transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black"
+        className="inline-flex items-center gap-1.5 text-[13px] font-normal uppercase tracking-[0.08em] transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black"
       >
         <span className="font-normal">SORT BY:</span>
-        <span className="font-medium text-black">{selectedSort}</span>
+        <span className="font-[500] text-black">{selectedSort}</span>
         <ChevronDown
           aria-hidden="true"
           className={`size-4 stroke-[1.9] transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
@@ -59,7 +59,7 @@ export function CollectionSortDropdown() {
         <div
           role="menu"
           aria-label="Sort collection"
-          className="absolute left-0 top-[calc(100%+10px)] z-40 min-w-[220px] border border-black bg-white p-2 text-black shadow-[0_12px_28px_rgba(0,0,0,0.16)]"
+          className="absolute left-0 top-[calc(100%+10px)] z-40 min-w-[220px] border border-black bg-white p-2 text-[13px] text-black shadow-[0_12px_28px_rgba(0,0,0,0.16)]"
         >
           {sortOptions.map((option) => (
             <button
@@ -71,10 +71,12 @@ export function CollectionSortDropdown() {
                 setSelectedSort(option)
                 setIsOpen(false)
               }}
-              className={`flex w-full items-center justify-between px-3 py-2.5 text-left text-[13px] uppercase tracking-[0.06em] transition-colors hover:bg-black hover:text-white ${selectedSort === option ? "font-semibold" : "font-normal"}`}
+              className={`flex w-full items-center justify-between px-3 py-2.5 text-left uppercase tracking-[0.06em] transition-colors hover:bg-black hover:text-white ${selectedSort === option ? "font-semibold" : "font-normal"}`}
             >
               <span>{option}</span>
-              {selectedSort === option && <span aria-hidden="true">✓</span>}
+              {selectedSort === option ? (
+                <Check aria-hidden="true" className="size-4 shrink-0 stroke-[2]" />
+              ) : null}
             </button>
           ))}
         </div>
