@@ -70,7 +70,7 @@ export function ProductSummary({
   )
 
   return (
-    <aside className="self-start [overflow-anchor:none]">
+    <aside className="self-start [overflow-anchor:none] xl:sticky xl:top-[calc(var(--header-stack-height)+24px)]">
       <div className="space-y-5 text-black xl:w-[573px] xl:max-w-[573px] xl:justify-self-end">
         <div className="space-y-1">
       <p className="w-fit text-[13px] font-normal uppercase leading-[17px] tracking-normal text-black/45">
@@ -104,21 +104,6 @@ export function ProductSummary({
             </span>
           </div>
         </div>
-
-        <section className="space-y-2">
-          <p className="text-[24px] font-medium">
-            Description:
-          </p>
-          <p className="max-w-[36rem] text-justify font-sans text-[13px] font-normal uppercase leading-[1.75] text-black/68">
-            {product.description}{" "}
-            <Link
-              href="#details"
-              className="font-[500] text-black underline underline-offset-4 transition-opacity hover:opacity-70"
-            >
-              See More...
-            </Link>
-          </p>
-        </section>
 
         <section className="space-y-3">
           <div className="flex items-center justify-between gap-3">
@@ -195,7 +180,7 @@ export function ProductSummary({
         </button>
 
         <section className="space-y-3">
-          <p className="text-[13px] font-medium text-black/45">
+          <p className="text-[13px] font-normal uppercase text-black/45">
             Delivery T&C
           </p>
 
@@ -212,10 +197,10 @@ export function ProductSummary({
                 >
                   <Icon className="size-5 stroke-[1.7] text-black" />
                   <div className="space-y-0.5">
-                    <p className="text-[13px] font-medium uppercase leading-tight text-black">
+                    <p className="text-[13px] font-normal uppercase leading-tight text-black">
                       {perk.label}
                     </p>
-                    <p className="text-[12px] leading-tight uppercase text-black">
+                    <p className="text-[10px] font-normal uppercase leading-tight text-black/45">
                       {perk.detail}
                     </p>
                   </div>
@@ -236,10 +221,10 @@ export function ProductSummary({
             value="product-details"
             className="border-b border-black/15"
           >
-            <AccordionTrigger className="rounded-none py-4 text-[15px] font-[500] uppercase leading-none tracking-normal hover:no-underline">
+            <AccordionTrigger className="h-[52px] items-center rounded-none py-0 text-[15px] font-[500] uppercase leading-none tracking-normal hover:no-underline">
               Product Details
             </AccordionTrigger>
-            <AccordionContent className="max-w-[36rem] font-sans text-[13px] font-normal leading-[1.72] text-black/68">
+            <AccordionContent className="max-w-[36rem] pb-5 font-sans text-[13px] font-normal uppercase leading-[1.55] text-black/68">
               <p>{product.detailsBody} See More...</p>
             </AccordionContent>
           </AccordionItem>
@@ -248,11 +233,11 @@ export function ProductSummary({
             value="details-and-care"
             className="border-b border-black/15"
           >
-            <AccordionTrigger className="rounded-none py-4 text-[15px] font-[500] uppercase leading-none tracking-normal hover:no-underline">
+            <AccordionTrigger className="h-[52px] items-center rounded-none py-0 text-[15px] font-[500] uppercase leading-none tracking-normal hover:no-underline">
               Details &amp; Care
             </AccordionTrigger>
-            <AccordionContent className="max-w-[36rem] font-sans text-[13px] font-normal leading-[1.72] text-black/68">
-              <ul className="space-y-1">
+            <AccordionContent className="max-w-[36rem] pb-5 font-sans text-[13px] font-normal uppercase leading-[1.55] text-black/68">
+              <ul className="space-y-2">
                 {product.careNotes.map((note) => (
                   <li key={note}>{note}</li>
                 ))}
@@ -264,11 +249,11 @@ export function ProductSummary({
             value="shipping-and-payment"
             className="border-b border-black/15"
           >
-            <AccordionTrigger className="rounded-none py-4 text-[15px] font-[500] uppercase leading-none tracking-normal hover:no-underline">
+            <AccordionTrigger className="h-[52px] items-center rounded-none py-0 text-[15px] font-[500] uppercase leading-none tracking-normal hover:no-underline">
               Shipping &amp; Payment
             </AccordionTrigger>
-            <AccordionContent className="max-w-[36rem] font-sans text-[13px] font-normal leading-[1.72] text-black/68">
-              <ul className="space-y-1">
+            <AccordionContent className="max-w-[36rem] pb-5 font-sans text-[13px] font-normal uppercase leading-[1.55] text-black/68">
+              <ul className="space-y-2">
                 {product.shippingNotes.map((note) => (
                   <li key={note}>{note}</li>
                 ))}
@@ -278,7 +263,7 @@ export function ProductSummary({
         </Accordion>
 
         <section className="space-y-4 pt-8">
-          <h2 className="text-[24px] font-medium uppercase tracking-[0.08em]">
+          <h2 className="text-[24px] font-normal uppercase">
             Complete The Look
           </h2>
 

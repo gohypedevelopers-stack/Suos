@@ -222,9 +222,9 @@ export function ProductQuickViewModal({
                 {product.description}{" "}
                 <Link
                   href="/products#details"
-                  className="font-[500] text-black"
+                  className="relative inline-block font-[500] leading-none text-black after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-200 after:content-[''] hover:after:scale-x-100 focus-visible:after:scale-x-100"
                 >
-                  See More....
+                  See More...
                 </Link>
               </p>
 

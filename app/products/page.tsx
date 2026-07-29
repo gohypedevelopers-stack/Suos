@@ -18,8 +18,11 @@ export default function Page() {
     <main className="flex-1 bg-white text-black">
       <section className="relative w-full overflow-x-clip px-4 pb-16 pt-5 sm:px-6 lg:px-8 lg:pt-6">
         <div className="w-full">
-          <nav aria-label="Breadcrumb" className="text-[0.7rem] text-black/45">
-            <ol className="flex flex-wrap items-center gap-1.5 uppercase tracking-[0.14em]">
+          <nav
+            aria-label="Breadcrumb"
+            className="text-[13px] font-normal text-black/45"
+          >
+            <ol className="flex flex-wrap items-center gap-1.5 uppercase tracking-[0]">
               {featuredProduct.breadcrumb.map((crumb, index) => {
                 const isLast = index === featuredProduct.breadcrumb.length - 1
 
