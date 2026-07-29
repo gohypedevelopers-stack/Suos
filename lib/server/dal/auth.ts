@@ -4,19 +4,20 @@ import { cache } from "react"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/server/db"
+import { getAuth } from "@/lib/auth"
+import { getPrisma } from "@/lib/server/db"
 
 export const getCurrentUser = cache(async () => {
-  const session = await auth.api.getSession({
-    headers: await headers(),
+  const requestHeaders = await headers()
+  const session = await getAuth().api.getSession({
+    headers: requestHeaders,
   })
 
   if (!session?.user.id) {
     return null
   }
 
-  return prisma.user.findUnique({
+  return getPrisma().user.findUnique({
     where: { id: session.user.id },
     select: {
       id: true,

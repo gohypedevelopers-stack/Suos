@@ -2,7 +2,7 @@ import "server-only"
 
 import { Prisma } from "@/generated/prisma/client"
 import { assertAdmin } from "@/lib/server/dal/auth"
-import { prisma } from "@/lib/server/db"
+import { getPrisma } from "@/lib/server/db"
 import {
   productInputSchema,
   type ProductInput,
@@ -21,6 +21,7 @@ function slugify(value: string) {
 }
 
 async function createAvailableSlug(requestedSlug: string) {
+  const prisma = getPrisma()
   const baseSlug = slugify(requestedSlug) || "product"
   const matchingSlugs = await prisma.product.findMany({
     where: {
@@ -45,6 +46,7 @@ async function createAvailableSlug(requestedSlug: string) {
 
 export async function createProduct(input: ProductInput) {
   await assertAdmin()
+  const prisma = getPrisma()
   const product = productInputSchema.parse(input)
   const slug = await createAvailableSlug(product.slug ?? product.title)
 
@@ -76,6 +78,7 @@ export async function createProduct(input: ProductInput) {
 
 export async function archiveProduct(productId: string) {
   await assertAdmin()
+  const prisma = getPrisma()
 
   return prisma.product.update({
     where: { id: productId },
@@ -86,6 +89,7 @@ export async function archiveProduct(productId: string) {
 
 export async function attachProductImage(input: unknown) {
   await assertAdmin()
+  const prisma = getPrisma()
   const image = attachProductImageSchema.parse(input)
 
   const lastImage = await prisma.productImage.findFirst({

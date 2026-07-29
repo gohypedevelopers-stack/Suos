@@ -13,6 +13,12 @@ import type { ButtonHTMLAttributes } from "react"
 import { useState } from "react"
 
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+import {
   Carousel,
   CarouselContent,
   CarouselItem,
@@ -40,7 +46,7 @@ function OptionButton({
       type="button"
       aria-pressed={active}
       className={cn(
-        "inline-flex cursor-pointer items-center justify-center border text-[22px] font-normal leading-none transition-[background-color,border-color,color,transform,font-weight] duration-200 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45",
+        "inline-flex cursor-pointer items-center justify-center border text-[13px] font-normal leading-none transition-[background-color,border-color,color,transform,font-weight] duration-200 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45",
         active
           ? "border-black bg-black font-[500] text-white"
           : "border-black/15 bg-white text-black hover:border-black hover:bg-black/4",
@@ -64,7 +70,7 @@ export function ProductSummary({
   )
 
   return (
-    <aside className="self-start xl:sticky xl:top-[calc(var(--main-navbar-height)+1.5rem)]">
+    <aside className="self-start [overflow-anchor:none]">
       <div className="space-y-5 text-black xl:w-[573px] xl:max-w-[573px] xl:justify-self-end">
         <div className="space-y-1">
       <p className="w-fit text-[13px] font-normal uppercase leading-[17px] tracking-normal text-black/45">
@@ -100,7 +106,7 @@ export function ProductSummary({
         </div>
 
         <section className="space-y-2">
-          <p className="text-[22px] font-medium">
+          <p className="text-[24px] font-medium">
             Description:
           </p>
           <p className="max-w-[36rem] text-justify font-sans text-[13px] font-normal uppercase leading-[1.75] text-black/68">
@@ -183,13 +189,13 @@ export function ProductSummary({
 
         <button
           type="button"
-          className="flex h-12 w-full cursor-pointer items-center justify-center border border-black bg-white text-[22px] font-medium uppercase transition-[background-color,color] duration-200 ease-out hover:bg-black hover:text-white"
+          className="flex h-12 w-full cursor-pointer items-center justify-center border border-black bg-white text-[13px] font-normal uppercase tracking-normal transition-[background-color,color] duration-200 ease-out hover:bg-black hover:text-white"
         >
           Add To Cart
         </button>
 
         <section className="space-y-3">
-          <p className="text-[16px] font-medium text-black/45">
+          <p className="text-[13px] font-medium text-black/45">
             Delivery T&C
           </p>
 
@@ -206,10 +212,10 @@ export function ProductSummary({
                 >
                   <Icon className="size-5 stroke-[1.7] text-black" />
                   <div className="space-y-0.5">
-                    <p className="text-[0.52rem] uppercase text-black">
+                    <p className="text-[13px] font-medium uppercase leading-tight text-black">
                       {perk.label}
                     </p>
-                    <p className="text-[0.6rem] uppercase text-black">
+                    <p className="text-[12px] leading-tight uppercase text-black">
                       {perk.detail}
                     </p>
                   </div>
@@ -219,32 +225,60 @@ export function ProductSummary({
           </div>
         </section>
 
-        <section id="details" className="border-t border-black/15 pt-4">
-          <h2 className="text-[22px] font-medium uppercase">
-            Product Details
-          </h2>
-          <p className="mt-3 max-w-[36rem] font-sans text-[16px] font-normal leading-[1.72] text-black/68">
-            {product.detailsBody} See More...
-          </p>
-        </section>
+        <Accordion
+          id="details"
+          type="single"
+          defaultValue="product-details"
+          collapsible
+          className="border-t border-black/15"
+        >
+          <AccordionItem
+            value="product-details"
+            className="border-b border-black/15"
+          >
+            <AccordionTrigger className="rounded-none py-4 text-[15px] font-[500] uppercase leading-none tracking-normal hover:no-underline">
+              Product Details
+            </AccordionTrigger>
+            <AccordionContent className="max-w-[36rem] font-sans text-[13px] font-normal leading-[1.72] text-black/68">
+              <p>{product.detailsBody} See More...</p>
+            </AccordionContent>
+          </AccordionItem>
 
-        <div className="space-y-4 border-t border-black/15 pt-3">
-          <button
-            type="button"
-            className="block w-fit border-b border-black/55 pb-0.5 text-[22px] font-medium leading-none uppercase tracking-normal transition-opacity hover:opacity-70"
+          <AccordionItem
+            value="details-and-care"
+            className="border-b border-black/15"
           >
-            Details &amp; Care
-          </button>
-          <button
-            type="button"
-            className="block w-fit border-b border-black/55 pb-0.5 text-[22px] font-medium leading-none uppercase tracking-normal transition-opacity hover:opacity-70"
+            <AccordionTrigger className="rounded-none py-4 text-[15px] font-[500] uppercase leading-none tracking-normal hover:no-underline">
+              Details &amp; Care
+            </AccordionTrigger>
+            <AccordionContent className="max-w-[36rem] font-sans text-[13px] font-normal leading-[1.72] text-black/68">
+              <ul className="space-y-1">
+                {product.careNotes.map((note) => (
+                  <li key={note}>{note}</li>
+                ))}
+              </ul>
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem
+            value="shipping-and-payment"
+            className="border-b border-black/15"
           >
-            Shipping &amp; Payment
-          </button>
-        </div>
+            <AccordionTrigger className="rounded-none py-4 text-[15px] font-[500] uppercase leading-none tracking-normal hover:no-underline">
+              Shipping &amp; Payment
+            </AccordionTrigger>
+            <AccordionContent className="max-w-[36rem] font-sans text-[13px] font-normal leading-[1.72] text-black/68">
+              <ul className="space-y-1">
+                {product.shippingNotes.map((note) => (
+                  <li key={note}>{note}</li>
+                ))}
+              </ul>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
 
         <section className="space-y-4 pt-8">
-          <h2 className="text-[22px] font-medium uppercase tracking-[0.08em]">
+          <h2 className="text-[24px] font-medium uppercase tracking-[0.08em]">
             Complete The Look
           </h2>
 

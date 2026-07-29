@@ -1,6 +1,6 @@
 import "server-only"
 
-import { prisma } from "@/lib/server/db"
+import { getPrisma } from "@/lib/server/db"
 import { assertAdmin } from "@/lib/server/dal/auth"
 
 function imageUrl(objectKey: string) {
@@ -9,6 +9,7 @@ function imageUrl(objectKey: string) {
 }
 
 export async function listPublishedProducts() {
+  const prisma = getPrisma()
   const products = await prisma.product.findMany({
     where: { status: "ACTIVE" },
     orderBy: { createdAt: "desc" },
@@ -70,6 +71,7 @@ export async function listPublishedProducts() {
 export async function listProductsForAdmin() {
   await assertAdmin()
 
+  const prisma = getPrisma()
   const products = await prisma.product.findMany({
     orderBy: { updatedAt: "desc" },
     select: {
