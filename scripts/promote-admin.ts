@@ -19,14 +19,21 @@ const adapter = new PrismaPg({
 })
 const prisma = new PrismaClient({ adapter })
 
-try {
-  const user = await prisma.user.update({
-    where: { email: env.ADMIN_EMAIL.toLowerCase() },
-    data: { role: "ADMIN" },
-    select: { id: true, email: true, role: true },
-  })
+async function main() {
+  try {
+    const user = await prisma.user.update({
+      where: { email: env.ADMIN_EMAIL.toLowerCase() },
+      data: { role: "ADMIN" },
+      select: { id: true, email: true, role: true },
+    })
 
-  console.log(`Promoted ${user.email} (${user.id}) to ${user.role}.`)
-} finally {
-  await prisma.$disconnect()
+    console.log(`Promoted ${user.email} (${user.id}) to ${user.role}.`)
+  } finally {
+    await prisma.$disconnect()
+  }
 }
+
+main().catch((error: unknown) => {
+  console.error(error)
+  process.exitCode = 1
+})

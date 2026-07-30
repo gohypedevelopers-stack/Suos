@@ -37,6 +37,9 @@ yarn-error.log*
 # generated database client
 /generated/prisma
 
+# local development database
+/.local-postgres-data/
+
 # vercel
 .vercel
 
