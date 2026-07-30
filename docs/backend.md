@@ -17,6 +17,23 @@ The application uses a modular Next.js backend:
 4. Run `npm run db:deploy`.
 5. Run `npm run dev`.
 
+On Windows, keep an encrypted backup of the local environment file outside the
+repository:
+
+```powershell
+npm run env:backup
+```
+
+If a Git cleanup or package workflow deletes `.env`, restore it with:
+
+```powershell
+npm run env:restore
+```
+
+The backup is encrypted for the current Windows account and stored under the
+user's local application-data directory. Run the backup command again whenever
+credentials change.
+
 Every signup is assigned the `CUSTOMER` role. To promote an existing account:
 
 ```bash

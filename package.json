@@ -13,6 +13,8 @@
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio",
+    "env:backup": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/backup-env.ps1",
+    "env:restore": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/restore-env.ps1",
     "admin:promote": "tsx scripts/promote-admin.ts"
   },
   "dependencies": {
