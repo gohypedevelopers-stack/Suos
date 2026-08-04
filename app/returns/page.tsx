@@ -30,7 +30,7 @@ export default function ReturnsPage() {
 
         <section className="flex items-center justify-center px-6 py-14 sm:px-12 lg:px-20 xl:px-24">
           <div className="w-full max-w-[474px]">
-            <h1 className="text-[25px] font-normal uppercase leading-none">
+            <h1 className="font-heading text-[24px] font-normal uppercase leading-none">
               Place a refund/ exchange request
             </h1>
 
@@ -43,7 +43,7 @@ export default function ReturnsPage() {
                 name="order-number"
                 type="text"
                 placeholder="Order number"
-                className="h-[42px] w-full border border-black px-4 text-[18px] outline-none placeholder:text-black/60 focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                className="h-[42px] w-full border border-black px-4 text-[13px] outline-none placeholder:text-black/60 focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
               />
               <label className="sr-only" htmlFor="return-email">
                 Email address
@@ -54,17 +54,17 @@ export default function ReturnsPage() {
                 type="email"
                 autoComplete="email"
                 placeholder="Email"
-                className="h-[42px] w-full border border-black px-4 text-[18px] outline-none placeholder:text-black/60 focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                className="h-[42px] w-full border border-black px-4 text-[13px] outline-none placeholder:text-black/60 focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
               />
               <button
                 type="submit"
-                className="mt-3 flex h-[42px] w-full items-center justify-center bg-black text-[18px] uppercase text-white transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                className="mt-3 flex h-[42px] w-full items-center justify-center bg-black text-[13px] font-normal uppercase text-white transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
               >
                 Proceed
               </button>
             </form>
 
-            <ul className="mt-10 space-y-4 text-[18px] leading-[1.35]">
+            <ul className="mt-10 space-y-4 text-[13px] font-normal leading-[1.45]">
               {conditions.map((condition) => (
                 <li key={condition} className="flex items-start gap-4">
                   <span className="mt-0.5 inline-flex size-3 shrink-0 items-center justify-center border border-black">
@@ -78,7 +78,7 @@ export default function ReturnsPage() {
             <div className="mt-9 space-y-2 text-[13px] text-black/60">
               <p>
                 Our full{" "}
-                <Link href="/returns" className="underline underline-offset-2 hover:text-black">
+                <Link href="/returns-policy" className="underline underline-offset-2 hover:text-black">
                   Return &amp; Exchange Policy
                 </Link>
               </p>

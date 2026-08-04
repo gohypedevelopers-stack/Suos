@@ -8,9 +8,9 @@ const companyLinks = [
   { label: "Contact Us", href: "/contact" },
   { label: "Help", href: "/#help" },
   { label: "Chat With Us", href: "/#chat" },
-  { label: "Privacy Policy", href: "/#privacy" },
-  { label: "Refund Policy", href: "/#refund" },
-  { label: "Terms of Service", href: "/#terms" },
+  { label: "Privacy Policy", href: "/privacy" },
+  { label: "Refund Policy", href: "/returns-policy#returns-policy" },
+  { label: "Terms of Service", href: "/terms" },
 ] as const
 
 const quickLinks = [
@@ -20,9 +20,9 @@ const quickLinks = [
 ] as const
 
 const bottomLinks = [
-  { label: "Privacy Policy", href: "/#privacy" },
-  { label: "Terms of Use", href: "/#terms" },
-  { label: "Returns", href: "/returns" },
+  { label: "Privacy Policy", href: "/privacy" },
+  { label: "Terms of Use", href: "/terms" },
+  { label: "Returns Policy", href: "/returns-policy" },
 ] as const
 
 function FooterLink({

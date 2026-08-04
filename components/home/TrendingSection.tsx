@@ -91,8 +91,14 @@ export function ProductCardView({
           className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.015]"
         />
 
+        <Link
+          href="/products"
+          aria-label={`View ${product.alt}`}
+          className="absolute inset-0 z-30 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-white"
+        />
+
         {product.badge ? (
-          <span className="absolute left-3 top-3 z-10 bg-black px-2.5 py-1 text-[13px] font-light uppercase leading-none tracking-normal text-white">
+          <span className="pointer-events-none absolute left-3 top-3 z-40 bg-black px-2.5 py-1 text-[13px] font-light uppercase leading-none tracking-normal text-white">
             {product.badge}
           </span>
         ) : null}
@@ -105,14 +111,14 @@ export function ProductCardView({
             setQuickViewOpen(true)
           }}
           className={cn(
-            "absolute right-3 top-3 z-10 inline-flex size-5 translate-y-0 cursor-pointer items-center justify-center border border-black/20 bg-white text-black opacity-100 transition-colors duration-200 hover:bg-[#e5e5e5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+            "absolute right-3 top-3 z-40 inline-flex size-5 translate-y-0 cursor-pointer items-center justify-center border border-black/20 bg-white text-black opacity-100 transition-colors duration-200 hover:bg-[#e5e5e5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
           )}
         >
           <Plus className="size-3.5 stroke-[2.1]" />
         </button>
 
         {hasGalleryControls ? (
-          <div className="pointer-events-none absolute inset-x-3 top-1/2 z-20 flex -translate-y-1/2 items-center justify-between opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100">
+          <div className="pointer-events-none absolute inset-x-3 top-1/2 z-40 flex -translate-y-1/2 items-center justify-between opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100">
               <button
                 type="button"
                 aria-label="Previous product image"
@@ -141,7 +147,7 @@ export function ProductCardView({
 
         <div
           className={cn(
-            "absolute inset-x-3 bottom-3 z-10 overflow-hidden bg-white text-black shadow-[0_8px_18px_rgba(0,0,0,0.12)] transition-[height,padding] duration-300 ease-out",
+            "pointer-events-none absolute inset-x-3 bottom-3 z-40 overflow-hidden bg-white text-black shadow-[0_8px_18px_rgba(0,0,0,0.12)] transition-[height,padding] duration-300 ease-out",
             expanded ? "h-[140px]" : "h-[56px] group-hover:h-[140px]"
           )}
         >
@@ -162,10 +168,10 @@ export function ProductCardView({
 
           <div
             className={cn(
-              "pointer-events-none absolute inset-0 flex flex-col gap-2.5 p-3 opacity-0 transition-all duration-300 ease-out",
+              "absolute inset-0 flex flex-col gap-2.5 p-3 opacity-0 transition-all duration-300 ease-out",
               expanded
-                ? "pointer-events-auto translate-y-0 opacity-100"
-                : "group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100"
+                ? "translate-y-0 opacity-100"
+                : "group-hover:translate-y-0 group-hover:opacity-100"
             )}
           >
             <div className="flex items-start justify-between gap-3">
@@ -192,7 +198,7 @@ export function ProductCardView({
 
               <button
                 type="button"
-                className="flex h-10 w-full cursor-pointer items-center justify-center border border-black bg-white text-[13px] uppercase tracking-normal transition-colors hover:bg-black hover:text-white"
+                className="pointer-events-auto flex h-10 w-full cursor-pointer items-center justify-center border border-black bg-white text-[13px] uppercase tracking-normal transition-colors hover:bg-black hover:text-white"
               >
                 Add To Cart
               </button>
