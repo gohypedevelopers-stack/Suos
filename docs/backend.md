@@ -59,7 +59,8 @@ Before starting:
 3. Connect the R2 bucket to the `R2_PUBLIC_URL` custom domain.
 4. Configure R2 CORS to allow `PUT` from the application origin with the
    supported image content types.
-5. Replace `example.com` in `deploy/nginx/suos.conf`.
+5. Verify `deploy/nginx/suos.conf` uses the deployment hostname and its
+   matching Let's Encrypt certificate paths.
 
 Deploy with:
 
