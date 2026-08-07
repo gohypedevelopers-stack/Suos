@@ -27,7 +27,7 @@ function ColorSwatches({ swatches }: { swatches: string[] }) {
       {swatches.map((swatch) => (
         <span
           key={swatch}
-          className="group/swatch relative inline-flex cursor-pointer flex-col items-center pb-0.5"
+          className="group/swatch relative inline-flex cursor-pointer flex-col items-center pb-0.5 pointer-events-auto"
         >
           <span
             className="size-[15px] border border-black/10"
@@ -35,7 +35,7 @@ function ColorSwatches({ swatches }: { swatches: string[] }) {
           />
           <span
             aria-hidden="true"
-            className="mt-[1px] h-px w-full origin-left scale-x-0 bg-black/55 transition-transform duration-200 group-hover/swatch:scale-x-100"
+            className="mt-[3px] h-px w-full origin-left scale-x-0 bg-black/55 transition-transform duration-200 group-hover/swatch:scale-x-100"
           />
         </span>
       ))}
@@ -45,8 +45,8 @@ function ColorSwatches({ swatches }: { swatches: string[] }) {
 
 function SizeMarker({ size }: { size: string }) {
   return (
-    <span className="group/size relative inline-flex cursor-pointer flex-col items-center pb-0.5">
-      <span className="leading-none">{size}</span>
+    <span className="group/size relative inline-flex cursor-pointer flex-col items-center pb-0.5 pointer-events-auto">
+      <span className="flex h-[15px] items-center justify-center leading-none">{size}</span>
       <span
         aria-hidden="true"
         className="mt-[1px] h-px w-full origin-left scale-x-0 bg-current transition-transform duration-200 group-hover/size:scale-x-100"

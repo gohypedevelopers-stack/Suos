@@ -1,8 +1,8 @@
 "use client"
 
-import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { Eye, EyeOff } from "lucide-react"
 import { type FormEvent, useState } from "react"
 
 import { authClient } from "@/lib/auth-client"
@@ -16,6 +16,8 @@ export function SignUpPanel() {
   const router = useRouter()
   const [submission, setSubmission] = useState<SubmissionState>({ type: "idle" })
   const [isPending, setIsPending] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -65,18 +67,9 @@ export function SignUpPanel() {
   }
 
   return (
-    <div className="w-full max-w-[28rem] px-6 py-12 sm:px-10 lg:px-0 lg:py-16">
-      <Image
-        src="/logo.svg"
-        alt="SUOS"
-        width={450}
-        height={208}
-        priority
-        className="mx-auto h-auto w-[min(100%,19rem)]"
-      />
-
-      <div className="mt-12">
-        <h1 className="font-heading text-[24px] font-normal uppercase leading-none">
+    <div className="w-full">
+      <div>
+        <h1 className="font-heading text-[24px] font-normal uppercase leading-none tracking-normal">
           Create your account
         </h1>
         <p className="mt-3 max-w-sm text-[13px] leading-[1.6] text-black">
@@ -84,7 +77,7 @@ export function SignUpPanel() {
         </p>
       </div>
 
-      <form className="mt-8 space-y-5" onSubmit={handleSubmit} noValidate>
+      <form className="mt-6 space-y-4" onSubmit={handleSubmit} noValidate>
         <div>
           <label htmlFor="full-name" className="mb-2 block text-[13px] font-normal uppercase leading-none">
             Full name
@@ -122,77 +115,101 @@ export function SignUpPanel() {
             <label htmlFor="password" className="mb-2 block text-[13px] font-normal uppercase leading-none">
               Password
             </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="new-password"
-              required
-              minLength={8}
-              placeholder="8+ characters"
-              onChange={() => setSubmission({ type: "idle" })}
-              className="h-12 w-full border border-black bg-white px-4 text-[13px] placeholder:text-black/40 focus:outline-none focus:ring-1 focus:ring-black"
-            />
+            <div className="relative">
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="new-password"
+                required
+                minLength={8}
+                placeholder="8+ characters"
+                onChange={() => setSubmission({ type: "idle" })}
+                className="h-12 w-full border border-black bg-white px-4 pr-11 text-[13px] placeholder:text-black/40 focus:outline-none focus:ring-1 focus:ring-black"
+              />
+              <button
+                type="button"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-pressed={showPassword}
+                onClick={() => setShowPassword((visible) => !visible)}
+                className="absolute right-3 top-1/2 inline-flex size-6 -translate-y-1/2 cursor-pointer items-center justify-center text-black/55 transition-colors hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30"
+              >
+                {showPassword ? (
+                  <EyeOff aria-hidden="true" className="size-[18px] stroke-[1.7]" />
+                ) : (
+                  <Eye aria-hidden="true" className="size-[18px] stroke-[1.7]" />
+                )}
+              </button>
+            </div>
           </div>
           <div>
             <label htmlFor="confirm-password" className="mb-2 block text-[13px] font-normal uppercase leading-none">
               Confirm password
             </label>
-            <input
-              id="confirm-password"
-              name="confirmPassword"
-              type="password"
-              autoComplete="new-password"
-              required
-              minLength={8}
-              placeholder="Repeat password"
-              onChange={() => setSubmission({ type: "idle" })}
-              className="h-12 w-full border border-black bg-white px-4 text-[13px] placeholder:text-black/40 focus:outline-none focus:ring-1 focus:ring-black"
-            />
+            <div className="relative">
+              <input
+                id="confirm-password"
+                name="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                autoComplete="new-password"
+                required
+                minLength={8}
+                placeholder="Repeat password"
+                onChange={() => setSubmission({ type: "idle" })}
+                className="h-12 w-full border border-black bg-white px-4 pr-11 text-[13px] placeholder:text-black/40 focus:outline-none focus:ring-1 focus:ring-black"
+              />
+              <button
+                type="button"
+                aria-label={showConfirmPassword ? "Hide confirmed password" : "Show confirmed password"}
+                aria-pressed={showConfirmPassword}
+                onClick={() => setShowConfirmPassword((visible) => !visible)}
+                className="absolute right-3 top-1/2 inline-flex size-6 -translate-y-1/2 cursor-pointer items-center justify-center text-black/55 transition-colors hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30"
+              >
+                {showConfirmPassword ? (
+                  <EyeOff aria-hidden="true" className="size-[18px] stroke-[1.7]" />
+                ) : (
+                  <Eye aria-hidden="true" className="size-[18px] stroke-[1.7]" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
 
-        <label className="flex cursor-pointer items-start gap-3 pt-1 text-[13px] leading-[1.45] text-black/70">
-          <input required type="checkbox" className="mt-0.5 size-4 shrink-0 accent-black" />
-          <span>
-            I agree to the{" "}
-            <Link href="/terms" className="underline underline-offset-2 hover:text-black">
-              Terms &amp; Conditions
-            </Link>{" "}
-            and{" "}
-            <Link href="/privacy" className="underline underline-offset-2 hover:text-black">
-              Privacy Policy
-            </Link>
-            .
-          </span>
-        </label>
-
-        <p
-          aria-live="polite"
-          className={`min-h-5 text-[13px] ${
-            submission.type === "error"
-              ? "text-red-700"
-              : submission.type === "success"
-                ? "text-emerald-700"
-                : "text-transparent"
-          }`}
-        >
-          {submission.type === "idle" ? "Form status" : submission.message}
-        </p>
+        {submission.type !== "idle" ? (
+          <p
+            aria-live="polite"
+            className={`text-[13px] ${
+              submission.type === "error" ? "text-red-700" : "text-emerald-700"
+            }`}
+          >
+            {submission.message}
+          </p>
+        ) : null}
 
         <button
           type="submit"
           disabled={isPending}
-          className="flex h-14 w-full items-center justify-between bg-black px-5 text-[13px] font-normal uppercase text-white transition-colors hover:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:cursor-wait disabled:bg-black/60"
+          className="flex h-14 w-full items-center justify-center bg-black px-5 text-[13px] font-normal uppercase text-white transition-colors hover:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:cursor-wait disabled:bg-black/60"
         >
           <span>{isPending ? "Creating account…" : "Create account"}</span>
-          <span aria-hidden="true">↗</span>
         </button>
+
+        <p className="text-[12px] leading-[1.5] text-black/60">
+          By creating an account, you agree to our{" "}
+          <Link href="/terms" className="font-medium underline underline-offset-2 hover:text-black">
+            Terms &amp; Conditions
+          </Link>{" "}
+          and{" "}
+          <Link href="/privacy" className="font-medium underline underline-offset-2 hover:text-black">
+            Privacy Policy
+          </Link>
+          . You also consent to receive marketing and promotional communications from SUOS. You may unsubscribe at any time.
+        </p>
       </form>
 
-      <p className="mt-7 text-center text-[13px] font-normal uppercase">
+      <p className="mt-5 text-center text-[13px] font-normal uppercase">
         Already have an account?{" "}
-        <Link href="/login" className="font-semibold underline underline-offset-4 hover:text-black/60">
+        <Link href="/login" className="font-[500] underline underline-offset-4 hover:text-black/60">
           Log in
         </Link>
       </p>

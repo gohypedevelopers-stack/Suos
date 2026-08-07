@@ -59,7 +59,7 @@ export function CollectionSortDropdown() {
         <div
           role="menu"
           aria-label="Sort collection"
-          className="absolute left-0 top-[calc(100%+10px)] z-40 min-w-[220px] border border-black bg-white p-2 text-[13px] text-black shadow-[0_12px_28px_rgba(0,0,0,0.16)]"
+          className="absolute left-0 top-[calc(100%+10px)] z-50 min-w-[220px] border border-black bg-white p-2 text-[13px] text-black shadow-[0_12px_28px_rgba(0,0,0,0.16)]"
         >
           {sortOptions.map((option) => (
             <button

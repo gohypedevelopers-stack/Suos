@@ -93,7 +93,7 @@ export function SearchSidebar({ open, onOpenChange }: SearchSidebarProps) {
             <SheetClose asChild>
               <button
                 type="button"
-                className="inline-flex items-center gap-2 text-[15px] font-normal uppercase text-white/90 transition-opacity hover:opacity-60"
+                className="inline-flex cursor-pointer items-center gap-2 text-[15px] font-normal uppercase text-white/90 transition-opacity hover:opacity-60"
               >
                 <span>Close</span>
                 <X aria-hidden="true" className="size-5 stroke-2" />

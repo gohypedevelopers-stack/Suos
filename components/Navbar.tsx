@@ -177,7 +177,7 @@ function IconButton({
       aria-haspopup={ariaHaspopup}
       onClick={onClick}
       className={cn(
-        "inline-flex size-9 items-center justify-center text-current transition-[color,opacity] duration-300 ease-out hover:opacity-60 focus-visible:outline-none focus-visible:ring-2",
+        "inline-flex size-9 cursor-pointer items-center justify-center text-current transition-[color,opacity] duration-300 ease-out hover:opacity-60 focus-visible:outline-none focus-visible:ring-2",
         tone === "light"
           ? "focus-visible:ring-white/30"
           : "focus-visible:ring-black/25"
@@ -536,35 +536,40 @@ export function Navbar({
               height={120}
               priority
               className={cn(
-                "block h-auto w-[9.5rem] max-w-none transition-[filter] duration-300 ease-out",
+                "block h-auto w-[8.5rem] max-w-none transition-[filter] duration-300 ease-out",
                 isOverlay && !isLightSurface && "invert"
               )}
             />
           </Link>
 
-          <div className="flex items-center justify-self-end gap-4 xl:gap-6">
-            <div className="relative h-[34px] w-[220px] shrink-0 xl:w-[266px]">
-              <button
-                type="button"
-                aria-label="Search products"
-                aria-haspopup="dialog"
-                aria-expanded={searchOpen}
-                onClick={() => setSearchOpen(true)}
-                className={cn(
-                  "relative flex h-full w-full items-center border border-current/80 bg-transparent px-4 pr-10 text-left text-[0.875rem] text-current outline-none transition-[color,border-color,opacity] duration-300 ease-out hover:opacity-80"
-                )}
-              >
-                <span
-                  className="block truncate text-[13px] font-normal text-current/80"
-                >
-                  What are you looking for?
-                </span>
-              </button>
-              <Search
-                aria-hidden="true"
-                className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 stroke-[1.75] text-current transition-colors duration-300 ease-out"
-              />
-            </div>
+          <div className="flex items-center justify-self-end gap-2 xl:gap-3">
+            <IconButton
+              label="Search products"
+              tone={tone}
+              onClick={() => setSearchOpen(true)}
+              ariaHaspopup="dialog"
+              ariaExpanded={searchOpen}
+            >
+              <Search className="size-[18px] stroke-[1.7]" />
+            </IconButton>
+
+            <Link
+              href="/login"
+              aria-label="Profile"
+              className="inline-flex size-9 cursor-pointer items-center justify-center text-current transition-[color,opacity] duration-300 ease-out hover:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current/30"
+            >
+              <UserRound className="size-[18px] stroke-[1.7]" />
+            </Link>
+
+            <IconButton
+              label="Wishlist"
+              tone={tone}
+              onClick={toggleWishlist}
+              ariaHaspopup="menu"
+              ariaExpanded={isWishlistOpen}
+            >
+              <Heart className="size-[18px] stroke-[1.7]" />
+            </IconButton>
 
             <IconButton
               label="Cart"
@@ -573,25 +578,6 @@ export function Navbar({
             >
               <ShoppingBag className="size-[18px] stroke-[1.7]" />
             </IconButton>
-
-            <div className="flex shrink-0 items-center gap-4 xl:gap-6">
-              <IconButton
-                label="Wishlist"
-                tone={tone}
-                onClick={toggleWishlist}
-                ariaHaspopup="menu"
-                ariaExpanded={isWishlistOpen}
-              >
-                <Heart className="size-[18px] stroke-[1.7]" />
-              </IconButton>
-              <Link
-                href="/login"
-                aria-label="Account"
-                className="inline-flex size-9 items-center justify-center text-current transition-[color,opacity] duration-300 ease-out hover:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current/30"
-              >
-                <UserRound className="size-[18px] stroke-[1.7]" />
-              </Link>
-            </div>
           </div>
         </div>
 
@@ -617,13 +603,20 @@ export function Navbar({
                 height={102}
                 priority
                 className={cn(
-                  "block h-auto w-[8.75rem] max-w-none transition-[filter] duration-300 ease-out",
+                  "block h-auto w-[8rem] max-w-none transition-[filter] duration-300 ease-out",
                   isOverlay && !isLightSurface && "invert"
                 )}
               />
             </Link>
 
             <div className="flex items-center gap-2">
+              <Link
+                href="/login"
+                aria-label="Profile"
+                className="inline-flex size-9 cursor-pointer items-center justify-center text-current transition-[color,opacity] duration-300 ease-out hover:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current/30"
+              >
+                <UserRound className="size-[18px] stroke-[1.7]" />
+              </Link>
               <IconButton
                 label="Wishlist"
                 tone={tone}
@@ -640,13 +633,6 @@ export function Navbar({
               >
                 <ShoppingBag className="size-[18px] stroke-[1.7]" />
               </IconButton>
-              <Link
-                href="/login"
-                aria-label="Account"
-                className="inline-flex size-9 items-center justify-center text-current transition-[color,opacity] duration-300 ease-out hover:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current/30"
-              >
-                <UserRound className="size-[18px] stroke-[1.7]" />
-              </Link>
             </div>
           </div>
 
