@@ -3,6 +3,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { akzidenzGrotesk, georgia, holiday } from "@/lib/fonts";
 import { SiteChrome } from "@/components/SiteChrome";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "SUOS",
@@ -30,6 +31,7 @@ export default function RootLayout({
       )}
     >
       <body className="min-h-full flex flex-col bg-white text-black">
+        <Toaster position="bottom-right" />
         <div className="relative flex flex-1 flex-col overflow-x-clip">
           <SiteChrome>{children}</SiteChrome>
         </div>

@@ -4,18 +4,15 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Eye, EyeOff } from "lucide-react"
 import { type FormEvent, useState } from "react"
+import { toast } from "sonner"
 
 import { authClient } from "@/lib/auth-client"
 
-type SubmissionState =
-  | { type: "idle" }
-  | { type: "error"; message: string }
-  | { type: "success"; message: string }
-
 export function SignUpPanel() {
   const router = useRouter()
-  const [submission, setSubmission] = useState<SubmissionState>({ type: "idle" })
   const [isPending, setIsPending] = useState(false)
+  const [passwordValue, setPasswordValue] = useState("")
+  const [confirmPasswordValue, setConfirmPasswordValue] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
@@ -29,41 +26,42 @@ export function SignUpPanel() {
     const confirmPassword = String(formData.get("confirmPassword") ?? "")
 
     if (fullName.length < 2) {
-      setSubmission({ type: "error", message: "Enter your full name." })
+      toast.error("Enter your full name.")
       return
     }
 
     if (password.length < 8) {
-      setSubmission({ type: "error", message: "Use at least 8 characters for your password." })
+      toast.error("Use at least 8 characters for your password.")
       return
     }
 
     if (password !== confirmPassword) {
-      setSubmission({ type: "error", message: "Your passwords do not match." })
+      toast.error("Your passwords do not match.")
       return
     }
 
     setIsPending(true)
-    setSubmission({ type: "idle" })
 
-    const result = await authClient.signUp.email({
-      name: fullName,
-      email,
-      password,
-    })
-
-    if (result.error) {
-      setIsPending(false)
-      setSubmission({
-        type: "error",
-        message: "We couldn’t create this account. Check your details or try logging in.",
+    try {
+      const result = await authClient.signUp.email({
+        name: fullName,
+        email,
+        password,
       })
-      return
-    }
 
-    setSubmission({ type: "success", message: "Your account has been created." })
-    router.replace("/")
-    router.refresh()
+      if (result.error) {
+        setIsPending(false)
+        toast.error("We couldn’t create this account. Check your details or try logging in.")
+        return
+      }
+
+      toast.success("Your account has been created.")
+      router.replace("/")
+      router.refresh()
+    } catch {
+      setIsPending(false)
+      toast.error("We couldn’t create this account. Please try again.")
+    }
   }
 
   return (
@@ -72,7 +70,7 @@ export function SignUpPanel() {
         <h1 className="font-heading text-[24px] font-normal uppercase leading-none tracking-normal">
           Create your account
         </h1>
-        <p className="mt-3 max-w-sm text-[13px] leading-[1.6] text-black">
+        <p className="mt-3 max-w-sm text-justify text-[12px] uppercase leading-[1.6] tracking-normal text-black">
           Save your favourites, follow your orders, and receive access to our latest edits.
         </p>
       </div>
@@ -88,9 +86,8 @@ export function SignUpPanel() {
             type="text"
             autoComplete="name"
             required
-            placeholder="Your full name"
-            onChange={() => setSubmission({ type: "idle" })}
-            className="h-12 w-full border border-black bg-white px-4 text-[13px] placeholder:text-black/40 focus:outline-none focus:ring-1 focus:ring-black"
+            placeholder="YOUR FULL NAME"
+            className="auth-form-input h-12 w-full border border-black bg-white px-4 text-[13px] placeholder:text-black/40 focus:outline-none focus:ring-1 focus:ring-black"
           />
         </div>
 
@@ -104,9 +101,8 @@ export function SignUpPanel() {
             type="email"
             autoComplete="email"
             required
-            placeholder="you@example.com"
-            onChange={() => setSubmission({ type: "idle" })}
-            className="h-12 w-full border border-black bg-white px-4 text-[13px] placeholder:text-black/40 focus:outline-none focus:ring-1 focus:ring-black"
+            placeholder="YOU@EXAMPLE.COM"
+            className="auth-form-input h-12 w-full border border-black bg-white px-4 text-[13px] placeholder:text-black/40 focus:outline-none focus:ring-1 focus:ring-black"
           />
         </div>
 
@@ -123,16 +119,19 @@ export function SignUpPanel() {
                 autoComplete="new-password"
                 required
                 minLength={8}
-                placeholder="8+ characters"
-                onChange={() => setSubmission({ type: "idle" })}
-                className="h-12 w-full border border-black bg-white px-4 pr-11 text-[13px] placeholder:text-black/40 focus:outline-none focus:ring-1 focus:ring-black"
+                placeholder="8+ CHARACTERS"
+                onChange={(event) => {
+                  setPasswordValue(event.target.value)
+                }}
+                className="auth-form-input h-12 w-full border border-black bg-white px-4 pr-11 text-[13px] placeholder:text-black/40 focus:outline-none focus:ring-1 focus:ring-black"
               />
               <button
                 type="button"
                 aria-label={showPassword ? "Hide password" : "Show password"}
                 aria-pressed={showPassword}
+                disabled={passwordValue.length === 0}
                 onClick={() => setShowPassword((visible) => !visible)}
-                className="absolute right-3 top-1/2 inline-flex size-6 -translate-y-1/2 cursor-pointer items-center justify-center text-black/55 transition-colors hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30"
+                className="absolute right-3 top-1/2 inline-flex size-6 -translate-y-1/2 cursor-pointer items-center justify-center text-black/55 transition-colors hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30 disabled:cursor-not-allowed disabled:text-black/25"
               >
                 {showPassword ? (
                   <EyeOff aria-hidden="true" className="size-[18px] stroke-[1.7]" />
@@ -154,16 +153,17 @@ export function SignUpPanel() {
                 autoComplete="new-password"
                 required
                 minLength={8}
-                placeholder="Repeat password"
-                onChange={() => setSubmission({ type: "idle" })}
-                className="h-12 w-full border border-black bg-white px-4 pr-11 text-[13px] placeholder:text-black/40 focus:outline-none focus:ring-1 focus:ring-black"
+                placeholder="REPEAT PASSWORD"
+                onChange={(event) => setConfirmPasswordValue(event.target.value)}
+                className="auth-form-input h-12 w-full border border-black bg-white px-4 pr-11 text-[13px] placeholder:text-black/40 focus:outline-none focus:ring-1 focus:ring-black"
               />
               <button
                 type="button"
                 aria-label={showConfirmPassword ? "Hide confirmed password" : "Show confirmed password"}
                 aria-pressed={showConfirmPassword}
+                disabled={confirmPasswordValue.length === 0}
                 onClick={() => setShowConfirmPassword((visible) => !visible)}
-                className="absolute right-3 top-1/2 inline-flex size-6 -translate-y-1/2 cursor-pointer items-center justify-center text-black/55 transition-colors hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30"
+                className="absolute right-3 top-1/2 inline-flex size-6 -translate-y-1/2 cursor-pointer items-center justify-center text-black/55 transition-colors hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30 disabled:cursor-not-allowed disabled:text-black/25"
               >
                 {showConfirmPassword ? (
                   <EyeOff aria-hidden="true" className="size-[18px] stroke-[1.7]" />
@@ -175,17 +175,6 @@ export function SignUpPanel() {
           </div>
         </div>
 
-        {submission.type !== "idle" ? (
-          <p
-            aria-live="polite"
-            className={`text-[13px] ${
-              submission.type === "error" ? "text-red-700" : "text-emerald-700"
-            }`}
-          >
-            {submission.message}
-          </p>
-        ) : null}
-
         <button
           type="submit"
           disabled={isPending}
@@ -194,7 +183,7 @@ export function SignUpPanel() {
           <span>{isPending ? "Creating account…" : "Create account"}</span>
         </button>
 
-        <p className="text-[12px] leading-[1.5] text-black/60">
+        <p className="text-justify text-[12px] uppercase leading-[1.5] tracking-normal text-black/60">
           By creating an account, you agree to our{" "}
           <Link href="/terms" className="font-medium underline underline-offset-2 hover:text-black">
             Terms &amp; Conditions

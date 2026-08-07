@@ -68,7 +68,7 @@ export function AdminOverview() {
   const greeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening"
 
   return (
-    <section className="relative flex flex-1 flex-col gap-4 bg-[#f5f5f5] p-4 pt-6">
+    <section className="relative flex min-w-0 flex-1 flex-col gap-4 bg-[#f5f5f5] p-4 pt-6">
       <div className="relative flex items-center justify-between gap-4">
         <div>
           <h1 className="mt-1 text-lg font-semibold tracking-tight text-black">
@@ -180,8 +180,14 @@ export function AdminOverview() {
           ))}
         </div>
 
-        {isExpanded ? <div className="mt-4 h-[220px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
+        {isExpanded ? <div className="mt-4 h-[220px] min-w-0 w-full">
+          <ResponsiveContainer
+            width="100%"
+            height="100%"
+            minWidth={0}
+            minHeight={220}
+            initialDimension={{ width: 320, height: 220 }}
+          >
             <LineChart data={salesData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid stroke="#e5e5e5" vertical={false} />
               <XAxis

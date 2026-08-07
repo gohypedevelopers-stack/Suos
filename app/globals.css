@@ -193,6 +193,32 @@
   }
 }
 
+/* Keep browser quick-fill controls aligned with the site's monochrome forms. */
+.auth-form-input:-webkit-autofill,
+.auth-form-input:-webkit-autofill:hover,
+.auth-form-input:-webkit-autofill:focus,
+.auth-form-input:-webkit-autofill:active {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: #000000 !important;
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  box-shadow: 0 0 0 1000px #ffffff inset !important;
+  caret-color: #000000 !important;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+.auth-form-input:autofill {
+  appearance: none !important;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  caret-color: #000000;
+}
+
 @keyframes marquee {
   from {
     transform: translateX(0);
