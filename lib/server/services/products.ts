@@ -20,12 +20,18 @@ function slugify(value: string) {
     .slice(0, 180)
 }
 
-async function createAvailableSlug(requestedSlug: string) {
+async function createAvailableSlug(
+  requestedSlug: string,
+  excludingProductId?: string,
+) {
   const prisma = getPrisma()
   const baseSlug = slugify(requestedSlug) || "product"
   const matchingSlugs = await prisma.product.findMany({
     where: {
-      OR: [{ slug: baseSlug }, { slug: { startsWith: `${baseSlug}-` } }],
+      AND: [
+        { OR: [{ slug: baseSlug }, { slug: { startsWith: `${baseSlug}-` } }] },
+        ...(excludingProductId ? [{ id: { not: excludingProductId } }] : []),
+      ],
     },
     select: { slug: true },
   })
@@ -44,11 +50,84 @@ async function createAvailableSlug(requestedSlug: string) {
   return `${baseSlug}-${suffix}`
 }
 
+function skuify(value: string) {
+  return value
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 56) || "SUOS"
+}
+
+async function createAvailableSku(
+  requestedSku: string,
+  suffix: number,
+) {
+  const prisma = getPrisma()
+  const baseSku = skuify(requestedSku)
+  const candidate = suffix === 1 ? baseSku : `${baseSku}-${suffix}`
+  const matchingSkus = await prisma.productVariant.findMany({
+    where: { sku: { startsWith: candidate } },
+    select: { sku: true },
+  })
+  const usedSkus = new Set(matchingSkus.map((variant) => variant.sku))
+
+  if (!usedSkus.has(candidate)) {
+    return candidate
+  }
+
+  let collision = 2
+  while (usedSkus.has(`${candidate}-${collision}`)) {
+    collision += 1
+  }
+
+  return `${candidate}-${collision}`
+}
+
 export async function createProduct(input: ProductInput) {
   await assertAdmin()
   const prisma = getPrisma()
   const product = productInputSchema.parse(input)
   const slug = await createAvailableSlug(product.slug ?? product.title)
+
+  if (product.categoryId) {
+    const category = await prisma.category.findUnique({
+      where: { id: product.categoryId },
+      select: { id: true },
+    })
+    if (!category) {
+      throw new Error("The selected category no longer exists.")
+    }
+  }
+
+  if (product.collectionIds.length > 0) {
+    const collectionCount = await prisma.collection.count({
+      where: { id: { in: product.collectionIds } },
+    })
+    if (collectionCount !== product.collectionIds.length) {
+      throw new Error("One or more selected collections no longer exist.")
+    }
+  }
+
+  const requestedVariants = product.variants.length > 0
+    ? product.variants
+    : [{
+        title: "Default",
+        sku: product.sku,
+        price: product.price,
+        compareAtPrice: product.compareAtPrice,
+        inventoryQuantity: product.inventoryQuantity,
+        optionValues: {},
+      }]
+
+  const variants = await Promise.all(
+    requestedVariants.map(async (variant, index) => ({
+      ...variant,
+      sku: await createAvailableSku(
+        variant.sku || product.sku || `SUOS-${slug}`,
+        index + 1,
+      ),
+    })),
+  )
 
   return prisma.product.create({
     data: {
@@ -57,16 +136,41 @@ export async function createProduct(input: ProductInput) {
       description: product.description || null,
       status: product.status,
       categoryId: product.categoryId || null,
+      tags: product.tags,
+      details: product.details.length > 0
+        ? (product.details as Prisma.InputJsonValue)
+        : Prisma.JsonNull,
+      collections: product.collectionIds.length > 0
+        ? {
+            create: product.collectionIds.map((collectionId, position) => ({
+              collectionId,
+              position,
+            })),
+          }
+        : undefined,
+      images: product.images.length > 0
+        ? {
+            create: product.images.map((objectKey, position) => ({
+              objectKey,
+              position,
+            })),
+          }
+        : undefined,
       variants: {
-        create: {
-          sku: product.sku,
-          price: new Prisma.Decimal(product.price.toFixed(2)),
+        create: variants.map((variant) => ({
+          title: variant.title,
+          sku: variant.sku,
+          price: new Prisma.Decimal(variant.price.toFixed(2)),
           compareAtPrice:
-            product.compareAtPrice === null
+            variant.compareAtPrice === null
               ? null
-              : new Prisma.Decimal(product.compareAtPrice.toFixed(2)),
-          inventoryQuantity: product.inventoryQuantity,
-        },
+              : new Prisma.Decimal(variant.compareAtPrice.toFixed(2)),
+          inventoryQuantity: variant.inventoryQuantity,
+          optionValues:
+            Object.keys(variant.optionValues).length > 0
+              ? (variant.optionValues as Prisma.InputJsonValue)
+              : Prisma.JsonNull,
+        })),
       },
     },
     select: {
@@ -76,14 +180,174 @@ export async function createProduct(input: ProductInput) {
   })
 }
 
-export async function archiveProduct(productId: string) {
+export async function updateProduct(productId: string, input: ProductInput) {
+  await assertAdmin()
+  const prisma = getPrisma()
+  const product = productInputSchema.parse(input)
+  const existing = await prisma.product.findUnique({
+    where: { id: productId },
+    select: {
+      id: true,
+      variants: {
+        orderBy: { createdAt: "asc" },
+        select: { id: true, sku: true },
+      },
+      images: { select: { objectKey: true } },
+    },
+  })
+
+  if (!existing) {
+    throw new Error("Product not found")
+  }
+
+  if (product.categoryId) {
+    const category = await prisma.category.findUnique({
+      where: { id: product.categoryId },
+      select: { id: true },
+    })
+    if (!category) {
+      throw new Error("The selected category no longer exists.")
+    }
+  }
+
+  if (product.collectionIds.length > 0) {
+    const collectionCount = await prisma.collection.count({
+      where: { id: { in: product.collectionIds } },
+    })
+    if (collectionCount !== product.collectionIds.length) {
+      throw new Error("One or more selected collections no longer exist.")
+    }
+  }
+
+  const slug = await createAvailableSlug(product.slug ?? product.title, productId)
+  const requestedVariants = product.variants.length > 0
+    ? product.variants
+    : [{
+        title: "Default",
+        sku: product.sku,
+        price: product.price,
+        compareAtPrice: product.compareAtPrice,
+        inventoryQuantity: product.inventoryQuantity,
+        optionValues: {},
+      }]
+
+  const variants: Array<
+    Omit<ProductInput["variants"][number], "sku"> & { sku: string }
+  > = []
+  for (const [index, variant] of requestedVariants.entries()) {
+    const existingVariant = existing.variants[index]
+    const requestedSku = variant.sku || existingVariant?.sku || product.sku || `SUOS-${slug}`
+    const sku = existingVariant?.sku === requestedSku
+      ? requestedSku
+      : await createAvailableSku(requestedSku, index + 1)
+
+    variants.push({ ...variant, sku })
+  }
+
+  const existingImageKeys = new Set(
+    existing.images.map((image) => image.objectKey),
+  )
+
+  return prisma.$transaction(async (transaction) => {
+    const updated = await transaction.product.update({
+      where: { id: productId },
+      data: {
+        title: product.title,
+        slug,
+        description: product.description || null,
+        status: product.status,
+        categoryId: product.categoryId || null,
+        tags: product.tags,
+        details: product.details.length > 0
+          ? (product.details as Prisma.InputJsonValue)
+          : Prisma.JsonNull,
+        collections: {
+          deleteMany: {},
+          create: product.collectionIds.map((collectionId, position) => ({
+            collectionId,
+            position,
+          })),
+        },
+      },
+      select: { id: true, slug: true },
+    })
+
+    await transaction.productImage.deleteMany({
+      where: {
+        productId,
+        objectKey: { notIn: product.images },
+      },
+    })
+
+    await Promise.all(
+      product.images.map((objectKey, position) =>
+        existingImageKeys.has(objectKey)
+          ? transaction.productImage.update({
+              where: { objectKey },
+              data: { position },
+            })
+          : transaction.productImage.create({
+              data: { productId, objectKey, position },
+            }),
+      ),
+    )
+
+    await Promise.all(
+      variants.map((variant, index) => {
+        const data = {
+          title: variant.title,
+          sku: variant.sku,
+          price: new Prisma.Decimal(variant.price.toFixed(2)),
+          compareAtPrice:
+            variant.compareAtPrice === null
+              ? null
+              : new Prisma.Decimal(variant.compareAtPrice.toFixed(2)),
+          inventoryQuantity: variant.inventoryQuantity,
+          optionValues:
+            Object.keys(variant.optionValues).length > 0
+              ? (variant.optionValues as Prisma.InputJsonValue)
+              : Prisma.JsonNull,
+        }
+
+        const existingVariant = existing.variants[index]
+        return existingVariant
+          ? transaction.productVariant.update({ where: { id: existingVariant.id }, data })
+          : transaction.productVariant.create({ data: { productId, ...data } })
+      }),
+    )
+
+    const removedVariantIds = existing.variants
+      .slice(variants.length)
+      .map((variant) => variant.id)
+    if (removedVariantIds.length > 0) {
+      await transaction.productVariant.deleteMany({
+        where: { id: { in: removedVariantIds } },
+      })
+    }
+
+    return updated
+  })
+}
+
+export async function deleteProducts(productIds: string[]) {
   await assertAdmin()
   const prisma = getPrisma()
 
-  return prisma.product.update({
-    where: { id: productId },
-    data: { status: "ARCHIVED" },
-    select: { id: true },
+  return prisma.product.deleteMany({
+    where: { id: { in: productIds } },
+  })
+}
+
+export async function updateProductsStatus(
+  productIds: string[],
+  status: "DRAFT" | "ACTIVE" | "ARCHIVED",
+) {
+  await assertAdmin()
+  const prisma = getPrisma()
+
+  return prisma.product.updateMany({
+    where: { id: { in: productIds } },
+    data: { status },
   })
 }
 

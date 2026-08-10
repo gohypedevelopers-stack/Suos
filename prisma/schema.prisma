@@ -13,6 +13,11 @@ enum Role {
   ADMIN
 }
 
+enum CategoryStatus {
+  DRAFT
+  ACTIVE
+}
+
 enum ProductStatus {
   DRAFT
   ACTIVE
@@ -92,14 +97,23 @@ model Verification {
 }
 
 model Category {
-  id          String    @id @default(cuid())
-  name        String
-  slug        String    @unique
-  description String?
-  products    Product[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id             String         @id @default(cuid())
+  name           String
+  slug           String         @unique
+  description    String?
+  status         CategoryStatus @default(DRAFT)
+  visible        Boolean        @default(true)
+  imageObjectKey String?
+  imageAltText   String?
+  parentId       String?
+  parent         Category?      @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children       Category[]     @relation("CategoryHierarchy")
+  products       Product[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 
+  @@index([parentId])
+  @@index([status, visible])
   @@map("categories")
 }
 
@@ -111,6 +125,8 @@ model Product {
   vendor      String                  @default("SUOS")
   status      ProductStatus           @default(DRAFT)
   categoryId  String?
+  tags        String[]                @default([])
+  details     Json?
   category    Category?               @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   variants    ProductVariant[]
   images      ProductImage[]

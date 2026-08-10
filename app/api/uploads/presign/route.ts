@@ -6,7 +6,10 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { getCurrentUser } from "@/lib/server/dal/auth"
 import { getR2Env } from "@/lib/server/env"
 import { getR2Client } from "@/lib/server/r2"
-import { productImageUploadSchema } from "@/lib/validations/upload"
+import {
+  imageUploadRequestSchema,
+  type ImageUploadRequest,
+} from "@/lib/validations/upload"
 
 const extensionByContentType = {
   "image/avif": "avif",
@@ -14,6 +17,22 @@ const extensionByContentType = {
   "image/png": "png",
   "image/webp": "webp",
 } as const
+
+function createLocalUploadResponse(input: ImageUploadRequest) {
+  const extension = extensionByContentType[input.contentType]
+  const folder = input.scope === "category" ? "categories" : "products"
+  const objectKey = `uploads/${folder}/${new Date().getUTCFullYear()}/${randomUUID()}.${extension}`
+  const uploadUrl = new URL("/api/uploads/local", "http://localhost")
+  uploadUrl.searchParams.set("objectKey", objectKey)
+  uploadUrl.searchParams.set("contentType", input.contentType)
+
+  return Response.json({
+    objectKey,
+    uploadUrl: `${uploadUrl.pathname}${uploadUrl.search}`,
+    publicUrl: `/${objectKey}`,
+    expiresIn: 5 * 60,
+  })
+}
 
 export async function POST(request: Request) {
   const user = await getCurrentUser()
@@ -33,7 +52,7 @@ export async function POST(request: Request) {
     return Response.json({ error: "Invalid JSON body" }, { status: 400 })
   }
 
-  const input = productImageUploadSchema.safeParse(payload)
+  const input = imageUploadRequestSchema.safeParse(payload)
 
   if (!input.success) {
     return Response.json(
@@ -42,9 +61,25 @@ export async function POST(request: Request) {
     )
   }
 
-  const env = getR2Env()
+  let env: ReturnType<typeof getR2Env>
+  try {
+    env = getR2Env()
+  } catch {
+    if (process.env.NODE_ENV === "development") {
+      return createLocalUploadResponse(input.data)
+    }
+
+    return Response.json(
+      {
+        error:
+          "Image storage is not configured. Set a valid R2_PUBLIC_URL before uploading images.",
+      },
+      { status: 503 },
+    )
+  }
   const extension = extensionByContentType[input.data.contentType]
-  const objectKey = `products/${new Date().getUTCFullYear()}/${randomUUID()}.${extension}`
+  const folder = input.data.scope === "category" ? "categories" : "products"
+  const objectKey = `${folder}/${new Date().getUTCFullYear()}/${randomUUID()}.${extension}`
 
   let uploadUrl: string
   try {

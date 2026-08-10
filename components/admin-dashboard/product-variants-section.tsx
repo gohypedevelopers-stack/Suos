@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Boxes, GripVertical, MoreHorizontal, Palette, Plus, Ruler, Trash2, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -10,6 +10,14 @@ import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 type OptionName = "color" | "size"
+
+export type ProductVariantDraft = {
+  title: string
+  price: number
+  compareAtPrice: number | null
+  inventoryQuantity: number
+  optionValues: Record<string, string>
+}
 
 const optionDetails = {
   color: { label: "Color", placeholder: "e.g. Black", icon: Palette },
@@ -55,13 +63,77 @@ function toTitleCase(value: string) {
   return trimmed.toLowerCase().replace(/\b[a-z]/g, (letter) => letter.toUpperCase())
 }
 
-export function ProductVariantsSection() {
-  const [enabledOptions, setEnabledOptions] = useState<Record<OptionName, boolean>>({ color: false, size: false })
-  const [values, setValues] = useState<Record<OptionName, string[]>>({ color: [], size: [] })
+function variantKey(size: string) {
+  return `size::${size.toUpperCase()}`
+}
+
+function getInitialVariantState(initialVariants: ProductVariantDraft[]) {
+  const colors: string[] = []
+  const sizes: string[] = []
+  const prices: Record<string, string> = {}
+  const compareAtPrices: Record<string, string> = {}
+  const quantities: Record<string, string> = {}
+
+  for (const variant of initialVariants) {
+    const colorValues = variant.optionValues.Color
+      ?.split(",")
+      .map((value) => toTitleCase(value))
+      .filter(Boolean) ?? []
+    const size = variant.optionValues.Size?.trim().toUpperCase()
+    const key = variantKey(size || "Variant")
+
+    for (const color of colorValues) {
+      if (!colors.some((current) => current.toLowerCase() === color.toLowerCase())) {
+        colors.push(color)
+      }
+    }
+    if (size && !sizes.includes(size)) {
+      sizes.push(size)
+    }
+
+    prices[key] = variant.price.toFixed(2)
+    compareAtPrices[key] = variant.compareAtPrice?.toFixed(2) ?? ""
+    quantities[key] = String(variant.inventoryQuantity)
+  }
+
+  return {
+    enabledOptions: { color: colors.length > 0, size: sizes.length > 0 },
+    values: { color: colors, size: sizes },
+    prices,
+    compareAtPrices,
+    quantities,
+  }
+}
+
+export function ProductVariantsSection({
+  fallbackPrice = "0",
+  fallbackCompareAtPrice = "",
+  fallbackInventoryQuantity = "0",
+  initialVariants = [],
+  onChange,
+}: {
+  fallbackPrice?: string
+  fallbackCompareAtPrice?: string
+  fallbackInventoryQuantity?: string
+  initialVariants?: ProductVariantDraft[]
+  onChange?: (variants: ProductVariantDraft[]) => void
+}) {
+  const [enabledOptions, setEnabledOptions] = useState<Record<OptionName, boolean>>(
+    () => getInitialVariantState(initialVariants).enabledOptions,
+  )
+  const [values, setValues] = useState<Record<OptionName, string[]>>(
+    () => getInitialVariantState(initialVariants).values,
+  )
   const [drafts, setDrafts] = useState<Record<OptionName, string>>({ color: "", size: "" })
-  const [quantities, setQuantities] = useState<Record<string, string>>({})
-  const [prices, setPrices] = useState<Record<string, string>>({})
-  const [compareAtPrices, setCompareAtPrices] = useState<Record<string, string>>({})
+  const [quantities, setQuantities] = useState<Record<string, string>>(
+    () => getInitialVariantState(initialVariants).quantities,
+  )
+  const [prices, setPrices] = useState<Record<string, string>>(
+    () => getInitialVariantState(initialVariants).prices,
+  )
+  const [compareAtPrices, setCompareAtPrices] = useState<Record<string, string>>(
+    () => getInitialVariantState(initialVariants).compareAtPrices,
+  )
   const [selectedVariantKeys, setSelectedVariantKeys] = useState<string[]>([])
   const [customSwatches, setCustomSwatches] = useState<Record<string, string>>({})
   const selectedColorRef = useRef("#000000")
@@ -82,11 +154,57 @@ export function ProductVariantsSection() {
 
     const sizes = values.size.length > 0 ? values.size : ["Variant"]
     return sizes.map((size) => ({
-      key: `size::${size.toUpperCase()}`,
+      key: variantKey(size),
       label: size.toUpperCase(),
       accessibleLabel: size.toUpperCase(),
     }))
   }, [values.color, values.size])
+
+  const variantDrafts = useMemo<ProductVariantDraft[]>(() => {
+    const fallbackPriceNumber = Number(fallbackPrice)
+    const fallbackCompareAtPriceNumber = Number(fallbackCompareAtPrice)
+    const fallbackInventoryNumber = Number(fallbackInventoryQuantity)
+
+    return variants.map((variant) => {
+      const enteredPrice = Number(prices[variant.key])
+      const enteredCompareAtPrice = Number(compareAtPrices[variant.key])
+      const enteredQuantity = Number(quantities[variant.key])
+      const optionValues: Record<string, string> = {}
+
+      if (values.color.length > 0) {
+        optionValues.Color = values.color.join(", ")
+      }
+      if (variant.label !== "Variant") {
+        optionValues.Size = variant.label
+      }
+
+      return {
+        title: variant.label,
+        price: Number.isFinite(enteredPrice) && prices[variant.key] !== ""
+          ? enteredPrice
+          : Number.isFinite(fallbackPriceNumber)
+            ? fallbackPriceNumber
+            : 0,
+        compareAtPrice:
+          compareAtPrices[variant.key] !== "" && Number.isFinite(enteredCompareAtPrice)
+            ? enteredCompareAtPrice
+            : fallbackCompareAtPrice !== "" && Number.isFinite(fallbackCompareAtPriceNumber)
+              ? fallbackCompareAtPriceNumber
+              : null,
+        inventoryQuantity:
+          Number.isFinite(enteredQuantity) && quantities[variant.key] !== ""
+            ? Math.max(0, Math.trunc(enteredQuantity))
+            : Number.isFinite(fallbackInventoryNumber)
+              ? Math.max(0, Math.trunc(fallbackInventoryNumber))
+              : 0,
+        optionValues,
+      }
+    })
+  }, [compareAtPrices, fallbackCompareAtPrice, fallbackInventoryQuantity, fallbackPrice, prices, quantities, values.color, variants])
+
+  useEffect(() => {
+    onChange?.(variantDrafts)
+  }, [onChange, variantDrafts])
 
   const totalInventory = variants.reduce((total, variant) => total + (Number(quantities[variant.key]) || 0), 0)
   const allVariantsSelected = variants.length > 0 && variants.every((variant) => selectedVariantKeys.includes(variant.key))

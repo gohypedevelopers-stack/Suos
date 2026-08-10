@@ -8,27 +8,42 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 
 type Detail = {
-  id: number
+  id: string
   name: string
   value: string
 }
 
-export function ProductAdditionalDetailsSection() {
-  const [details, setDetails] = useState<Detail[]>([])
+export type ProductDetailDraft = Omit<Detail, "id">
+
+export function ProductAdditionalDetailsSection({
+  value,
+  onChange,
+}: {
+  value?: ProductDetailDraft[]
+  onChange?: (details: ProductDetailDraft[]) => void
+}) {
+  const [details, setDetails] = useState<Detail[]>(() =>
+    (value ?? []).map((detail, index) => ({ ...detail, id: `detail-${index}` })),
+  )
   const nextDetailId = useRef(1)
 
+  function commit(next: Detail[]) {
+    setDetails(next)
+    onChange?.(next.map(({ name, value: detailValue }) => ({ name, value: detailValue })))
+  }
+
   function addDetail() {
-    const id = nextDetailId.current
+    const id = `detail-${nextDetailId.current}`
     nextDetailId.current += 1
-    setDetails((current) => [...current, { id, name: "", value: "" }])
+    commit([...details, { id, name: "", value: "" }])
   }
 
-  function updateDetail(id: number, field: "name" | "value", value: string) {
-    setDetails((current) => current.map((detail) => detail.id === id ? { ...detail, [field]: value } : detail))
+  function updateDetail(id: string, field: "name" | "value", value: string) {
+    commit(details.map((detail) => detail.id === id ? { ...detail, [field]: value } : detail))
   }
 
-  function removeDetail(id: number) {
-    setDetails((current) => current.filter((detail) => detail.id !== id))
+  function removeDetail(id: string) {
+    commit(details.filter((detail) => detail.id !== id))
   }
 
   return (

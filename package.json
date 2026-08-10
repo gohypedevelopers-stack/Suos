@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "npm run db:local:start && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -13,6 +13,7 @@
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio",
+    "db:local:start": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-local-postgres.ps1",
     "env:backup": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/backup-env.ps1",
     "env:restore": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/restore-env.ps1",
     "admin:promote": "tsx scripts/promote-admin.ts"

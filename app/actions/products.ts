@@ -5,8 +5,10 @@ import { z } from "zod"
 
 import {
   attachProductImage,
-  archiveProduct,
   createProduct,
+  deleteProducts,
+  updateProduct,
+  updateProductsStatus,
 } from "@/lib/server/services/products"
 import { productInputSchema } from "@/lib/validations/product"
 
@@ -53,13 +55,133 @@ export async function createProductAction(
   }
 }
 
-export async function archiveProductAction(productId: string) {
-  const id = z.string().min(1).parse(productId)
-  await archiveProduct(id)
-  revalidatePath("/dashboard/products")
-  revalidatePath("/collections")
+export async function updateProductAction(
+  productId: string,
+  input: unknown,
+): Promise<ProductActionState> {
+  const result = productInputSchema.safeParse(input)
 
-  return { success: true }
+  if (!result.success) {
+    return {
+      status: "error",
+      message: "Check the highlighted product fields.",
+      fields: z.flattenError(result.error).fieldErrors,
+    }
+  }
+
+  try {
+    const product = await updateProduct(productId, result.data)
+    revalidatePath("/dashboard/products")
+    revalidatePath(`/dashboard/products/${productId}`)
+    revalidatePath("/collections")
+
+    return {
+      status: "success",
+      productId: product.id,
+    }
+  } catch (error) {
+    if (error instanceof Error && error.message === "Unauthorized") {
+      return { status: "error", message: "Sign in to continue." }
+    }
+
+    if (error instanceof Error && error.message === "Forbidden") {
+      return { status: "error", message: "Administrator access is required." }
+    }
+
+    if (error instanceof Error && error.message === "Product not found") {
+      return { status: "error", message: "This product no longer exists." }
+    }
+
+    return {
+      status: "error",
+      message: "The product could not be saved. Try again.",
+    }
+  }
+}
+
+export async function deleteProductsAction(productIds: unknown) {
+  const ids = z.array(z.string().trim().min(1)).min(1).max(100).safeParse(productIds)
+
+  if (!ids.success) {
+    return { success: false, message: "Select at least one product." }
+  }
+
+  try {
+    const deleted = await deleteProducts([...new Set(ids.data)])
+    revalidatePath("/dashboard/products")
+    revalidatePath("/collections")
+    return { success: true, count: deleted.count }
+  } catch (error) {
+    if (error instanceof Error && error.message === "Unauthorized") {
+      return { success: false, message: "Sign in to continue." }
+    }
+    if (error instanceof Error && error.message === "Forbidden") {
+      return { success: false, message: "Administrator access is required." }
+    }
+
+    return { success: false, message: "The selected products could not be deleted." }
+  }
+}
+
+export async function updateProductsStatusAction(
+  productIds: unknown,
+  status: unknown,
+) {
+  const ids = z.array(z.string().trim().min(1)).min(1).max(100).safeParse(productIds)
+  const nextStatus = z.enum(["DRAFT", "ACTIVE", "ARCHIVED"]).safeParse(status)
+
+  if (!ids.success || !nextStatus.success) {
+    return { success: false, message: "Select products and a valid status." }
+  }
+
+  try {
+    const updated = await updateProductsStatus(
+      [...new Set(ids.data)],
+      nextStatus.data,
+    )
+    revalidatePath("/dashboard/products")
+    revalidatePath("/collections")
+    return { success: true, count: updated.count }
+  } catch (error) {
+    if (error instanceof Error && error.message === "Unauthorized") {
+      return { success: false, message: "Sign in to continue." }
+    }
+    if (error instanceof Error && error.message === "Forbidden") {
+      return { success: false, message: "Administrator access is required." }
+    }
+
+    return { success: false, message: "The selected products could not be updated." }
+  }
+}
+
+export async function importProductsAction(input: unknown) {
+  const products = z.array(productInputSchema).min(1).max(100).safeParse(input)
+
+  if (!products.success) {
+    return {
+      success: false,
+      message: "The CSV has one or more invalid products. Check title, price, stock, and status values.",
+    }
+  }
+
+  try {
+    for (const product of products.data) {
+      await createProduct(product)
+    }
+    revalidatePath("/dashboard/products")
+    revalidatePath("/collections")
+
+    return { success: true, count: products.data.length }
+  } catch (error) {
+    if (error instanceof Error && error.message === "Unauthorized") {
+      return { success: false, message: "Sign in to continue." }
+    }
+    if (error instanceof Error && error.message === "Forbidden") {
+      return { success: false, message: "Administrator access is required." }
+    }
+
+    return { success: false, message: "The products could not be fully imported. Review the CSV and try again." }
+  }
 }
 
 export async function attachProductImageAction(input: unknown) {
