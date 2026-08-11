@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "npm run db:local:start && next dev",
+    "dev": "npm run db:local:start && npm run db:generate && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

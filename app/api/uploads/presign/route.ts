@@ -20,7 +20,11 @@ const extensionByContentType = {
 
 function createLocalUploadResponse(input: ImageUploadRequest) {
   const extension = extensionByContentType[input.contentType]
-  const folder = input.scope === "category" ? "categories" : "products"
+  const folder = input.scope === "category"
+    ? "categories"
+    : input.scope === "collection"
+      ? "collections"
+      : "products"
   const objectKey = `uploads/${folder}/${new Date().getUTCFullYear()}/${randomUUID()}.${extension}`
   const uploadUrl = new URL("/api/uploads/local", "http://localhost")
   uploadUrl.searchParams.set("objectKey", objectKey)
@@ -78,7 +82,11 @@ export async function POST(request: Request) {
     )
   }
   const extension = extensionByContentType[input.data.contentType]
-  const folder = input.data.scope === "category" ? "categories" : "products"
+  const folder = input.data.scope === "category"
+    ? "categories"
+    : input.data.scope === "collection"
+      ? "collections"
+      : "products"
   const objectKey = `${folder}/${new Date().getUTCFullYear()}/${randomUUID()}.${extension}`
 
   let uploadUrl: string

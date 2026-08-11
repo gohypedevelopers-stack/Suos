@@ -1,5 +1,7 @@
 import { Mail, MessageCircle, Phone } from "lucide-react"
 
+import { ContactSubjectSelect } from "@/components/storefront/contact-subject-select"
+
 export const metadata = {
   title: "Contact Us | SUOS",
 }
@@ -129,22 +131,7 @@ export default function ContactPage() {
                   </label>
                 </div>
 
-                <label className="block border-b border-black/55 pb-3 text-[22px] text-black/55">
-                  <span className="sr-only">Select subject</span>
-                  <select
-                    name="subject"
-                    defaultValue=""
-                    className="w-full appearance-none bg-transparent uppercase outline-none"
-                  >
-                    <option value="" disabled>
-                      SELECT SUBJECT
-                    </option>
-                    <option value="order">Order enquiry</option>
-                    <option value="styling">Styling advice</option>
-                    <option value="returns">Returns and exchanges</option>
-                    <option value="other">Other</option>
-                  </select>
-                </label>
+                <ContactSubjectSelect />
 
                 <label className="block border-b border-black/55 pb-3 text-[22px] text-black/55">
                   <span className="sr-only">Your message</span>

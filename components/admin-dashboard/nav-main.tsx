@@ -43,19 +43,16 @@ function NavMainItem({
   }
   pathname: string
 }) {
+  const activeSubIndex =
+    item.items?.findIndex((subItem) => isRouteActive(pathname, subItem.url)) ?? -1
+  const hasActiveSubRoute = activeSubIndex >= 0
   const routeActive =
-    item.isActive ||
-    isRouteActive(pathname, item.url) ||
-    item.items?.some((subItem) => isRouteActive(pathname, subItem.url)) ||
-    false
-  const [open, setOpen] = React.useState(routeActive)
+    Boolean(item.isActive) ||
+    (isRouteActive(pathname, item.url) && !hasActiveSubRoute)
+  const [open, setOpen] = React.useState(routeActive || hasActiveSubRoute)
   const [hoveredSubIndex, setHoveredSubIndex] = React.useState<number | null>(null)
 
   if (item.items?.length) {
-    const activeSubIndex = item.items.findIndex((subItem) =>
-      isRouteActive(pathname, subItem.url)
-    )
-
     const hoveredConnectorIndex = hoveredSubIndex ?? -1
     const guideIndex = Math.max(activeSubIndex, hoveredConnectorIndex)
     const guideHeight = guideIndex * 28 + 24
@@ -81,14 +78,30 @@ function NavMainItem({
         className="group/collapsible"
       >
         <SidebarMenuItem>
-          <SidebarMenuButton asChild isActive={routeActive} tooltip={item.title}>
+          <SidebarMenuButton
+            asChild
+            isActive={routeActive}
+            tooltip={item.title}
+            className={
+              routeActive
+                ? "text-sidebar-foreground"
+                : "text-sidebar-foreground/55 hover:text-sidebar-foreground"
+            }
+          >
             <Link href={item.url}>
               {item.icon}
               <span>{item.title}</span>
             </Link>
           </SidebarMenuButton>
           <CollapsibleTrigger asChild>
-            <SidebarMenuAction showOnHover>
+            <SidebarMenuAction
+              showOnHover
+              className={
+                routeActive
+                  ? "text-sidebar-foreground"
+                  : "text-sidebar-foreground/45 hover:text-sidebar-foreground"
+              }
+            >
               <ChevronRightIcon className="transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
             </SidebarMenuAction>
           </CollapsibleTrigger>
@@ -125,22 +138,31 @@ function NavMainItem({
                   )}
                 </svg>
               )}
-              {item.items.map((subItem, subItemIndex) => (
-                <SidebarMenuSubItem
-                  key={subItem.title}
-                  onMouseEnter={() => setHoveredSubIndex(subItemIndex)}
-                  onMouseLeave={() => setHoveredSubIndex(null)}
-                >
-                  <SidebarMenuSubButton
-                    asChild
-                    isActive={isRouteActive(pathname, subItem.url)}
+              {item.items.map((subItem, subItemIndex) => {
+                const subRouteActive = isRouteActive(pathname, subItem.url)
+
+                return (
+                  <SidebarMenuSubItem
+                    key={subItem.title}
+                    onMouseEnter={() => setHoveredSubIndex(subItemIndex)}
+                    onMouseLeave={() => setHoveredSubIndex(null)}
                   >
-                    <Link href={subItem.url}>
-                      <span>{subItem.title}</span>
-                    </Link>
-                  </SidebarMenuSubButton>
-                </SidebarMenuSubItem>
-              ))}
+                    <SidebarMenuSubButton
+                      asChild
+                      isActive={subRouteActive}
+                      className={
+                        subRouteActive
+                          ? "text-sidebar-foreground"
+                          : "text-sidebar-foreground/55 hover:text-sidebar-foreground"
+                      }
+                    >
+                      <Link href={subItem.url}>
+                        <span>{subItem.title}</span>
+                      </Link>
+                    </SidebarMenuSubButton>
+                  </SidebarMenuSubItem>
+                )
+              })}
             </SidebarMenuSub>
           </CollapsibleContent>
         </SidebarMenuItem>
@@ -150,7 +172,16 @@ function NavMainItem({
 
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton asChild isActive={routeActive} tooltip={item.title}>
+      <SidebarMenuButton
+        asChild
+        isActive={routeActive}
+        tooltip={item.title}
+        className={
+          routeActive
+            ? "text-sidebar-foreground"
+            : "text-sidebar-foreground/55 hover:text-sidebar-foreground"
+        }
+      >
         <Link href={item.url}>
           {item.icon}
           <span>{item.title}</span>

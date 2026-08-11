@@ -12,7 +12,7 @@ export const imageContentTypeSchema = z.enum([
 export const localImageObjectKeySchema = z
   .string()
   .regex(
-    /^uploads\/(?:products|categories)\/\d{4}\/[0-9a-f-]{36}\.(?:avif|jpg|png|webp)$/,
+    /^uploads\/(?:products|categories|collections)\/\d{4}\/[0-9a-f-]{36}\.(?:avif|jpg|png|webp)$/,
     "Invalid local image key",
   )
 
@@ -25,7 +25,7 @@ const imageUploadSchema = z.object({
 export const productImageUploadSchema = imageUploadSchema
 
 export const imageUploadRequestSchema = imageUploadSchema.extend({
-  scope: z.enum(["product", "category"]).default("product"),
+  scope: z.enum(["product", "category", "collection"]).default("product"),
 })
 
 export type ImageUploadRequest = z.infer<typeof imageUploadRequestSchema>

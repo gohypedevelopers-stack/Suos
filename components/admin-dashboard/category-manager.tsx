@@ -130,7 +130,7 @@ export function CategoryManager({
 
   return (
     <main className="min-h-full flex-1 bg-[#f5f5f5] p-4 text-black sm:p-5">
-      <div className="mx-auto max-w-[1180px]">
+      <div className="w-full">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="flex items-center gap-2 text-lg font-semibold">

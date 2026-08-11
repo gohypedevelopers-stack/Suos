@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import type { DateRange } from "react-day-picker"
 import {
   CartesianGrid,
   Line,
@@ -11,6 +12,10 @@ import {
   YAxis,
 } from "recharts"
 import { CalendarDays, ChevronDown, ChevronUp } from "lucide-react"
+
+import { Calendar } from "@/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 const salesData = [
   { date: "Jun 15", current: 0, previous: 0 },
@@ -59,10 +64,21 @@ function MiniSparkline({ metric }: { metric: string }) {
   )
 }
 
+function formatRange(range: DateRange | undefined) {
+  if (!range?.from) return "Custom range"
+  const formatter = new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", year: "numeric" })
+  if (!range.to) return formatter.format(range.from)
+  return `${formatter.format(range.from)} – ${formatter.format(range.to)}`
+}
+
 export function AdminOverview() {
   const [isExpanded, setIsExpanded] = useState(true)
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false)
   const [rangeLabel, setRangeLabel] = useState("Last 30 days")
+  const [dateRange, setDateRange] = useState<DateRange | undefined>()
+  const [rangeAmount, setRangeAmount] = useState("30")
+  const [dateUnit, setDateUnit] = useState("Days")
+  const [includeToday, setIncludeToday] = useState(true)
   const [selectedMetric, setSelectedMetric] = useState("Sessions")
   const hour = new Date().getHours()
   const greeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening"
@@ -78,19 +94,19 @@ export function AdminOverview() {
             Here&apos;s what&apos;s happening with your store today.
           </p>
         </div>
-        <button
-          type="button"
-          aria-expanded={isDatePickerOpen}
-          onClick={() => setIsDatePickerOpen((open) => !open)}
-          className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-black/25 bg-white px-2.5 text-xs font-medium text-black/75 shadow-sm transition-colors hover:bg-black/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/25"
-        >
-          <CalendarDays className="size-3.5 text-black/65" />
-          {rangeLabel}
-          <ChevronDown className="size-3.5 text-black/55" />
-        </button>
-
-        {isDatePickerOpen ? (
-          <div className="absolute right-0 top-10 z-30 flex w-[min(680px,calc(100vw-2rem))] overflow-hidden rounded-xl border border-black/15 bg-white shadow-xl">
+        <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              aria-expanded={isDatePickerOpen}
+              className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-black/25 bg-white px-2.5 text-xs font-medium text-black/75 shadow-sm transition-colors hover:bg-black/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/25"
+            >
+              <CalendarDays className="size-3.5 text-black/65" />
+              {rangeLabel}
+              <ChevronDown className="size-3.5 text-black/55" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="z-30 flex w-[min(680px,calc(100vw-2rem))] overflow-hidden rounded-xl border-black/15 p-0 shadow-xl">
             <div className="hidden w-40 shrink-0 border-r border-black/10 bg-[#fafafa] p-2 sm:block">
               {["Today", "Yesterday", "Last 7 days", "Last 30 days", "Quarter to date", "Custom range"].map((option) => (
                 <button
@@ -98,6 +114,7 @@ export function AdminOverview() {
                   type="button"
                   onClick={() => {
                     setRangeLabel(option)
+                    if (option !== "Custom range") setDateRange(undefined)
                     setIsDatePickerOpen(false)
                   }}
                   className={`w-full rounded-md px-2 py-2 text-left text-xs transition-colors hover:bg-black/5 ${
@@ -111,37 +128,23 @@ export function AdminOverview() {
             <div className="min-w-0 flex-1 p-4">
               <div className="flex flex-wrap items-center gap-2 text-xs">
                 <span className="text-black/70">Last</span>
-                <input aria-label="Number of days" defaultValue="30" className="h-8 w-20 rounded-md border border-black/20 px-2 outline-none focus:border-black/50" />
-                <select aria-label="Date unit" defaultValue="Days" className="h-8 rounded-md border border-black/20 bg-white px-2 outline-none focus:border-black/50">
-                  <option>Days</option>
-                  <option>Weeks</option>
-                  <option>Months</option>
-                </select>
+                <input aria-label="Number of days" value={rangeAmount} onChange={(event) => setRangeAmount(event.target.value)} inputMode="numeric" className="h-8 w-20 rounded-md border border-black/20 px-2 outline-none focus:border-black/50" />
+                <Select value={dateUnit} onValueChange={setDateUnit}>
+                  <SelectTrigger aria-label="Date unit" className="h-8 w-24 border-black/20 px-2 text-xs shadow-none"><SelectValue /></SelectTrigger>
+                  <SelectContent position="popper"><SelectItem value="Days">Days</SelectItem><SelectItem value="Weeks">Weeks</SelectItem><SelectItem value="Months">Months</SelectItem></SelectContent>
+                </Select>
                 <label className="inline-flex items-center gap-1.5 text-black/70">
-                  <input type="checkbox" defaultChecked className="accent-black" /> Include today
+                  <input type="checkbox" checked={includeToday} onChange={(event) => setIncludeToday(event.target.checked)} className="accent-black" /> Include today
                 </label>
               </div>
-              <div className="mt-5 grid grid-cols-2 gap-6 text-xs text-black/75">
-                {["June 2026", "July 2026"].map((month) => (
-                  <div key={month}>
-                    <p className="mb-3 text-center font-semibold">{month}</p>
-                    <div className="grid grid-cols-7 gap-y-2 text-center text-black/60">
-                      {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => <span key={day} className="text-[10px]">{day}</span>)}
-                      {Array.from({ length: 35 }, (_, index) => {
-                        const day = index - (month === "June 2026" ? 0 : 1)
-                        return <span key={index} className={day === 15 ? "rounded bg-black px-1 py-0.5 text-white" : "px-1 py-0.5"}>{day > 0 && day < 31 ? day : ""}</span>
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <Calendar mode="range" selected={dateRange} onSelect={setDateRange} numberOfMonths={2} className="mt-4 max-w-full" />
               <div className="mt-5 flex justify-end gap-2 border-t border-black/10 pt-3">
                 <button type="button" onClick={() => setIsDatePickerOpen(false)} className="rounded-md border border-black/20 px-3 py-1.5 text-xs">Cancel</button>
-                <button type="button" onClick={() => setIsDatePickerOpen(false)} className="rounded-md bg-black px-3 py-1.5 text-xs text-white">Apply</button>
+                <button type="button" onClick={() => { setRangeLabel(dateRange?.from ? formatRange(dateRange) : `Last ${rangeAmount} ${dateUnit.toLowerCase()}${includeToday ? "" : " excluding today"}`); setIsDatePickerOpen(false) }} className="rounded-md bg-black px-3 py-1.5 text-xs text-white">Apply</button>
               </div>
             </div>
-          </div>
-        ) : null}
+          </PopoverContent>
+        </Popover>
       </div>
 
       <div className="relative rounded-xl border border-black/10 bg-white p-2 shadow-sm sm:p-3">
