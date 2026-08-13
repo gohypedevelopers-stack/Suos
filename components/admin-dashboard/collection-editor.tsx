@@ -19,6 +19,7 @@ import {
   createCollectionAction,
   updateCollectionAction,
 } from "@/app/actions/collections"
+import { toAdminUppercase } from "@/lib/content-case"
 import {
   Dialog,
   DialogContent,
@@ -134,13 +135,15 @@ export function CollectionEditor({
   const router = useRouter()
   const imageInputRef = useRef<HTMLInputElement>(null)
   const isNew = !collection
-  const [title, setTitle] = useState(collection?.title ?? "")
-  const [description, setDescription] = useState(collection?.description ?? "")
+  const [title, setTitle] = useState(toAdminUppercase(collection?.title ?? ""))
+  const [description, setDescription] = useState(toAdminUppercase(collection?.description ?? ""))
   const [slug, setSlug] = useState(collection?.slug ?? "")
   const [isCustomSlug, setIsCustomSlug] = useState(Boolean(collection?.slug))
   const [isPublished, setIsPublished] = useState(collection?.isPublished ?? false)
   const [image, setImage] = useState<CollectionImage | null>(collection?.image ?? null)
-  const [imageAltText, setImageAltText] = useState(collection?.image?.altText ?? "")
+  const [imageAltText, setImageAltText] = useState(
+    toAdminUppercase(collection?.image?.altText ?? ""),
+  )
   const [isUploadingImage, setIsUploadingImage] = useState(false)
   const [isSaved, setIsSaved] = useState(Boolean(collection))
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
@@ -317,7 +320,7 @@ export function CollectionEditor({
                     id="collection-title"
                     value={title}
                     onChange={(event) => {
-                      const nextTitle = event.target.value
+                      const nextTitle = toAdminUppercase(event.target.value)
                       setTitle(nextTitle)
                       if (!isCustomSlug) setSlug(slugify(nextTitle))
                       markChanged()
@@ -336,7 +339,7 @@ export function CollectionEditor({
                     id="collection-description"
                     value={description}
                     onChange={(event) => {
-                      setDescription(event.target.value)
+                      setDescription(toAdminUppercase(event.target.value))
                       markChanged()
                     }}
                     rows={6}
@@ -404,7 +407,7 @@ export function CollectionEditor({
                         id="collection-image-alt"
                         value={imageAltText}
                         onChange={(event) => {
-                          setImageAltText(event.target.value)
+                          setImageAltText(toAdminUppercase(event.target.value))
                           markChanged()
                         }}
                         maxLength={300}

@@ -19,6 +19,7 @@ import {
   createCategoryAction,
   updateCategoryAction,
 } from "@/app/actions/categories"
+import { toAdminUppercase } from "@/lib/content-case"
 import {
   Dialog,
   DialogContent,
@@ -151,8 +152,8 @@ export function CategoryEditor({
   const router = useRouter()
   const imageInputRef = useRef<HTMLInputElement>(null)
   const isNew = !category
-  const [name, setName] = useState(category?.name ?? "")
-  const [description, setDescription] = useState(category?.description ?? "")
+  const [name, setName] = useState(toAdminUppercase(category?.name ?? ""))
+  const [description, setDescription] = useState(toAdminUppercase(category?.description ?? ""))
   const [slug, setSlug] = useState(category?.slug ?? "")
   const [isCustomSlug, setIsCustomSlug] = useState(Boolean(category?.slug))
   const [parentId, setParentId] = useState(category?.parentId ?? "")
@@ -161,7 +162,9 @@ export function CategoryEditor({
     category?.status ?? "ACTIVE",
   )
   const [image, setImage] = useState<CategoryImage | null>(category?.image ?? null)
-  const [imageAltText, setImageAltText] = useState(category?.image?.altText ?? "")
+  const [imageAltText, setImageAltText] = useState(
+    toAdminUppercase(category?.image?.altText ?? ""),
+  )
   const [isUploadingImage, setIsUploadingImage] = useState(false)
   const [isSaved, setIsSaved] = useState(Boolean(category))
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
@@ -362,7 +365,7 @@ export function CategoryEditor({
                     id="category-name"
                     value={name}
                     onChange={(event) => {
-                      const nextName = event.target.value
+                      const nextName = toAdminUppercase(event.target.value)
                       setName(nextName)
                       if (!isCustomSlug) {
                         setSlug(slugify(nextName))
@@ -387,7 +390,7 @@ export function CategoryEditor({
                     id="category-description"
                     value={description}
                     onChange={(event) => {
-                      setDescription(event.target.value)
+                      setDescription(toAdminUppercase(event.target.value))
                       markChanged()
                     }}
                     rows={6}
@@ -452,7 +455,7 @@ export function CategoryEditor({
                         id="category-image-alt"
                         value={imageAltText}
                         onChange={(event) => {
-                          setImageAltText(event.target.value)
+                          setImageAltText(toAdminUppercase(event.target.value))
                           markChanged()
                         }}
                         maxLength={300}

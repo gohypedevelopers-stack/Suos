@@ -19,6 +19,7 @@ import {
 import { toast } from "sonner"
 
 import { createProductAction, updateProductAction } from "@/app/actions/products"
+import { toAdminUppercase } from "@/lib/content-case"
 import {
   ProductAdditionalDetailsSection,
   type ProductDetailDraft,
@@ -138,15 +139,17 @@ export function ProductEditor({
 }) {
   const router = useRouter()
   const imageInputRef = useRef<HTMLInputElement>(null)
-  const [title, setTitle] = useState(initialProduct?.title ?? "")
-  const [description, setDescription] = useState(initialProduct?.description ?? "")
+  const [title, setTitle] = useState(toAdminUppercase(initialProduct?.title ?? ""))
+  const [description, setDescription] = useState(toAdminUppercase(initialProduct?.description ?? ""))
   const [slug, setSlug] = useState(initialProduct?.slug ?? "")
   const [isCustomSlug, setIsCustomSlug] = useState(Boolean(initialProduct))
   const [seoExpanded, setSeoExpanded] = useState(false)
   const [status, setStatus] = useState<"ACTIVE" | "DRAFT">(initialProduct?.status ?? "ACTIVE")
   const [categoryId, setCategoryId] = useState(initialProduct?.categoryId ?? "")
   const [collectionIds, setCollectionIds] = useState<string[]>(initialProduct?.collectionIds ?? [])
-  const [tags, setTags] = useState<string[]>(initialProduct?.tags ?? [])
+  const [tags, setTags] = useState<string[]>(() =>
+    (initialProduct?.tags ?? []).map(toAdminUppercase),
+  )
   const [price, setPrice] = useState(initialProduct?.price ?? "0.00")
   const [compareAtPrice, setCompareAtPrice] = useState(initialProduct?.compareAtPrice ?? "")
   const [inventoryQuantity, setInventoryQuantity] = useState(initialProduct?.inventoryQuantity ?? "0")
@@ -155,7 +158,12 @@ export function ProductEditor({
   const [draggedImageKey, setDraggedImageKey] = useState<string | null>(null)
   const [dropImageKey, setDropImageKey] = useState<string | null>(null)
   const [variants, setVariants] = useState<ProductVariantDraft[]>(initialProduct?.variants ?? [])
-  const [details, setDetails] = useState<ProductDetailDraft[]>(initialProduct?.details ?? [])
+  const [details, setDetails] = useState<ProductDetailDraft[]>(() =>
+    (initialProduct?.details ?? []).map((detail) => ({
+      name: toAdminUppercase(detail.name),
+      value: toAdminUppercase(detail.value),
+    })),
+  )
   const [isUploading, setIsUploading] = useState(false)
   const [uploadMessage, setUploadMessage] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
@@ -169,9 +177,10 @@ export function ProductEditor({
   }
 
   const updateTitle = (value: string) => {
-    setTitle(value)
+    const nextTitle = toAdminUppercase(value)
+    setTitle(nextTitle)
     if (!isCustomSlug) {
-      setSlug(slugify(value))
+      setSlug(slugify(nextTitle))
     }
     markChanged()
   }
@@ -408,7 +417,7 @@ export function ProductEditor({
                   <textarea
                     id="product-description"
                     value={description}
-                    onChange={(event) => { setDescription(event.target.value); markChanged() }}
+                    onChange={(event) => { setDescription(toAdminUppercase(event.target.value)); markChanged() }}
                     placeholder="Write a product description"
                     rows={6}
                     className="w-full resize-y rounded-lg border border-black/25 bg-white px-3 py-2.5 text-sm leading-6 outline-none placeholder:text-black/40 focus:border-black focus:ring-2 focus:ring-black/10"
@@ -671,7 +680,7 @@ export function ProductEditor({
                 tags={tags}
                 onCategoryChange={(value) => { setCategoryId(value); markChanged() }}
                 onCollectionIdsChange={(value) => { setCollectionIds(value); markChanged() }}
-                onTagsChange={(value) => { setTags(value); markChanged() }}
+                onTagsChange={(value) => { setTags(value.map(toAdminUppercase)); markChanged() }}
               />
             </Card>
           </aside>

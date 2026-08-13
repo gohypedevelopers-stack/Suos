@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { toAdminUppercase } from "@/lib/content-case"
 import type { AdminCategoryOption } from "@/lib/server/dal/categories"
 import type { AdminCollectionOption } from "@/lib/server/dal/products"
 
@@ -64,7 +65,7 @@ export function ProductOrganizationFields({
   )
 
   function addTag(value = tagDraft) {
-    const nextTags = value
+    const nextTags = toAdminUppercase(value)
       .split(",")
       .map((tag) => tag.trim())
       .filter(Boolean)
@@ -182,7 +183,7 @@ export function ProductOrganizationFields({
             <input
               id="product-tags"
               value={tagDraft}
-              onChange={(event) => setTagDraft(event.target.value)}
+              onChange={(event) => setTagDraft(toAdminUppercase(event.target.value))}
               onBlur={() => addTag()}
               onKeyDown={(event) => {
                 if (event.key === "Enter" || event.key === ",") {

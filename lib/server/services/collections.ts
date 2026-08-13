@@ -1,6 +1,7 @@
 import "server-only"
 
 import { Prisma } from "@/generated/prisma/client"
+import { toAdminUppercase } from "@/lib/content-case"
 import { assertAdmin } from "@/lib/server/dal/auth"
 import { getPrisma } from "@/lib/server/db"
 import type { CollectionInput } from "@/lib/validations/collection"
@@ -59,12 +60,14 @@ async function validateProductIds(
 
 function collectionData(input: CollectionInput, slug: string) {
   return {
-    title: input.title,
+    title: toAdminUppercase(input.title),
     slug,
-    description: input.description || null,
+    description: input.description ? toAdminUppercase(input.description) : null,
     isPublished: input.isPublished,
     imageObjectKey: input.imageObjectKey || null,
-    imageAltText: input.imageObjectKey ? input.imageAltText || null : null,
+    imageAltText: input.imageObjectKey && input.imageAltText
+      ? toAdminUppercase(input.imageAltText)
+      : null,
   }
 }
 

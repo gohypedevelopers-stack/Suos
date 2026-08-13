@@ -56,12 +56,17 @@ const optionalSkuSchema = z.preprocess(
 
 const productVariantSchema = z
   .object({
-    title: z.string().trim().min(1).max(120).default("Default"),
+    title: z.string().trim().toUpperCase().min(1).max(120).default("DEFAULT"),
     sku: optionalSkuSchema,
     price: requiredMoneySchema,
     compareAtPrice: optionalMoneySchema,
     inventoryQuantity: requiredQuantitySchema,
-    optionValues: z.record(z.string().min(1).max(60), z.string().min(1).max(120)).default({}),
+    optionValues: z
+      .record(
+        z.string().min(1).max(60),
+        z.string().trim().toUpperCase().min(1).max(120),
+      )
+      .default({}),
   })
   .superRefine((value, context) => {
     if (
@@ -78,7 +83,7 @@ const productVariantSchema = z
 
 export const productInputSchema = z
   .object({
-    title: z.string().trim().min(2).max(160),
+    title: z.string().trim().toUpperCase().min(2).max(160),
     slug: z
       .string()
       .trim()
@@ -86,7 +91,7 @@ export const productInputSchema = z
       .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
       .max(180)
       .optional(),
-    description: z.string().trim().max(10_000).optional(),
+    description: z.string().trim().toUpperCase().max(10_000).optional(),
     status: z.enum(["DRAFT", "ACTIVE"]).default("DRAFT"),
     categoryId: z.string().trim().min(1).nullable().optional(),
     sku: optionalSkuSchema,
@@ -101,15 +106,15 @@ export const productInputSchema = z
       .default([])
       .transform((ids) => [...new Set(ids)]),
     tags: z
-      .array(z.string().trim().min(1).max(60))
+      .array(z.string().trim().toUpperCase().min(1).max(60))
       .max(30)
       .default([])
       .transform((tags) => [...new Set(tags)]),
     details: z
       .array(
         z.object({
-          name: z.string().trim().min(1).max(80),
-          value: z.string().trim().min(1).max(2_000),
+          name: z.string().trim().toUpperCase().min(1).max(80),
+          value: z.string().trim().toUpperCase().min(1).max(2_000),
         }),
       )
       .max(30)

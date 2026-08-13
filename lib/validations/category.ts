@@ -8,14 +8,14 @@ export const categoryImageObjectKeySchema = z
   )
 
 export const categoryInputSchema = z.object({
-  name: z.string().trim().min(1, "Enter a category title.").max(120),
+  name: z.string().trim().toUpperCase().min(1, "Enter a category title.").max(120),
   slug: z.string().trim().max(180).default(""),
-  description: z.string().trim().max(2_000).default(""),
+  description: z.string().trim().toUpperCase().max(2_000).default(""),
   status: z.enum(["DRAFT", "ACTIVE"]),
   visible: z.boolean(),
   parentId: z.string().trim().min(1).nullable().optional(),
   imageObjectKey: categoryImageObjectKeySchema.nullable().optional(),
-  imageAltText: z.string().trim().max(300).nullable().optional(),
+  imageAltText: z.string().trim().toUpperCase().max(300).nullable().optional(),
   productIds: z
     .array(z.string().trim().min(1))
     .max(500, "A category can contain at most 500 products.")

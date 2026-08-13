@@ -1,6 +1,7 @@
 import "server-only"
 
 import { Prisma } from "@/generated/prisma/client"
+import { toAdminUppercase } from "@/lib/content-case"
 import { getPrisma } from "@/lib/server/db"
 import type { CategoryInput } from "@/lib/validations/category"
 
@@ -114,14 +115,16 @@ async function replaceCategoryProducts(
 
 function categoryData(input: CategoryInput, slug: string) {
   return {
-    name: input.name,
+    name: toAdminUppercase(input.name),
     slug,
-    description: input.description || null,
+    description: input.description ? toAdminUppercase(input.description) : null,
     status: input.status,
     visible: input.visible,
     parentId: input.parentId || null,
     imageObjectKey: input.imageObjectKey || null,
-    imageAltText: input.imageObjectKey ? input.imageAltText || null : null,
+    imageAltText: input.imageObjectKey && input.imageAltText
+      ? toAdminUppercase(input.imageAltText)
+      : null,
   }
 }
 

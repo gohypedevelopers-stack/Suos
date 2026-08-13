@@ -6,6 +6,7 @@ import { ListPlus, Plus, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { toAdminUppercase } from "@/lib/content-case"
 
 type Detail = {
   id: string
@@ -23,7 +24,11 @@ export function ProductAdditionalDetailsSection({
   onChange?: (details: ProductDetailDraft[]) => void
 }) {
   const [details, setDetails] = useState<Detail[]>(() =>
-    (value ?? []).map((detail, index) => ({ ...detail, id: `detail-${index}` })),
+    (value ?? []).map((detail, index) => ({
+      id: `detail-${index}`,
+      name: toAdminUppercase(detail.name),
+      value: toAdminUppercase(detail.value),
+    })),
   )
   const nextDetailId = useRef(1)
 
@@ -39,7 +44,7 @@ export function ProductAdditionalDetailsSection({
   }
 
   function updateDetail(id: string, field: "name" | "value", value: string) {
-    commit(details.map((detail) => detail.id === id ? { ...detail, [field]: value } : detail))
+    commit(details.map((detail) => detail.id === id ? { ...detail, [field]: toAdminUppercase(value) } : detail))
   }
 
   function removeDetail(id: string) {

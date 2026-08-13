@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { toAdminUppercase } from "@/lib/content-case"
 
 type OptionName = "color" | "size"
 
@@ -57,10 +58,8 @@ function getColorSwatch(value: string, customSwatch?: string) {
   return colorSwatches[normalized] ?? "#d1d5db"
 }
 
-function toTitleCase(value: string) {
-  const trimmed = value.trim()
-  if (/^#[0-9a-f]{3,8}$/i.test(trimmed)) return trimmed.toUpperCase()
-  return trimmed.toLowerCase().replace(/\b[a-z]/g, (letter) => letter.toUpperCase())
+function normalizeOptionValue(value: string) {
+  return toAdminUppercase(value.trim())
 }
 
 function variantKey(size: string) {
@@ -77,7 +76,7 @@ function getInitialVariantState(initialVariants: ProductVariantDraft[]) {
   for (const variant of initialVariants) {
     const colorValues = variant.optionValues.Color
       ?.split(",")
-      .map((value) => toTitleCase(value))
+      .map(normalizeOptionValue)
       .filter(Boolean) ?? []
     const size = variant.optionValues.Size?.trim().toUpperCase()
     const key = variantKey(size || "Variant")
@@ -220,7 +219,7 @@ export function ProductVariantsSection({
   }
 
   function addValue(option: OptionName) {
-    const nextValue = option === "size" ? drafts[option].trim().toUpperCase() : toTitleCase(drafts[option])
+    const nextValue = normalizeOptionValue(drafts[option])
     if (!nextValue || values[option].some((value) => value.toLowerCase() === nextValue.toLowerCase())) return
 
     setValues((current) => ({ ...current, [option]: [...current[option], nextValue] }))
@@ -274,7 +273,7 @@ export function ProductVariantsSection({
   }
 
   function saveValue(option: OptionName, value: string) {
-    const nextValue = option === "size" ? valueDraft.trim().toUpperCase() : toTitleCase(valueDraft)
+    const nextValue = normalizeOptionValue(valueDraft)
     const hasDuplicate = values[option].some((item) => item !== value && item.toLowerCase() === nextValue.toLowerCase())
     if (!nextValue || hasDuplicate) {
       setEditingValue(null)
@@ -365,14 +364,14 @@ export function ProductVariantsSection({
                             onDragEnd={() => setDraggedValue(null)}
                             className={`inline-flex cursor-grab items-center gap-1 rounded bg-[#edf5ff] py-1 pl-2 pr-1 text-xs font-medium text-[#16446f] active:cursor-grabbing ${draggedValue?.option === option && draggedValue.value === value ? "opacity-45" : ""}`}
                           >
-                            {option === "color" && <span aria-hidden="true" className="size-3 rounded-sm ring-1 ring-inset ring-black/15" style={{ backgroundColor: getColorSwatch(value, customSwatches[value] ?? customSwatches[toTitleCase(value)]) }} />}
+                            {option === "color" && <span aria-hidden="true" className="size-3 rounded-sm ring-1 ring-inset ring-black/15" style={{ backgroundColor: getColorSwatch(value, customSwatches[value] ?? customSwatches[normalizeOptionValue(value)]) }} />}
                             {editingValue?.option === option && editingValue.value === value ? (
                               <Input
                                 aria-label={`Edit ${value}`}
                                 autoFocus
                                 value={valueDraft}
                                 onClick={(event) => event.stopPropagation()}
-                                onChange={(event) => setValueDraft(event.target.value)}
+                                onChange={(event) => setValueDraft(toAdminUppercase(event.target.value))}
                                 onBlur={() => saveValue(option, value)}
                                 onKeyDown={(event) => {
                                   if (event.key === "Enter") saveValue(option, value)
@@ -382,7 +381,7 @@ export function ProductVariantsSection({
                               />
                             ) : (
                               <button type="button" draggable={false} onClick={(event) => { event.stopPropagation(); startEditingValue(option, value) }} className="cursor-text text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16446f]/30" title="Click to edit">
-                                {option === "size" ? value.toUpperCase() : toTitleCase(value)}
+                                {value.toUpperCase()}
                               </button>
                             )}
                             <button type="button" draggable={false} aria-label={`Remove ${value}`} onClick={() => removeValue(option, value)} className="grid size-4 cursor-pointer place-items-center rounded text-[#16446f]/60 transition-colors hover:bg-[#cfe4fa] hover:text-[#16446f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16446f]/30">
@@ -409,7 +408,7 @@ export function ProductVariantsSection({
                           <Input
                             aria-label={`Add ${label.toLowerCase()} value`}
                             value={drafts[option]}
-                            onChange={(event) => setDrafts((current) => ({ ...current, [option]: event.target.value }))}
+                            onChange={(event) => setDrafts((current) => ({ ...current, [option]: toAdminUppercase(event.target.value) }))}
                             onKeyDown={(event) => {
                               if (event.key === "Enter") {
                                 event.preventDefault()
