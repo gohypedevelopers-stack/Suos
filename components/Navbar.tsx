@@ -18,6 +18,8 @@ import {
 import { cn } from "@/lib/utils"
 import { CartSidebar } from "@/components/cart/CartSidebar"
 import { SearchSidebar } from "@/components/home/SearchSidebar"
+import { WishlistSidebar } from "@/components/wishlist/WishlistSidebar"
+import { useWishlist } from "@/lib/wishlist-context"
 
 type NavKey = "women" | "men" | "bestsellers"
 type ActiveMenu = NavKey | "wishlist"
@@ -312,6 +314,7 @@ export function Navbar({
   const defaultNavKey: NavKey = "men"
   const pathname = usePathname()
   const isOverlay = pathname === "/"
+  const { wishlist, isLoaded, setIsSidebarOpen } = useWishlist()
   const [isScrolled, setIsScrolled] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [cartOpen, setCartOpen] = useState(false)
@@ -561,15 +564,24 @@ export function Navbar({
               <UserRound className="size-[18px] stroke-[1.7]" />
             </Link>
 
-            <IconButton
-              label="Wishlist"
-              tone={tone}
-              onClick={toggleWishlist}
-              ariaHaspopup="menu"
-              ariaExpanded={isWishlistOpen}
+            <button
+              type="button"
+              aria-label="Wishlist"
+              onClick={() => setIsSidebarOpen(true)}
+              className={cn(
+                "relative inline-flex size-9 cursor-pointer items-center justify-center text-current transition-[color,opacity] duration-300 ease-out hover:opacity-60 focus-visible:outline-none focus-visible:ring-2",
+                tone === "light"
+                  ? "focus-visible:ring-white/30"
+                  : "focus-visible:ring-black/25"
+              )}
             >
               <Heart className="size-[18px] stroke-[1.7]" />
-            </IconButton>
+              {wishlist.length > 0 && isLoaded && (
+                <span className="absolute right-[2px] top-[2px] flex min-h-[14px] min-w-[14px] items-center justify-center rounded-full bg-black px-[4px] text-[9px] font-bold text-white ring-1 ring-white">
+                  {wishlist.length}
+                </span>
+              )}
+            </button>
 
             <IconButton
               label="Cart"
@@ -617,15 +629,24 @@ export function Navbar({
               >
                 <UserRound className="size-[18px] stroke-[1.7]" />
               </Link>
-              <IconButton
-                label="Wishlist"
-                tone={tone}
-                onClick={toggleWishlist}
-                ariaHaspopup="menu"
-                ariaExpanded={isWishlistOpen}
+              <button
+                type="button"
+                aria-label="Wishlist"
+                onClick={() => setIsSidebarOpen(true)}
+                className={cn(
+                  "relative inline-flex size-9 cursor-pointer items-center justify-center text-current transition-[color,opacity] duration-300 ease-out hover:opacity-60 focus-visible:outline-none focus-visible:ring-2",
+                  tone === "light"
+                    ? "focus-visible:ring-white/30"
+                    : "focus-visible:ring-black/25"
+                )}
               >
                 <Heart className="size-[18px] stroke-[1.7]" />
-              </IconButton>
+                {wishlist.length > 0 && isLoaded && (
+                  <span className="absolute right-[2px] top-[2px] flex min-h-[14px] min-w-[14px] items-center justify-center rounded-full bg-black px-[4px] text-[9px] font-bold text-white ring-1 ring-white">
+                    {wishlist.length}
+                  </span>
+                )}
+              </button>
               <IconButton
                 label="Cart"
                 tone={tone}
@@ -700,37 +721,33 @@ export function Navbar({
                   }
                   className="absolute inset-0"
                 >
-                  {activeMenu === "wishlist" ? (
-                    <WishlistPanel />
-                  ) : (
-                    <div className="grid h-full w-full gap-x-14 gap-y-8 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(10rem,12rem)_minmax(14rem,18rem)_minmax(0,1fr)] lg:px-8">
-                      <MenuSection
-                        title="Featured"
-                        items={megaMenuFeatured}
-                        open={Boolean(activeMenu)}
-                        onClose={closeMenu}
-                      />
+                  <div className="grid h-full w-full gap-x-14 gap-y-8 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(10rem,12rem)_minmax(14rem,18rem)_minmax(0,1fr)] lg:px-8">
+                    <MenuSection
+                      title="Featured"
+                      items={megaMenuFeatured}
+                      open={Boolean(activeMenu)}
+                      onClose={closeMenu}
+                    />
 
-                      <MenuSection
-                        title="Categories"
-                        items={megaMenuCategories}
-                        open={Boolean(activeMenu)}
-                        onClose={closeMenu}
-                      />
+                    <MenuSection
+                      title="Categories"
+                      items={megaMenuCategories}
+                      open={Boolean(activeMenu)}
+                      onClose={closeMenu}
+                    />
 
-                      <div className="grid w-full max-w-[652px] min-w-0 grid-cols-2 gap-6 justify-self-end">
-                        {megaMenuCards.map((card) => (
-                          <MenuCard
-                            key={card.src}
-                            src={card.src}
-                            alt={card.alt}
-                            eyebrow={card.eyebrow}
-                            titleLines={card.titleLines}
-                          />
-                        ))}
-                      </div>
+                    <div className="grid w-full max-w-[652px] min-w-0 grid-cols-2 gap-6 justify-self-end">
+                      {megaMenuCards.map((card) => (
+                        <MenuCard
+                          key={card.src}
+                          src={card.src}
+                          alt={card.alt}
+                          eyebrow={card.eyebrow}
+                          titleLines={card.titleLines}
+                        />
+                      ))}
                     </div>
-                  )}
+                  </div>
                 </motion.div>
               </AnimatePresence>
             </motion.div>
@@ -740,6 +757,7 @@ export function Navbar({
 
       <SearchSidebar open={searchOpen} onOpenChange={setSearchOpen} />
       <CartSidebar open={cartOpen} onOpenChange={setCartOpen} />
+      <WishlistSidebar />
     </header>
   )
 

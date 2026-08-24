@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/carousel"
 import { cn } from "@/lib/utils"
 import type { ProductDetail } from "@/components/product/productData"
+import { SizeChartModal } from "@/components/product/SizeChartModal"
 
 const deliveryIcons = {
   truck: Truck,
@@ -146,16 +147,18 @@ export function ProductSummary({
             <p className="text-[13px] font-normal uppercase text-black/45">
               Size <span className="font-[500] text-black">{selectedSize}</span>
             </p>
-            <Link
-              href="#size-guide"
-              className="group inline-flex flex-col items-start pb-0.5 text-[13px] font-normal uppercase leading-none text-black/45 transition-colors duration-200 hover:text-black focus-visible:text-black"
-            >
-              <span>View Size Chart</span>
-              <span
-                aria-hidden="true"
-                className="mt-[2px] h-px w-full origin-left scale-x-0 bg-black transition-transform duration-200 group-hover:scale-x-100 group-focus-visible:scale-x-100"
-              />
-            </Link>
+            <SizeChartModal images={product.sizeGuideImages}>
+              <button
+                type="button"
+                className="group inline-flex flex-col items-start pb-0.5 text-[13px] font-normal uppercase leading-none text-black/45 transition-colors duration-200 hover:text-black focus-visible:text-black cursor-pointer"
+              >
+                <span>View Size Chart</span>
+                <span
+                  aria-hidden="true"
+                  className="mt-[2px] h-px w-full origin-left scale-x-0 bg-black transition-transform duration-200 group-hover:scale-x-100 group-focus-visible:scale-x-100"
+                />
+              </button>
+            </SizeChartModal>
           </div>
 
           <div id="size-guide" className="grid grid-cols-3 gap-2 sm:grid-cols-6">

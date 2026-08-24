@@ -3,10 +3,11 @@
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react"
+import { ChevronLeft, ChevronRight, Heart } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { ProductQuickViewModal } from "@/components/product/ProductQuickViewModal"
+import { useWishlist } from "@/lib/wishlist-context"
 import {
   featuredProduct,
   trendingProducts,
@@ -65,6 +66,9 @@ export function ProductCardView({
   const gallery = product.gallery?.length ? product.gallery : [product.image]
   const [activeImageIndex, setActiveImageIndex] = useState(0)
   const [quickViewOpen, setQuickViewOpen] = useState(false)
+  const { isInWishlist, toggleWishlist, setIsSidebarOpen } = useWishlist()
+  
+  const isWished = isInWishlist(product.id)
 
   const activeImage = gallery[activeImageIndex] ?? product.image
   const hasGalleryControls = gallery.length > 1
@@ -105,16 +109,23 @@ export function ProductCardView({
 
         <button
           type="button"
-          aria-label={`Quick view ${product.alt}`}
+          aria-label={`Toggle wishlist for ${product.alt}`}
           onClick={(event) => {
+            event.preventDefault()
             event.stopPropagation()
-            setQuickViewOpen(true)
+            toggleWishlist(product)
+            if (!isWished) {
+              setIsSidebarOpen(true)
+            }
           }}
           className={cn(
-            "absolute right-3 top-3 z-40 inline-flex size-5 translate-y-0 cursor-pointer items-center justify-center border border-black/20 bg-white text-black opacity-100 transition-colors duration-200 hover:bg-[#e5e5e5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+            "absolute right-3 top-3 z-40 inline-flex size-8 translate-y-0 cursor-pointer items-center justify-center text-black opacity-100 transition-transform duration-200 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
           )}
         >
-          <Plus className="size-3.5 stroke-[2.1]" />
+          <Heart 
+            className={cn("size-5", isWished ? "fill-white stroke-white" : "stroke-white")} 
+            strokeWidth={isWished ? 2.5 : 1.7} 
+          />
         </button>
 
         {hasGalleryControls ? (

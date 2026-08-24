@@ -42,11 +42,11 @@ function ContactMethod({
 }) {
   return (
     <article className={`space-y-3 ${className ?? ""}`}>
-      <div className="flex items-center gap-4 text-[22px] text-black/55">
+      <div className="flex items-center gap-4 text-[18px] text-black/55">
         {icon}
         <h2 className="font-normal uppercase">{title}</h2>
       </div>
-      <div className="pl-10 text-[22px] leading-[1.65] text-black">{children}</div>
+      <div className="pl-10 text-[18px] leading-[1.65] text-black">{children}</div>
     </article>
   )
 }
@@ -59,7 +59,7 @@ export default function ContactPage() {
           <p className="text-[1rem] uppercase">Contact us</p>
           <h1
             id="contact-heading"
-            className="mt-8 max-w-[32rem] text-[70px] font-normal uppercase leading-[1.02] tracking-[-0.055em]"
+            className="mt-8 max-w-[32rem] text-6xl font-normal uppercase leading-[1.1] tracking-tight sm:text-[68px]"
           >
             Let’s
             <br />
@@ -103,14 +103,14 @@ export default function ContactPage() {
             <section aria-labelledby="message-heading">
               <h2
                 id="message-heading"
-                className="text-[22px] font-normal uppercase text-black/55"
+                className="text-[18px] font-normal uppercase text-black/55"
               >
                 Send a message
               </h2>
 
               <form className="mt-20 space-y-14" noValidate>
                 <div className="grid gap-12 sm:grid-cols-2 sm:gap-6">
-                  <label className="block border-b border-black/55 pb-3 text-[22px] text-black/55">
+                  <label className="block border-b border-black/55 pb-3 text-sm text-black/55">
                     <span className="sr-only">Full name</span>
                     <input
                       name="name"
@@ -119,7 +119,7 @@ export default function ContactPage() {
                       className="w-full bg-transparent uppercase outline-none placeholder:text-black/55"
                     />
                   </label>
-                  <label className="block border-b border-black/55 pb-3 text-[22px] text-black/55">
+                  <label className="block border-b border-black/55 pb-3 text-sm text-black/55">
                     <span className="sr-only">Email address</span>
                     <input
                       name="email"
@@ -133,7 +133,7 @@ export default function ContactPage() {
 
                 <ContactSubjectSelect />
 
-                <label className="block border-b border-black/55 pb-3 text-[22px] text-black/55">
+                <label className="block border-b border-black/55 pb-3 text-sm text-black/55">
                   <span className="sr-only">Your message</span>
                   <textarea
                     name="message"
@@ -145,7 +145,7 @@ export default function ContactPage() {
 
                 <button
                   type="submit"
-                  className="flex h-[59px] w-full items-center justify-center bg-black text-[18px] uppercase text-white transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                  className="flex h-[59px] w-full items-center justify-center bg-black text-sm uppercase text-white transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
                 >
                   Send message
                 </button>
@@ -155,7 +155,7 @@ export default function ContactPage() {
             <section aria-labelledby="faq-heading">
               <h2
                 id="faq-heading"
-                className="text-[22px] font-normal uppercase text-black/55"
+                className="text-[18px] font-normal uppercase text-black/55"
               >
                 Frequently asked
               </h2>
@@ -163,7 +163,7 @@ export default function ContactPage() {
               <div className="mt-14 divide-y divide-black/55">
                 {faqs.map((faq) => (
                   <details key={faq.question} className="group py-0">
-                    <summary className="flex cursor-pointer list-none items-center justify-between gap-5 py-7 text-[22px] leading-tight marker:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-5 py-7 text-[18px] leading-tight marker:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30">
                       {faq.question}
                       <span
                         aria-hidden="true"

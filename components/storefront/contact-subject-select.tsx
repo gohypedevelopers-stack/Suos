@@ -11,7 +11,7 @@ export function ContactSubjectSelect() {
     <div className="border-b border-black/55 pb-3">
       <input type="hidden" name="subject" value={subject} />
       <Select value={subject} onValueChange={setSubject}>
-        <SelectTrigger aria-label="Select subject" className="h-auto w-full border-0 bg-transparent px-0 py-0 text-[22px] uppercase text-black/55 shadow-none focus:ring-0">
+        <SelectTrigger aria-label="Select subject" className="h-auto w-full border-0 bg-transparent px-0 py-0 text-sm uppercase text-black/55 shadow-none focus:ring-0">
           <SelectValue placeholder="SELECT SUBJECT" />
         </SelectTrigger>
         <SelectContent position="popper">

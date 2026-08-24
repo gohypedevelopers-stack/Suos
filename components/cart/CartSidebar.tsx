@@ -14,31 +14,9 @@ import {
   SheetDescription,
   SheetTitle,
 } from "@/components/ui/sheet"
+import { useCart, type CartItem } from "@/lib/cart-context"
 
-type CartItem = {
-  id: string
-  image: string
-  alt: string
-  title: string
-  size: string
-}
 
-const cartItems: CartItem[] = [
-  {
-    id: "cart-item-1",
-    image: trendingProducts[0].image,
-    alt: trendingProducts[0].alt,
-    title: "NAME OF THE...",
-    size: "XS",
-  },
-  {
-    id: "cart-item-2",
-    image: trendingProducts[2].image,
-    alt: trendingProducts[2].alt,
-    title: "NAME OF THE...",
-    size: "XS",
-  },
-]
 
 const promoStripText = "Additional Discount on Pre-paid | Free Return and Exchange"
 
@@ -61,6 +39,8 @@ const recommendations = [
 ]
 
 function CartItemRow({ item }: { item: CartItem }) {
+  const { removeFromCart, updateQuantity } = useCart()
+  
   return (
     <article className="grid grid-cols-[150px_minmax(0,1fr)] gap-4">
       <div className="relative aspect-[3/4] overflow-hidden bg-[#1a1a1a]">
@@ -93,6 +73,7 @@ function CartItemRow({ item }: { item: CartItem }) {
 
           <button
             type="button"
+            onClick={() => removeFromCart(item.id, item.size)}
             aria-label={`Remove ${item.title}`}
             className="-translate-y-px shrink-0 text-white/92 transition-opacity hover:opacity-70"
           >
@@ -104,14 +85,16 @@ function CartItemRow({ item }: { item: CartItem }) {
           <div className="flex items-center gap-2 text-[13px] font-normal leading-none">
             <button
               type="button"
+              onClick={() => updateQuantity(item.id, item.size, item.quantity - 1)}
               aria-label="Decrease quantity"
               className="transition-opacity hover:opacity-70"
             >
               -
             </button>
-            <span>1</span>
+            <span>{item.quantity}</span>
             <button
               type="button"
+              onClick={() => updateQuantity(item.id, item.size, item.quantity + 1)}
               aria-label="Increase quantity"
               className="transition-opacity hover:opacity-70"
             >
@@ -146,6 +129,8 @@ type CartSidebarProps = {
 }
 
 export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
+  const { cart, totalItems } = useCart()
+  
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
@@ -159,7 +144,7 @@ export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
           <div className="flex items-center justify-between px-5 py-5">
             <div className="flex items-center gap-2 text-[15px] font-normal uppercase text-white">
               <Check className="size-4 stroke-[2.4]" />
-              <span>2 ITEM ADDED</span>
+              <span>{totalItems} ITEM{totalItems !== 1 && "S"} ADDED</span>
             </div>
 
             <SheetClose asChild>
@@ -184,8 +169,8 @@ export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
 
           <div className="cart-item-scrollbar min-h-0 flex-1 overflow-y-auto px-5 pb-5">
             <section className="space-y-5">
-              {cartItems.map((item) => (
-                <CartItemRow key={`scroll-${item.id}`} item={item} />
+              {cart.map((item) => (
+                <CartItemRow key={`scroll-${item.id}-${item.size}`} item={item} />
               ))}
             </section>
           </div>

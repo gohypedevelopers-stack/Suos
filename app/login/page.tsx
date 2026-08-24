@@ -10,9 +10,9 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <main className="min-h-[calc(100svh-var(--header-stack-height))] bg-white text-black lg:h-[calc(100svh-var(--header-stack-height))] lg:min-h-0 lg:overflow-hidden">
-      <div className="grid min-h-[calc(100svh-var(--header-stack-height))] lg:h-full lg:min-h-0 lg:grid-cols-2">
-        <section className="relative hidden min-h-full overflow-hidden bg-[#101820] lg:block">
+    <main className="min-h-[calc(100svh-var(--header-stack-height))] bg-white text-black">
+      <div className="grid min-h-[calc(100svh-var(--header-stack-height))] lg:grid-cols-2">
+        <section className="relative hidden bg-[#101820] lg:block">
           <div className="absolute inset-x-0 top-0 -bottom-2">
             <Image
               src="/images/products/product1.png"
