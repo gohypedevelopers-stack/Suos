@@ -17,6 +17,7 @@ export type DeliveryPerk = {
 
 export type ProductCard = {
   id: string
+  title?: string
   image: string
   alt: string
   badge?: string

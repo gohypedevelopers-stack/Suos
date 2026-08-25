@@ -57,7 +57,7 @@ function CartItemRow({ item }: { item: CartItem }) {
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h3 className="truncate text-[13px] font-normal uppercase leading-[1.15] tracking-[0.06em] text-white/95">
-              {item.title}
+              {item.title || "NAME OF THE PRODUCT"}
             </h3>
 
             <div className="mt-3 flex items-center gap-4 text-[0.8rem] uppercase tracking-[0.04em] text-white/68">
