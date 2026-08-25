@@ -147,7 +147,7 @@ export function ProductSummary({
             <p className="text-[13px] font-normal uppercase text-black/45">
               Size <span className="font-[500] text-black">{selectedSize}</span>
             </p>
-            <SizeChartModal images={product.sizeGuideImages}>
+            <SizeChartModal images={product.sizeGuideImages} fitType={product.fitType}>
               <button
                 type="button"
                 className="group inline-flex flex-col items-start pb-0.5 text-[13px] font-normal uppercase leading-none text-black/45 transition-colors duration-200 hover:text-black focus-visible:text-black cursor-pointer"

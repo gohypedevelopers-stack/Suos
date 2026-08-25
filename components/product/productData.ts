@@ -49,6 +49,7 @@ export type ProductDetail = {
   deliveryPerks: DeliveryPerk[]
   completeLook: ProductImage[]
   sizeGuideImages?: string[]
+  fitType?: "regular" | "bootcut" | "straight"
 }
 
 export const trendingProducts: ProductCard[] = [
@@ -241,5 +242,6 @@ export const featuredProduct: ProductDetail = {
     "/size-charts/SU022026-27_TECHPACK_page_6.png",
     "/size-charts/SU022026-27_TECHPACK_page_7.png",
   ],
+  fitType: "bootcut",
 }
 
