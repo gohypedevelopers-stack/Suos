@@ -175,12 +175,20 @@ export function ProductSummary({
           </div>
         </section>
 
-        <button
-          type="button"
-          className="flex h-12 w-full cursor-pointer items-center justify-center border border-black bg-white text-[13px] font-normal uppercase tracking-normal transition-[background-color,color] duration-200 ease-out hover:bg-black hover:text-white"
-        >
-          Add To Cart
-        </button>
+        <div className="flex flex-col gap-2.5">
+          <button
+            type="button"
+            className="flex h-12 w-full cursor-pointer items-center justify-center border border-black bg-white text-[13px] font-[500] uppercase tracking-normal transition-[background-color,color] duration-200 ease-out hover:bg-black hover:text-white"
+          >
+            Add To Cart
+          </button>
+          <button
+            type="button"
+            className="flex h-12 w-full cursor-pointer items-center justify-center bg-black text-white text-[13px] font-[500] uppercase tracking-normal transition-opacity duration-200 ease-out hover:opacity-90"
+          >
+            Buy Now
+          </button>
+        </div>
 
         <section className="space-y-3">
           <p className="text-[13px] font-normal uppercase text-black/45">
