@@ -95,14 +95,20 @@ export function ProductCardView({
   return (
     <article className="group relative overflow-hidden bg-black shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
       <div className="relative aspect-[330/479]">
-        <Image
-          key={`${product.id}-${activeImageIndex}`}
-          src={activeImage}
-          alt={product.alt}
-          fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-          className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.015]"
-        />
+        {activeImage ? (
+          <Image
+            key={`${product.id}-${activeImageIndex}`}
+            src={activeImage}
+            alt={product.alt}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.015]"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-neutral-100">
+            <span className="text-xs uppercase text-neutral-400">No Image</span>
+          </div>
+        )}
 
         <Link
           href={`/products/${product.slug}`}
