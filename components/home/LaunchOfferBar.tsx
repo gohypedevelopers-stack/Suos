@@ -3,7 +3,7 @@ import Link from "next/link"
 import { LaunchOfferCountdown } from "@/components/home/LaunchOfferCountdown"
 import { getServerTimestamp } from "@/lib/server-time"
 
-const launchDeadline = Date.parse("2026-07-18T00:00:00Z")
+const launchDeadline = Date.parse("2026-10-18T00:00:00Z")
 
 export function LaunchOfferBar() {
   const initialNow = getServerTimestamp()

@@ -3,9 +3,11 @@ import Link from "next/link"
 import {
   ProductCardView,
 } from "@/components/home/TrendingSection"
-import { trendingProducts } from "@/components/product/productData"
+import { listPublishedProducts } from "@/lib/server/dal/products"
 
-export function YouMayAlsoLikeSection() {
+export async function YouMayAlsoLikeSection() {
+  const products = await listPublishedProducts()
+  
   return (
     <section className="w-full bg-white px-4 pb-14 pt-10 text-black sm:px-6 lg:px-8">
       <div className="w-full">
@@ -27,7 +29,7 @@ export function YouMayAlsoLikeSection() {
         </div>
 
         <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {trendingProducts.map((product) => (
+          {products.slice(0, 4).map((product) => (
             <ProductCardView key={product.id} product={product} />
           ))}
         </div>

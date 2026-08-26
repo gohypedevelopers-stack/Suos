@@ -4,8 +4,10 @@ import { assertAdmin } from "@/lib/server/dal/auth"
 import { getPrisma } from "@/lib/server/db"
 
 function imageUrl(objectKey: string | null) {
-  if (!objectKey) {
-    return null
+  if (!objectKey) return null
+
+  if (objectKey.startsWith("/")) {
+    return objectKey
   }
 
   if (objectKey.startsWith("uploads/")) {

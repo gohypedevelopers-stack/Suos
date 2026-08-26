@@ -3,11 +3,11 @@
 import Image from "next/image"
 import Link from "next/link"
 
-import { trendingProducts } from "@/components/product/productData"
 import { useContinuousDraggableCarousel } from "@/components/home/useContinuousDraggableCarousel"
+import type { ProductCard } from "@/components/home/TrendingSection"
 
-export function CollectionRecommendations() {
-  const products = trendingProducts.slice(0, 6)
+export function CollectionRecommendations({ products = [] }: { products?: ProductCard[] }) {
+  const displayProducts = products.slice(0, 6)
   const {
     viewportRef,
     trackRef,
@@ -18,8 +18,10 @@ export function CollectionRecommendations() {
     onPointerUp,
     onPointerCancel,
   } = useContinuousDraggableCarousel({
-    slideCount: products.length,
+    slideCount: displayProducts.length || 1,
   })
+
+  if (!displayProducts.length) return null
 
   return (
     <section
@@ -59,14 +61,14 @@ export function CollectionRecommendations() {
           onPointerCancel={onPointerCancel}
         >
           <div ref={trackRef} className="continuous-carousel-track">
-            {[...products, ...products, ...products].map((product, index) => (
+            {[...displayProducts, ...displayProducts, ...displayProducts].map((product, index) => (
               <Link
                 key={`${product.id}-${index}`}
-                href="/products"
+                href={`/products/${product.slug}`}
                 className="recommendation-card group"
                 aria-label={`View ${product.alt}`}
-                aria-hidden={index >= products.length}
-                tabIndex={index >= products.length ? -1 : undefined}
+                aria-hidden={index >= displayProducts.length}
+                tabIndex={index >= displayProducts.length ? -1 : undefined}
               >
                 <div className="relative aspect-[330/479] overflow-hidden bg-[#e7e7e4]">
                   <Image

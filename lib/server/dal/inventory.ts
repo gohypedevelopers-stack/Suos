@@ -5,7 +5,14 @@ import { getPrisma } from "@/lib/server/db"
 
 function imageUrl(objectKey: string | null) {
   if (!objectKey) return null
-  if (objectKey.startsWith("uploads/")) return `/${objectKey}`
+
+  if (objectKey.startsWith("/")) {
+    return objectKey
+  }
+
+  if (objectKey.startsWith("uploads/")) {
+    return `/${objectKey}`
+  }
 
   const baseUrl = process.env.R2_PUBLIC_URL?.replace(/\/$/, "")
   return baseUrl ? `${baseUrl}/${objectKey}` : null

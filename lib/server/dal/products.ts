@@ -4,6 +4,10 @@ import { getPrisma } from "@/lib/server/db"
 import { assertAdmin } from "@/lib/server/dal/auth"
 
 function imageUrl(objectKey: string) {
+  if (objectKey.startsWith("/")) {
+    return objectKey
+  }
+
   if (objectKey.startsWith("uploads/")) {
     return `/${objectKey}`
   }
@@ -60,7 +64,7 @@ export type AdminProductDetail = {
     price: string
     compareAtPrice: string | null
     inventoryQuantity: number
-    optionValues: Record<string, string>
+    optionValues: Record<string, any>
   }[]
   createdAt: string
   updatedAt: string
@@ -88,6 +92,7 @@ export async function listPublishedProducts() {
       title: true,
       slug: true,
       description: true,
+      tags: true,
       category: {
         select: {
           name: true,
@@ -96,17 +101,17 @@ export async function listPublishedProducts() {
       },
       variants: {
         orderBy: { createdAt: "asc" },
-        take: 1,
         select: {
           id: true,
           price: true,
           compareAtPrice: true,
           inventoryQuantity: true,
+          optionValues: true,
         },
       },
       images: {
         orderBy: { position: "asc" },
-        take: 1,
+        take: 5,
         select: {
           objectKey: true,
           altText: true,
@@ -117,7 +122,27 @@ export async function listPublishedProducts() {
 
   return products.map((product) => {
     const variant = product.variants[0]
+    
+    const sizes = Array.from(new Set(
+      product.variants.map(v => variantOptionValues(v.optionValues)["Size"]).filter(Boolean)
+    ))
+    
+    // In our static data, swatches are just colors like "#0a1a2b", but from DB they might be "Blue" or hex codes depending on how admin inputs them.
+    // If we assume admin inputs hex codes or standard css colors in "Color" option:
+    const swatches = Array.from(new Set(
+      product.variants.map(v => {
+        const colorOpt = variantOptionValues(v.optionValues)["Color"] as any;
+        if (colorOpt && typeof colorOpt === 'object' && 'value' in colorOpt) {
+          return colorOpt.value as string;
+        }
+        return colorOpt as string;
+      }).filter(Boolean)
+    ))
+    
     const image = product.images[0]
+    const gallery = product.images.map(img => imageUrl(img.objectKey)).filter((url): url is string => url !== null)
+
+    const badge = product.tags.find(t => t.toUpperCase() === "NEW ARRIVAL" || t.toUpperCase() === "BESTSELLER")?.toUpperCase()
 
     return {
       id: product.id,
@@ -125,15 +150,15 @@ export async function listPublishedProducts() {
       slug: product.slug,
       description: product.description,
       category: product.category,
-      price: variant?.price.toString() ?? null,
-      compareAtPrice: variant?.compareAtPrice?.toString() ?? null,
-      isInStock: Boolean(variant && variant.inventoryQuantity > 0),
-      image: image
-        ? {
-            url: imageUrl(image.objectKey),
-            altText: image.altText,
-          }
-        : null,
+      price: variant ? `₹${variant.price.toString()}` : "N/A", // Default formatting for the UI
+      compareAtPrice: variant?.compareAtPrice ? `₹${variant.compareAtPrice.toString()}` : null,
+      isInStock: product.variants.some(v => v.inventoryQuantity > 0),
+      image: image ? (imageUrl(image.objectKey) ?? "") : "",
+      alt: image?.altText || product.title,
+      gallery,
+      sizes,
+      swatches,
+      badge,
     }
   })
 }
@@ -237,15 +262,14 @@ function productDetails(value: unknown): { name: string; value: string }[] {
   })
 }
 
-function variantOptionValues(value: unknown): Record<string, string> {
+function variantOptionValues(value: unknown): Record<string, any> {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return {}
   }
 
   return Object.fromEntries(
     Object.entries(value).filter(
-      ([key, optionValue]) =>
-        typeof key === "string" && typeof optionValue === "string",
+      ([key, optionValue]) => typeof key === "string"
     ),
   )
 }
@@ -326,5 +350,125 @@ export async function getProductForAdmin(
     })),
     createdAt: product.createdAt.toISOString(),
     updatedAt: product.updatedAt.toISOString(),
+  }
+}
+
+export async function getProductBySlug(slug: string) {
+  const prisma = getPrisma()
+  const product = await prisma.product.findUnique({
+    where: { slug, status: "ACTIVE" },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      description: true,
+      details: true,
+      category: { select: { name: true } },
+      collections: { select: { collection: { select: { title: true } } } },
+      images: {
+        orderBy: { position: "asc" },
+        select: { objectKey: true, altText: true },
+      },
+      variants: {
+        orderBy: { createdAt: "asc" },
+        select: {
+          id: true,
+          price: true,
+          compareAtPrice: true,
+          inventoryQuantity: true,
+          optionValues: true,
+        },
+      },
+    },
+  })
+
+  if (!product) return null
+
+  const detailsList = productDetails(product.details)
+  const detailsBody = detailsList.find(d => d.name === "Body")?.value || product.description || ""
+
+  const sizes = Array.from(new Set(
+    product.variants.map(v => variantOptionValues(v.optionValues)["Size"]).filter(Boolean)
+  ))
+  
+  // Create color objects: { name: "Royal Brown", value: "#6f5639" }
+  const colorMap = new Map<string, string>()
+  product.variants.forEach(v => {
+    const opts = variantOptionValues(v.optionValues)
+    
+    let colorName = "Default"
+    let colorValue = "#000000"
+    
+    if (opts["Color"]) {
+      const colorOpt = opts["Color"]
+      if (typeof colorOpt === 'object' && colorOpt !== null) {
+        colorName = colorOpt.name || colorName
+        colorValue = colorOpt.value || colorValue
+      } else if (typeof colorOpt === 'string') {
+        colorValue = colorOpt
+        colorName = opts["Color Name"] || colorOpt
+      }
+      colorMap.set(colorName, colorValue)
+    }
+  })
+  const colors = Array.from(colorMap.entries()).map(([name, value]) => ({ name, value }))
+  
+  // Default fallback if variants don't define colors properly yet
+  if (colors.length === 0) {
+    colors.push({ name: "Default", value: "#000000" })
+  }
+
+  const gallery = product.images.map(img => ({
+    src: imageUrl(img.objectKey) ?? "",
+    alt: img.altText ?? product.title,
+    objectPosition: "center 36%" // fallback position
+  })).filter(img => img.src)
+
+  const variant = product.variants[0]
+
+  return {
+    id: product.id,
+    slug: product.slug,
+    editLabel: product.category?.name?.toUpperCase() || "PRODUCT",
+    title: product.title,
+    breadcrumb: [
+      { label: "Homepage", href: "/" },
+      { label: "Collections", href: "/collections" },
+      { label: product.category?.name || "Products" },
+      { label: product.title },
+    ],
+    originalPrice: variant?.compareAtPrice ? `₹${variant.compareAtPrice.toString()}` : null,
+    price: variant ? `₹${variant.price.toString()}` : "N/A",
+    sold: "1,238 Sold", // Static fallback
+    rating: "4.5", // Static fallback
+    description: product.description || "",
+    detailsBody: detailsBody,
+    careNotes: [
+      "Machine wash cold, inside out.",
+      "Do not bleach or tumble dry.",
+      "Hang dry to preserve the drape.",
+      "Steam lightly to refresh the finish.",
+    ],
+    shippingNotes: [
+      "Standard delivery in 2-4 business days.",
+      "Free exchange within 14 days.",
+      "Cash on delivery available on select pin codes.",
+    ],
+    colorName: colors[0]?.name || "Default",
+    colors,
+    sizes,
+    gallery,
+    deliveryPerks: [
+      { label: "Fast delivery", detail: "2-4 days", icon: "truck" as const },
+      { label: "Easy exchange", detail: "14 days", icon: "exchange" as const },
+      { label: "Secure checkout", detail: "COD available", icon: "shield" as const },
+      { label: "Tracked shipping", detail: "Live updates", icon: "card" as const },
+    ],
+    completeLook: gallery.slice(0, 3), // Fallback to using some gallery images
+    sizeGuideImages: [
+      "/size-charts/SU022026-27_TECHPACK_page_1.png",
+      "/size-charts/SU022026-27_TECHPACK_page_2.png",
+    ],
+    fitType: "regular" as const,
   }
 }

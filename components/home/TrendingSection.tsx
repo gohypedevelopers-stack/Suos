@@ -8,11 +8,20 @@ import { ChevronLeft, ChevronRight, Heart } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ProductQuickViewModal } from "@/components/product/ProductQuickViewModal"
 import { useWishlist } from "@/lib/wishlist-context"
-import {
-  featuredProduct,
-  trendingProducts,
-  type ProductCard,
-} from "@/components/product/productData"
+import { featuredProduct } from "@/components/product/productData"
+
+export type ProductCard = {
+  id: string
+  title: string
+  slug: string
+  image: string
+  alt: string
+  badge?: string
+  sizes: string[]
+  swatches: string[]
+  gallery: string[]
+  price: string | null
+}
 
 const tabs = [
   { label: "ALL", active: false },
@@ -96,7 +105,7 @@ export function ProductCardView({
         />
 
         <Link
-          href="/products"
+          href={`/products/${product.slug}`}
           aria-label={`View ${product.alt}`}
           className="absolute inset-0 z-30 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-white"
         />
@@ -166,10 +175,10 @@ export function ProductCardView({
             <div className="flex h-full items-start justify-between gap-2.5 p-3 transition-opacity duration-200 group-hover:opacity-0">
               <div className="min-w-0">
                 <p className="text-[13px] font-normal uppercase leading-tight tracking-normal">
-                  NAME OF THE PRODUCT
+                  {product.title}
                 </p>
                 <p className="mt-0.5 text-[13px] uppercase leading-tight tracking-normal">
-                  PRICE
+                  {product.price}
                 </p>
               </div>
 
@@ -188,10 +197,10 @@ export function ProductCardView({
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-[13px] font-normal uppercase leading-tight tracking-normal">
-                  NAME OF THE PRODUCT
+                  {product.title}
                 </p>
                 <p className="mt-0.5 text-[13px] uppercase leading-tight tracking-normal">
-                  PRICE
+                  {product.price}
                 </p>
               </div>
 
@@ -201,7 +210,7 @@ export function ProductCardView({
             <div className="flex flex-col gap-2.5">
               <div className="flex items-center gap-3">
                 <div className="flex flex-wrap items-start gap-1.5 text-[13px] font-normal uppercase leading-tight tracking-normal text-black/75">
-                  {hoverSizes.map((size) => (
+                  {(product.sizes || []).slice(0, 4).map((size) => (
                     <SizeMarker key={size} size={size} />
                   ))}
                 </div>
@@ -230,7 +239,7 @@ export function ProductCardView({
   )
 }
 
-export function TrendingSection() {
+export function TrendingSection({ products = [] }: { products?: ProductCard[] }) {
   return (
     <section className="w-full bg-white px-4 py-14 text-black sm:px-6 lg:px-8 md:py-16">
       <div className="flex w-full flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
@@ -260,7 +269,7 @@ export function TrendingSection() {
       </div>
 
       <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {trendingProducts.map((product) => (
+        {products.map((product) => (
           <ProductCardView key={product.id} product={product} />
         ))}
       </div>

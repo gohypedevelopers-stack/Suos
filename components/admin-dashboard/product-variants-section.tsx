@@ -17,7 +17,7 @@ export type ProductVariantDraft = {
   price: number
   compareAtPrice: number | null
   inventoryQuantity: number
-  optionValues: Record<string, string>
+  optionValues: Record<string, any>
 }
 
 const optionDetails = {
@@ -74,11 +74,19 @@ function getInitialVariantState(initialVariants: ProductVariantDraft[]) {
   const quantities: Record<string, string> = {}
 
   for (const variant of initialVariants) {
-    const colorValues = variant.optionValues.Color
-      ?.split(",")
-      .map(normalizeOptionValue)
-      .filter(Boolean) ?? []
-    const size = variant.optionValues.Size?.trim().toUpperCase()
+    const colorOpt = variant.optionValues.Color;
+    let colorString = "";
+    if (typeof colorOpt === 'string') {
+      colorString = colorOpt;
+    } else if (colorOpt && typeof colorOpt === 'object' && colorOpt.name) {
+      colorString = colorOpt.name;
+    }
+
+    const colorValues = colorString
+      ? colorString.split(",").map(normalizeOptionValue).filter(Boolean)
+      : []
+    const sizeOpt = variant.optionValues.Size;
+    const size = typeof sizeOpt === 'string' ? sizeOpt.trim().toUpperCase() : undefined;
     const key = variantKey(size || "Variant")
 
     for (const color of colorValues) {

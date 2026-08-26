@@ -17,6 +17,7 @@ export type DeliveryPerk = {
 
 export type ProductCard = {
   id: string
+  slug?: string
   title?: string
   image: string
   alt: string
@@ -25,6 +26,7 @@ export type ProductCard = {
   sizes?: string[]
   swatches: string[]
   gallery?: string[]
+  price?: string | null
 }
 
 export type ProductDetail = {
@@ -35,7 +37,7 @@ export type ProductDetail = {
     label: string
     href?: string
   }>
-  originalPrice: string
+  originalPrice: string | null
   price: string
   sold: string
   rating: string
@@ -56,9 +58,12 @@ export type ProductDetail = {
 export const trendingProducts: ProductCard[] = [
   {
     id: "product-1",
+    slug: "product-1",
     image: "/images/products/product1.png",
     alt: "Model wearing a blue denim outfit",
     badge: "NEW ARRIVAL",
+    sizes: [],
+    price: "N/A",
     swatches: ["#0a1a2b", "#15436b", "#d1d9e2"],
     gallery: [
       "/images/products/product1.png",
