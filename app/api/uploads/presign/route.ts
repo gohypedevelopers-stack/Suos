@@ -97,8 +97,6 @@ export async function POST(request: Request) {
         Bucket: env.R2_BUCKET_NAME,
         Key: objectKey,
         ContentType: input.data.contentType,
-        ContentLength: input.data.size,
-        CacheControl: "public, max-age=31536000, immutable",
       }),
       { expiresIn: 5 * 60 },
     )
