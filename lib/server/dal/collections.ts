@@ -191,3 +191,144 @@ export async function getCollectionForAdmin(
     products: collection.products.map(({ product }) => toCollectionProduct(product)),
   }
 }
+
+export async function listPublishedCollections() {
+  const prisma = getPrisma()
+  const collections = await prisma.collection.findMany({
+    where: { isPublished: true },
+    orderBy: { updatedAt: "desc" },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      description: true,
+      imageObjectKey: true,
+      imageAltText: true,
+      _count: { select: { products: true } },
+    },
+  })
+
+  return collections.map((collection) => ({
+    id: collection.id,
+    title: collection.title,
+    slug: collection.slug,
+    description: collection.description,
+    productCount: collection._count.products,
+    image: collection.imageObjectKey ? (imageUrl(collection.imageObjectKey) ?? "") : "",
+    alt: collection.imageAltText || collection.title,
+  }))
+}
+
+export async function getPublishedCollectionBySlug(slug: string) {
+  const prisma = getPrisma()
+  const collection = await prisma.collection.findUnique({
+    where: { slug, isPublished: true },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      description: true,
+      imageObjectKey: true,
+      imageAltText: true,
+      products: {
+        orderBy: { position: "asc" },
+        select: {
+          product: {
+            select: {
+              id: true,
+              title: true,
+              slug: true,
+              description: true,
+              status: true,
+              tags: true,
+              category: { select: { name: true, slug: true } },
+              variants: {
+                orderBy: { createdAt: "asc" },
+                select: {
+                  id: true,
+                  price: true,
+                  compareAtPrice: true,
+                  inventoryQuantity: true,
+                  optionValues: true,
+                },
+              },
+              images: {
+                orderBy: { position: "asc" },
+                take: 5,
+                select: { objectKey: true, altText: true },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+
+  if (!collection) return null
+
+  const activeProducts = collection.products
+    .map(({ product }) => product)
+    .filter((product) => product.status === "ACTIVE")
+    .map((product) => {
+      const variant = product.variants[0]
+      const sizes = Array.from(new Set(
+        product.variants.flatMap(v => {
+          const opts = (v.optionValues && typeof v.optionValues === "object" && !Array.isArray(v.optionValues))
+            ? (v.optionValues as Record<string, any>)
+            : {}
+          const size = opts["Size"] || opts["size"]
+          return typeof size === "string" && size.trim() ? [size.trim().toUpperCase()] : []
+        })
+      ))
+
+      const swatches = Array.from(new Set(
+        product.variants.flatMap(v => {
+          const opts = (v.optionValues && typeof v.optionValues === "object" && !Array.isArray(v.optionValues))
+            ? (v.optionValues as Record<string, any>)
+            : {}
+          const colorOpt = opts["Color"] || opts["color"]
+          if (!colorOpt) return []
+          if (typeof colorOpt === "object" && "value" in colorOpt) {
+            return [String(colorOpt.value)]
+          }
+          if (typeof colorOpt === "string") {
+            return colorOpt.split(",").map(c => c.trim()).filter(Boolean)
+          }
+          return []
+        })
+      ))
+
+      const image = product.images[0]
+      const gallery = product.images.map(img => imageUrl(img.objectKey)).filter((url): url is string => url !== null)
+      const badge = product.tags.find(t => 
+        ["NEW ARRIVAL", "BESTSELLER", "SALE", "HOT", "TRENDING", "LIMITED"].includes(t.toUpperCase())
+      )?.toUpperCase() || (product.tags.length > 0 ? product.tags[0].toUpperCase() : undefined)
+
+      return {
+        id: product.id,
+        title: product.title,
+        slug: product.slug,
+        description: product.description,
+        category: product.category,
+        price: variant ? `₹${variant.price.toString()}` : "N/A",
+        compareAtPrice: variant?.compareAtPrice ? `₹${variant.compareAtPrice.toString()}` : null,
+        isInStock: product.variants.some(v => v.inventoryQuantity > 0),
+        image: image ? (imageUrl(image.objectKey) ?? "") : (gallery[0] ?? ""),
+        alt: image?.altText || product.title,
+        gallery: gallery.length > 0 ? gallery : (image ? [imageUrl(image.objectKey) ?? ""] : []),
+        sizes: sizes.length > 0 ? sizes : ["28", "32", "36", "42"],
+        swatches: swatches.length > 0 ? swatches : ["#171717"],
+        badge,
+      }
+    })
+
+  return {
+    id: collection.id,
+    title: collection.title,
+    slug: collection.slug,
+    description: collection.description,
+    image: collection.imageObjectKey ? (imageUrl(collection.imageObjectKey) ?? "") : "",
+    alt: collection.imageAltText || collection.title,
+    products: activeProducts,
+  }
+}

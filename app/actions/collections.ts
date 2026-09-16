@@ -20,10 +20,12 @@ export type CollectionActionState =
     }
 
 function revalidateCollectionPaths(collectionId?: string) {
+  revalidatePath("/")
+  revalidatePath("/collections")
+  revalidatePath("/collections/[slug]", "page")
   revalidatePath("/dashboard/products")
   revalidatePath("/dashboard/products/collections")
   revalidatePath("/dashboard/products/collections/new")
-  revalidatePath("/collections")
 
   if (collectionId) {
     revalidatePath(`/dashboard/products/collections/${collectionId}`)

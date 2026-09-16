@@ -19,7 +19,7 @@ export default async function Page() {
   return (
     <main className="flex-1 bg-white">
       <section className="w-full bg-white px-4 pb-0 pt-8 text-black sm:px-6 md:pt-10 lg:px-8">
-        <CollectionHeader />
+        <CollectionHeader itemCount={products.length} />
 
         <div className="mt-8">
           <CollectionGrid products={products} />
