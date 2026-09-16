@@ -50,9 +50,9 @@ export function Hero() {
   return (
     <section className="relative -mt-[var(--header-stack-height)] w-full bg-black text-white">
       {/* Static Single Banner Image with exact aspect ratio - 100% uncropped on all devices */}
-      <div className="relative w-full aspect-[1491/1055]">
+      <div className="relative w-full aspect-[1672/941]">
         <Image
-          src="/home page content/ChatGPT Image Sep 16, 2026, 11_53_51 AM.png"
+          src="/home-page-content/hero-1.png"
           alt="Hero Banner"
           fill
           priority

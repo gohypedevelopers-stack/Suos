@@ -13,10 +13,10 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({ adapter })
 
 const newImages = [
-  "/home page content/ChatGPT Image Sep 16, 2026, 12_09_28 PM.png",
-  "/home page content/ChatGPT Image Sep 16, 2026, 12_09_37 PM.png",
-  "/home page content/ChatGPT Image Sep 16, 2026, 12_09_43 PM.png",
-  "/home page content/ChatGPT Image Sep 16, 2026, 12_09_49 PM.png",
+  "/home-page-content/product-urban.png",
+  "/home-page-content/product-vintage.png",
+  "/home-page-content/product-allblack.png",
+  "/home-page-content/product-monochrome.png",
 ]
 
 async function main() {
