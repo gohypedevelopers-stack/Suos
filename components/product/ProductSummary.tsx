@@ -236,7 +236,21 @@ export function ProductSummary({
               Product Details
             </AccordionTrigger>
             <AccordionContent className="max-w-[36rem] pb-5 font-sans text-[13px] font-normal uppercase leading-[1.55] text-black/68">
-              <p>{product.detailsBody} See More...</p>
+              {product.details && product.details.length > 0 ? (
+                <div className="space-y-3">
+                  {product.description ? <p>{product.description}</p> : null}
+                  <div className="grid grid-cols-1 gap-2 pt-2 sm:grid-cols-2">
+                    {product.details.map((detail, idx) => (
+                      <div key={idx} className="flex gap-2">
+                        <span className="font-[500] text-black">{detail.name}:</span>
+                        <span>{detail.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <p>{product.detailsBody || product.description || "No details provided."}</p>
+              )}
             </AccordionContent>
           </AccordionItem>
 

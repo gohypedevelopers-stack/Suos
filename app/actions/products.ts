@@ -32,8 +32,13 @@ export async function createProductAction(
 
   try {
     const product = await createProduct(result.data)
-    revalidatePath("/dashboard/products")
+    revalidatePath("/")
     revalidatePath("/collections")
+    revalidatePath("/products/[slug]", "page")
+    if (product.slug) {
+      revalidatePath(`/products/${product.slug}`)
+    }
+    revalidatePath("/dashboard/products")
 
     return {
       status: "success",
@@ -71,9 +76,14 @@ export async function updateProductAction(
 
   try {
     const product = await updateProduct(productId, result.data)
+    revalidatePath("/")
+    revalidatePath("/collections")
+    revalidatePath("/products/[slug]", "page")
+    if (product.slug) {
+      revalidatePath(`/products/${product.slug}`)
+    }
     revalidatePath("/dashboard/products")
     revalidatePath(`/dashboard/products/${productId}`)
-    revalidatePath("/collections")
 
     return {
       status: "success",
@@ -108,8 +118,9 @@ export async function deleteProductsAction(productIds: unknown) {
 
   try {
     const deleted = await deleteProducts([...new Set(ids.data)])
-    revalidatePath("/dashboard/products")
+    revalidatePath("/")
     revalidatePath("/collections")
+    revalidatePath("/dashboard/products")
     return { success: true, count: deleted.count }
   } catch (error) {
     if (error instanceof Error && error.message === "Unauthorized") {
@@ -139,8 +150,9 @@ export async function updateProductsStatusAction(
       [...new Set(ids.data)],
       nextStatus.data,
     )
-    revalidatePath("/dashboard/products")
+    revalidatePath("/")
     revalidatePath("/collections")
+    revalidatePath("/dashboard/products")
     return { success: true, count: updated.count }
   } catch (error) {
     if (error instanceof Error && error.message === "Unauthorized") {
@@ -168,8 +180,9 @@ export async function importProductsAction(input: unknown) {
     for (const product of products.data) {
       await createProduct(product)
     }
-    revalidatePath("/dashboard/products")
+    revalidatePath("/")
     revalidatePath("/collections")
+    revalidatePath("/dashboard/products")
 
     return { success: true, count: products.data.length }
   } catch (error) {

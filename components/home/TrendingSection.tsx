@@ -8,7 +8,7 @@ import { ChevronLeft, ChevronRight, Heart } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ProductQuickViewModal } from "@/components/product/ProductQuickViewModal"
 import { useWishlist } from "@/lib/wishlist-context"
-import { featuredProduct } from "@/components/product/productData"
+import type { ProductDetail } from "@/components/product/productData"
 
 export type ProductCard = {
   id: string
@@ -21,6 +21,61 @@ export type ProductCard = {
   swatches: string[]
   gallery: string[]
   price: string | null
+  compareAtPrice?: string | null
+  description?: string | null
+  category?: { name: string; slug: string } | null
+}
+
+function cardToProductDetail(card: ProductCard): ProductDetail {
+  const galleryImages = (card.gallery?.length ? card.gallery : [card.image]).map((src) => ({
+    src,
+    alt: card.alt || card.title,
+    objectPosition: "center 36%",
+  }))
+
+  return {
+    id: card.id,
+    slug: card.slug,
+    editLabel: card.category?.name?.toUpperCase() || "SUOS",
+    title: card.title,
+    breadcrumb: [
+      { label: "Homepage", href: "/" },
+      { label: "Collections", href: "/collections" },
+      { label: card.title },
+    ],
+    originalPrice: card.compareAtPrice || null,
+    price: card.price || "N/A",
+    sold: "1,238 Sold",
+    rating: "4.5",
+    description: card.description || "",
+    detailsBody: card.description || "",
+    careNotes: [
+      "Machine wash cold, inside out.",
+      "Do not bleach or tumble dry.",
+      "Hang dry to preserve the drape.",
+      "Steam lightly to refresh the finish.",
+    ],
+    shippingNotes: [
+      "Standard delivery in 2-4 business days.",
+      "Free exchange within 14 days.",
+      "Cash on delivery available on select pin codes.",
+    ],
+    colorName: "Selected",
+    colors: card.swatches.map((swatch, idx) => ({
+      name: `Color ${idx + 1}`,
+      value: swatch,
+    })),
+    sizes: card.sizes?.length ? card.sizes : ["28", "32", "36", "42"],
+    gallery: galleryImages,
+    deliveryPerks: [
+      { label: "Fast delivery", detail: "2-4 days", icon: "truck" },
+      { label: "Easy exchange", detail: "14 days", icon: "exchange" },
+      { label: "Secure checkout", detail: "COD available", icon: "shield" },
+      { label: "Tracked shipping", detail: "Live updates", icon: "card" },
+    ],
+    completeLook: galleryImages.slice(0, 3),
+    fitType: "regular",
+  }
 }
 
 const tabs = [
@@ -237,7 +292,7 @@ export function ProductCardView({
         key={`${product.id}-${quickViewOpen ? "open" : "closed"}-${activeImageIndex}`}
         open={quickViewOpen}
         onOpenChange={setQuickViewOpen}
-        product={featuredProduct}
+        product={cardToProductDetail(product)}
         gallery={gallery}
         initialImageIndex={activeImageIndex}
       />

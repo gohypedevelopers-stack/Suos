@@ -9,6 +9,8 @@ import { ProductSummary } from "@/components/product/ProductSummary"
 import { YouMayAlsoLikeSection } from "@/components/product/YouMayAlsoLikeSection"
 import { getProductBySlug } from "@/lib/server/dal/products"
 
+export const dynamic = "force-dynamic"
+
 export async function generateMetadata({
   params,
 }: {

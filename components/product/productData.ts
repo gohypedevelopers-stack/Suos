@@ -30,6 +30,7 @@ export type ProductCard = {
 }
 
 export type ProductDetail = {
+  id?: string
   slug: string
   editLabel: string
   title: string
@@ -43,6 +44,7 @@ export type ProductDetail = {
   rating: string
   description: string
   detailsBody: string
+  details?: Array<{ name: string; value: string }>
   careNotes: string[]
   shippingNotes: string[]
   colorName: string
