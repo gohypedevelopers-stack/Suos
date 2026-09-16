@@ -353,7 +353,12 @@ export function ProductEditor({
 
       if (result.status === "error") {
         setFieldErrors(result.fields ?? {})
-        setFormMessage(result.message)
+        const fieldErrorMessages = Object.entries(result.fields ?? {})
+          .flatMap(([field, errors]) => errors.map((e) => `${field}: ${e}`))
+          .join(" | ")
+        setFormMessage(
+          fieldErrorMessages ? `${result.message} (${fieldErrorMessages})` : result.message,
+        )
         return
       }
 

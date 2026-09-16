@@ -2,8 +2,17 @@ import { z } from "zod"
 
 export const productImageObjectKeySchema = z
   .string()
-  .regex(
-    /^(?:products|uploads\/products)\/\d{4}\/[0-9a-f-]{36}\.(?:avif|jpg|png|webp)$/,
+  .trim()
+  .min(1)
+  .refine(
+    (key) =>
+      key.startsWith("/") ||
+      key.startsWith("uploads/") ||
+      key.startsWith("products/") ||
+      key.startsWith("images/") ||
+      key.startsWith("home-page-content/") ||
+      /^(?:products|uploads\/products)\/\d{4}\/[0-9a-f-]{36}\.(?:avif|jpg|png|webp)$/i.test(key) ||
+      /\.(?:avif|jpg|jpeg|png|webp|svg)$/i.test(key),
     "Invalid product image key",
   )
 
@@ -24,30 +33,30 @@ const optionalMoneySchema = z
 const requiredMoneySchema = z.preprocess(
   (value) => {
     if (value === null || value === undefined || value === "") {
-      return undefined
+      return 0
     }
 
     return Number(value)
   },
-  z.number().finite().nonnegative().max(99_999_999),
+  z.number().finite().nonnegative().max(99_999_999).default(0),
 )
 
 const requiredQuantitySchema = z.preprocess(
   (value) => {
     if (value === null || value === undefined || value === "") {
-      return undefined
+      return 0
     }
 
     return Number(value)
   },
-  z.number().int().min(0).max(10_000_000),
+  z.number().int().min(0).max(10_000_000).default(0),
 )
 
 const skuSchema = z
   .string()
   .trim()
   .toUpperCase()
-  .regex(/^[A-Z0-9][A-Z0-9._-]{1,63}$/)
+  .regex(/^[A-Z0-9][A-Z0-9._-]{0,63}$/)
 
 const optionalSkuSchema = z.preprocess(
   (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
@@ -64,7 +73,7 @@ const productVariantSchema = z
     optionValues: z
       .record(
         z.string().min(1).max(60),
-        z.string().trim().toUpperCase().min(1).max(120),
+        z.any(),
       )
       .default({}),
   })
