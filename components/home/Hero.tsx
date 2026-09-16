@@ -2,10 +2,11 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { useEffect, useState } from "react"
+// import { useEffect, useState } from "react"
 
-import { cn } from "@/lib/utils"
+// import { cn } from "@/lib/utils"
 
+/*
 type HeroSlide = {
   leftImage: string
   rightImage: string
@@ -29,8 +30,10 @@ const heroSlides: HeroSlide[] = [
     rightImage: "/images/products/product9.png",
   },
 ]
+*/
 
 export function Hero() {
+  /*
   const [activeSlide, setActiveSlide] = useState(1)
 
   useEffect(() => {
@@ -42,9 +45,35 @@ export function Hero() {
       window.clearInterval(interval)
     }
   }, [])
+  */
 
   return (
-    <section className="relative -mt-[var(--header-stack-height)] min-h-[100svh] overflow-hidden bg-[#d4cdc1] pt-[var(--header-stack-height)] text-white">
+    <section className="relative -mt-[var(--header-stack-height)] w-full bg-black text-white">
+      {/* Static Single Banner Image with exact aspect ratio - 100% uncropped on all devices */}
+      <div className="relative w-full aspect-[1491/1055]">
+        <Image
+          src="/home page content/ChatGPT Image Sep 16, 2026, 11_53_51 AM.png"
+          alt="Hero Banner"
+          fill
+          priority
+          sizes="100vw"
+          className="object-contain w-full h-full"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/20" />
+
+        {/* Center CTA Button placed near bottom of banner */}
+        <div className="absolute inset-x-0 bottom-6 sm:bottom-10 lg:bottom-14 z-10 flex items-center justify-center px-5 sm:px-6">
+          <Link
+            href="/collections"
+            className="inline-flex cursor-pointer items-center justify-center border border-white/85 bg-black/20 backdrop-blur-xs px-6 py-3 text-[13px] font-normal uppercase tracking-normal transition-colors hover:bg-white/10 shadow-sm"
+          >
+            Explore Collection
+          </Link>
+        </div>
+      </div>
+
+      {/* 
+      Commented out changing banner slides:
       <div className="absolute inset-0">
         {heroSlides.map((slide, index) => {
           const isActive = index === activeSlide
@@ -82,18 +111,12 @@ export function Hero() {
           )
         })}
 
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/8 via-transparent to-black/10" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/8 via-transparent to-black/10" />
       </div>
+      */}
 
-      <div className="relative z-10 flex min-h-[calc(100svh-var(--header-stack-height))] items-end justify-center px-5 pb-20 sm:px-6 lg:pb-[7rem]">
-        <Link
-          href="/collections"
-          className="inline-flex cursor-pointer items-center justify-center border border-white/85 px-5 py-2.5 text-[13px] font-normal uppercase tracking-normal transition-colors hover:bg-white/10"
-        >
-          Explore Collection
-        </Link>
-      </div>
-
+      {/* 
+      Slide pagination controls commented out:
       <div className="absolute bottom-6 right-7 z-20 flex items-center gap-2 text-white/85">
         <div className="flex items-center gap-2">
           {heroSlides.map((slide, index) => (
@@ -116,6 +139,7 @@ export function Hero() {
           {activeSlide + 1}/{heroSlides.length}
         </span>
       </div>
+      */}
 
       <span id="women" className="sr-only">
         Women

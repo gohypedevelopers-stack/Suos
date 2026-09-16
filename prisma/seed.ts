@@ -81,7 +81,7 @@ async function main() {
       slug: 'vintage-bootcut-denim',
       price: 3200,
       images: [
-        '/images/products/product5-white_b.png',
+        '/home page content/ChatGPT Image Sep 16, 2026, 12_09_49 PM.png',
         '/images/products/product1_b.png',
         '/images/products/product9_b.png',
         '/images/products/product13_b.png',
@@ -94,7 +94,7 @@ async function main() {
       slug: 'classic-monochrome-jacket',
       price: 4800,
       images: [
-        '/images/products/product6_b.png',
+        '/home page content/ChatGPT Image Sep 16, 2026, 12_09_43 PM.png',
         '/images/products/product2_b.png',
         '/images/products/product10_b.png',
         '/images/products/product14_b.png',
@@ -107,7 +107,7 @@ async function main() {
       slug: 'elegant-tailored-suit',
       price: 9500,
       images: [
-        '/images/products/product7_b.png',
+        '/home page content/ChatGPT Image Sep 16, 2026, 12_09_37 PM.png',
         '/images/products/product3_b.png',
         '/images/products/product11_b.png',
         '/images/products/product15_b.png',
@@ -120,7 +120,7 @@ async function main() {
       slug: 'urban-all-black-outfit',
       price: 6800,
       images: [
-        '/images/products/product8_b.png',
+        '/home page content/ChatGPT Image Sep 16, 2026, 12_09_28 PM.png',
         '/images/products/product4_b.png',
         '/images/products/product12_b.png',
         '/images/products/product5-white_c.png',
