@@ -165,6 +165,60 @@ async function main() {
     })
     console.log(`Created product: ${product.title}`)
   }
+
+  // Create sample collections
+  const collectionsData = [
+    {
+      title: "Denim Edit",
+      slug: "denim-edit",
+      description: "Structured bootcut and vintage denim cuts crafted for clean movement.",
+      imageObjectKey: "/home-page-content/product-urban.png",
+      productSlugs: ["bootcut-denim", "vintage-bootcut-denim"],
+    },
+    {
+      title: "Monochrome Collection",
+      slug: "monochrome-collection",
+      description: "Tailored outerwear, jackets, and all-black tonal essentials.",
+      imageObjectKey: "/home-page-content/product-allblack.png",
+      productSlugs: ["monochrome-jacket", "classic-monochrome-jacket", "all-black-outfit", "urban-all-black-outfit"],
+    },
+    {
+      title: "Tailored Suits & Sets",
+      slug: "tailored-suits",
+      description: "Refined sartorial tailoring for elevated day-to-night styling.",
+      imageObjectKey: "/home-page-content/product-vintage.png",
+      productSlugs: ["tailored-suit", "elegant-tailored-suit"],
+    },
+  ]
+
+  for (const c of collectionsData) {
+    const products = await prisma.product.findMany({
+      where: { slug: { in: c.productSlugs } },
+      select: { id: true },
+    })
+
+    const collection = await prisma.collection.upsert({
+      where: { slug: c.slug },
+      update: {
+        isPublished: true,
+      },
+      create: {
+        title: c.title,
+        slug: c.slug,
+        description: c.description,
+        isPublished: true,
+        imageObjectKey: c.imageObjectKey,
+        imageAltText: c.title,
+        products: {
+          create: products.map((p, i) => ({
+            productId: p.id,
+            position: i,
+          })),
+        },
+      },
+    })
+    console.log(`Created collection: ${collection.title}`)
+  }
 }
 
 main()
