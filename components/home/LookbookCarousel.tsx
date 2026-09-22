@@ -77,7 +77,7 @@ function PlayBadge() {
 
 function LookbookCard({ slide }: { slide: LookbookSlide }) {
   return (
-    <div className="w-[82vw] shrink-0 bg-black/70 p-px sm:w-[40vw] md:w-[28vw] lg:w-[16.2vw]">
+    <div className="w-[68vw] shrink-0 bg-black/70 p-px sm:w-[40vw] md:w-[28vw] lg:w-[16.2vw]">
       <article className="group relative aspect-[7/12] overflow-hidden bg-[#e6e8eb]">
         <Image
           src={slide.image}

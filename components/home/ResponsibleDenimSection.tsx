@@ -61,8 +61,8 @@ export function ResponsibleDenimSection() {
             recognised textile and chemical safety standards.
           </p>
 
-          <div className="mt-8 sm:mt-10 pt-6 border-t border-black/10 w-full text-center lg:text-left">
-            <p className="text-[13px] sm:text-[14px] font-medium tracking-[0.1em] text-black">
+          <div className="mt-6 sm:mt-10 pt-5 sm:pt-6 border-t border-black/10 w-full text-center lg:text-left">
+            <p className="text-[12px] sm:text-[14px] font-medium tracking-[0.1em] text-black">
               OEKO-TEX® &nbsp;|&nbsp; RoHS &nbsp;|&nbsp; GOTS
             </p>
           </div>
@@ -97,7 +97,7 @@ export function ResponsibleDenimSection() {
         {bottomFeatures.map((feature) => (
           <div
             key={feature.title}
-            className="relative aspect-square sm:aspect-[4/3] lg:aspect-[3/2] w-full overflow-hidden flex flex-col justify-center items-center text-center p-4 sm:p-6 lg:p-8"
+            className="relative aspect-square sm:aspect-[4/3] lg:aspect-[3/2] w-full overflow-hidden flex flex-col justify-center items-center text-center p-3 sm:p-6 lg:p-8"
           >
             {/* Background Texture Image */}
             <Image
@@ -112,11 +112,11 @@ export function ResponsibleDenimSection() {
             <div className="absolute inset-0 bg-black/5" />
 
             {/* Card Content Overlay */}
-            <div className={cn("relative z-10 max-w-[240px] flex flex-col items-center justify-center", feature.textColor)}>
-              <h3 className="font-heading text-[13px] sm:text-[16px] lg:text-[17px] font-semibold uppercase tracking-[0.06em] leading-tight drop-shadow-sm">
+            <div className={cn("relative z-10 max-w-[180px] sm:max-w-[240px] flex flex-col items-center justify-center", feature.textColor)}>
+              <h3 className="font-heading text-[12px] sm:text-[16px] lg:text-[17px] font-semibold uppercase tracking-[0.05em] leading-tight drop-shadow-sm">
                 {feature.title}
               </h3>
-              <p className="mt-2 text-[11px] sm:text-[12px] lg:text-[13px] leading-snug opacity-90 drop-shadow-sm">
+              <p className="mt-1.5 sm:mt-2 text-[10px] sm:text-[12px] lg:text-[13px] leading-snug opacity-90 drop-shadow-sm">
                 {feature.description}
               </p>
             </div>

@@ -9,10 +9,10 @@ export async function YouMayAlsoLikeSection() {
   const products = await listPublishedProducts()
   
   return (
-    <section className="w-full bg-white px-4 pb-14 pt-10 text-black sm:px-6 lg:px-8">
+    <section className="w-full bg-white px-3 pb-14 pt-10 text-black sm:px-6 lg:px-8">
       <div className="w-full">
         <div className="flex items-center justify-between gap-6">
-          <h2 className="font-heading text-[24px] font-normal uppercase leading-none tracking-[-0.04em]">
+          <h2 className="font-heading text-[20px] sm:text-[24px] font-normal uppercase leading-none tracking-[-0.04em]">
             You May Also Like
           </h2>
 
@@ -28,7 +28,7 @@ export async function YouMayAlsoLikeSection() {
           </Link>
         </div>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-6 grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
           {products.slice(0, 4).map((product) => (
             <ProductCardView key={product.id} product={product} />
           ))}

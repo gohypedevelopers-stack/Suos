@@ -60,6 +60,9 @@ function OptionButton({
   )
 }
 
+import { useCart } from "@/lib/cart-context"
+import type { ProductCard } from "@/components/product/productData"
+
 export function ProductSummary({
   product,
 }: {
@@ -69,52 +72,72 @@ export function ProductSummary({
   const [selectedSize, setSelectedSize] = useState(
     product.sizes[1] ?? product.sizes[0]
   )
+  const { addToCart, setIsCartOpen } = useCart()
+
+  const productCard: ProductCard = {
+    id: product.id || product.slug,
+    title: product.title,
+    slug: product.slug,
+    image: product.gallery[0]?.src || "",
+    alt: product.title,
+    sizes: product.sizes,
+    swatches: product.colors.map((c) => c.value),
+    gallery: product.gallery.map((g) => g.src),
+    price: product.price,
+  }
+
+  const handleAddToCart = () => {
+    addToCart(productCard, selectedSize)
+    setIsCartOpen(true)
+  }
 
   return (
-    <aside className="self-start [overflow-anchor:none] xl:sticky xl:top-[calc(var(--header-stack-height)+24px)]">
-      <div className="space-y-5 text-black xl:w-[573px] xl:max-w-[573px] xl:justify-self-end">
+    <aside className="self-start w-full min-w-0 max-w-full [overflow-anchor:none] xl:sticky xl:top-[calc(var(--header-stack-height)+24px)]">
+      <div className="space-y-5 text-black w-full min-w-0 max-w-full xl:w-[573px] xl:max-w-[573px] xl:justify-self-end">
         <div className="space-y-1">
-      <p className="w-fit text-[13px] font-normal uppercase leading-[17px] tracking-normal text-black/45">
+          <p className="w-fit text-[12px] sm:text-[13px] font-normal uppercase leading-[17px] tracking-normal text-black/45">
             {product.editLabel}
           </p>
-          <h1 className="font-heading text-[24px] font-normal uppercase leading-[0.9] tracking-[-0.06em]">
+          <h1 className="font-heading text-[20px] sm:text-[24px] font-normal uppercase leading-[1.05] tracking-[-0.04em]">
             {product.title}
           </h1>
         </div>
 
-        <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="space-y-1">
-            <div className="flex items-end gap-3">
-          <span className="text-[17px] font-normal leading-[20px] text-black/45 line-through">
-                {product.originalPrice}
-              </span>
-          <span className="font-sans text-[17px] font-[500] leading-[20px] tracking-normal">
+            <div className="flex items-end gap-2.5">
+              {product.originalPrice ? (
+                <span className="text-[15px] sm:text-[17px] font-normal leading-[20px] text-black/45 line-through">
+                  {product.originalPrice}
+                </span>
+              ) : null}
+              <span className="font-sans text-[16px] sm:text-[17px] font-[500] leading-[20px] tracking-normal">
                 {product.price}
               </span>
             </div>
           </div>
 
-          <div className="flex items-end gap-2 text-black">
-        <span className="text-[17px] font-normal uppercase leading-[20px] text-black/45">
+          <div className="flex items-center gap-2 text-black">
+            <span className="text-[13px] sm:text-[15px] font-normal uppercase leading-none text-black/45">
               {product.sold}
             </span>
-        <span className="text-[17px] font-normal leading-[20px] text-black/25">|</span>
-        <span className="inline-flex items-end gap-1 text-[17px] font-[500] leading-[20px] text-black">
-              <Star className="h-24px w-24px fill-[#d08b21] text-[#d08b21]" />
+            <span className="text-[13px] sm:text-[15px] font-normal leading-none text-black/25">|</span>
+            <span className="inline-flex items-center gap-1 text-[13px] sm:text-[15px] font-[500] leading-none text-black">
+              <Star className="size-3.5 fill-[#d08b21] text-[#d08b21]" />
               {product.rating}
             </span>
           </div>
         </div>
 
-        <section className="space-y-3">
+        <section className="space-y-2.5">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-[13px] font-normal uppercase text-black/45">
+            <p className="text-[12px] sm:text-[13px] font-normal uppercase text-black/45">
               Color{" "}
               <span className="font-[500] text-black">{selectedColor}</span>
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-2">
             {product.colors.map((color) => {
               const isSelected = color.name === selectedColor
 
@@ -126,10 +149,10 @@ export function ProductSummary({
                   aria-label={`Select ${color.name}`}
                   onClick={() => setSelectedColor(color.name)}
                   className={cn(
-                    "flex h-[40px] w-[75px] cursor-pointer items-stretch justify-stretch bg-white transition-[box-shadow] duration-200 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45",
+                    "flex h-[36px] w-[62px] sm:h-[40px] sm:w-[75px] cursor-pointer items-stretch justify-stretch bg-white transition-[box-shadow] duration-200 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45",
                     isSelected
-                      ? "border-[2px] border-black p-[4px]"
-                      : "border-0 p-0"
+                      ? "border-[2px] border-black p-[3px]"
+                      : "border border-neutral-200 p-0"
                   )}
                 >
                   <span
@@ -142,15 +165,15 @@ export function ProductSummary({
           </div>
         </section>
 
-        <section className="space-y-3">
+        <section className="space-y-2.5">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-[13px] font-normal uppercase text-black/45">
+            <p className="text-[12px] sm:text-[13px] font-normal uppercase text-black/45">
               Size <span className="font-[500] text-black">{selectedSize}</span>
             </p>
             <SizeChartModal images={product.sizeGuideImages} fitType={product.fitType}>
               <button
                 type="button"
-                className="group inline-flex flex-col items-start pb-0.5 text-[13px] font-normal uppercase leading-none text-black/45 transition-colors duration-200 hover:text-black focus-visible:text-black cursor-pointer"
+                className="group inline-flex flex-col items-start pb-0.5 text-[12px] sm:text-[13px] font-normal uppercase leading-none text-black/45 transition-colors duration-200 hover:text-black focus-visible:text-black cursor-pointer"
               >
                 <span>View Size Chart</span>
                 <span
@@ -161,13 +184,13 @@ export function ProductSummary({
             </SizeChartModal>
           </div>
 
-          <div id="size-guide" className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+          <div id="size-guide" className="grid grid-cols-4 gap-1.5 sm:grid-cols-6 sm:gap-2">
             {product.sizes.map((size) => (
               <OptionButton
                 key={size}
                 active={selectedSize === size}
                 onClick={() => setSelectedSize(size)}
-                className="h-10 min-w-0 px-3"
+                className="h-10 min-w-0 px-2 sm:px-3 text-[12px] sm:text-[13px]"
               >
                 {size}
               </OptionButton>
@@ -175,27 +198,29 @@ export function ProductSummary({
           </div>
         </section>
 
-        <div className="flex flex-col gap-2.5">
+        <div className="flex flex-col gap-2.5 pt-1">
           <button
             type="button"
-            className="flex h-12 w-full cursor-pointer items-center justify-center border border-black bg-white text-[13px] font-[500] uppercase tracking-normal transition-[background-color,color] duration-200 ease-out hover:bg-black hover:text-white"
+            onClick={handleAddToCart}
+            className="flex h-12 w-full cursor-pointer items-center justify-center border border-black bg-white text-[13px] font-[500] uppercase tracking-normal transition-[background-color,color] duration-200 ease-out hover:bg-black hover:text-white active:scale-[0.99]"
           >
             Add To Cart
           </button>
           <button
             type="button"
-            className="flex h-12 w-full cursor-pointer items-center justify-center bg-black text-white text-[13px] font-[500] uppercase tracking-normal transition-opacity duration-200 ease-out hover:opacity-90"
+            onClick={handleAddToCart}
+            className="flex h-12 w-full cursor-pointer items-center justify-center bg-black text-white text-[13px] font-[500] uppercase tracking-normal transition-opacity duration-200 ease-out hover:opacity-90 active:scale-[0.99]"
           >
             Buy Now
           </button>
         </div>
 
-        <section className="space-y-3">
-          <p className="text-[13px] font-normal uppercase text-black/45">
+        <section className="space-y-2.5 pt-1 w-full min-w-0">
+          <p className="text-[12px] sm:text-[13px] font-normal uppercase text-black/45">
             Delivery T&C
           </p>
 
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 w-full min-w-0">
             {product.deliveryPerks.map((perk) => {
               const Icon = deliveryIcons[perk.icon]
 
@@ -204,14 +229,14 @@ export function ProductSummary({
                   key={perk.label}
                   title={`${perk.label} · ${perk.detail}`}
                   aria-label={`${perk.label}, ${perk.detail}`}
-                  className="flex aspect-[1.15/1] flex-col items-center justify-center gap-2 border border-black bg-white px-2 text-center text-black"
+                  className="flex min-h-[72px] sm:min-h-[85px] w-full min-w-0 flex-col items-center justify-center gap-1 border border-black/15 bg-white p-2 text-center text-black"
                 >
-                  <Icon className="size-5 stroke-[1.7] text-black" />
-                  <div className="space-y-0.5">
-                    <p className="text-[13px] font-normal uppercase leading-tight text-black">
+                  <Icon className="size-4 sm:size-5 shrink-0 stroke-[1.7] text-black" />
+                  <div className="space-y-0.5 w-full min-w-0 overflow-hidden">
+                    <p className="truncate text-[11px] sm:text-[12px] font-medium uppercase leading-tight text-black">
                       {perk.label}
                     </p>
-                    <p className="text-[10px] font-normal uppercase leading-tight text-black/45">
+                    <p className="truncate text-[9px] sm:text-[10px] font-normal uppercase leading-tight text-black/55">
                       {perk.detail}
                     </p>
                   </div>
@@ -235,21 +260,21 @@ export function ProductSummary({
             <AccordionTrigger className="h-[52px] items-center rounded-none py-0 text-[15px] font-[500] uppercase leading-none tracking-normal hover:no-underline">
               Product Details
             </AccordionTrigger>
-            <AccordionContent className="max-w-[36rem] pb-5 font-sans text-[13px] font-normal uppercase leading-[1.55] text-black/68">
+            <AccordionContent className="w-full min-w-0 max-w-full pb-5 font-sans text-[12px] sm:text-[13px] font-normal uppercase leading-[1.55] text-black/68 break-words">
               {product.details && product.details.length > 0 ? (
-                <div className="space-y-3">
-                  {product.description ? <p>{product.description}</p> : null}
-                  <div className="grid grid-cols-1 gap-2 pt-2 sm:grid-cols-2">
+                <div className="space-y-3 min-w-0">
+                  {product.description ? <p className="break-words">{product.description}</p> : null}
+                  <div className="grid grid-cols-1 gap-2 pt-2 sm:grid-cols-2 min-w-0">
                     {product.details.map((detail, idx) => (
-                      <div key={idx} className="flex gap-2">
-                        <span className="font-[500] text-black">{detail.name}:</span>
-                        <span>{detail.value}</span>
+                      <div key={idx} className="flex gap-2 min-w-0">
+                        <span className="font-[500] text-black shrink-0">{detail.name}:</span>
+                        <span className="break-words min-w-0">{detail.value}</span>
                       </div>
                     ))}
                   </div>
                 </div>
               ) : (
-                <p>{product.detailsBody || product.description || "No details provided."}</p>
+                <p className="break-words">{product.detailsBody || product.description || "No details provided."}</p>
               )}
             </AccordionContent>
           </AccordionItem>
@@ -261,10 +286,10 @@ export function ProductSummary({
             <AccordionTrigger className="h-[52px] items-center rounded-none py-0 text-[15px] font-[500] uppercase leading-none tracking-normal hover:no-underline">
               Details &amp; Care
             </AccordionTrigger>
-            <AccordionContent className="max-w-[36rem] pb-5 font-sans text-[13px] font-normal uppercase leading-[1.55] text-black/68">
-              <ul className="space-y-2">
+            <AccordionContent className="w-full min-w-0 max-w-full pb-5 font-sans text-[12px] sm:text-[13px] font-normal uppercase leading-[1.55] text-black/68 break-words">
+              <ul className="space-y-2 min-w-0">
                 {product.careNotes.map((note) => (
-                  <li key={note}>{note}</li>
+                  <li key={note} className="break-words">{note}</li>
                 ))}
               </ul>
             </AccordionContent>
@@ -277,10 +302,10 @@ export function ProductSummary({
             <AccordionTrigger className="h-[52px] items-center rounded-none py-0 text-[15px] font-[500] uppercase leading-none tracking-normal hover:no-underline">
               Shipping &amp; Payment
             </AccordionTrigger>
-            <AccordionContent className="max-w-[36rem] pb-5 font-sans text-[13px] font-normal uppercase leading-[1.55] text-black/68">
-              <ul className="space-y-2">
+            <AccordionContent className="w-full min-w-0 max-w-full pb-5 font-sans text-[12px] sm:text-[13px] font-normal uppercase leading-[1.55] text-black/68 break-words">
+              <ul className="space-y-2 min-w-0">
                 {product.shippingNotes.map((note) => (
-                  <li key={note}>{note}</li>
+                  <li key={note} className="break-words">{note}</li>
                 ))}
               </ul>
             </AccordionContent>
