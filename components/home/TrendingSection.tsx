@@ -210,12 +210,7 @@ export function ProductCardView({
 
   return (
     <article
-      className={cn(
-        "group relative flex flex-col bg-white text-black transition-all duration-200",
-        isExpanded
-          ? "border-2 border-black p-2 sm:p-2.5"
-          : "border-2 border-transparent p-2 sm:p-2.5"
-      )}
+      className="group relative flex flex-col bg-white text-black p-2 sm:p-2.5 transition-colors duration-200"
     >
       <div className="relative aspect-[330/440] w-full overflow-hidden bg-neutral-100">
         {activeImage ? (
@@ -262,40 +257,55 @@ export function ProductCardView({
         </button>
 
         {/* Expanded Mode: QUICK VIEW & Gallery Indicators in Center Bottom */}
-        {isExpanded && (
-          <div className="pointer-events-none absolute inset-x-0 bottom-2.5 z-20 flex flex-col items-center justify-center gap-1.5">
-            <button
-              type="button"
-              onClick={handleQuickView}
-              className="pointer-events-auto bg-black px-4 py-1.5 text-[10px] sm:text-[11px] font-medium uppercase tracking-widest text-white shadow hover:bg-neutral-800 transition-opacity cursor-pointer"
-            >
-              QUICK VIEW
-            </button>
-
-            {gallery.length > 1 && (
-              <div className="pointer-events-auto flex items-center justify-center gap-1">
-                {gallery.map((_, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      setActiveImageIndex(idx)
-                    }}
-                    className={cn(
-                      "h-[2px] transition-all cursor-pointer",
-                      idx === activeImageIndex
-                        ? "w-5 bg-black"
-                        : "w-3 bg-black/30 hover:bg-black/60"
-                    )}
-                    aria-label={`Slide ${idx + 1}`}
-                  />
-                ))}
-              </div>
+        <div
+          className={cn(
+            "pointer-events-none absolute inset-x-0 bottom-10 sm:bottom-11 z-20 flex flex-col items-center justify-center gap-1.5 px-2 transition-[opacity,transform] duration-200 ease-out",
+            isExpanded
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-1.5 pointer-events-none"
+          )}
+        >
+          <button
+            type="button"
+            onClick={handleQuickView}
+            tabIndex={isExpanded ? 0 : -1}
+            className={cn(
+              "bg-black px-3.5 sm:px-4 py-1.5 text-[10px] sm:text-[11px] font-medium uppercase tracking-widest text-white shadow-md hover:bg-neutral-800 transition-colors cursor-pointer whitespace-nowrap",
+              isExpanded ? "pointer-events-auto" : "pointer-events-none"
             )}
-          </div>
-        )}
+          >
+            QUICK VIEW
+          </button>
+
+          {gallery.length > 1 && (
+            <div
+              className={cn(
+                "flex items-center justify-center gap-1 transition-opacity duration-200",
+                isExpanded ? "pointer-events-auto" : "pointer-events-none"
+              )}
+            >
+              {gallery.map((_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  tabIndex={isExpanded ? 0 : -1}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setActiveImageIndex(idx)
+                  }}
+                  className={cn(
+                    "h-[2px] transition-colors cursor-pointer",
+                    idx === activeImageIndex
+                      ? "w-5 bg-black"
+                      : "w-3 bg-black/30 hover:bg-black/60"
+                  )}
+                  aria-label={`Slide ${idx + 1}`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Gallery Prev / Next Arrows on Hover */}
         {hasGalleryControls && (
@@ -365,42 +375,40 @@ export function ProductCardView({
           {subtitle}
         </p>
 
-        {/* Pricing row */}
+        {/* Pricing row (stable, no layout shift or jitter) */}
         <div className="mt-1 flex items-baseline gap-1.5 sm:gap-2 flex-wrap text-[12px] sm:text-[14px]">
-          {isExpanded ? (
-            <>
-              <span className="font-normal text-neutral-400 line-through text-[11px] sm:text-[13px]">
-                {comparePriceStr}
-              </span>
-              <span className="font-semibold text-black">
-                {displayPrice}
-              </span>
-              {discountPercent && discountPercent > 0 ? (
-                <span className="text-[10px] sm:text-[11px] font-medium uppercase tracking-wide text-red-600">
-                  SAVE {discountPercent}%
-                </span>
-              ) : null}
-            </>
-          ) : (
-            <span className="font-semibold text-black">
-              {displayPrice}
+          <span className="font-semibold text-black">
+            {displayPrice}
+          </span>
+          <span className="font-normal text-neutral-400 line-through text-[11px] sm:text-[13px]">
+            {comparePriceStr}
+          </span>
+          {discountPercent && discountPercent > 0 ? (
+            <span className="text-[10px] sm:text-[11px] font-medium uppercase tracking-wide text-red-600">
+              SAVE {discountPercent}%
             </span>
-          )}
+          ) : null}
         </div>
 
-        {/* Size Selection Row (Displayed when Expanded) */}
-        {isExpanded && (
-          <div className="mt-2 sm:mt-2.5 flex flex-col gap-1">
-            <div className="flex flex-wrap items-center gap-1 sm:gap-1.5">
+        {/* Size Selection Row (Smooth, jitter-free accordion animation) */}
+        <div
+          className={cn(
+            "grid transition-[grid-template-rows,opacity] duration-200 ease-out",
+            isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+          )}
+        >
+          <div className="overflow-hidden">
+            <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 pt-2 sm:pt-2.5">
               {sizesList.map((size) => {
                 const isSelected = selectedSize === size
                 return (
                   <button
                     key={size}
                     type="button"
+                    tabIndex={isExpanded ? 0 : -1}
                     onClick={(e) => handleSelectSize(size, e)}
                     className={cn(
-                      "flex min-w-[24px] sm:min-w-[28px] h-6 sm:h-7 px-1 sm:px-1.5 items-center justify-center text-[10px] sm:text-[12px] font-medium uppercase border transition-all cursor-pointer",
+                      "flex min-w-[24px] sm:min-w-[28px] h-6 sm:h-7 px-1 sm:px-1.5 items-center justify-center text-[10px] sm:text-[12px] font-medium uppercase border transition-colors cursor-pointer",
                       isSelected
                         ? "border-black ring-1 ring-black bg-white text-black font-semibold"
                         : "border-neutral-300 bg-white text-neutral-800 hover:border-black"
@@ -413,7 +421,7 @@ export function ProductCardView({
               })}
             </div>
           </div>
-        )}
+        </div>
       </div>
 
       <ProductQuickViewModal

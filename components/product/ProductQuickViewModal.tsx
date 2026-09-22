@@ -4,7 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Star, X } from "lucide-react"
 import { useEffect, useState } from "react"
-import type { ButtonHTMLAttributes } from "react"
+import type { ButtonHTMLAttributes, UIEvent } from "react"
 
 import {
   Dialog,
@@ -99,6 +99,7 @@ export function ProductQuickViewModal({
   const [activeImageIndex] = useState(() =>
     Math.min(initialImageIndex, Math.max(gallery.length - 1, 0))
   )
+  const [activeSlide, setActiveSlide] = useState(0)
   const [selectedColor, setSelectedColor] = useState(product.colorName)
   const [selectedSize, setSelectedSize] = useState(
     product.sizes[1] ?? product.sizes[0] ?? ""
@@ -139,6 +140,16 @@ export function ProductQuickViewModal({
     ...galleryImages.filter((_, index) => index !== activeImageIndex),
   ].filter((image): image is string => Boolean(image))
 
+  const handleGalleryScroll = (e: UIEvent<HTMLDivElement>) => {
+    const target = e.currentTarget
+    if (target.clientWidth > 0) {
+      const newIndex = Math.round(target.scrollLeft / target.clientWidth)
+      if (newIndex !== activeSlide && newIndex >= 0 && newIndex < scrollableGallery.length) {
+        setActiveSlide(newIndex)
+      }
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
@@ -146,80 +157,97 @@ export function ProductQuickViewModal({
         overlayClassName="bg-black/80 backdrop-blur-[1px]"
         onClick={(event) => event.stopPropagation()}
         onPointerDown={(event) => event.stopPropagation()}
-        className="!w-[min(96vw,908px)] !max-w-none max-h-[calc(100dvh-1.25rem)] overflow-hidden rounded-none border-0 bg-white p-0 text-black ring-0 sm:max-w-none"
+        className="!w-[94vw] sm:!w-[90vw] lg:!w-[920px] !max-w-none max-h-[92dvh] lg:h-[580px] overflow-hidden rounded-none border border-black/15 bg-white p-0 text-black shadow-2xl ring-0"
       >
         <DialogTitle className="sr-only">{product.title} quick view</DialogTitle>
         <DialogDescription className="sr-only">
           Quick view dialog for {product.title}
         </DialogDescription>
 
-        <div className="grid h-[min(88dvh,540px)] grid-cols-1 gap-0 p-3 lg:grid-cols-[353px_minmax(0,1fr)] lg:gap-10">
-          <div
-            aria-label={`${product.title} image gallery`}
-            className="quick-view-gallery min-h-0 overflow-y-auto bg-[#111]"
-            tabIndex={0}
+        <DialogClose asChild>
+          <button
+            type="button"
+            aria-label="Close quick view"
+            className="absolute right-3 top-3 z-50 inline-flex size-8 items-center justify-center bg-white/90 hover:bg-white text-black backdrop-blur-sm border border-black/10 transition-colors shadow-sm cursor-pointer"
           >
-            <div className="flex flex-col gap-1">
+            <X className="size-4 stroke-2" />
+          </button>
+        </DialogClose>
+
+        <div className="flex flex-col h-full max-h-[92dvh] overflow-y-auto lg:overflow-hidden lg:grid lg:grid-cols-[360px_minmax(0,1fr)] lg:gap-8 lg:h-[580px]">
+          {/* Gallery: Horizontal swipe on mobile, vertical stack on desktop */}
+          <div className="relative w-full shrink-0 bg-[#111] lg:h-full lg:overflow-hidden">
+            <div
+              aria-label={`${product.title} image gallery`}
+              onScroll={handleGalleryScroll}
+              className="quick-view-gallery flex flex-row overflow-x-auto snap-x snap-mandatory scrollbar-none lg:flex-col lg:h-full lg:overflow-y-auto lg:gap-1"
+              tabIndex={0}
+            >
               {scrollableGallery.map((image, index) => (
-                  <figure
-                    key={`${image}-${index}`}
-                    className="relative aspect-[353/452] shrink-0 overflow-hidden bg-[#111]"
-                  >
-                    <Image
-                      src={image}
-                      alt={`${product.title} view ${index + 1}`}
-                      fill
-                      priority={index === 0}
-                      sizes="348px"
-                      className="object-cover object-center"
-                    />
-                  </figure>
-                ))}
+                <figure
+                  key={`${image}-${index}`}
+                  className="relative aspect-[3/4] max-h-[380px] w-full shrink-0 snap-center overflow-hidden bg-[#111] sm:max-h-[440px] lg:max-h-none lg:h-auto lg:aspect-[353/452]"
+                >
+                  <Image
+                    src={image}
+                    alt={`${product.title} view ${index + 1}`}
+                    fill
+                    priority={index === 0}
+                    sizes="(max-width: 1024px) 94vw, 360px"
+                    className="object-cover object-center"
+                  />
+                </figure>
+              ))}
             </div>
+
+            {/* Mobile swipe pagination dots */}
+            {scrollableGallery.length > 1 && (
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-black/45 backdrop-blur-sm px-2.5 py-1 rounded-full lg:hidden pointer-events-none">
+                {scrollableGallery.map((_, idx) => (
+                  <span
+                    key={idx}
+                    className={`h-1.5 rounded-full transition-all duration-200 ${
+                      idx === activeSlide ? "w-4 bg-white" : "w-1.5 bg-white/50"
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
 
-          <div className="quick-view-details relative min-h-0 overflow-y-auto px-0 pb-3 pt-5 lg:pr-2">
-            <DialogClose asChild>
-              <button
-                type="button"
-                aria-label="Close quick view"
-                className="absolute right-0 top-0 inline-flex size-5 items-center justify-center leading-none text-black transition-opacity hover:opacity-70"
-              >
-                <X className="size-5 stroke-2" />
-              </button>
-            </DialogClose>
-
-            <div className="pr-5">
-  <p className="w-fit text-[13px] font-normal uppercase leading-[17px] tracking-normal text-black/45">
+          {/* Details Column */}
+          <div className="quick-view-details flex-1 px-4 py-5 sm:p-6 lg:overflow-y-auto lg:h-full lg:py-7 lg:pr-8 lg:pl-0">
+            <div className="w-full">
+              <p className="w-fit text-[12px] sm:text-[13px] font-normal uppercase leading-[17px] tracking-normal text-black/45">
                 {product.editLabel}
               </p>
-              <h2 className="mt-1 font-heading text-[24px] font-normal uppercase leading-[0.95] tracking-[-0.06em]">
+              <h2 className="mt-1 font-heading text-[20px] sm:text-[24px] font-normal uppercase leading-[1.05] tracking-[-0.04em] sm:tracking-[-0.06em]">
                 {product.title}
               </h2>
 
-              <div className="mt-5 flex flex-wrap items-end justify-between gap-3">
+              <div className="mt-4 sm:mt-5 flex flex-wrap items-end justify-between gap-3">
                 <div className="flex items-end gap-3">
-      <span className="text-[17px] font-normal leading-[20px] text-black/45 line-through">
+                  <span className="text-[15px] sm:text-[17px] font-normal leading-[20px] text-black/45 line-through">
                     {product.originalPrice}
                   </span>
-      <span className="font-sans text-[17px] font-[500] leading-[20px] tracking-normal">
+                  <span className="font-sans text-[15px] sm:text-[17px] font-[500] leading-[20px] tracking-normal">
                     {product.price}
                   </span>
                 </div>
 
                 <div className="flex items-end gap-2 text-black">
-      <span className="text-[17px] font-normal uppercase leading-[20px] text-black/45">
+                  <span className="text-[13px] sm:text-[17px] font-normal uppercase leading-[20px] text-black/45">
                     {product.sold}
                   </span>
-      <span className="text-[17px] font-normal leading-[20px] text-black/25">•</span>
-      <span className="inline-flex items-end gap-1 text-[17px] font-[500] leading-[20px] text-black">
-                    <Star className="size-5 fill-[#f2a33c] text-[#f2a33c]" />
+                  <span className="text-[13px] sm:text-[17px] font-normal leading-[20px] text-black/25">•</span>
+                  <span className="inline-flex items-end gap-1 text-[13px] sm:text-[17px] font-[500] leading-[20px] text-black">
+                    <Star className="size-4 sm:size-5 fill-[#f2a33c] text-[#f2a33c]" />
                     {product.rating}
                   </span>
                 </div>
               </div>
 
-              <p className="mt-5 max-w-none text-justify font-sans text-[13px] font-normal uppercase leading-[1.35] text-black/65">
+              <p className="mt-3 sm:mt-5 max-w-none text-justify font-sans text-[12px] sm:text-[13px] font-normal uppercase leading-[1.4] text-black/65">
                 {product.description}{" "}
                 <Link
                   href="/products#details"
@@ -229,8 +257,8 @@ export function ProductQuickViewModal({
                 </Link>
               </p>
 
-              <section className="mt-[34px] space-y-3">
-                <p className="text-[13px] font-normal uppercase text-black/45">
+              <section className="mt-5 sm:mt-7 space-y-2.5 sm:space-y-3">
+                <p className="text-[12px] sm:text-[13px] font-normal uppercase text-black/45">
                   Color{" "}
                   <span className="font-[500] text-black">{selectedColor}</span>
                 </p>
@@ -242,16 +270,16 @@ export function ProductQuickViewModal({
                 />
               </section>
 
-              <section className="mt-5 space-y-3">
+              <section className="mt-4 sm:mt-5 space-y-2.5 sm:space-y-3">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-[13px] font-normal uppercase text-black/45">
+                  <p className="text-[12px] sm:text-[13px] font-normal uppercase text-black/45">
                     Size{" "}
                     <span className="font-[500] text-black">{selectedSize}</span>
                   </p>
                   <SizeChartModal images={product.sizeGuideImages} fitType={product.fitType}>
                     <button
                       type="button"
-                      className="group inline-flex flex-col items-start pb-0.5 text-[13px] font-normal uppercase leading-none text-black/45 transition-colors duration-200 hover:text-black focus-visible:text-black cursor-pointer"
+                      className="group inline-flex flex-col items-start pb-0.5 text-[12px] sm:text-[13px] font-normal uppercase leading-none text-black/45 transition-colors duration-200 hover:text-black focus-visible:text-black cursor-pointer"
                     >
                       <span>View Size Chart</span>
                       <span
@@ -277,15 +305,15 @@ export function ProductQuickViewModal({
 
               <button
                 type="button"
-                className="mt-12 flex h-10 w-full cursor-pointer items-center justify-center bg-black text-[13px] font-normal uppercase tracking-normal text-white transition-opacity hover:opacity-90"
+                className="mt-6 sm:mt-8 flex h-11 sm:h-12 w-full cursor-pointer items-center justify-center bg-black text-xs sm:text-sm font-medium uppercase tracking-wider text-white transition-opacity hover:opacity-90"
               >
                 Add To Cart
               </button>
 
-              <div className="mt-3 text-center">
+              <div className="mt-3 sm:mt-4 text-center pb-2 sm:pb-0">
                 <Link
                   href="/products"
-                  className="group inline-flex flex-col items-start pb-0.5 text-[13px] font-normal uppercase leading-none tracking-normal text-black/55 transition-colors duration-200 hover:text-black focus-visible:text-black"
+                  className="group inline-flex flex-col items-center pb-0.5 text-xs sm:text-[13px] font-normal uppercase leading-none tracking-wider text-black/60 transition-colors duration-200 hover:text-black focus-visible:text-black"
                 >
                   <span>View Full Details</span>
                   <span
