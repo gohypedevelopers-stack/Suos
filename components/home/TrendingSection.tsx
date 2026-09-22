@@ -398,7 +398,7 @@ export function ProductCardView({
           )}
         >
           <div className="overflow-hidden">
-            <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 pt-2 sm:pt-2.5">
+            <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 pt-2 pb-1.5 sm:pt-2.5 sm:pb-2">
               {sizesList.map((size) => {
                 const isSelected = selectedSize === size
                 return (
@@ -408,10 +408,10 @@ export function ProductCardView({
                     tabIndex={isExpanded ? 0 : -1}
                     onClick={(e) => handleSelectSize(size, e)}
                     className={cn(
-                      "flex min-w-[24px] sm:min-w-[28px] h-6 sm:h-7 px-1 sm:px-1.5 items-center justify-center text-[10px] sm:text-[12px] font-medium uppercase border transition-colors cursor-pointer",
+                      "flex min-w-[24px] sm:min-w-[28px] h-6 sm:h-7 px-1 sm:px-1.5 items-center justify-center text-[10px] sm:text-[12px] font-medium uppercase transition-colors cursor-pointer",
                       isSelected
-                        ? "border-black ring-1 ring-black bg-white text-black font-semibold"
-                        : "border-neutral-300 bg-white text-neutral-800 hover:border-black"
+                        ? "border-2 border-black bg-white text-black font-semibold"
+                        : "border border-neutral-300 bg-white text-neutral-800 hover:border-black"
                     )}
                     title={`Select size ${size} and add to cart`}
                   >
