@@ -4,6 +4,7 @@ import { notFound } from "next/navigation"
 import { ChevronRight } from "lucide-react"
 
 import { LookbookCarousel } from "@/components/home/LookbookCarousel"
+import { ResponsibleDenimSection } from "@/components/home/ResponsibleDenimSection"
 import { ProductGallery } from "@/components/product/ProductGallery"
 import { ProductSummary } from "@/components/product/ProductSummary"
 import { YouMayAlsoLikeSection } from "@/components/product/YouMayAlsoLikeSection"
@@ -85,6 +86,7 @@ export default async function Page({
           </div>
         </div>
       </section>
+      <ResponsibleDenimSection />
       <YouMayAlsoLikeSection />
       <LookbookCarousel />
     </main>

@@ -45,23 +45,23 @@ export function ResponsibleDenimSection() {
         </div>
 
         {/* Middle: Mission Statement Card */}
-        <div className="flex flex-col justify-center px-6 py-12 sm:px-10 lg:px-12 xl:px-16 text-left">
+        <div className="flex flex-col justify-center items-center text-center lg:items-start lg:text-left px-6 py-12 sm:px-10 lg:px-12 xl:px-16">
           <p className="text-[11px] sm:text-[12px] font-medium uppercase tracking-[0.14em] text-neutral-500">
             Considered Beyond The Surface
           </p>
 
           <h2 className="mt-4 font-heading text-[26px] sm:text-[32px] lg:text-[36px] font-normal uppercase leading-[1.12] tracking-[-0.03em] text-black">
             What Touches
-            <br />
+            <br className="hidden sm:inline" />{" "}
             Your Skin Matters
           </h2>
 
-          <p className="mt-5 max-w-[440px] text-[13px] sm:text-[14px] leading-relaxed text-neutral-700">
+          <p className="mt-5 max-w-[440px] mx-auto lg:mx-0 text-[13px] sm:text-[14px] leading-relaxed text-neutral-700">
             Our denim is washed and finished using inputs selected to meet
             recognised textile and chemical safety standards.
           </p>
 
-          <div className="mt-8 sm:mt-10 pt-6 border-t border-black/10">
+          <div className="mt-8 sm:mt-10 pt-6 border-t border-black/10 w-full text-center lg:text-left">
             <p className="text-[13px] sm:text-[14px] font-medium tracking-[0.1em] text-black">
               OEKO-TEX® &nbsp;|&nbsp; RoHS &nbsp;|&nbsp; GOTS
             </p>
