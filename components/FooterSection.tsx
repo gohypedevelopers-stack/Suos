@@ -35,7 +35,7 @@ function FooterLink({
   return (
     <Link
       href={href}
-      className="inline-flex w-fit transition-opacity hover:opacity-65"
+      className="inline-flex w-fit shrink-0 transition-opacity hover:opacity-65"
     >
       {children}
     </Link>
@@ -157,13 +157,13 @@ export function FooterSection() {
         </div>
 
         <div className="border-t border-black/55 py-4">
-          <div className="grid grid-cols-2 gap-3 text-[12px] sm:text-[13px] font-normal uppercase tracking-[0.04em] sm:grid-cols-2 lg:grid-cols-4 lg:gap-4">
+          <div className="flex w-full flex-nowrap items-center justify-between gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden whitespace-nowrap text-[9.5px] min-[360px]:text-[10.5px] min-[400px]:text-[11.5px] sm:text-[12px] lg:text-[13px] font-normal uppercase tracking-normal sm:tracking-[0.04em]">
             {bottomLinks.map((link) => (
               <FooterLink key={link.label} href={link.href}>
                 {link.label}
               </FooterLink>
             ))}
-            <div className="lg:justify-self-end">Follow Us</div>
+            <div className="shrink-0">Follow Us</div>
           </div>
         </div>
       </div>
