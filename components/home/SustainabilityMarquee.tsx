@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils"
 
 const marqueeText =
-  "SUSTAINABLE PACKAGING | ZERO WATER DENIM | RESPONSIBLE DENIM"
+  "OEKO-TEX® | RoHS | GOTS | CONSIDERED WASHING | RESPONSIBLE PACKAGING | MADE WITH MORE IN MIND"
 
 function MarqueeStrip() {
   return (

@@ -51,10 +51,10 @@ function FooterGroup({
 }) {
   return (
     <div>
-      <h3 className="text-[15px] font-[500] uppercase tracking-[0.01em]">
+      <h3 className="text-[14px] sm:text-[15px] font-[500] uppercase tracking-[0.01em]">
         {title}
       </h3>
-      <div className="mt-5 text-[13px] font-normal uppercase tracking-[0.02em] text-black/90">
+      <div className="mt-4 sm:mt-5 text-[12px] sm:text-[13px] font-normal uppercase tracking-[0.02em] text-black/90">
         {children}
       </div>
     </div>
@@ -71,9 +71,9 @@ export function FooterSection() {
           </h2>
         </div>
 
-        <div className="grid gap-10 py-7 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 py-7 sm:gap-x-10 lg:grid-cols-4 lg:gap-12">
           <FooterGroup title="Company">
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {companyLinks.map((link) => (
                 <div key={link.label}>
                   <FooterLink href={link.href}>{link.label}</FooterLink>
@@ -82,49 +82,51 @@ export function FooterSection() {
             </div>
           </FooterGroup>
 
-          <FooterGroup title="Quick Links">
-            <div className="space-y-4">
-              {quickLinks.map((link) => (
-                <div key={link.label}>
-                  <FooterLink href={link.href}>{link.label}</FooterLink>
+          <div className="flex flex-col gap-8 lg:contents">
+            <FooterGroup title="Quick Links">
+              <div className="space-y-3 sm:space-y-4">
+                {quickLinks.map((link) => (
+                  <div key={link.label}>
+                    <FooterLink href={link.href}>{link.label}</FooterLink>
+                  </div>
+                ))}
+              </div>
+            </FooterGroup>
+
+            <div>
+              <h3 className="text-[14px] sm:text-[15px] font-[500] uppercase tracking-[0.01em]">
+                Contact
+              </h3>
+
+              <div className="mt-4 sm:mt-5 space-y-4 sm:space-y-5 text-[12px] sm:text-[13px] font-normal uppercase tracking-[0.02em] text-black/90">
+                <div className="space-y-0.5">
+                  <p className="font-normal">For customer care</p>
+                  <p className="normal-case tracking-[-0.01em] break-all">
+                    customercare@suos.in
+                  </p>
                 </div>
-              ))}
-            </div>
-          </FooterGroup>
 
-          <div>
-            <h3 className="text-[15px] font-[500] uppercase tracking-[0.01em]">
-              Contact
-            </h3>
+                <div className="space-y-0.5">
+                  <p className="font-normal">For online orders</p>
+                  <p className="normal-case tracking-[-0.01em]">+91 000000000</p>
+                </div>
 
-            <div className="mt-5 space-y-5 text-[13px] font-normal uppercase tracking-[0.02em] text-black/90">
-              <div className="space-y-0.5">
-                <p className="font-normal">For customer care</p>
-                <p className="normal-case tracking-[-0.01em]">
-                  customercare@suos.in
-                </p>
-              </div>
-
-              <div className="space-y-0.5">
-                <p className="font-normal">For online orders</p>
-                <p className="normal-case tracking-[-0.01em]">+91 000000000</p>
-              </div>
-
-              <div className="space-y-0.5">
-                <p className="font-normal">Timings</p>
-                <p className="normal-case tracking-[-0.01em]">
-                  Mon-Sat : 9AM - 8PM
-                </p>
+                <div className="space-y-0.5">
+                  <p className="font-normal">Timings</p>
+                  <p className="normal-case tracking-[-0.01em]">
+                    Mon-Sat : 9AM - 8PM
+                  </p>
+                </div>
               </div>
             </div>
           </div>
 
-          <div>
-            <h3 className="text-[15px] font-normal uppercase tracking-[0.01em]">
+          <div className="col-span-2 lg:col-span-1">
+            <h3 className="text-[14px] sm:text-[15px] font-normal uppercase tracking-[0.01em]">
               Subscribe to our newsletter
             </h3>
 
-            <div className="mt-6">
+            <div className="mt-5 sm:mt-6">
               <div className="flex items-center gap-3 border-b border-black/55 pb-2">
                 <input
                   type="email"
@@ -138,7 +140,7 @@ export function FooterSection() {
                 <button
                   type="button"
                   aria-label="Submit newsletter email"
-                  className="inline-flex size-8 items-center justify-center text-black transition-opacity hover:opacity-65"
+                  className="inline-flex size-8 items-center justify-center text-black transition-opacity hover:opacity-65 cursor-pointer"
                 >
                   <ArrowRight className="size-5 stroke-[1.8]" />
                 </button>
@@ -146,7 +148,7 @@ export function FooterSection() {
 
               <button
                 type="button"
-                className="mt-5 flex h-14 w-full items-center justify-center bg-black text-[15px] font-normal uppercase tracking-normal text-white transition-opacity hover:opacity-90"
+                className="mt-5 flex h-12 sm:h-14 w-full items-center justify-center bg-black text-[14px] sm:text-[15px] font-normal uppercase tracking-normal text-white transition-opacity hover:opacity-90 cursor-pointer"
               >
                 Subscribe
               </button>
@@ -155,7 +157,7 @@ export function FooterSection() {
         </div>
 
         <div className="border-t border-black/55 py-4">
-          <div className="grid gap-3 text-[13px] font-normal uppercase tracking-[0.04em] sm:grid-cols-2 lg:grid-cols-4 lg:gap-4">
+          <div className="grid grid-cols-2 gap-3 text-[12px] sm:text-[13px] font-normal uppercase tracking-[0.04em] sm:grid-cols-2 lg:grid-cols-4 lg:gap-4">
             {bottomLinks.map((link) => (
               <FooterLink key={link.label} href={link.href}>
                 {link.label}

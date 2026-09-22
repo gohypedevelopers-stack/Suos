@@ -3,7 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Heart, Search, ShoppingBag, UserRound } from "lucide-react"
+import { Heart, Search, ShoppingBag, UserRound, Menu, X, ChevronRight } from "lucide-react"
 import { AnimatePresence, motion, useReducedMotion, type Transition } from "motion/react"
 import {
   useEffect,
@@ -19,7 +19,15 @@ import { cn } from "@/lib/utils"
 import { CartSidebar } from "@/components/cart/CartSidebar"
 import { SearchSidebar } from "@/components/home/SearchSidebar"
 import { WishlistSidebar } from "@/components/wishlist/WishlistSidebar"
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet"
 import { useWishlist } from "@/lib/wishlist-context"
+import { useCart } from "@/lib/cart-context"
 
 type NavKey = "women" | "men" | "bestsellers"
 type ActiveMenu = NavKey | "wishlist"
@@ -179,7 +187,7 @@ function IconButton({
       aria-haspopup={ariaHaspopup}
       onClick={onClick}
       className={cn(
-        "inline-flex size-9 cursor-pointer items-center justify-center text-current transition-[color,opacity] duration-300 ease-out hover:opacity-60 focus-visible:outline-none focus-visible:ring-2",
+        "relative inline-flex size-9 cursor-pointer items-center justify-center text-current transition-[color,opacity] duration-300 ease-out hover:opacity-60 focus-visible:outline-none focus-visible:ring-2",
         tone === "light"
           ? "focus-visible:ring-white/30"
           : "focus-visible:ring-black/25"
@@ -315,9 +323,10 @@ export function Navbar({
   const pathname = usePathname()
   const isOverlay = pathname === "/"
   const { wishlist, isLoaded, setIsSidebarOpen } = useWishlist()
+  const { isCartOpen, setIsCartOpen, totalItems } = useCart()
   const [isScrolled, setIsScrolled] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
-  const [cartOpen, setCartOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [selectedNav, setSelectedNav] = useState<NavKey>(defaultNavKey)
   const [activeMenu, setActiveMenu] = useState<ActiveMenu | null>(null)
   const [isHovered, setIsHovered] = useState(false)
@@ -479,7 +488,7 @@ export function Navbar({
       ref={headerRef}
       className={cn(
         "main-navbar navbar-shell border-b",
-        isOverlay ? "h-[98px]" : "lg:h-[98px]",
+        "h-14 sm:h-16 lg:h-[98px]",
         isInteractiveSurface
           ? "!bg-white text-black border-transparent shadow-none"
           : isLightSurface
@@ -569,32 +578,70 @@ export function Navbar({
               aria-label="Wishlist"
               onClick={() => setIsSidebarOpen(true)}
               className={cn(
-                "relative inline-flex size-9 cursor-pointer items-center justify-center text-current transition-[color,opacity] duration-300 ease-out hover:opacity-60 focus-visible:outline-none focus-visible:ring-2",
+                "inline-flex size-9 cursor-pointer items-center justify-center text-current transition-[color,opacity] duration-300 ease-out hover:opacity-60 focus-visible:outline-none focus-visible:ring-2",
                 tone === "light"
                   ? "focus-visible:ring-white/30"
                   : "focus-visible:ring-black/25"
               )}
             >
-              <Heart className="size-[18px] stroke-[1.7]" />
-              {wishlist.length > 0 && isLoaded && (
-                <span className="absolute right-[2px] top-[2px] flex min-h-[14px] min-w-[14px] items-center justify-center rounded-full bg-black px-[4px] text-[9px] font-bold text-white ring-1 ring-white">
-                  {wishlist.length}
-                </span>
-              )}
+              <span className="relative inline-flex items-center justify-center">
+                <Heart className="size-[18px] stroke-[1.7]" />
+                {wishlist.length > 0 && isLoaded && (
+                  <span
+                    className={cn(
+                      "absolute -right-1.5 -top-1 flex min-h-[14px] min-w-[14px] items-center justify-center rounded-full px-[3px] text-[9px] font-bold leading-none ring-1",
+                      tone === "light"
+                        ? "bg-white text-black ring-black/20"
+                        : "bg-black text-white ring-white"
+                    )}
+                  >
+                    {wishlist.length}
+                  </span>
+                )}
+              </span>
             </button>
 
             <IconButton
               label="Cart"
               tone={tone}
-              onClick={() => setCartOpen(true)}
+              onClick={() => setIsCartOpen(true)}
             >
-              <ShoppingBag className="size-[18px] stroke-[1.7]" />
+              <span className="relative inline-flex items-center justify-center">
+                <ShoppingBag className="size-[18px] stroke-[1.7]" />
+                {totalItems > 0 && isLoaded && (
+                  <span
+                    className={cn(
+                      "absolute -right-1.5 -top-1 flex min-h-[14px] min-w-[14px] items-center justify-center rounded-full px-[3px] text-[9px] font-bold leading-none ring-1",
+                      tone === "light"
+                        ? "bg-white text-black ring-black/20"
+                        : "bg-black text-white ring-white"
+                    )}
+                  >
+                    {totalItems}
+                  </span>
+                )}
+              </span>
             </IconButton>
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 py-4 lg:hidden">
-          <div className="flex items-center justify-between gap-4">
+        {/* Mobile Header: Single row with Hamburger */}
+        <div className="flex h-full items-center justify-between lg:hidden">
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              aria-label="Open menu"
+              onClick={() => setMobileMenuOpen(true)}
+              className={cn(
+                "inline-flex size-9 cursor-pointer items-center justify-center text-current transition-opacity hover:opacity-60 focus-visible:outline-none focus-visible:ring-2",
+                tone === "light"
+                  ? "focus-visible:ring-white/30"
+                  : "focus-visible:ring-black/25"
+              )}
+            >
+              <Menu className="size-[20px] stroke-[1.8]" />
+            </button>
+
             <IconButton
               label="Search"
               tone={tone}
@@ -602,80 +649,77 @@ export function Navbar({
             >
               <Search className="size-[18px] stroke-[1.7]" />
             </IconButton>
+          </div>
 
-            <Link
-              href="/"
-              aria-label="SUOS home"
-              className="transition-opacity hover:opacity-70"
+          <Link
+            href="/"
+            aria-label="SUOS home"
+            className="transition-opacity hover:opacity-70"
+          >
+            <Image
+              src="/logo.svg"
+              alt="SUOS"
+              width={160}
+              height={70}
+              priority
+              className={cn(
+                "block h-auto w-[6rem] max-w-none transition-[filter] duration-300 ease-out",
+                isOverlay && !isLightSurface && "invert"
+              )}
+            />
+          </Link>
+
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              aria-label="Wishlist"
+              onClick={() => setIsSidebarOpen(true)}
+              className={cn(
+                "inline-flex size-9 cursor-pointer items-center justify-center text-current transition-[color,opacity] duration-300 ease-out hover:opacity-60 focus-visible:outline-none focus-visible:ring-2",
+                tone === "light"
+                  ? "focus-visible:ring-white/30"
+                  : "focus-visible:ring-black/25"
+              )}
             >
-              <Image
-                src="/logo.svg"
-                alt="SUOS"
-                width={220}
-                height={102}
-                priority
-                className={cn(
-                  "block h-auto w-[8rem] max-w-none transition-[filter] duration-300 ease-out",
-                  isOverlay && !isLightSurface && "invert"
-                )}
-              />
-            </Link>
-
-            <div className="flex items-center gap-2">
-              <Link
-                href="/login"
-                aria-label="Profile"
-                className="inline-flex size-9 cursor-pointer items-center justify-center text-current transition-[color,opacity] duration-300 ease-out hover:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current/30"
-              >
-                <UserRound className="size-[18px] stroke-[1.7]" />
-              </Link>
-              <button
-                type="button"
-                aria-label="Wishlist"
-                onClick={() => setIsSidebarOpen(true)}
-                className={cn(
-                  "relative inline-flex size-9 cursor-pointer items-center justify-center text-current transition-[color,opacity] duration-300 ease-out hover:opacity-60 focus-visible:outline-none focus-visible:ring-2",
-                  tone === "light"
-                    ? "focus-visible:ring-white/30"
-                    : "focus-visible:ring-black/25"
-                )}
-              >
+              <span className="relative inline-flex items-center justify-center">
                 <Heart className="size-[18px] stroke-[1.7]" />
                 {wishlist.length > 0 && isLoaded && (
-                  <span className="absolute right-[2px] top-[2px] flex min-h-[14px] min-w-[14px] items-center justify-center rounded-full bg-black px-[4px] text-[9px] font-bold text-white ring-1 ring-white">
+                  <span
+                    className={cn(
+                      "absolute -right-1.5 -top-1 flex min-h-[14px] min-w-[14px] items-center justify-center rounded-full px-[3px] text-[9px] font-bold leading-none ring-1",
+                      tone === "light"
+                        ? "bg-white text-black ring-black/20"
+                        : "bg-black text-white ring-white"
+                    )}
+                  >
                     {wishlist.length}
                   </span>
                 )}
-              </button>
-              <IconButton
-                label="Cart"
-                tone={tone}
-                onClick={() => setCartOpen(true)}
-              >
-                <ShoppingBag className="size-[18px] stroke-[1.7]" />
-              </IconButton>
-            </div>
-          </div>
+              </span>
+            </button>
 
-          <nav
-            aria-label="Primary"
-            className={cn(
-              "flex items-center gap-6 overflow-x-auto pb-1 text-[0.75rem] uppercase tracking-[0.18em] text-current transition-[color,opacity] duration-300 ease-out [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            )}
-          >
-            {primaryNav.map((item) => (
-              <NavLink
-                key={item.key}
-                href={item.href}
-                active={selectedNav === item.key}
-                selected={selectedNav === item.key}
-                mobile
-                onClick={() => setSelectedNav(item.key)}
-              >
-                {item.label}
-              </NavLink>
-            ))}
-          </nav>
+            <IconButton
+              label="Cart"
+              tone={tone}
+              onClick={() => setIsCartOpen(true)}
+            >
+              <span className="relative inline-flex items-center justify-center">
+                <ShoppingBag className="size-[18px] stroke-[1.7]" />
+                {totalItems > 0 && isLoaded && (
+                  <span
+                    className={cn(
+                      "absolute -right-1.5 -top-1 flex min-h-[14px] min-w-[14px] items-center justify-center rounded-full px-[3px] text-[9px] font-bold leading-none ring-1",
+                      tone === "light"
+                        ? "bg-white text-black ring-black/20"
+                        : "bg-black text-white ring-white"
+                    )}
+                  >
+                    {totalItems}
+                  </span>
+                )}
+              </span>
+            </IconButton>
+          </div>
         </div>
 
         <AnimatePresence>
@@ -756,8 +800,161 @@ export function Navbar({
       </div>
 
       <SearchSidebar open={searchOpen} onOpenChange={setSearchOpen} />
-      <CartSidebar open={cartOpen} onOpenChange={setCartOpen} />
+      <CartSidebar open={isCartOpen} onOpenChange={setIsCartOpen} />
       <WishlistSidebar />
+
+      {/* Mobile Navigation Drawer */}
+      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+        <SheetContent
+          side="left"
+          showCloseButton={false}
+          overlayClassName="!z-[10000] bg-black/60 backdrop-blur-[2px]"
+          className="!z-[10001] flex flex-col justify-between border-r border-white/10 bg-black p-0 text-white shadow-2xl"
+          style={{ width: "min(100vw, 340px)", maxWidth: "none" }}
+        >
+          <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+          <SheetDescription className="sr-only">
+            Explore products, collections, and account.
+          </SheetDescription>
+
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+            <Link
+              href="/"
+              onClick={() => setMobileMenuOpen(false)}
+              className="transition-opacity hover:opacity-70"
+            >
+              <Image
+                src="/logo.svg"
+                alt="SUOS"
+                width={140}
+                height={65}
+                className="h-auto w-[5.5rem] invert"
+              />
+            </Link>
+            <SheetClose asChild>
+              <button
+                type="button"
+                aria-label="Close menu"
+                className="inline-flex size-9 cursor-pointer items-center justify-center text-white/80 transition-colors hover:text-white"
+              >
+                <X className="size-5 stroke-[2]" />
+              </button>
+            </SheetClose>
+          </div>
+
+          {/* Navigation Links */}
+          <div className="flex-1 overflow-y-auto px-6 py-6">
+            <div className="flex flex-col gap-6">
+              <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-white/40">
+                Menu
+              </p>
+              <nav className="flex flex-col gap-2">
+                {primaryNav.map((item) => (
+                  <Link
+                    key={item.key}
+                    href={item.href}
+                    onClick={() => {
+                      setSelectedNav(item.key)
+                      setMobileMenuOpen(false)
+                    }}
+                    className={cn(
+                      "flex items-center justify-between py-2.5 text-[17px] font-normal uppercase tracking-[0.08em] transition-colors hover:text-white/70",
+                      selectedNav === item.key ? "text-white font-semibold" : "text-white/80"
+                    )}
+                  >
+                    <span>{item.label}</span>
+                    <ChevronRight className="size-4 stroke-[1.5] text-white/40" />
+                  </Link>
+                ))}
+
+                <Link
+                  href="/collections"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between py-2.5 text-[17px] font-normal uppercase tracking-[0.08em] text-white/80 transition-colors hover:text-white/70"
+                >
+                  <span>All Collections</span>
+                  <ChevronRight className="size-4 stroke-[1.5] text-white/40" />
+                </Link>
+              </nav>
+
+              <div className="my-1 h-px w-full bg-white/10" />
+
+              <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-white/40">
+                Account & Utilities
+              </p>
+
+              <div className="flex flex-col gap-2 text-[14px] uppercase tracking-[0.1em] text-white/75">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false)
+                    setSearchOpen(true)
+                  }}
+                  className="flex items-center gap-3 py-2 text-left transition-colors hover:text-white cursor-pointer"
+                >
+                  <Search className="size-4 stroke-[1.8]" />
+                  <span>Search Products</span>
+                </button>
+
+                <Link
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-3 py-2 transition-colors hover:text-white"
+                >
+                  <UserRound className="size-4 stroke-[1.8]" />
+                  <span>My Account</span>
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false)
+                    setIsSidebarOpen(true)
+                  }}
+                  className="flex items-center justify-between py-2 text-left transition-colors hover:text-white cursor-pointer"
+                >
+                  <div className="flex items-center gap-3">
+                    <Heart className="size-4 stroke-[1.8]" />
+                    <span>Wishlist</span>
+                  </div>
+                  {wishlist.length > 0 && (
+                    <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-semibold text-white">
+                      {wishlist.length}
+                    </span>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false)
+                    setIsCartOpen(true)
+                  }}
+                  className="flex items-center justify-between py-2 text-left transition-colors hover:text-white cursor-pointer"
+                >
+                  <div className="flex items-center gap-3">
+                    <ShoppingBag className="size-4 stroke-[1.8]" />
+                    <span>Bag / Cart</span>
+                  </div>
+                  {totalItems > 0 && (
+                    <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-semibold text-white">
+                      {totalItems}
+                    </span>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer in Drawer */}
+          <div className="border-t border-white/10 p-5">
+            <p className="text-[11px] uppercase tracking-wider text-white/40">
+              SUOS ORIGINALS — FREE SHIPPING OVER ₹2,900
+            </p>
+          </div>
+        </SheetContent>
+      </Sheet>
     </header>
   )
 

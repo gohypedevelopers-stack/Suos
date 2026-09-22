@@ -3,11 +3,12 @@
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ChevronLeft, ChevronRight, Heart } from "lucide-react"
+import { ChevronLeft, ChevronRight, Heart, Plus, Minus, ShoppingBag, Bookmark } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { ProductQuickViewModal } from "@/components/product/ProductQuickViewModal"
 import { useWishlist } from "@/lib/wishlist-context"
+import { useCart } from "@/lib/cart-context"
 import type { ProductDetail } from "@/components/product/productData"
 
 export type ProductCard = {
@@ -129,11 +130,14 @@ export function ProductCardView({
 }) {
   const gallery = product.gallery?.length ? product.gallery : [product.image]
   const [activeImageIndex, setActiveImageIndex] = useState(0)
+  const [isExpanded, setIsExpanded] = useState(expanded)
+  const [selectedSize, setSelectedSize] = useState<string | null>(null)
   const [quickViewOpen, setQuickViewOpen] = useState(false)
+  
   const { isInWishlist, toggleWishlist, setIsSidebarOpen } = useWishlist()
+  const { addToCart, setIsCartOpen } = useCart()
   
   const isWished = isInWishlist(product.id)
-
   const activeImage = gallery[activeImageIndex] ?? product.image
   const hasGalleryControls = gallery.length > 1
 
@@ -147,14 +151,78 @@ export function ProductCardView({
     setActiveImageIndex((currentIndex) => (currentIndex + 1) % gallery.length)
   }
 
+  const toggleExpand = (event: React.MouseEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
+    setIsExpanded((prev) => !prev)
+  }
+
+  const handleSelectSize = (size: string, event: React.MouseEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
+    setSelectedSize(size)
+    addToCart(product, size)
+    setIsCartOpen(true)
+  }
+
+  const handleQuickView = (event: React.MouseEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
+    setQuickViewOpen(true)
+  }
+
+  const handleTitleIconClick = (event: React.MouseEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
+    if (isExpanded) {
+      setIsCartOpen(true)
+    } else {
+      toggleWishlist(product)
+      if (!isWished) {
+        setIsSidebarOpen(true)
+      }
+    }
+  }
+
+  // Price calculations
+  const displayPrice = product.price && product.price !== "N/A" ? product.price : "₹2,200"
+  const numPrice = parseInt(displayPrice.replace(/[^\d]/g, "") || "2200", 10)
+  
+  // Calculate compare price if not provided
+  const comparePriceStr = product.compareAtPrice
+    ? product.compareAtPrice
+    : `₹${(Math.round((numPrice * 1.35) / 100) * 100).toLocaleString("en-IN")}`
+  const numCompare = parseInt(comparePriceStr.replace(/[^\d]/g, "") || "3200", 10)
+  
+  const discountPercent =
+    numCompare > numPrice
+      ? Math.round(((numCompare - numPrice) / numCompare) * 100)
+      : 10
+
+  const subtitle = product.category?.name
+    ? `ORIGINALS 001 - ${product.category.name.toUpperCase()}`
+    : "ORIGINALS 001 - AFTER DARK"
+
+  const sizesList =
+    product.sizes && product.sizes.length > 0
+      ? product.sizes
+      : ["6", "8", "10", "14", "18", "20"]
+
   return (
-    <article className="group relative overflow-hidden bg-black shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
-      <div className="relative aspect-[330/479]">
+    <article
+      className={cn(
+        "group relative flex flex-col bg-white text-black transition-all duration-200",
+        isExpanded
+          ? "border-2 border-black p-2 sm:p-2.5"
+          : "border-2 border-transparent p-2 sm:p-2.5"
+      )}
+    >
+      <div className="relative aspect-[330/440] w-full overflow-hidden bg-neutral-100">
         {activeImage ? (
           <Image
             key={`${product.id}-${activeImageIndex}`}
             src={activeImage}
-            alt={product.alt}
+            alt={product.alt || product.title}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.015]"
@@ -165,127 +233,187 @@ export function ProductCardView({
           </div>
         )}
 
+        {/* Link to product detail page */}
         <Link
           href={`/products/${product.slug}`}
-          aria-label={`View ${product.alt}`}
-          className="absolute inset-0 z-30 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-white"
+          aria-label={`View ${product.title}`}
+          className="absolute inset-0 z-10 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-white"
         />
 
-        {product.badge ? (
-          <span className="pointer-events-none absolute left-3 top-3 z-40 bg-black px-2.5 py-1 text-[13px] font-light uppercase leading-none tracking-normal text-white">
-            {product.badge}
+        {/* Badge at Top-Left */}
+        <div className="pointer-events-none absolute left-2.5 top-2.5 z-20">
+          <span className="inline-block bg-black px-2 py-1 text-[10px] font-medium uppercase tracking-widest text-white leading-none">
+            {product.badge || "NEW ARRIVAL"}
           </span>
-        ) : null}
+        </div>
 
+        {/* Expand / Collapse Button (+ / -) in Bottom-Right Corner of Image */}
         <button
           type="button"
-          aria-label={`Toggle wishlist for ${product.alt}`}
-          onClick={(event) => {
-            event.preventDefault()
-            event.stopPropagation()
-            toggleWishlist(product)
-            if (!isWished) {
-              setIsSidebarOpen(true)
-            }
-          }}
-          className={cn(
-            "absolute right-3 top-3 z-40 inline-flex size-8 translate-y-0 cursor-pointer items-center justify-center text-black opacity-100 transition-transform duration-200 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
-          )}
+          aria-label={isExpanded ? "Collapse details" : "Expand size options"}
+          onClick={toggleExpand}
+          className="pointer-events-auto absolute bottom-0 right-0 z-20 flex size-8 sm:size-9 items-center justify-center bg-white text-black shadow-sm transition-colors hover:bg-neutral-100 cursor-pointer"
         >
-          <Heart 
-            className={cn("size-5", isWished ? "fill-white stroke-white" : "stroke-white")} 
-            strokeWidth={isWished ? 2.5 : 1.7} 
-          />
+          {isExpanded ? (
+            <Minus className="size-4 stroke-[2.2]" />
+          ) : (
+            <Plus className="size-4 stroke-[2.2]" />
+          )}
         </button>
 
-        {hasGalleryControls ? (
-          <div className="pointer-events-none absolute inset-x-3 top-1/2 z-40 flex -translate-y-1/2 items-center justify-between opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100">
-              <button
-                type="button"
-                aria-label="Previous product image"
-                onClick={(event) => {
-                  event.stopPropagation()
-                  handlePreviousImage()
-                }}
-                className="pointer-events-auto inline-flex size-9 items-center justify-center rounded-none text-white/90 transition-colors duration-200 hover:bg-white/15 hover:text-white"
-              >
-                <ChevronLeft className="size-5" strokeWidth={2.25} />
-              </button>
+        {/* Expanded Mode: QUICK VIEW & Gallery Indicators in Center Bottom */}
+        {isExpanded && (
+          <div className="pointer-events-none absolute inset-x-0 bottom-2.5 z-20 flex flex-col items-center justify-center gap-1.5">
+            <button
+              type="button"
+              onClick={handleQuickView}
+              className="pointer-events-auto bg-black px-4 py-1.5 text-[10px] sm:text-[11px] font-medium uppercase tracking-widest text-white shadow hover:bg-neutral-800 transition-opacity cursor-pointer"
+            >
+              QUICK VIEW
+            </button>
 
-              <button
-                type="button"
-                aria-label="Next product image"
-                onClick={(event) => {
-                  event.stopPropagation()
-                  handleNextImage()
-                }}
-                className="pointer-events-auto inline-flex size-9 items-center justify-center rounded-none text-white/90 transition-colors duration-200 hover:bg-white/15 hover:text-white"
-              >
-                <ChevronRight className="size-5" strokeWidth={2.25} />
-              </button>
-          </div>
-        ) : null}
-
-        <div
-          className={cn(
-            "pointer-events-none absolute inset-x-3 bottom-3 z-40 overflow-hidden bg-white text-black shadow-[0_8px_18px_rgba(0,0,0,0.12)] transition-[height,padding] duration-300 ease-out",
-            expanded ? "h-[140px]" : "h-[56px] group-hover:h-[140px]"
-          )}
-        >
-          {!expanded ? (
-            <div className="flex h-full items-start justify-between gap-2.5 p-3 transition-opacity duration-200 group-hover:opacity-0">
-              <div className="min-w-0">
-                <p className="text-[13px] font-normal uppercase leading-tight tracking-normal">
-                  {product.title}
-                </p>
-                <p className="mt-0.5 text-[13px] uppercase leading-tight tracking-normal">
-                  {product.price}
-                </p>
+            {gallery.length > 1 && (
+              <div className="pointer-events-auto flex items-center justify-center gap-1">
+                {gallery.map((_, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      setActiveImageIndex(idx)
+                    }}
+                    className={cn(
+                      "h-[2px] transition-all cursor-pointer",
+                      idx === activeImageIndex
+                        ? "w-5 bg-black"
+                        : "w-3 bg-black/30 hover:bg-black/60"
+                    )}
+                    aria-label={`Slide ${idx + 1}`}
+                  />
+                ))}
               </div>
-
-              <ColorSwatches swatches={product.swatches} />
-            </div>
-          ) : null}
-
-          <div
-            className={cn(
-              "absolute inset-0 flex flex-col gap-2.5 p-3 opacity-0 transition-all duration-300 ease-out",
-              expanded
-                ? "translate-y-0 opacity-100"
-                : "group-hover:translate-y-0 group-hover:opacity-100"
             )}
+          </div>
+        )}
+
+        {/* Gallery Prev / Next Arrows on Hover */}
+        {hasGalleryControls && (
+          <div className="pointer-events-none absolute inset-x-2 top-1/2 z-20 flex -translate-y-1/2 items-center justify-between opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+            <button
+              type="button"
+              aria-label="Previous product image"
+              onClick={(event) => {
+                event.preventDefault()
+                event.stopPropagation()
+                handlePreviousImage()
+              }}
+              className="pointer-events-auto flex size-7 items-center justify-center bg-white/80 text-black shadow transition-colors hover:bg-white cursor-pointer"
+            >
+              <ChevronLeft className="size-4" strokeWidth={2.2} />
+            </button>
+
+            <button
+              type="button"
+              aria-label="Next product image"
+              onClick={(event) => {
+                event.preventDefault()
+                event.stopPropagation()
+                handleNextImage()
+              }}
+              className="pointer-events-auto flex size-7 items-center justify-center bg-white/80 text-black shadow transition-colors hover:bg-white cursor-pointer"
+            >
+              <ChevronRight className="size-4" strokeWidth={2.2} />
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Info Area Below Image */}
+      <div className="mt-2.5 flex flex-col">
+        {/* Title row with icon */}
+        <div className="flex items-center justify-between gap-2">
+          <Link
+            href={`/products/${product.slug}`}
+            className="truncate text-[13px] sm:text-[14px] font-normal uppercase tracking-tight text-black transition-opacity hover:opacity-70"
           >
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-[13px] font-normal uppercase leading-tight tracking-normal">
-                  {product.title}
-                </p>
-                <p className="mt-0.5 text-[13px] uppercase leading-tight tracking-normal">
-                  {product.price}
-                </p>
-              </div>
+            {product.title || "WASHED BLACK STRAIGHT FIT DENIM"}
+          </Link>
 
-              <ColorSwatches swatches={product.swatches} />
-            </div>
+          <button
+            type="button"
+            onClick={handleTitleIconClick}
+            aria-label={isExpanded ? "View Cart" : "Toggle wishlist"}
+            className="flex-shrink-0 cursor-pointer p-0.5 text-black transition-transform hover:scale-110"
+          >
+            {isExpanded ? (
+              <ShoppingBag className="size-4 stroke-[1.8]" />
+            ) : (
+              <Bookmark
+                className={cn(
+                  "size-4",
+                  isWished ? "fill-black stroke-black" : "stroke-black"
+                )}
+                strokeWidth={1.8}
+              />
+            )}
+          </button>
+        </div>
 
-            <div className="flex flex-col gap-2.5">
-              <div className="flex items-center gap-3">
-                <div className="flex flex-wrap items-start gap-1.5 text-[13px] font-normal uppercase leading-tight tracking-normal text-black/75">
-                  {(product.sizes || []).slice(0, 4).map((size) => (
-                    <SizeMarker key={size} size={size} />
-                  ))}
-                </div>
-              </div>
+        {/* Subtitle row */}
+        <p className="mt-0.5 truncate text-[11px] sm:text-[12px] uppercase tracking-wider text-neutral-500 font-normal">
+          {subtitle}
+        </p>
 
-              <button
-                type="button"
-                className="pointer-events-auto flex h-10 w-full cursor-pointer items-center justify-center border border-black bg-white text-[13px] uppercase tracking-normal transition-colors hover:bg-black hover:text-white"
-              >
-                Add To Cart
-              </button>
+        {/* Pricing row */}
+        <div className="mt-1 flex items-baseline gap-1.5 sm:gap-2 flex-wrap text-[12px] sm:text-[14px]">
+          {isExpanded ? (
+            <>
+              <span className="font-normal text-neutral-400 line-through text-[11px] sm:text-[13px]">
+                {comparePriceStr}
+              </span>
+              <span className="font-semibold text-black">
+                {displayPrice}
+              </span>
+              {discountPercent && discountPercent > 0 ? (
+                <span className="text-[10px] sm:text-[11px] font-medium uppercase tracking-wide text-red-600">
+                  SAVE {discountPercent}%
+                </span>
+              ) : null}
+            </>
+          ) : (
+            <span className="font-semibold text-black">
+              {displayPrice}
+            </span>
+          )}
+        </div>
+
+        {/* Size Selection Row (Displayed when Expanded) */}
+        {isExpanded && (
+          <div className="mt-2 sm:mt-2.5 flex flex-col gap-1">
+            <div className="flex flex-wrap items-center gap-1 sm:gap-1.5">
+              {sizesList.map((size) => {
+                const isSelected = selectedSize === size
+                return (
+                  <button
+                    key={size}
+                    type="button"
+                    onClick={(e) => handleSelectSize(size, e)}
+                    className={cn(
+                      "flex min-w-[24px] sm:min-w-[28px] h-6 sm:h-7 px-1 sm:px-1.5 items-center justify-center text-[10px] sm:text-[12px] font-medium uppercase border transition-all cursor-pointer",
+                      isSelected
+                        ? "border-black ring-1 ring-black bg-white text-black font-semibold"
+                        : "border-neutral-300 bg-white text-neutral-800 hover:border-black"
+                    )}
+                    title={`Select size ${size} and add to cart`}
+                  >
+                    {size}
+                  </button>
+                )
+              })}
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       <ProductQuickViewModal
@@ -302,20 +430,20 @@ export function ProductCardView({
 
 export function TrendingSection({ products = [] }: { products?: ProductCard[] }) {
   return (
-    <section className="w-full bg-white px-4 py-14 text-black sm:px-6 lg:px-8 md:py-16">
-      <div className="flex w-full flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-        <h2 className="font-heading text-[24px] font-normal uppercase leading-none tracking-[-0.04em]">
+    <section className="w-full bg-white px-3 sm:px-6 lg:px-8 py-10 md:py-16 text-black">
+      <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <h2 className="font-heading text-[22px] sm:text-[24px] font-normal uppercase leading-none tracking-[-0.04em]">
           Trending
         </h2>
 
-        <div className="flex items-center gap-6 sm:gap-8">
+        <div className="flex items-center gap-5 sm:gap-8">
           {tabs.map((tab) => (
             <button
               key={tab.label}
               type="button"
               aria-pressed={tab.active}
               className={cn(
-                "group inline-flex flex-col items-start pb-0.5 text-[13px] font-normal uppercase leading-none tracking-normal transition-opacity hover:opacity-70"
+                "group inline-flex flex-col items-start pb-0.5 text-[12px] sm:text-[13px] font-normal uppercase leading-none tracking-normal transition-opacity hover:opacity-70"
               )}
             >
               <span>{tab.label}</span>
@@ -329,7 +457,7 @@ export function TrendingSection({ products = [] }: { products?: ProductCard[] })
 
       </div>
 
-      <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-6 sm:mt-8 grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
         {products.map((product) => (
           <ProductCardView key={product.id} product={product} />
         ))}

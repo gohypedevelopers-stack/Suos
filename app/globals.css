@@ -70,8 +70,8 @@
   --brand-blue: #0c5a85;
 
   /* Header stack */
-  --announcement-height: 50px;
-  --main-navbar-height: 98px;
+  --announcement-height: 34px;
+  --main-navbar-height: 56px;
   --header-stack-height: calc(var(--announcement-height) + var(--main-navbar-height));
 
   /* Base */
@@ -416,4 +416,16 @@
   color: #000000;
   border-color: rgba(0, 0, 0, 0.08);
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --announcement-height: 50px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --main-navbar-height: 98px;
+  }
 }

@@ -49,8 +49,21 @@ export function Hero() {
 
   return (
     <section className="relative -mt-[var(--header-stack-height)] w-full bg-black text-white">
-      {/* Static Single Banner Image with exact aspect ratio - 100% uncropped on all devices */}
-      <div className="relative w-full aspect-[1672/941]">
+      {/* Mobile Portrait Hero Banner (< sm) */}
+      <div className="relative block sm:hidden w-full h-[72svh] min-h-[460px] max-h-[620px]">
+        <Image
+          src="/home-page-content/hero-mobile.jpg"
+          alt="Hero Banner"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center w-full h-full"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/55" />
+      </div>
+
+      {/* Desktop Widescreen Hero Banner (>= sm) */}
+      <div className="relative hidden sm:block w-full aspect-[1672/941]">
         <Image
           src="/home-page-content/hero-1.png"
           alt="Hero Banner"
@@ -60,16 +73,16 @@ export function Hero() {
           className="object-contain w-full h-full"
         />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/20" />
+      </div>
 
-        {/* Center CTA Button placed near bottom of banner */}
-        <div className="absolute inset-x-0 bottom-6 sm:bottom-10 lg:bottom-14 z-10 flex items-center justify-center px-5 sm:px-6">
-          <Link
-            href="/collections"
-            className="inline-flex cursor-pointer items-center justify-center border border-white/85 bg-black/20 backdrop-blur-xs px-6 py-3 text-[13px] font-normal uppercase tracking-normal transition-colors hover:bg-white/10 shadow-sm"
-          >
-            Explore Collection
-          </Link>
-        </div>
+      {/* Center CTA Button */}
+      <div className="absolute inset-x-0 bottom-6 sm:bottom-10 lg:bottom-14 z-10 flex items-center justify-center px-4 sm:px-6">
+        <Link
+          href="/collections"
+          className="inline-flex cursor-pointer items-center justify-center border border-white/85 bg-black/25 backdrop-blur-sm px-5 py-2.5 sm:px-6 sm:py-3 text-[11px] sm:text-[13px] font-normal uppercase tracking-[0.12em] sm:tracking-normal transition-colors hover:bg-white/10 shadow-sm"
+        >
+          Explore Collection
+        </Link>
       </div>
 
       {/* 

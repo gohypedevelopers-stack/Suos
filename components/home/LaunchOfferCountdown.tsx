@@ -60,7 +60,7 @@ export function LaunchOfferCountdown({
     <div
       aria-label={countdownLabel}
       aria-live="off"
-      className="flex shrink-0 items-center gap-1 sm:gap-2 md:gap-3"
+      className="flex shrink-0 items-center gap-0.5 sm:gap-2 md:gap-3"
     >
       {[
         { label: "Days", value: countdown.days },
@@ -72,16 +72,16 @@ export function LaunchOfferCountdown({
           {index > 0 ? (
             <span
               aria-hidden="true"
-              className="mr-1 text-[0.625rem] leading-none text-white/70 sm:mr-2 sm:text-[0.8125rem] md:mr-3 md:text-[1rem]"
+              className="mr-0.5 text-[0.625rem] leading-none text-white/70 sm:mr-2 sm:text-[0.8125rem] md:mr-3 md:text-[1rem]"
             >
               :
             </span>
           ) : null}
-          <div className="flex min-w-[2.25rem] flex-col items-center text-center sm:min-w-[2.75rem] md:min-w-[3.5rem]">
+          <div className="flex min-w-[1.85rem] flex-col items-center text-center sm:min-w-[2.75rem] md:min-w-[3.5rem]">
             <span className="text-[0.5625rem] font-normal leading-none sm:text-[0.6875rem] md:text-[0.875rem]">
               {formatValue(item.value)}
             </span>
-            <span className="mt-0.5 text-[0.375rem] font-normal uppercase tracking-[0.12em] text-white/70 sm:text-[0.5rem] md:text-[0.625rem]">
+            <span className="mt-0.5 text-[0.35rem] font-normal uppercase tracking-[0.1em] text-white/70 sm:text-[0.5rem] md:text-[0.625rem]">
               {item.label}
             </span>
           </div>
