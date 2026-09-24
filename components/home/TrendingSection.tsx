@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ChevronLeft, ChevronRight, Heart, Plus, Minus, ShoppingBag, Bookmark } from "lucide-react"
+import { ChevronLeft, ChevronRight, ShoppingBag, Bookmark } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { ProductQuickViewModal } from "@/components/product/ProductQuickViewModal"
@@ -85,42 +85,6 @@ const tabs = [
   { label: "MEN", active: true },
 ] as const
 
-const hoverSizes = ["28", "32", "36", "42"]
-
-function ColorSwatches({ swatches }: { swatches: string[] }) {
-  return (
-    <div className="flex items-start gap-1">
-      {swatches.map((swatch) => (
-        <span
-          key={swatch}
-          className="group/swatch relative inline-flex cursor-pointer flex-col items-center pb-0.5 pointer-events-auto"
-        >
-          <span
-            className="size-[15px] border border-black/10"
-            style={{ backgroundColor: swatch }}
-          />
-          <span
-            aria-hidden="true"
-            className="mt-[3px] h-px w-full origin-left scale-x-0 bg-black/55 transition-transform duration-200 group-hover/swatch:scale-x-100"
-          />
-        </span>
-      ))}
-    </div>
-  )
-}
-
-function SizeMarker({ size }: { size: string }) {
-  return (
-    <span className="group/size relative inline-flex cursor-pointer flex-col items-center pb-0.5 pointer-events-auto">
-      <span className="flex h-[15px] items-center justify-center leading-none">{size}</span>
-      <span
-        aria-hidden="true"
-        className="mt-[1px] h-px w-full origin-left scale-x-0 bg-current transition-transform duration-200 group-hover/size:scale-x-100"
-      />
-    </span>
-  )
-}
-
 export function ProductCardView({
   product,
   expanded = false,
@@ -171,17 +135,19 @@ export function ProductCardView({
     setQuickViewOpen(true)
   }
 
-  const handleTitleIconClick = (event: React.MouseEvent) => {
+  const handleWishlistClick = (event: React.MouseEvent) => {
     event.preventDefault()
     event.stopPropagation()
-    if (isExpanded) {
-      setIsCartOpen(true)
-    } else {
-      toggleWishlist(product)
-      if (!isWished) {
-        setIsSidebarOpen(true)
-      }
+    toggleWishlist(product)
+    if (!isWished) {
+      setIsSidebarOpen(true)
     }
+  }
+
+  const handleCartClick = (event: React.MouseEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
+    setIsCartOpen(true)
   }
 
   // Price calculations
@@ -249,29 +215,56 @@ export function ProductCardView({
           onClick={toggleExpand}
           className="pointer-events-auto absolute bottom-0 right-0 z-20 flex size-8 sm:size-9 items-center justify-center bg-white text-black shadow-sm transition-colors hover:bg-neutral-100 cursor-pointer"
         >
-          {isExpanded ? (
-            <Minus className="size-4 stroke-[2.2]" />
-          ) : (
-            <Plus className="size-4 stroke-[2.2]" />
-          )}
+          <div className="relative size-4 flex items-center justify-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className={cn(
+                "size-4 transition-transform duration-300 ease-out",
+                isExpanded ? "rotate-180" : "rotate-0 md:group-hover:rotate-180"
+              )}
+            >
+              {/* Horizontal line (stays in place as the minus bar) */}
+              <line x1="5" y1="12" x2="19" y2="12" />
+              {/* Vertical line (rotates and collapses height to morph + into -) */}
+              <line
+                x1="12"
+                y1="5"
+                x2="12"
+                y2="19"
+                className={cn(
+                  "origin-center transition-all duration-300 ease-out",
+                  isExpanded
+                    ? "scale-y-0 opacity-0 rotate-90"
+                    : "scale-y-100 opacity-100 rotate-0 md:group-hover:scale-y-0 md:group-hover:opacity-0 md:group-hover:rotate-90"
+                )}
+              />
+            </svg>
+          </div>
         </button>
 
-        {/* Expanded Mode: QUICK VIEW & Gallery Indicators in Center Bottom */}
+        {/* Expanded Mode & Laptop/Desktop Hover Mode: QUICK VIEW & Gallery Indicators in Center Bottom */}
         <div
           className={cn(
-            "pointer-events-none absolute inset-x-0 bottom-10 sm:bottom-11 z-20 flex flex-col items-center justify-center gap-1.5 px-2 transition-[opacity,transform] duration-200 ease-out",
+            "pointer-events-none absolute inset-x-0 bottom-10 sm:bottom-11 z-20 flex flex-col items-center justify-center gap-1.5 px-2 transition-[opacity,transform] duration-300 ease-out",
             isExpanded
               ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-1.5 pointer-events-none"
+              : "opacity-0 translate-y-2 pointer-events-none md:group-hover:opacity-100 md:group-hover:translate-y-0 md:group-hover:pointer-events-auto"
           )}
         >
           <button
             type="button"
             onClick={handleQuickView}
-            tabIndex={isExpanded ? 0 : -1}
             className={cn(
               "bg-black px-3.5 sm:px-4 py-1.5 text-[10px] sm:text-[11px] font-medium uppercase tracking-widest text-white shadow-md hover:bg-neutral-800 transition-colors cursor-pointer whitespace-nowrap",
-              isExpanded ? "pointer-events-auto" : "pointer-events-none"
+              isExpanded
+                ? "pointer-events-auto"
+                : "pointer-events-none md:group-hover:pointer-events-auto"
             )}
           >
             QUICK VIEW
@@ -281,14 +274,15 @@ export function ProductCardView({
             <div
               className={cn(
                 "flex items-center justify-center gap-1 transition-opacity duration-200",
-                isExpanded ? "pointer-events-auto" : "pointer-events-none"
+                isExpanded
+                  ? "pointer-events-auto"
+                  : "pointer-events-none md:group-hover:pointer-events-auto"
               )}
             >
               {gallery.map((_, idx) => (
                 <button
                   key={idx}
                   type="button"
-                  tabIndex={isExpanded ? 0 : -1}
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
@@ -350,15 +344,19 @@ export function ProductCardView({
             {product.title || "WASHED BLACK STRAIGHT FIT DENIM"}
           </Link>
 
-          <button
-            type="button"
-            onClick={handleTitleIconClick}
-            aria-label={isExpanded ? "View Cart" : "Toggle wishlist"}
-            className="flex-shrink-0 cursor-pointer p-0.5 text-black transition-transform hover:scale-110"
-          >
-            {isExpanded ? (
-              <ShoppingBag className="size-4 stroke-[1.8]" />
-            ) : (
+          <div className="relative flex-shrink-0 size-5 flex items-center justify-center">
+            {/* Wishlist Button */}
+            <button
+              type="button"
+              onClick={handleWishlistClick}
+              aria-label="Toggle wishlist"
+              className={cn(
+                "cursor-pointer p-0.5 text-black transition-all duration-200 hover:scale-110",
+                isExpanded
+                  ? "opacity-0 pointer-events-none scale-75"
+                  : "opacity-100 scale-100 md:group-hover:opacity-0 md:group-hover:pointer-events-none md:group-hover:scale-75"
+              )}
+            >
               <Bookmark
                 className={cn(
                   "size-4",
@@ -366,8 +364,23 @@ export function ProductCardView({
                 )}
                 strokeWidth={1.8}
               />
-            )}
-          </button>
+            </button>
+
+            {/* Shopping Bag Button (shown on hover on desktop/laptop or when expanded) */}
+            <button
+              type="button"
+              onClick={handleCartClick}
+              aria-label="View Cart"
+              className={cn(
+                "absolute inset-0 m-auto cursor-pointer p-0.5 text-black transition-all duration-200 hover:scale-110",
+                isExpanded
+                  ? "opacity-100 scale-100 pointer-events-auto"
+                  : "opacity-0 pointer-events-none scale-75 md:group-hover:opacity-100 md:group-hover:pointer-events-auto md:group-hover:scale-100"
+              )}
+            >
+              <ShoppingBag className="size-4 stroke-[1.8]" />
+            </button>
+          </div>
         </div>
 
         {/* Subtitle row */}
@@ -390,11 +403,13 @@ export function ProductCardView({
           ) : null}
         </div>
 
-        {/* Size Selection Row (Smooth, jitter-free accordion animation) */}
+        {/* Size Selection Row (Smooth accordion animation on expand or hover) */}
         <div
           className={cn(
-            "grid transition-[grid-template-rows,opacity] duration-200 ease-out",
-            isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+            "grid transition-[grid-template-rows,opacity] duration-300 ease-out",
+            isExpanded
+              ? "grid-rows-[1fr] opacity-100"
+              : "grid-rows-[0fr] opacity-0 md:group-hover:grid-rows-[1fr] md:group-hover:opacity-100"
           )}
         >
           <div className="overflow-hidden">
@@ -405,7 +420,6 @@ export function ProductCardView({
                   <button
                     key={size}
                     type="button"
-                    tabIndex={isExpanded ? 0 : -1}
                     onClick={(e) => handleSelectSize(size, e)}
                     className={cn(
                       "flex min-w-[24px] sm:min-w-[28px] h-6 sm:h-7 px-1 sm:px-1.5 items-center justify-center text-[10px] sm:text-[12px] font-medium uppercase transition-colors cursor-pointer",
@@ -465,7 +479,7 @@ export function TrendingSection({ products = [] }: { products?: ProductCard[] })
 
       </div>
 
-      <div className="mt-6 sm:mt-8 grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-6 sm:mt-8 grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-2 lg:grid-cols-4">
         {products.map((product) => (
           <ProductCardView key={product.id} product={product} />
         ))}

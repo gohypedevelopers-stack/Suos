@@ -23,10 +23,11 @@ function createPrismaClient() {
 }
 
 export function getPrisma() {
-  prisma ??= createPrismaClient()
-
-  if (process.env.NODE_ENV !== "production") {
-    globalForPrisma.prisma = prisma
+  if (!prisma || !("banner" in prisma)) {
+    prisma = createPrismaClient()
+    if (process.env.NODE_ENV !== "production") {
+      globalForPrisma.prisma = prisma
+    }
   }
 
   return prisma

@@ -28,7 +28,7 @@ export async function YouMayAlsoLikeSection() {
           </Link>
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-6 grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-2 lg:grid-cols-4">
           {products.slice(0, 4).map((product) => (
             <ProductCardView key={product.id} product={product} />
           ))}

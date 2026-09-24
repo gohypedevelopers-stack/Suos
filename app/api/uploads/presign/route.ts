@@ -24,7 +24,9 @@ function createLocalUploadResponse(input: ImageUploadRequest) {
     ? "categories"
     : input.scope === "collection"
       ? "collections"
-      : "products"
+      : input.scope === "banner"
+        ? "banners"
+        : "products"
   const objectKey = `uploads/${folder}/${new Date().getUTCFullYear()}/${randomUUID()}.${extension}`
   const uploadUrl = new URL("/api/uploads/local", "http://localhost")
   uploadUrl.searchParams.set("objectKey", objectKey)
@@ -60,7 +62,10 @@ export async function POST(request: Request) {
 
   if (!input.success) {
     return Response.json(
-      { error: "Invalid upload request" },
+      {
+        error: input.error.issues[0]?.message || "Invalid upload request",
+        details: input.error.flatten(),
+      },
       { status: 400 },
     )
   }
@@ -86,7 +91,9 @@ export async function POST(request: Request) {
     ? "categories"
     : input.data.scope === "collection"
       ? "collections"
-      : "products"
+      : input.data.scope === "banner"
+        ? "banners"
+        : "products"
   const objectKey = `${folder}/${new Date().getUTCFullYear()}/${randomUUID()}.${extension}`
 
   let uploadUrl: string

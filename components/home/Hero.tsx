@@ -2,158 +2,168 @@
 
 import Image from "next/image"
 import Link from "next/link"
-// import { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 
-// import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils"
+import type { HomeHeroBanner } from "@/lib/server/dal/banners"
 
-/*
-type HeroSlide = {
-  leftImage: string
-  rightImage: string
+const defaultFallbackBanner: HomeHeroBanner = {
+  id: "default-hero",
+  title: null,
+  subtitle: null,
+  desktopImageUrl: "/home-page-content/hero-1.png",
+  mobileImageUrl: "/home-page-content/hero-mobile.jpg",
+  ctaText: "Explore Collection",
+  ctaLink: "/collections",
+  textAlignment: "CENTER",
+  overlayOpacity: 15,
 }
 
-const heroSlides: HeroSlide[] = [
-  {
-    leftImage: "/images/products/product1.png",
-    rightImage: "/images/products/product2.png",
-  },
-  {
-    leftImage: "/images/hero-left.png",
-    rightImage: "/images/hero-right.png",
-  },
-  {
-    leftImage: "/images/products/product3.png",
-    rightImage: "/images/products/product4.png",
-  },
-  {
-    leftImage: "/images/products/product8.png",
-    rightImage: "/images/products/product9.png",
-  },
-]
-*/
+export function Hero({ banners }: { banners?: HomeHeroBanner[] }) {
+  const slides = banners && banners.length > 0 ? banners : [defaultFallbackBanner]
+  const [activeSlide, setActiveSlide] = useState(0)
 
-export function Hero() {
-  /*
-  const [activeSlide, setActiveSlide] = useState(1)
-
+  // Continuous auto-rotation every 5 seconds
   useEffect(() => {
-    const interval = window.setInterval(() => {
-      setActiveSlide((current) => (current + 1) % heroSlides.length)
+    if (slides.length <= 1) return
+
+    const timer = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % slides.length)
     }, 5000)
 
-    return () => {
-      window.clearInterval(interval)
-    }
-  }, [])
-  */
+    return () => clearInterval(timer)
+  }, [slides.length])
 
   return (
-    <section className="relative -mt-[var(--header-stack-height)] w-full bg-black text-white">
-      {/* Mobile Portrait Hero Banner (< sm) */}
-      <div className="relative block sm:hidden w-full h-[72svh] min-h-[460px] max-h-[620px]">
-        <Image
-          src="/home-page-content/hero-mobile.jpg"
-          alt="Hero Banner"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center w-full h-full"
-        />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/55" />
-      </div>
+    <section className="relative -mt-[var(--header-stack-height)] w-full h-[100svh] min-h-[580px] bg-black text-white overflow-hidden">
+      {slides.map((slide, index) => {
+        const isActive = index === activeSlide
 
-      {/* Desktop Widescreen Hero Banner (>= sm) */}
-      <div className="relative hidden sm:block w-full aspect-[1672/941]">
-        <Image
-          src="/home-page-content/hero-1.png"
-          alt="Hero Banner"
-          fill
-          priority
-          sizes="100vw"
-          className="object-contain w-full h-full"
-        />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/20" />
-      </div>
-
-      {/* Center CTA Button */}
-      <div className="absolute inset-x-0 bottom-6 sm:bottom-10 lg:bottom-14 z-10 flex items-center justify-center px-4 sm:px-6">
-        <Link
-          href="/collections"
-          className="inline-flex cursor-pointer items-center justify-center border border-white/85 bg-black/25 backdrop-blur-sm px-5 py-2.5 sm:px-6 sm:py-3 text-[11px] sm:text-[13px] font-normal uppercase tracking-[0.12em] sm:tracking-normal transition-colors hover:bg-white/10 shadow-sm"
-        >
-          Explore Collection
-        </Link>
-      </div>
-
-      {/* 
-      Commented out changing banner slides:
-      <div className="absolute inset-0">
-        {heroSlides.map((slide, index) => {
-          const isActive = index === activeSlide
-
-          return (
-            <div
-              key={slide.leftImage}
-              aria-hidden={!isActive}
-              className={cn(
-                "absolute inset-0 grid grid-rows-2 transition-opacity duration-700 ease-out lg:grid-cols-2 lg:grid-rows-1",
-                isActive ? "opacity-100" : "pointer-events-none opacity-0"
+        return (
+          <div
+            key={slide.id}
+            aria-hidden={!isActive}
+            className={cn(
+              "absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out",
+              isActive ? "opacity-100 z-10" : "opacity-0 pointer-events-none z-0",
+            )}
+          >
+            {/* Full-screen hero image covering full viewport without black letterboxing */}
+            <div className="relative w-full h-full">
+              {slide.mobileImageUrl ? (
+                <>
+                  <div className="relative block sm:hidden w-full h-full">
+                    <Image
+                      src={slide.mobileImageUrl}
+                      alt={slide.title || "Hero Banner"}
+                      fill
+                      priority={index === 0}
+                      sizes="100vw"
+                      className="object-cover object-center w-full h-full"
+                    />
+                  </div>
+                  <div className="relative hidden sm:block w-full h-full">
+                    <Image
+                      src={slide.desktopImageUrl}
+                      alt={slide.title || "Hero Banner"}
+                      fill
+                      priority={index === 0}
+                      sizes="100vw"
+                      className="object-cover object-center w-full h-full"
+                    />
+                  </div>
+                </>
+              ) : (
+                <Image
+                  src={slide.desktopImageUrl}
+                  alt={slide.title || "Hero Banner"}
+                  fill
+                  priority={index === 0}
+                  sizes="100vw"
+                  className="object-cover object-center w-full h-full"
+                />
               )}
-            >
-              <div className="relative min-h-[50svh] lg:min-h-0">
-                <Image
-                  src={slide.leftImage}
-                  alt=""
-                  fill
-                  priority={isActive}
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover object-center"
-                />
-              </div>
-              <div className="relative min-h-[50svh] lg:min-h-0">
-                <Image
-                  src={slide.rightImage}
-                  alt=""
-                  fill
-                  priority={isActive}
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover object-center grayscale"
-                />
-              </div>
+
+              {/* Gradient Dark Overlay */}
+              <div
+                className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-black/60"
+                style={{
+                  opacity: Math.max(0.2, (slide.overlayOpacity ?? 15) / 100),
+                }}
+              />
             </div>
-          )
-        })}
 
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/8 via-transparent to-black/10" />
-      </div>
-      */}
+            {/* Clickable full-slide link when button text is omitted */}
+            {!slide.ctaText && slide.ctaLink && (
+              <Link
+                href={slide.ctaLink}
+                className="absolute inset-0 z-10"
+                aria-label={slide.title || "Hero banner"}
+              />
+            )}
 
-      {/* 
-      Slide pagination controls commented out:
-      <div className="absolute bottom-6 right-7 z-20 flex items-center gap-2 text-white/85">
-        <div className="flex items-center gap-2">
-          {heroSlides.map((slide, index) => (
+            {/* Content & CTA Button (Only rendered if title, subtitle, or button exists) */}
+            {(slide.title || slide.subtitle || slide.ctaText) && (
+              <div
+                className={cn(
+                  "absolute inset-x-0 bottom-8 sm:bottom-12 lg:bottom-16 z-20 px-4 sm:px-8 flex flex-col pointer-events-none",
+                  slide.textAlignment === "LEFT"
+                    ? "items-start text-left max-w-7xl mx-auto"
+                    : slide.textAlignment === "RIGHT"
+                      ? "items-end text-right max-w-7xl mx-auto"
+                      : "items-center text-center justify-center",
+                )}
+              >
+                {slide.title && (
+                  <h2 className="text-white text-sm sm:text-2xl lg:text-3xl font-serif font-normal uppercase tracking-[0.14em] drop-shadow-md leading-tight">
+                    {slide.title}
+                  </h2>
+                )}
+                {slide.subtitle && (
+                  <p className="mt-0.5 sm:mt-1 text-white/90 text-[9px] sm:text-xs uppercase tracking-[0.2em] font-light drop-shadow-sm">
+                    {slide.subtitle}
+                  </p>
+                )}
+
+                {slide.ctaText && (
+                  <div className={cn(slide.title || slide.subtitle ? "mt-2.5 sm:mt-4" : "")}>
+                    <Link
+                      href={slide.ctaLink || "/collections"}
+                      className="inline-flex cursor-pointer pointer-events-auto items-center justify-center border border-white/85 bg-black/30 backdrop-blur-sm px-4 py-2 sm:px-6 sm:py-3 text-[10px] sm:text-[13px] font-normal uppercase tracking-[0.12em] sm:tracking-normal transition-colors hover:bg-white/10 shadow-sm"
+                    >
+                      {slide.ctaText}
+                    </Link>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )
+      })}
+
+      {/* Subtle Slide Indicator Dots (when multiple slides exist, no arrows) */}
+      {slides.length > 1 && (
+        <div className="absolute bottom-5 right-6 z-30 flex items-center gap-1.5 bg-black/40 backdrop-blur-xs px-2.5 py-1 rounded-full">
+          {slides.map((_, idx) => (
             <button
-              key={slide.leftImage}
+              key={idx}
               type="button"
-              aria-label={`Go to slide ${index + 1}`}
-              aria-pressed={index === activeSlide}
-              onClick={() => setActiveSlide(index)}
+              onClick={() => setActiveSlide(idx)}
+              aria-label={`Go to slide ${idx + 1}`}
               className={cn(
-                "rounded-full transition-all duration-300",
-                index === activeSlide
-                  ? "size-3 bg-white"
-                  : "size-3 bg-white/35 hover:bg-white/60"
+                "h-1.5 rounded-full transition-all duration-500 cursor-pointer",
+                idx === activeSlide ? "w-6 bg-white" : "w-1.5 bg-white/40 hover:bg-white/70",
               )}
             />
           ))}
+          <span className="ml-1 text-[10px] font-mono text-white/75">
+            {activeSlide + 1}/{slides.length}
+          </span>
         </div>
-        <span className="ml-1 text-sm font-normal tracking-[0.04em]">
-          {activeSlide + 1}/{heroSlides.length}
-        </span>
-      </div>
-      */}
+      )}
 
+      {/* Screen-reader anchors preserved */}
       <span id="women" className="sr-only">
         Women
       </span>

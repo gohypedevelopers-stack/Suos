@@ -10,23 +10,27 @@ import { LaunchOfferBar } from "@/components/home/LaunchOfferBar"
 import { EditsCarousel } from "@/components/home/EditsCarousel"
 import { TrendingSection } from "@/components/home/TrendingSection"
 import { listPublishedProducts } from "@/lib/server/dal/products"
+import { getHomeBanners } from "@/lib/server/dal/banners"
 
 export const dynamic = "force-dynamic"
 
 export default async function Home() {
-  const products = await listPublishedProducts()
+  const [products, banners] = await Promise.all([
+    listPublishedProducts(),
+    getHomeBanners(),
+  ])
   
   return (
     <main className="flex-1 bg-black">
-      <Hero />
+      <Hero banners={banners.hero} />
       <LaunchOfferBar />
       <TrendingSection products={products.slice(0, 8)} />
-      <MotionBannerSection />
+      <MotionBannerSection banner={banners.middle} />
       <DenimCarousel />
       <EditsCarousel />
       <DenimEditorialSection />
       <LookbookCarousel />
-      <ProductBannerSection />
+      <ProductBannerSection banner={banners.bottom} />
       <RecommendedSection products={products.slice(4, 8).length >= 4 ? products.slice(4, 8) : products.slice(0, 4)} />
       <ResponsibleDenimSection />
     </main>

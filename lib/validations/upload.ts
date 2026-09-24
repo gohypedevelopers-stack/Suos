@@ -12,21 +12,44 @@ export const imageContentTypeSchema = z.enum([
 export const localImageObjectKeySchema = z
   .string()
   .regex(
-    /^uploads\/(?:products|categories|collections)\/\d{4}\/[0-9a-f-]{36}\.(?:avif|jpg|png|webp)$/,
+    /^uploads\/(?:products|categories|collections|banners)\/\d{4}\/[0-9a-f-]{36}\.(?:avif|jpg|png|webp)$/,
     "Invalid local image key",
   )
 
-const imageUploadSchema = z.object({
+const imageUploadBaseSchema = z.object({
   filename: z.string().trim().min(1).max(255),
   contentType: imageContentTypeSchema,
-  size: z.number().int().positive().max(10 * 1024 * 1024),
+  size: z.number().int().positive().max(10 * 1024 * 1024).optional(),
+  sizeBytes: z.number().int().positive().max(10 * 1024 * 1024).optional(),
 })
+
+export const imageUploadSchema = imageUploadBaseSchema
+  .refine((data) => data.size !== undefined || data.sizeBytes !== undefined, {
+    message: "Image size is required",
+    path: ["size"],
+  })
+  .transform((data) => ({
+    filename: data.filename,
+    contentType: data.contentType,
+    size: (data.size ?? data.sizeBytes) as number,
+  }))
 
 export const productImageUploadSchema = imageUploadSchema
 
-export const imageUploadRequestSchema = imageUploadSchema.extend({
-  scope: z.enum(["product", "category", "collection"]).default("product"),
-})
+export const imageUploadRequestSchema = imageUploadBaseSchema
+  .extend({
+    scope: z.enum(["product", "category", "collection", "banner"]).default("product"),
+  })
+  .refine((data) => data.size !== undefined || data.sizeBytes !== undefined, {
+    message: "Image size is required",
+    path: ["size"],
+  })
+  .transform((data) => ({
+    filename: data.filename,
+    contentType: data.contentType,
+    scope: data.scope,
+    size: (data.size ?? data.sizeBytes) as number,
+  }))
 
 export type ImageUploadRequest = z.infer<typeof imageUploadRequestSchema>
 

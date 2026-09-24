@@ -66,6 +66,12 @@ enum DiscountAppliesTo {
   COLLECTIONS
 }
 
+enum BannerPlacement {
+  HERO
+  MIDDLE
+  BOTTOM
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String
@@ -370,3 +376,24 @@ model Discount {
   @@index([type, status])
   @@map("discounts")
 }
+
+model Banner {
+  id              String          @id @default(cuid())
+  title           String?
+  subtitle        String?
+  desktopImageKey String
+  mobileImageKey  String?
+  ctaText         String?
+  ctaLink         String?
+  placement       BannerPlacement @default(HERO)
+  textAlignment   String          @default("CENTER")
+  overlayOpacity  Int             @default(20)
+  isActive        Boolean         @default(true)
+  position        Int             @default(0)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([placement, isActive, position])
+  @@map("banners")
+}
+

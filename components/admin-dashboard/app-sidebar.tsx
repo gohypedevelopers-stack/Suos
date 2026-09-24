@@ -19,6 +19,7 @@ import {
   ChartNoAxesCombinedIcon,
   PackageIcon,
   UsersRoundIcon,
+  ImageIcon,
 } from "lucide-react"
 
 const data = {
@@ -27,6 +28,11 @@ const data = {
       title: "Home",
       url: "/dashboard",
       icon: <HomeIcon />,
+    },
+    {
+      title: "Banners",
+      url: "/dashboard/banners",
+      icon: <ImageIcon />,
     },
     {
       title: "Orders",

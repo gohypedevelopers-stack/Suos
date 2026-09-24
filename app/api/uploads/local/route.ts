@@ -53,7 +53,10 @@ export async function PUT(request: Request) {
 
   const destination = resolve(process.cwd(), "public", input.data.objectKey)
   const publicDirectory = resolve(process.cwd(), "public", "uploads")
-  if (!destination.startsWith(`${publicDirectory}\\`)) {
+  if (
+    !destination.startsWith(`${publicDirectory}\\`) &&
+    !destination.startsWith(`${publicDirectory}/`)
+  ) {
     return Response.json({ error: "Invalid upload destination" }, { status: 400 })
   }
 
