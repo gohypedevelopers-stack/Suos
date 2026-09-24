@@ -69,8 +69,8 @@ export function BannerManager({
   const router = useRouter()
   const [banners, setBanners] = useState<AdminBannerListItem[]>(initialBanners)
   const [heroExpanded, setHeroExpanded] = useState<boolean>(true)
-  const [carouselExpanded, setCarouselExpanded] = useState<boolean>(true)
-  const [editorialExpanded, setEditorialExpanded] = useState<boolean>(true)
+  const [carouselExpanded, setCarouselExpanded] = useState<boolean>(false)
+  const [editorialExpanded, setEditorialExpanded] = useState<boolean>(false)
   const [query, setQuery] = useState("")
   const [bannersToDelete, setBannersToDelete] = useState<string[] | null>(null)
   const [mediaLibraryOpen, setMediaLibraryOpen] = useState(false)
@@ -118,7 +118,7 @@ export function BannerManager({
     })
   }
 
-  // Slide drag and drop reordering inside Hero
+  // Hero Drag & Drop
   const handleSlideDragStart = (index: number, e: React.DragEvent) => {
     setDraggedSlideIdx(index)
     e.dataTransfer.effectAllowed = "move"
@@ -150,7 +150,6 @@ export function BannerManager({
       position: idx,
     }))
 
-    // Optimistically update
     setBanners((prev) => {
       const others = prev.filter((b) => b.placement !== "HERO")
       return [...updatedWithPositions, ...others]
@@ -159,7 +158,6 @@ export function BannerManager({
     setDraggedSlideIdx(null)
     setDragOverSlideIdx(null)
 
-    // Save to database
     startTransition(async () => {
       const payload = updatedWithPositions.map((item) => ({
         id: item.id,
@@ -208,7 +206,7 @@ export function BannerManager({
     })
   }
 
-  // Upload slide files directly into Hero
+  // Upload hero slides
   const handleUploadHeroSlides = async (fileList: FileList | File[]) => {
     const files = Array.from(fileList)
     if (files.length === 0) return
@@ -280,7 +278,7 @@ export function BannerManager({
     }
   }
 
-  // Slide drag and drop reordering inside Denim Carousel
+  // Carousel Drag & Drop
   const handleCarouselSlideDragStart = (index: number, e: React.DragEvent) => {
     setDraggedCarouselIdx(index)
     e.dataTransfer.effectAllowed = "move"
@@ -335,7 +333,7 @@ export function BannerManager({
     })
   }
 
-  // Upload slide files directly into Denim Carousel
+  // Upload denim carousel slides
   const handleUploadCarouselSlides = async (fileList: FileList | File[]) => {
     const files = Array.from(fileList)
     if (files.length === 0) return
@@ -440,134 +438,90 @@ export function BannerManager({
       matchesSearch(s.ctaLink),
   )
 
+  const carouselVisibleSlides = denimCarouselBanners.filter(
+    (s) =>
+      !normalizedQuery ||
+      matchesSearch(s.title) ||
+      matchesSearch(s.subtitle) ||
+      matchesSearch(s.ctaText) ||
+      matchesSearch(s.ctaLink),
+  )
+
   return (
-    <main className="min-h-full flex-1 bg-[#f7f7f8] p-4 text-black sm:p-6">
-      <div className="mx-auto max-w-7xl">
-        {/* Top Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4">
+    <main className="min-h-full flex-1 bg-[#f9fafb] p-4 text-black sm:p-6 lg:p-8">
+      <div className="mx-auto max-w-6xl space-y-6">
+        {/* Page Top Header */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight text-neutral-900">
-              <ImageIcon className="size-5 text-neutral-800" /> Homepage Banners
-            </h1>
+            <div className="flex items-center gap-2">
+              <span className="flex size-8 items-center justify-center rounded-lg bg-black text-white">
+                <ImageIcon className="size-4" />
+              </span>
+              <h1 className="text-xl font-bold tracking-tight text-neutral-950">
+                Homepage Visuals & Banners
+              </h1>
+            </div>
             <p className="mt-1 text-xs text-neutral-500">
-              Manage the 3 homepage sections. All slides are neatly organized inside the Hero Carousel.
+              Manage all 5 visual sections of the SUOS homepage in order of appearance from top to bottom.
             </p>
           </div>
-          <div className="flex items-center gap-2">
+
+          <div className="flex items-center gap-2.5">
             <button
               type="button"
               onClick={() => setMediaLibraryOpen(true)}
-              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-black/15 bg-white px-3 text-xs font-medium text-neutral-800 transition hover:bg-neutral-50 shadow-sm cursor-pointer"
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-neutral-300 bg-white px-3.5 text-xs font-semibold text-neutral-800 shadow-xs transition hover:bg-neutral-50 cursor-pointer"
             >
-              <Cloud className="size-3.5 text-blue-600" /> Cloudflare R2 Library
+              <Cloud className="size-3.5 text-blue-600" />
+              Cloudflare R2 Media
             </button>
             <Link
               href="/"
               target="_blank"
-              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-black/15 bg-white px-3 text-xs font-medium text-black transition hover:bg-neutral-50 shadow-sm"
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-black px-3.5 text-xs font-semibold text-white shadow-xs transition hover:bg-neutral-800"
             >
-              <ExternalLink className="size-3.5 text-neutral-600" /> View Storefront
+              <ExternalLink className="size-3.5" />
+              View Storefront
             </Link>
           </div>
         </div>
 
-        {/* 3 Section Overview Metrics */}
-        <section className="mt-4 overflow-hidden rounded-xl border border-black/10 bg-white shadow-xs">
-          <div className="grid grid-cols-1 divide-y divide-black/10 sm:grid-cols-3 sm:divide-y-0 sm:divide-x">
-            <div className="p-4 sm:p-5">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-neutral-700 uppercase tracking-wider">
-                  #1 Hero Carousel
-                </span>
-                <span className="rounded-full bg-black px-2 py-0.5 text-[10px] font-medium text-white">
-                  {heroBanners.length} {heroBanners.length === 1 ? "Slide" : "Slides"}
-                </span>
-              </div>
-              <p className="mt-1.5 text-sm font-semibold text-neutral-900">Top Header Slideshow</p>
-              <p className="mt-0.5 text-xs text-neutral-500">
-                {heroBanners.length > 1
-                  ? "Auto-playing slideshow in hero header"
-                  : "Single slide hero header"}
-              </p>
-            </div>
-
-            <div className="p-4 sm:p-5">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-neutral-700 uppercase tracking-wider">
-                  #2 Middle Motion
-                </span>
-                <span
-                  className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                    middleBanner?.isActive
-                      ? "bg-emerald-100 text-emerald-800"
-                      : "bg-neutral-200 text-neutral-600"
-                  }`}
-                >
-                  {middleBanner?.isActive ? "Active" : "Inactive"}
-                </span>
-              </div>
-              <p className="mt-1.5 text-sm font-semibold text-neutral-900">Editorial Section</p>
-              <p className="mt-0.5 text-xs text-neutral-500">Full-width editorial visual banner</p>
-            </div>
-
-            <div className="p-4 sm:p-5">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-neutral-700 uppercase tracking-wider">
-                  #3 Bottom Product
-                </span>
-                <span
-                  className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                    bottomBanner?.isActive
-                      ? "bg-emerald-100 text-emerald-800"
-                      : "bg-neutral-200 text-neutral-600"
-                  }`}
-                >
-                  {bottomBanner?.isActive ? "Active" : "Inactive"}
-                </span>
-              </div>
-              <p className="mt-1.5 text-sm font-semibold text-neutral-900">Showcase Section</p>
-              <p className="mt-0.5 text-xs text-neutral-500">Brand craftsmanship & collections</p>
-            </div>
-          </div>
-        </section>
-
-        {/* Section List (The 3 Sections) */}
-        <section className="mt-6 overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm">
-          {/* Header search bar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-5 py-3.5 bg-neutral-50/50">
-            <div>
-              <h2 className="text-sm font-semibold text-neutral-900">Homepage Sections (3)</h2>
-              <p className="text-[11px] text-neutral-500">
-                The 3 banner sections of the SUOS homepage. Expand Hero to manage its slides.
-              </p>
-            </div>
-
-            <label className="flex h-9 w-72 items-center gap-2 rounded-lg border border-black/15 bg-white px-3 text-sm text-neutral-600 transition focus-within:border-black focus-within:ring-2 focus-within:ring-black/10">
-              <Search className="size-4 text-neutral-400" />
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search slides or sections..."
-                className="w-full bg-transparent text-xs text-neutral-900 outline-none placeholder:text-neutral-400"
-              />
-            </label>
+        {/* Quick Search and Overview Bar */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-neutral-200/80 bg-white p-3.5 shadow-xs">
+          <div className="flex items-center gap-2 text-xs font-medium text-neutral-600">
+            <span className="flex size-5 items-center justify-center rounded-full bg-neutral-900 text-[10px] font-bold text-white">
+              5
+            </span>
+            <span>Homepage sections ordered top-to-bottom</span>
           </div>
 
-          <div className="divide-y divide-black/10">
-            {/* ================================================================ */}
-            {/* SECTION 1: HERO (TOP CAROUSEL)                                   */}
-            {/* ================================================================ */}
-            <div className="bg-white">
-              {/* Main Section Row */}
-              <div className="flex flex-wrap items-center justify-between gap-4 p-4 sm:p-5 hover:bg-neutral-50/40 transition">
-                {/* Left: Position & Section Info */}
-                <div className="flex items-center gap-4 min-w-0">
-                  <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-black text-white font-mono text-xs font-semibold shadow-xs">
-                    1
+          <div className="relative w-full sm:w-72">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-neutral-400" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Filter slides or links..."
+              className="h-8 w-full rounded-lg border border-neutral-200 bg-neutral-50 pl-8 pr-3 text-xs text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:bg-white focus:outline-none"
+            />
+          </div>
+        </div>
+
+        {/* The 5 Homepage Sections in visual order */}
+        <div className="space-y-4">
+          {/* ================================================================ */}
+          {/* SECTION 1: HERO TOP CAROUSEL                                     */}
+          {/* ================================================================ */}
+          <section className="overflow-hidden rounded-xl border border-neutral-200/90 bg-white shadow-xs transition hover:border-neutral-300">
+            <div className="p-4 sm:p-5">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                {/* Left Info */}
+                <div className="flex items-start sm:items-center gap-3.5 min-w-0">
+                  <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-black font-mono text-xs font-bold text-white shadow-2xs">
+                    01
                   </div>
 
-                  {/* Thumbnail Stack Preview */}
-                  <div className="relative aspect-[16/9] w-24 shrink-0 overflow-hidden rounded-lg border border-black/10 bg-neutral-900 shadow-xs">
+                  {/* Thumbnail Stack */}
+                  <div className="relative aspect-[16/9] w-24 shrink-0 overflow-hidden rounded-lg border border-neutral-200 bg-neutral-900 shadow-2xs">
                     {heroBanners[0]?.desktopImageUrl ? (
                       <Image
                         src={heroBanners[0].desktopImageUrl}
@@ -578,47 +532,51 @@ export function BannerManager({
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center text-[10px] text-white/50">
-                        No Slides
+                        No image
                       </div>
                     )}
                     {heroBanners.length > 1 && (
-                      <span className="absolute bottom-1 right-1 rounded bg-black/80 px-1 py-0.5 text-[9px] font-semibold text-white backdrop-blur-xs">
+                      <span className="absolute bottom-1 right-1 rounded bg-black/85 px-1 py-0.5 text-[9px] font-bold text-white">
                         +{heroBanners.length - 1}
                       </span>
                     )}
                   </div>
 
                   <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-semibold text-neutral-900">Hero (Top Carousel)</h3>
-                      <span className="rounded-full bg-black px-2 py-0.5 text-[10px] font-medium text-white">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h2 className="text-sm font-bold text-neutral-900">
+                        Hero Header Slideshow
+                      </h2>
+                      <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-semibold text-neutral-700">
                         {heroBanners.length} {heroBanners.length === 1 ? "Slide" : "Slides"}
                       </span>
-                      <span className="inline-flex items-center rounded-md bg-black/[0.06] px-2 py-0.5 text-[10px] font-medium text-black/75">
-                        Top of Homepage
+                      <span className="rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-700">
+                        Top of Page
                       </span>
                     </div>
                     <p className="mt-0.5 text-xs text-neutral-500">
-                      Auto-playing slideshow in the header. All individual slides are managed inside.
+                      Full-screen auto-advancing slideshow greeting visitors at the very top.
                     </p>
                   </div>
                 </div>
 
-                {/* Right: Section Actions & Slide Expand Toggle */}
-                <div className="flex items-center gap-2.5">
+                {/* Right Actions */}
+                <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
                   <button
                     type="button"
                     onClick={() => heroUploadRef.current?.click()}
                     disabled={isUploadingSlide}
-                    className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-black/15 bg-white px-3 text-xs font-semibold text-neutral-800 transition hover:bg-neutral-50 shadow-2xs cursor-pointer disabled:opacity-50"
+                    className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 text-xs font-semibold text-neutral-700 shadow-2xs transition hover:bg-neutral-50 disabled:opacity-50 cursor-pointer"
                   >
                     {isUploadingSlide ? (
                       <>
-                        <LoaderCircle className="size-3.5 animate-spin" /> Uploading...
+                        <LoaderCircle className="size-3.5 animate-spin text-neutral-500" />
+                        <span>Uploading...</span>
                       </>
                     ) : (
                       <>
-                        <Plus className="size-3.5" /> Add Slide
+                        <Plus className="size-3.5 text-neutral-600" />
+                        <span>Add Slide</span>
                       </>
                     )}
                   </button>
@@ -626,9 +584,9 @@ export function BannerManager({
                   <button
                     type="button"
                     onClick={() => setHeroExpanded(!heroExpanded)}
-                    className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-black px-3.5 text-xs font-medium text-white transition hover:bg-black/85 shadow-sm cursor-pointer"
+                    className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-neutral-900 px-3 text-xs font-semibold text-white shadow-2xs transition hover:bg-black cursor-pointer"
                   >
-                    <span>{heroExpanded ? "Hide Slides" : `View Slides (${heroBanners.length})`}</span>
+                    <span>{heroExpanded ? "Hide Slides" : `Manage Slides (${heroBanners.length})`}</span>
                     {heroExpanded ? (
                       <ChevronUp className="size-3.5" />
                     ) : (
@@ -651,347 +609,355 @@ export function BannerManager({
                   }
                 }}
               />
+            </div>
 
-              {/* ================================================================ */}
-              {/* INSIDE HERO: NESTED SLIDE MANAGER                                */}
-              {/* ================================================================ */}
-              {heroExpanded && (
-                <div className="border-t border-black/10 bg-neutral-50/70 p-4 sm:p-5">
-                  <div className="rounded-xl border border-black/10 bg-white p-4 shadow-xs">
-                    {/* Nested Slide Header */}
-                    <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-black/10">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <Sparkles className="size-3.5 text-neutral-700" />
-                          <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-900">
-                            Slides Inside Hero Carousel ({heroBanners.length})
-                          </h4>
-                        </div>
-                        <p className="mt-0.5 text-[11px] text-neutral-500">
-                          Drag any slide to rearrange playback sequence. Click any slide to edit its image, title, or CTA link.
-                        </p>
-                      </div>
-
+            {/* Expanded Hero Slides Manager */}
+            {heroExpanded && (
+              <div className="border-t border-neutral-200/80 bg-neutral-50/70 p-4 sm:p-5">
+                <div className="rounded-xl border border-neutral-200 bg-white p-4 shadow-xs">
+                  <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-neutral-200">
+                    <div>
                       <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          disabled={isUploadingSlide}
-                          onClick={() => heroUploadRef.current?.click()}
-                          className="inline-flex h-7 items-center gap-1 rounded-md bg-black px-2.5 text-[11px] font-semibold text-white hover:bg-neutral-800 transition cursor-pointer shadow-xs disabled:opacity-50"
-                        >
-                          <Plus className="size-3" /> Upload Slide
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setMediaLibraryOpen(true)}
-                          className="inline-flex h-7 items-center gap-1 rounded-md border border-black/15 bg-white px-2.5 text-[11px] font-medium text-neutral-700 hover:bg-neutral-50 transition cursor-pointer shadow-2xs"
-                        >
-                          <Cloud className="size-3 text-blue-600" /> Library
-                        </button>
+                        <Sparkles className="size-3.5 text-neutral-700" />
+                        <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-800">
+                          Hero Slides ({heroBanners.length})
+                        </h3>
                       </div>
+                      <p className="mt-0.5 text-[11px] text-neutral-500">
+                        Drag slides using the grip icon to change order. Click Edit to customize desktop/mobile photos or buttons.
+                      </p>
                     </div>
 
-                    {/* Slides List Table */}
-                    {heroVisibleSlides.length === 0 ? (
-                      <div className="py-8 text-center text-xs text-neutral-500">
-                        {normalizedQuery
-                          ? "No slides match your search."
-                          : "No slides yet. Click '+ Upload Slide' above to add slides to the carousel."}
-                      </div>
-                    ) : (
-                      <div className="divide-y divide-black/5 mt-1">
-                        {heroVisibleSlides.map((slide, idx) => {
-                          const isDragged = draggedSlideIdx === idx
-                          const isDragOver =
-                            dragOverSlideIdx === idx && draggedSlideIdx !== idx
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        disabled={isUploadingSlide}
+                        onClick={() => heroUploadRef.current?.click()}
+                        className="inline-flex h-7 items-center gap-1 rounded-md bg-black px-2.5 text-[11px] font-semibold text-white hover:bg-neutral-800 transition cursor-pointer shadow-xs disabled:opacity-50"
+                      >
+                        <Plus className="size-3" /> Quick Upload
+                      </button>
+                      <Link
+                        href="/dashboard/banners/new?placement=HERO"
+                        className="inline-flex h-7 items-center gap-1 rounded-md border border-neutral-200 bg-white px-2.5 text-[11px] font-medium text-neutral-700 hover:bg-neutral-50 transition shadow-2xs"
+                      >
+                        <Pencil className="size-3" /> Custom Slide
+                      </Link>
+                    </div>
+                  </div>
 
-                          return (
-                            <div
-                              key={slide.id}
-                              draggable={true}
-                              onDragStart={(e) => handleSlideDragStart(idx, e)}
-                              onDragOver={(e) => handleSlideDragOver(idx, e)}
-                              onDrop={(e) => handleSlideDrop(idx, e)}
-                              onDragEnd={() => {
-                                setDraggedSlideIdx(null)
-                                setDragOverSlideIdx(null)
-                              }}
-                              className={`flex flex-wrap items-center justify-between gap-3 py-3 px-2 rounded-lg transition select-none ${
-                                isDragged
-                                  ? "opacity-30 bg-neutral-100"
-                                  : isDragOver
-                                    ? "bg-blue-50/70 border-t-2 border-t-blue-600 shadow-sm"
-                                    : "hover:bg-neutral-50/90"
-                              }`}
-                            >
-                              {/* Left: Drag Handle, Number, Preview, Details */}
-                              <div className="flex items-center gap-3 min-w-0">
-                                {/* Drag Grip & Arrows */}
-                                <div className="flex items-center gap-1 text-neutral-400">
+                  {heroVisibleSlides.length === 0 ? (
+                    <div className="py-8 text-center text-xs text-neutral-500">
+                      {normalizedQuery
+                        ? "No slides match your search filter."
+                        : "No slides yet. Click '+ Quick Upload' above to add slides."}
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-neutral-100 mt-2">
+                      {heroVisibleSlides.map((slide, idx) => {
+                        const isDragged = draggedSlideIdx === idx
+                        const isDragOver =
+                          dragOverSlideIdx === idx && draggedSlideIdx !== idx
+
+                        return (
+                          <div
+                            key={slide.id}
+                            draggable
+                            onDragStart={(e) => handleSlideDragStart(idx, e)}
+                            onDragOver={(e) => handleSlideDragOver(idx, e)}
+                            onDrop={(e) => handleSlideDrop(idx, e)}
+                            onDragEnd={() => {
+                              setDraggedSlideIdx(null)
+                              setDragOverSlideIdx(null)
+                            }}
+                            className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 py-3 px-2 rounded-lg transition select-none ${
+                              isDragged
+                                ? "opacity-30 bg-neutral-100"
+                                : isDragOver
+                                  ? "bg-blue-50/70 border-t-2 border-t-blue-600 shadow-xs"
+                                  : "hover:bg-neutral-50/80"
+                            }`}
+                          >
+                            {/* Left: Reorder arrows, preview, title */}
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="flex items-center gap-1 text-neutral-400">
+                                <span
+                                  title="Drag to rearrange"
+                                  className="cursor-grab active:cursor-grabbing p-0.5 rounded hover:text-black transition-colors"
+                                >
+                                  <GripVertical className="size-4" />
+                                </span>
+                                <button
+                                  type="button"
+                                  disabled={idx === 0 || isPending}
+                                  onClick={() => handleMoveSlideStep(idx, "up")}
+                                  title="Move Up"
+                                  className="p-1 rounded hover:bg-neutral-200 hover:text-black disabled:opacity-25 disabled:pointer-events-none cursor-pointer"
+                                >
+                                  <ArrowUp className="size-3" />
+                                </button>
+                                <span className="font-mono text-neutral-800 text-xs font-semibold min-w-[14px] text-center">
+                                  {idx + 1}
+                                </span>
+                                <button
+                                  type="button"
+                                  disabled={idx === heroBanners.length - 1 || isPending}
+                                  onClick={() => handleMoveSlideStep(idx, "down")}
+                                  title="Move Down"
+                                  className="p-1 rounded hover:bg-neutral-200 hover:text-black disabled:opacity-25 disabled:pointer-events-none cursor-pointer"
+                                >
+                                  <ArrowDown className="size-3" />
+                                </button>
+                              </div>
+
+                              <Link
+                                href={`/dashboard/banners/${slide.id}`}
+                                className="group relative block aspect-[16/9] w-24 shrink-0 overflow-hidden rounded-md border border-neutral-200 bg-neutral-900 shadow-2xs"
+                              >
+                                <Image
+                                  src={slide.desktopImageUrl}
+                                  alt={slide.title || `Slide ${idx + 1}`}
+                                  fill
+                                  sizes="96px"
+                                  className="object-cover transition-transform group-hover:scale-105"
+                                />
+                                {slide.mobileImageUrl && (
                                   <span
-                                    title="Drag to rearrange"
-                                    className="cursor-grab active:cursor-grabbing p-0.5 rounded hover:text-black transition-colors"
+                                    title="Has mobile portrait image"
+                                    className="absolute bottom-0.5 right-0.5 flex size-4 items-center justify-center rounded bg-black/80 text-white"
                                   >
-                                    <GripVertical className="size-4" />
+                                    <Smartphone className="size-2.5" />
                                   </span>
-                                  <button
-                                    type="button"
-                                    disabled={idx === 0 || isPending}
-                                    onClick={() => handleMoveSlideStep(idx, "up")}
-                                    title="Move Up"
-                                    className="p-1 rounded hover:bg-neutral-200 hover:text-black disabled:opacity-25 disabled:pointer-events-none cursor-pointer"
-                                  >
-                                    <ArrowUp className="size-3" />
-                                  </button>
-                                  <span className="font-mono text-neutral-800 text-xs font-semibold min-w-[14px] text-center">
-                                    {idx + 1}
-                                  </span>
-                                  <button
-                                    type="button"
-                                    disabled={idx === heroBanners.length - 1 || isPending}
-                                    onClick={() => handleMoveSlideStep(idx, "down")}
-                                    title="Move Down"
-                                    className="p-1 rounded hover:bg-neutral-200 hover:text-black disabled:opacity-25 disabled:pointer-events-none cursor-pointer"
-                                  >
-                                    <ArrowDown className="size-3" />
-                                  </button>
-                                </div>
+                                )}
+                              </Link>
 
-                                {/* Thumbnail */}
+                              <div className="min-w-0">
                                 <Link
                                   href={`/dashboard/banners/${slide.id}`}
-                                  className="group relative block aspect-[16/9] w-24 shrink-0 overflow-hidden rounded-md border border-black/10 bg-neutral-900 shadow-2xs"
+                                  className="font-semibold text-xs text-neutral-900 hover:underline block truncate max-w-xs"
                                 >
-                                  <Image
-                                    src={slide.desktopImageUrl}
-                                    alt={slide.title || `Slide ${idx + 1}`}
-                                    fill
-                                    sizes="96px"
-                                    className="object-cover transition-transform group-hover:scale-105"
-                                  />
-                                  {slide.mobileImageUrl && (
-                                    <span
-                                      title="Has mobile portrait image"
-                                      className="absolute bottom-0.5 right-0.5 flex size-4 items-center justify-center rounded bg-black/80 text-white"
-                                    >
-                                      <Smartphone className="size-2.5" />
+                                  {slide.title || (
+                                    <span className="italic text-neutral-400 font-normal">
+                                      (Visual slide without text)
                                     </span>
                                   )}
                                 </Link>
-
-                                {/* Slide Info */}
-                                <div className="min-w-0">
-                                  <Link
-                                    href={`/dashboard/banners/${slide.id}`}
-                                    className="font-semibold text-xs text-neutral-900 hover:underline block truncate max-w-xs"
-                                  >
-                                    {slide.title || (
-                                      <span className="italic text-neutral-400 font-normal">
-                                        (Image-only visual)
-                                      </span>
-                                    )}
-                                  </Link>
-                                  <p className="text-[11px] text-neutral-500 truncate max-w-xs">
-                                    {slide.subtitle || `Slide ${idx + 1} of Hero Slideshow`}
-                                  </p>
-                                </div>
-                              </div>
-
-                              {/* Center: CTA & Target Link */}
-                              <div className="hidden sm:block min-w-40 text-left">
-                                <p className="text-[11px] font-semibold text-neutral-800">
-                                  {slide.ctaText || "Clickable Image"}
+                                <p className="text-[11px] text-neutral-500 truncate max-w-xs">
+                                  {slide.subtitle || `Position ${idx + 1} in header rotation`}
                                 </p>
-                                <p className="text-[10px] font-mono text-neutral-500 truncate max-w-[180px]">
-                                  {slide.ctaLink ? `→ ${slide.ctaLink}` : "No link"}
-                                </p>
-                              </div>
-
-                              {/* Right: Slide Status Toggle & Actions */}
-                              <div className="flex items-center gap-2">
-                                <button
-                                  type="button"
-                                  disabled={isPending}
-                                  onClick={() => handleToggleActive(slide.id, slide.isActive)}
-                                  className={`rounded-full px-2 py-0.5 text-[10px] font-medium transition cursor-pointer ${
-                                    slide.isActive
-                                      ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
-                                      : "bg-neutral-200 text-neutral-600 hover:bg-neutral-300"
-                                  }`}
-                                >
-                                  {slide.isActive ? "Active" : "Inactive"}
-                                </button>
-
-                                <Link
-                                  href={`/dashboard/banners/${slide.id}`}
-                                  title="Edit Slide"
-                                  className="inline-flex size-7 items-center justify-center rounded border border-black/10 bg-white text-neutral-600 hover:bg-neutral-100 hover:text-black transition"
-                                >
-                                  <Pencil className="size-3" />
-                                </Link>
-
-                                <button
-                                  type="button"
-                                  title="Delete Slide"
-                                  onClick={() => setBannersToDelete([slide.id])}
-                                  className="inline-flex size-7 items-center justify-center rounded border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 transition cursor-pointer"
-                                >
-                                  <Trash2 className="size-3" />
-                                </button>
                               </div>
                             </div>
-                          )
-                        })}
+
+                            {/* Middle: CTA link */}
+                            <div className="hidden md:block min-w-44 text-left">
+                              <p className="text-[11px] font-semibold text-neutral-800">
+                                {slide.ctaText || "Clickable Slide"}
+                              </p>
+                              <p className="text-[10px] font-mono text-neutral-500 truncate max-w-[200px]">
+                                {slide.ctaLink ? `→ ${slide.ctaLink}` : "No link"}
+                              </p>
+                            </div>
+
+                            {/* Right: Actions */}
+                            <div className="flex items-center gap-2 self-end sm:self-center">
+                              <button
+                                type="button"
+                                disabled={isPending}
+                                onClick={() => handleToggleActive(slide.id, slide.isActive)}
+                                className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold transition cursor-pointer ${
+                                  slide.isActive
+                                    ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/60"
+                                    : "bg-neutral-100 text-neutral-500 hover:bg-neutral-200 border border-neutral-200"
+                                }`}
+                              >
+                                {slide.isActive ? "Active" : "Inactive"}
+                              </button>
+
+                              <Link
+                                href={`/dashboard/banners/${slide.id}`}
+                                title="Edit Slide"
+                                className="inline-flex h-7 items-center gap-1 rounded border border-neutral-200 bg-white px-2 text-[11px] font-medium text-neutral-700 hover:bg-neutral-50 transition shadow-2xs"
+                              >
+                                <Pencil className="size-3" /> Edit
+                              </Link>
+
+                              <button
+                                type="button"
+                                title="Delete Slide"
+                                onClick={() => setBannersToDelete([slide.id])}
+                                className="inline-flex size-7 items-center justify-center rounded border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 transition cursor-pointer"
+                              >
+                                <Trash2 className="size-3" />
+                              </button>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </section>
+
+          {/* ================================================================ */}
+          {/* SECTION 2: MIDDLE MOTION BANNER                                  */}
+          {/* ================================================================ */}
+          <section className="overflow-hidden rounded-xl border border-neutral-200/90 bg-white shadow-xs transition hover:border-neutral-300">
+            <div className="p-4 sm:p-5">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                {/* Left Info */}
+                <div className="flex items-start sm:items-center gap-3.5 min-w-0">
+                  <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-neutral-200 font-mono text-xs font-bold text-neutral-800 shadow-2xs">
+                    02
+                  </div>
+
+                  <div className="relative aspect-[16/9] w-24 shrink-0 overflow-hidden rounded-lg border border-neutral-200 bg-neutral-900 shadow-2xs">
+                    {middleBanner?.desktopImageUrl ? (
+                      <Image
+                        src={middleBanner.desktopImageUrl}
+                        alt="Middle Motion Banner"
+                        fill
+                        sizes="96px"
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-[10px] text-white/50">
+                        No image
                       </div>
                     )}
                   </div>
-                </div>
-              )}
-            </div>
-
-            {/* ================================================================ */}
-            {/* SECTION 2: MIDDLE (MOTION SECTION)                               */}
-            {/* ================================================================ */}
-            <div className="flex flex-wrap items-center justify-between gap-4 p-4 sm:p-5 hover:bg-neutral-50/40 transition bg-white">
-              {/* Left: Position & Section Info */}
-              <div className="flex items-center gap-4 min-w-0">
-                <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-neutral-200 text-neutral-800 font-mono text-xs font-semibold shadow-xs">
-                  2
-                </div>
-
-                {/* Preview Thumbnail */}
-                <div className="relative aspect-[16/9] w-24 shrink-0 overflow-hidden rounded-lg border border-black/10 bg-neutral-900 shadow-xs">
-                  {middleBanner?.desktopImageUrl ? (
-                    <Image
-                      src={middleBanner.desktopImageUrl}
-                      alt="Middle Motion Banner"
-                      fill
-                      sizes="96px"
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-[10px] text-white/50">
-                      Empty
-                    </div>
-                  )}
-                </div>
-
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-semibold text-neutral-900">
-                      Middle (Motion Section)
-                    </h3>
-                    <span className="inline-flex items-center rounded-md bg-black/[0.06] px-2 py-0.5 text-[10px] font-medium text-black/75">
-                      Middle of Homepage
-                    </span>
-                  </div>
-                  <p className="mt-0.5 text-xs text-neutral-500">
-                    Full-width editorial motion banner displayed between collections.
-                  </p>
-                  {middleBanner?.ctaLink && (
-                    <p className="mt-0.5 font-mono text-[10px] text-neutral-400">
-                      Target: {middleBanner.ctaLink}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Right: Status Switch & Edit Button */}
-              <div className="flex items-center gap-2.5">
-                {middleBanner ? (
-                  <>
-                    <button
-                      type="button"
-                      disabled={isPending}
-                      onClick={() => handleToggleActive(middleBanner.id, middleBanner.isActive)}
-                      className={`rounded-full px-2.5 py-1 text-xs font-medium transition cursor-pointer ${
-                        middleBanner.isActive
-                          ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
-                          : "bg-neutral-200 text-neutral-600 hover:bg-neutral-300"
-                      }`}
-                    >
-                      {middleBanner.isActive ? "Active (Visible)" : "Inactive (Hidden)"}
-                    </button>
-
-                    <Link
-                      href={`/dashboard/banners/${middleBanner.id}`}
-                      className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-black/15 bg-white px-3 text-xs font-semibold text-neutral-800 hover:bg-neutral-50 transition shadow-2xs"
-                    >
-                      <Pencil className="size-3.5" /> Edit Banner
-                    </Link>
-                  </>
-                ) : (
-                  <Link
-                    href="/dashboard/banners/new?placement=MIDDLE"
-                    className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-black px-3.5 text-xs font-medium text-white transition hover:bg-black/85 shadow-sm"
-                  >
-                    <Plus className="size-3.5" /> Add Middle Banner
-                  </Link>
-                )}
-              </div>
-            </div>
-
-            {/* ================================================================ */}
-            {/* SECTION 3: DENIM CAROUSEL (COLLECTION SLIDES)                    */}
-            {/* ================================================================ */}
-            <div className="bg-white">
-              <div className="flex flex-wrap items-center justify-between gap-4 p-4 sm:p-5 hover:bg-neutral-50/40 transition">
-                {/* Left: Position & Section Info */}
-                <div className="flex items-center gap-4 min-w-0">
-                  <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-neutral-200 text-neutral-800 font-mono text-xs font-semibold shadow-xs">
-                    3
-                  </div>
 
                   <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-semibold text-neutral-900">
-                        Denim Carousel (Collection Slides)
-                      </h3>
-                      <span className="rounded-full bg-black px-2 py-0.5 text-[10px] font-medium text-white">
-                        {denimCarouselBanners.length} {denimCarouselBanners.length === 1 ? "Slide" : "Slides"}
-                      </span>
-                      <span className="inline-flex items-center rounded-md bg-black/[0.06] px-2 py-0.5 text-[10px] font-medium text-black/75">
-                        Middle Carousel
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h2 className="text-sm font-bold text-neutral-900">
+                        Middle Editorial Banner
+                      </h2>
+                      <span className="rounded-md bg-neutral-100 px-2 py-0.5 text-[10px] font-medium text-neutral-700">
+                        Mid-Page Break
                       </span>
                     </div>
                     <p className="mt-0.5 text-xs text-neutral-500">
-                      Draggable looping model showcase cards. Drag to reorder, click to edit cuts and destination links.
+                      Full-width editorial visual displayed between product collections.
+                    </p>
+                    {middleBanner?.ctaLink && (
+                      <p className="mt-0.5 font-mono text-[10px] text-neutral-400 truncate max-w-xs">
+                        Target link: {middleBanner.ctaLink}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Right Actions */}
+                <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                  {middleBanner ? (
+                    <>
+                      <button
+                        type="button"
+                        disabled={isPending}
+                        onClick={() => handleToggleActive(middleBanner.id, middleBanner.isActive)}
+                        className={`rounded-full px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+                          middleBanner.isActive
+                            ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/60"
+                            : "bg-neutral-100 text-neutral-500 hover:bg-neutral-200 border border-neutral-200"
+                        }`}
+                      >
+                        {middleBanner.isActive ? "Active (Visible)" : "Hidden"}
+                      </button>
+
+                      <Link
+                        href={`/dashboard/banners/${middleBanner.id}`}
+                        className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 text-xs font-semibold text-neutral-800 shadow-2xs transition hover:bg-neutral-50"
+                      >
+                        <Pencil className="size-3.5" /> Edit Banner
+                      </Link>
+                    </>
+                  ) : (
+                    <Link
+                      href="/dashboard/banners/new?placement=MIDDLE"
+                      className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-black px-3.5 text-xs font-semibold text-white shadow-2xs transition hover:bg-neutral-800"
+                    >
+                      <Plus className="size-3.5" /> Create Banner
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* ================================================================ */}
+          {/* SECTION 3: DENIM CAROUSEL (COLLECTION CUTOUTS)                   */}
+          {/* ================================================================ */}
+          <section className="overflow-hidden rounded-xl border border-neutral-200/90 bg-white shadow-xs transition hover:border-neutral-300">
+            <div className="p-4 sm:p-5">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                {/* Left Info */}
+                <div className="flex items-start sm:items-center gap-3.5 min-w-0">
+                  <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-neutral-200 font-mono text-xs font-bold text-neutral-800 shadow-2xs">
+                    03
+                  </div>
+
+                  <div className="relative aspect-[3/4] w-12 shrink-0 overflow-hidden rounded-lg border border-neutral-200 bg-neutral-100 shadow-2xs">
+                    {denimCarouselBanners[0]?.desktopImageUrl ? (
+                      <Image
+                        src={denimCarouselBanners[0].desktopImageUrl}
+                        alt="Denim Carousel"
+                        fill
+                        sizes="48px"
+                        className="object-contain"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-[9px] text-neutral-400">
+                        Default
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h2 className="text-sm font-bold text-neutral-900">
+                        Denim Cut Showcase Carousel
+                      </h2>
+                      <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-semibold text-neutral-700">
+                        {denimCarouselBanners.length} {denimCarouselBanners.length === 1 ? "Slide" : "Slides"}
+                      </span>
+                      <span className="rounded-md bg-neutral-100 px-2 py-0.5 text-[10px] font-medium text-neutral-700">
+                        Interactive Cutout Strip
+                      </span>
+                    </div>
+                    <p className="mt-0.5 text-xs text-neutral-500">
+                      Draggable model cutout cards (Skinny, Bootcut, Straight, etc.) with custom links.
                     </p>
                   </div>
                 </div>
 
-                {/* Right: Section Actions & Slide Expand Toggle */}
-                <div className="flex items-center gap-2.5">
+                {/* Right Actions */}
+                <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
                   <button
                     type="button"
                     onClick={() => carouselUploadRef.current?.click()}
                     disabled={isUploadingCarouselSlide}
-                    className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-black/15 bg-white px-3 text-xs font-semibold text-neutral-800 transition hover:bg-neutral-50 shadow-2xs cursor-pointer disabled:opacity-50"
+                    className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 text-xs font-semibold text-neutral-700 shadow-2xs transition hover:bg-neutral-50 disabled:opacity-50 cursor-pointer"
                   >
                     {isUploadingCarouselSlide ? (
                       <>
-                        <LoaderCircle className="size-3.5 animate-spin" /> Uploading...
+                        <LoaderCircle className="size-3.5 animate-spin text-neutral-500" />
+                        <span>Uploading...</span>
                       </>
                     ) : (
                       <>
-                        <Plus className="size-3.5" /> Upload Slides
+                        <Plus className="size-3.5 text-neutral-600" />
+                        <span>Upload Slides</span>
                       </>
                     )}
                   </button>
 
-                  <Link
-                    href="/dashboard/banners/new?placement=DENIM_CAROUSEL"
-                    className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-black/15 bg-white px-3 text-xs font-semibold text-neutral-800 transition hover:bg-neutral-50 shadow-2xs"
-                  >
-                    <Plus className="size-3.5" /> Custom Slide
-                  </Link>
-
                   <button
                     type="button"
                     onClick={() => setCarouselExpanded(!carouselExpanded)}
-                    className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-black px-3.5 text-xs font-medium text-white transition hover:bg-black/85 shadow-sm cursor-pointer"
+                    className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-neutral-900 px-3 text-xs font-semibold text-white shadow-2xs transition hover:bg-black cursor-pointer"
                   >
-                    <span>{carouselExpanded ? "Hide Slides" : `View Slides (${denimCarouselBanners.length})`}</span>
+                    <span>{carouselExpanded ? "Hide Slides" : `Manage Slides (${denimCarouselBanners.length})`}</span>
                     {carouselExpanded ? (
                       <ChevronUp className="size-3.5" />
                     ) : (
@@ -1014,171 +980,175 @@ export function BannerManager({
                   }
                 }}
               />
-
-              {carouselExpanded && (
-                <div className="border-t border-black/10 bg-neutral-50/70 p-4 sm:p-5">
-                  <div className="rounded-xl border border-black/10 bg-white p-4 shadow-xs">
-                    <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-black/10">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <Sparkles className="size-3.5 text-neutral-700" />
-                          <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-900">
-                            Slides Inside Denim Carousel ({denimCarouselBanners.length})
-                          </h4>
-                        </div>
-                        <p className="mt-0.5 text-[11px] text-neutral-500">
-                          {denimCarouselBanners.length === 0
-                            ? "Currently showing 5 default cutout model slides. Add your own custom slides below to replace them."
-                            : "Drag any slide to rearrange order. Click edit to customize cut name or product link."}
-                        </p>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          disabled={isUploadingCarouselSlide}
-                          onClick={() => carouselUploadRef.current?.click()}
-                          className="inline-flex h-7 items-center gap-1 rounded-md bg-black px-2.5 text-[11px] font-semibold text-white hover:bg-neutral-800 transition cursor-pointer shadow-xs disabled:opacity-50"
-                        >
-                          <Plus className="size-3" /> Quick Upload
-                        </button>
-                        <Link
-                          href="/dashboard/banners/new?placement=DENIM_CAROUSEL"
-                          className="inline-flex h-7 items-center gap-1 rounded-md border border-black/15 bg-white px-2.5 text-[11px] font-medium text-neutral-700 hover:bg-neutral-50 transition shadow-2xs"
-                        >
-                          <Pencil className="size-3" /> Detailed New Slide
-                        </Link>
-                      </div>
-                    </div>
-
-                    {denimCarouselBanners.length === 0 ? (
-                      <div className="py-8 text-center">
-                        <p className="text-xs text-neutral-500">
-                          Storefront is currently using the 5 built-in default model slides (Skinny, Bootcut, Low-Rise, Straight, Relaxed).
-                        </p>
-                        <button
-                          type="button"
-                          onClick={() => carouselUploadRef.current?.click()}
-                          className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-black px-3.5 py-1.5 text-xs font-medium text-white transition hover:bg-neutral-800 cursor-pointer"
-                        >
-                          <Plus className="size-3.5" /> Upload First Slide
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="mt-3 divide-y divide-black/5">
-                        {denimCarouselBanners.map((slide, idx) => (
-                          <div
-                            key={slide.id}
-                            draggable
-                            onDragStart={(e) => handleCarouselSlideDragStart(idx, e)}
-                            onDragOver={(e) => handleCarouselSlideDragOver(idx, e)}
-                            onDrop={(e) => handleCarouselSlideDrop(idx, e)}
-                            className={`flex flex-wrap items-center justify-between gap-3 py-2.5 px-2 rounded-lg transition ${
-                              dragOverCarouselIdx === idx
-                                ? "bg-blue-50 border-2 border-dashed border-blue-400"
-                                : "hover:bg-neutral-50"
-                            }`}
-                          >
-                            <div className="flex items-center gap-3 min-w-0">
-                              <span className="cursor-grab text-neutral-400 hover:text-black">
-                                <GripVertical className="size-4" />
-                              </span>
-                              <span className="font-mono text-xs text-neutral-500 w-4">
-                                {idx + 1}
-                              </span>
-                              <div className="relative aspect-[3/4] w-12 shrink-0 overflow-hidden rounded border border-black/10 bg-neutral-100">
-                                <Image
-                                  src={slide.desktopImageUrl}
-                                  alt={slide.title || "Slide"}
-                                  fill
-                                  sizes="48px"
-                                  className="object-contain"
-                                />
-                              </div>
-                              <div className="min-w-0">
-                                <p className="text-xs font-medium text-neutral-900 truncate max-w-[200px]">
-                                  {slide.title || "Untitled Slide"}
-                                </p>
-                                <p className="text-[10px] font-mono text-neutral-400 truncate max-w-[200px]">
-                                  {slide.ctaLink ? `→ ${slide.ctaLink}` : "No link"}
-                                </p>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                              <button
-                                type="button"
-                                disabled={isPending}
-                                onClick={() => handleToggleActive(slide.id, slide.isActive)}
-                                className={`rounded-full px-2 py-0.5 text-[10px] font-medium transition cursor-pointer ${
-                                  slide.isActive
-                                    ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
-                                    : "bg-neutral-200 text-neutral-600 hover:bg-neutral-300"
-                                }`}
-                              >
-                                {slide.isActive ? "Active" : "Inactive"}
-                              </button>
-
-                              <Link
-                                href={`/dashboard/banners/${slide.id}`}
-                                title="Edit Slide"
-                                className="inline-flex size-7 items-center justify-center rounded border border-black/10 bg-white text-neutral-600 hover:bg-neutral-100 hover:text-black transition"
-                              >
-                                <Pencil className="size-3" />
-                              </Link>
-
-                              <button
-                                type="button"
-                                title="Delete Slide"
-                                onClick={() => setBannersToDelete([slide.id])}
-                                className="inline-flex size-7 items-center justify-center rounded border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 transition cursor-pointer"
-                              >
-                                <Trash2 className="size-3" />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
             </div>
 
-            {/* ================================================================ */}
-            {/* SECTION 4: DENIM EDITORIAL GRID (3 IMAGES)                       */}
-            {/* ================================================================ */}
-            <div className="bg-white">
-              <div className="flex flex-wrap items-center justify-between gap-4 p-4 sm:p-5 hover:bg-neutral-50/40 transition">
-                {/* Left: Position & Section Info */}
-                <div className="flex items-center gap-4 min-w-0">
-                  <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-neutral-200 text-neutral-800 font-mono text-xs font-semibold shadow-xs">
-                    4
+            {/* Expanded Carousel Slides Manager */}
+            {carouselExpanded && (
+              <div className="border-t border-neutral-200/80 bg-neutral-50/70 p-4 sm:p-5">
+                <div className="rounded-xl border border-neutral-200 bg-white p-4 shadow-xs">
+                  <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-neutral-200">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="size-3.5 text-neutral-700" />
+                        <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-800">
+                          Denim Carousel Slides ({denimCarouselBanners.length})
+                        </h3>
+                      </div>
+                      <p className="mt-0.5 text-[11px] text-neutral-500">
+                        {denimCarouselBanners.length === 0
+                          ? "Using 5 default model cutouts on storefront. Upload custom transparent PNGs to personalize."
+                          : "Drag items to reorder the infinite carousel. Click Edit to change the cut name or link."}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        disabled={isUploadingCarouselSlide}
+                        onClick={() => carouselUploadRef.current?.click()}
+                        className="inline-flex h-7 items-center gap-1 rounded-md bg-black px-2.5 text-[11px] font-semibold text-white hover:bg-neutral-800 transition cursor-pointer shadow-xs disabled:opacity-50"
+                      >
+                        <Plus className="size-3" /> Quick Upload
+                      </button>
+                      <Link
+                        href="/dashboard/banners/new?placement=DENIM_CAROUSEL"
+                        className="inline-flex h-7 items-center gap-1 rounded-md border border-neutral-200 bg-white px-2.5 text-[11px] font-medium text-neutral-700 hover:bg-neutral-50 transition shadow-2xs"
+                      >
+                        <Pencil className="size-3" /> Custom Slide
+                      </Link>
+                    </div>
+                  </div>
+
+                  {carouselVisibleSlides.length === 0 ? (
+                    <div className="py-8 text-center">
+                      <p className="text-xs text-neutral-500">
+                        Storefront is currently displaying the 5 default cutout model slides.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => carouselUploadRef.current?.click()}
+                        className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-black px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-neutral-800 cursor-pointer shadow-xs"
+                      >
+                        <Plus className="size-3.5" /> Upload First Slide
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-neutral-100 mt-2">
+                      {carouselVisibleSlides.map((slide, idx) => (
+                        <div
+                          key={slide.id}
+                          draggable
+                          onDragStart={(e) => handleCarouselSlideDragStart(idx, e)}
+                          onDragOver={(e) => handleCarouselSlideDragOver(idx, e)}
+                          onDrop={(e) => handleCarouselSlideDrop(idx, e)}
+                          className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 py-2.5 px-2 rounded-lg transition ${
+                            dragOverCarouselIdx === idx
+                              ? "bg-blue-50 border-2 border-dashed border-blue-400"
+                              : "hover:bg-neutral-50"
+                          }`}
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <span className="cursor-grab text-neutral-400 hover:text-black">
+                              <GripVertical className="size-4" />
+                            </span>
+                            <span className="font-mono text-xs font-semibold text-neutral-500 w-4">
+                              {idx + 1}
+                            </span>
+                            <div className="relative aspect-[3/4] w-12 shrink-0 overflow-hidden rounded border border-neutral-200 bg-neutral-100">
+                              <Image
+                                src={slide.desktopImageUrl}
+                                alt={slide.title || "Slide"}
+                                fill
+                                sizes="48px"
+                                className="object-contain"
+                              />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-xs font-semibold text-neutral-900 truncate max-w-[200px]">
+                                {slide.title || "Untitled Slide"}
+                              </p>
+                              <p className="text-[10px] font-mono text-neutral-400 truncate max-w-[200px]">
+                                {slide.ctaLink ? `→ ${slide.ctaLink}` : "No link"}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 self-end sm:self-center">
+                            <button
+                              type="button"
+                              disabled={isPending}
+                              onClick={() => handleToggleActive(slide.id, slide.isActive)}
+                              className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold transition cursor-pointer ${
+                                slide.isActive
+                                  ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/60"
+                                  : "bg-neutral-100 text-neutral-500 hover:bg-neutral-200 border border-neutral-200"
+                              }`}
+                            >
+                              {slide.isActive ? "Active" : "Inactive"}
+                            </button>
+
+                            <Link
+                              href={`/dashboard/banners/${slide.id}`}
+                              title="Edit Slide"
+                              className="inline-flex h-7 items-center gap-1 rounded border border-neutral-200 bg-white px-2 text-[11px] font-medium text-neutral-700 hover:bg-neutral-50 transition shadow-2xs"
+                            >
+                              <Pencil className="size-3" /> Edit
+                            </Link>
+
+                            <button
+                              type="button"
+                              title="Delete Slide"
+                              onClick={() => setBannersToDelete([slide.id])}
+                              className="inline-flex size-7 items-center justify-center rounded border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 transition cursor-pointer"
+                            >
+                              <Trash2 className="size-3" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </section>
+
+          {/* ================================================================ */}
+          {/* SECTION 4: EDITORIAL 3-PHOTO GRID                                */}
+          {/* ================================================================ */}
+          <section className="overflow-hidden rounded-xl border border-neutral-200/90 bg-white shadow-xs transition hover:border-neutral-300">
+            <div className="p-4 sm:p-5">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                {/* Left Info */}
+                <div className="flex items-start sm:items-center gap-3.5 min-w-0">
+                  <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-neutral-200 font-mono text-xs font-bold text-neutral-800 shadow-2xs">
+                    04
                   </div>
 
                   <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-semibold text-neutral-900">
-                        Denim Editorial Grid (3 Images)
-                      </h3>
-                      <span className="rounded-full bg-black px-2 py-0.5 text-[10px] font-medium text-white">
-                        {editorialBanners.length}/3 Custom Slots
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h2 className="text-sm font-bold text-neutral-900">
+                        Editorial 3-Photo Grid
+                      </h2>
+                      <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-semibold text-neutral-700">
+                        3 Slots (2 Square + 1 Wide)
                       </span>
-                      <span className="inline-flex items-center rounded-md bg-black/[0.06] px-2 py-0.5 text-[10px] font-medium text-black/75">
-                        Editorial Section
+                      <span className="rounded-md bg-neutral-100 px-2 py-0.5 text-[10px] font-medium text-neutral-700">
+                        Mid-Lower Grid
                       </span>
                     </div>
                     <p className="mt-0.5 text-xs text-neutral-500">
-                      2 side-by-side square panels followed by a wide banner underneath. Change images, labels, and target links.
+                      Two square panels side-by-side followed by one wide banner underneath.
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2.5">
+                {/* Right Actions */}
+                <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
                   <button
                     type="button"
                     onClick={() => setEditorialExpanded(!editorialExpanded)}
-                    className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-black px-3.5 text-xs font-medium text-white transition hover:bg-black/85 shadow-sm cursor-pointer"
+                    className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-neutral-900 px-3 text-xs font-semibold text-white shadow-2xs transition hover:bg-black cursor-pointer"
                   >
                     <span>{editorialExpanded ? "Hide Slots" : "Manage 3 Slots"}</span>
                     {editorialExpanded ? (
@@ -1189,216 +1159,220 @@ export function BannerManager({
                   </button>
                 </div>
               </div>
+            </div>
 
-              {editorialExpanded && (
-                <div className="border-t border-black/10 bg-neutral-50/70 p-4 sm:p-5">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {[
-                      {
-                        slotNum: 0,
-                        title: "Slot 1: Top-Left Square",
-                        ratio: "Aspect 1:1",
-                        defaultImg: "/images/products/product6.png",
-                        defaultDesc: "Model sitting in a denim set on a chair",
-                        banner: editorialBanners.find((b) => b.position === 0),
-                      },
-                      {
-                        slotNum: 1,
-                        title: "Slot 2: Top-Right Square",
-                        ratio: "Aspect 1:1",
-                        defaultImg: "/images/products/product7.png",
-                        defaultDesc: "Model sitting in denim beside greenery",
-                        banner: editorialBanners.find((b) => b.position === 1),
-                      },
-                      {
-                        slotNum: 2,
-                        title: "Slot 3: Bottom Wide Banner",
-                        ratio: "Aspect 20:9",
-                        defaultImg: "/images/products/product8.png",
-                        defaultDesc: "Model reclining in denim look across screens",
-                        banner: editorialBanners.find((b) => b.position === 2),
-                      },
-                    ].map((slot) => {
-                      const activeBanner = slot.banner
-                      const imgSrc = activeBanner?.desktopImageUrl || slot.defaultImg
+            {/* Expanded 3 Slots */}
+            {editorialExpanded && (
+              <div className="border-t border-neutral-200/80 bg-neutral-50/70 p-4 sm:p-5">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {[
+                    {
+                      slotNum: 0,
+                      title: "Slot 1: Top-Left Square",
+                      ratio: "1:1 Square (1024×1024)",
+                      defaultImg: "/images/products/product6.png",
+                      defaultDesc: "Model in denim sitting on chair",
+                      banner: editorialBanners.find((b) => b.position === 0),
+                    },
+                    {
+                      slotNum: 1,
+                      title: "Slot 2: Top-Right Square",
+                      ratio: "1:1 Square (1024×1024)",
+                      defaultImg: "/images/products/product7.png",
+                      defaultDesc: "Model in denim beside greenery",
+                      banner: editorialBanners.find((b) => b.position === 1),
+                    },
+                    {
+                      slotNum: 2,
+                      title: "Slot 3: Bottom Wide Banner",
+                      ratio: "20:9 Wide (2000×900)",
+                      defaultImg: "/images/products/product8.png",
+                      defaultDesc: "Panoramic horizontal denim banner",
+                      banner: editorialBanners.find((b) => b.position === 2),
+                    },
+                  ].map((slot) => {
+                    const activeBanner = slot.banner
+                    const imgSrc = activeBanner?.desktopImageUrl || slot.defaultImg
 
-                      return (
-                        <div
-                          key={slot.slotNum}
-                          className="flex flex-col justify-between rounded-xl border border-black/10 bg-white p-4 shadow-xs"
-                        >
-                          <div>
-                            <div className="flex items-center justify-between pb-2 border-b border-black/5">
-                              <div>
-                                <h4 className="text-xs font-semibold text-neutral-900">{slot.title}</h4>
-                                <span className="text-[10px] font-mono text-neutral-400">{slot.ratio}</span>
-                              </div>
-                              <span
-                                className={`rounded-full px-2 py-0.5 text-[9px] font-medium ${
-                                  activeBanner
-                                    ? activeBanner.isActive
-                                      ? "bg-emerald-100 text-emerald-800"
-                                      : "bg-neutral-100 text-neutral-600"
-                                    : "bg-blue-50 text-blue-700"
-                                }`}
-                              >
-                                {activeBanner ? (activeBanner.isActive ? "Custom" : "Hidden") : "Default"}
-                              </span>
+                    return (
+                      <div
+                        key={slot.slotNum}
+                        className="flex flex-col justify-between rounded-xl border border-neutral-200 bg-white p-4 shadow-xs"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between pb-2 border-b border-neutral-100">
+                            <div>
+                              <h3 className="text-xs font-bold text-neutral-900">{slot.title}</h3>
+                              <span className="text-[10px] font-mono text-neutral-400">{slot.ratio}</span>
                             </div>
-
-                            <div className="mt-3 relative w-full aspect-video rounded-lg overflow-hidden border border-black/10 bg-neutral-100">
-                              <Image
-                                src={imgSrc}
-                                alt={activeBanner?.title || slot.defaultDesc}
-                                fill
-                                sizes="200px"
-                                className="object-cover"
-                              />
-                            </div>
-
-                            <div className="mt-2.5">
-                              <p className="text-xs font-medium text-neutral-800 truncate">
-                                {activeBanner?.title || slot.defaultDesc}
-                              </p>
-                              <p className="mt-0.5 font-mono text-[10px] text-neutral-400 truncate">
-                                Link: {activeBanner?.ctaLink || "/collections"}
-                              </p>
-                            </div>
+                            <span
+                              className={`rounded-full px-2 py-0.5 text-[9px] font-semibold ${
+                                activeBanner
+                                  ? activeBanner.isActive
+                                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60"
+                                    : "bg-neutral-100 text-neutral-500"
+                                  : "bg-blue-50 text-blue-700"
+                              }`}
+                            >
+                              {activeBanner ? (activeBanner.isActive ? "Custom Active" : "Hidden") : "Default"}
+                            </span>
                           </div>
 
-                          <div className="mt-4 pt-3 border-t border-black/5 flex items-center justify-between gap-2">
-                            {activeBanner ? (
-                              <>
-                                <button
-                                  type="button"
-                                  disabled={isPending}
-                                  onClick={() => handleToggleActive(activeBanner.id, activeBanner.isActive)}
-                                  className={`rounded-full px-2 py-0.5 text-[10px] font-medium transition cursor-pointer ${
-                                    activeBanner.isActive
-                                      ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
-                                      : "bg-neutral-200 text-neutral-600 hover:bg-neutral-300"
-                                  }`}
-                                >
-                                  {activeBanner.isActive ? "Active" : "Hidden"}
-                                </button>
+                          <div className="mt-3 relative w-full aspect-video rounded-lg overflow-hidden border border-neutral-200 bg-neutral-100">
+                            <Image
+                              src={imgSrc}
+                              alt={activeBanner?.title || slot.defaultDesc}
+                              fill
+                              sizes="260px"
+                              className="object-cover"
+                            />
+                          </div>
 
-                                <div className="flex items-center gap-1.5">
-                                  <Link
-                                    href={`/dashboard/banners/${activeBanner.id}`}
-                                    className="inline-flex h-7 items-center gap-1 rounded border border-black/15 bg-white px-2.5 text-[11px] font-medium text-neutral-700 hover:bg-neutral-50 transition shadow-2xs"
-                                  >
-                                    <Pencil className="size-3" /> Edit
-                                  </Link>
-                                  <button
-                                    type="button"
-                                    onClick={() => setBannersToDelete([activeBanner.id])}
-                                    title="Reset to default"
-                                    className="inline-flex size-7 items-center justify-center rounded border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 transition cursor-pointer"
-                                  >
-                                    <Trash2 className="size-3" />
-                                  </button>
-                                </div>
-                              </>
-                            ) : (
-                              <Link
-                                href={`/dashboard/banners/new?placement=EDITORIAL&position=${slot.slotNum}`}
-                                className="w-full inline-flex h-7 items-center justify-center gap-1 rounded bg-black px-3 text-[11px] font-medium text-white hover:bg-neutral-800 transition shadow-xs"
-                              >
-                                <Plus className="size-3" /> Upload Custom Slot {slot.slotNum + 1}
-                              </Link>
-                            )}
+                          <div className="mt-2.5">
+                            <p className="text-xs font-semibold text-neutral-900 truncate">
+                              {activeBanner?.title || slot.defaultDesc}
+                            </p>
+                            <p className="mt-0.5 font-mono text-[10px] text-neutral-400 truncate">
+                              Link: {activeBanner?.ctaLink || "/collections"}
+                            </p>
                           </div>
                         </div>
-                      )
-                    })}
+
+                        <div className="mt-4 pt-3 border-t border-neutral-100 flex items-center justify-between gap-2">
+                          {activeBanner ? (
+                            <>
+                              <button
+                                type="button"
+                                disabled={isPending}
+                                onClick={() => handleToggleActive(activeBanner.id, activeBanner.isActive)}
+                                className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold transition cursor-pointer ${
+                                  activeBanner.isActive
+                                    ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/60"
+                                    : "bg-neutral-100 text-neutral-500 hover:bg-neutral-200 border border-neutral-200"
+                                }`}
+                              >
+                                {activeBanner.isActive ? "Active" : "Hidden"}
+                              </button>
+
+                              <div className="flex items-center gap-1.5">
+                                <Link
+                                  href={`/dashboard/banners/${activeBanner.id}`}
+                                  className="inline-flex h-7 items-center gap-1 rounded border border-neutral-200 bg-white px-2.5 text-[11px] font-semibold text-neutral-700 hover:bg-neutral-50 transition shadow-2xs"
+                                >
+                                  <Pencil className="size-3" /> Edit Photo
+                                </Link>
+                                <button
+                                  type="button"
+                                  onClick={() => setBannersToDelete([activeBanner.id])}
+                                  title="Reset slot to default"
+                                  className="inline-flex size-7 items-center justify-center rounded border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 transition cursor-pointer"
+                                >
+                                  <Trash2 className="size-3" />
+                                </button>
+                              </div>
+                            </>
+                          ) : (
+                            <Link
+                              href={`/dashboard/banners/new?placement=EDITORIAL&position=${slot.slotNum}`}
+                              className="w-full inline-flex h-7 items-center justify-center gap-1 rounded bg-black px-3 text-[11px] font-semibold text-white hover:bg-neutral-800 transition shadow-xs"
+                            >
+                              <Plus className="size-3" /> Upload Photo for Slot {slot.slotNum + 1}
+                            </Link>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+          </section>
+
+          {/* ================================================================ */}
+          {/* SECTION 5: BOTTOM PRODUCT BANNER                                 */}
+          {/* ================================================================ */}
+          <section className="overflow-hidden rounded-xl border border-neutral-200/90 bg-white shadow-xs transition hover:border-neutral-300">
+            <div className="p-4 sm:p-5">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                {/* Left Info */}
+                <div className="flex items-start sm:items-center gap-3.5 min-w-0">
+                  <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-neutral-200 font-mono text-xs font-bold text-neutral-800 shadow-2xs">
+                    05
                   </div>
-                </div>
-              )}
-            </div>
 
-            {/* ================================================================ */}
-            {/* SECTION 5: BOTTOM (PRODUCT SECTION)                              */}
-            {/* ================================================================ */}
-            <div className="flex flex-wrap items-center justify-between gap-4 p-4 sm:p-5 hover:bg-neutral-50/40 transition bg-white">
-              {/* Left: Position & Section Info */}
-              <div className="flex items-center gap-4 min-w-0">
-                <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-neutral-200 text-neutral-800 font-mono text-xs font-semibold shadow-xs">
-                  5
-                </div>
+                  <div className="relative aspect-[16/9] w-24 shrink-0 overflow-hidden rounded-lg border border-neutral-200 bg-neutral-900 shadow-2xs">
+                    {bottomBanner?.desktopImageUrl ? (
+                      <Image
+                        src={bottomBanner.desktopImageUrl}
+                        alt="Bottom Product Banner"
+                        fill
+                        sizes="96px"
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-[10px] text-white/50">
+                        No image
+                      </div>
+                    )}
+                  </div>
 
-                {/* Preview Thumbnail */}
-                <div className="relative aspect-[16/9] w-24 shrink-0 overflow-hidden rounded-lg border border-black/10 bg-neutral-900 shadow-xs">
-                  {bottomBanner?.desktopImageUrl ? (
-                    <Image
-                      src={bottomBanner.desktopImageUrl}
-                      alt="Bottom Product Banner"
-                      fill
-                      sizes="96px"
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-[10px] text-white/50">
-                      Empty
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h2 className="text-sm font-bold text-neutral-900">
+                        Bottom Craftsmanship Spotlight
+                      </h2>
+                      <span className="rounded-md bg-neutral-100 px-2 py-0.5 text-[10px] font-medium text-neutral-700">
+                        Pre-Footer Spotlight
+                      </span>
                     </div>
-                  )}
-                </div>
-
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-semibold text-neutral-900">
-                      Bottom (Product Section)
-                    </h3>
-                    <span className="inline-flex items-center rounded-md bg-black/[0.06] px-2 py-0.5 text-[10px] font-medium text-black/75">
-                      Bottom of Homepage
-                    </span>
-                  </div>
-                  <p className="mt-0.5 text-xs text-neutral-500">
-                    Product craftsmanship and collection spotlight banner.
-                  </p>
-                  {bottomBanner?.ctaLink && (
-                    <p className="mt-0.5 font-mono text-[10px] text-neutral-400">
-                      Target: {bottomBanner.ctaLink}
+                    <p className="mt-0.5 text-xs text-neutral-500">
+                      Brand craftsmanship and materials spotlight banner before the footer.
                     </p>
+                    {bottomBanner?.ctaLink && (
+                      <p className="mt-0.5 font-mono text-[10px] text-neutral-400 truncate max-w-xs">
+                        Target link: {bottomBanner.ctaLink}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Right Actions */}
+                <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                  {bottomBanner ? (
+                    <>
+                      <button
+                        type="button"
+                        disabled={isPending}
+                        onClick={() => handleToggleActive(bottomBanner.id, bottomBanner.isActive)}
+                        className={`rounded-full px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+                          bottomBanner.isActive
+                            ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/60"
+                            : "bg-neutral-100 text-neutral-500 hover:bg-neutral-200 border border-neutral-200"
+                        }`}
+                      >
+                        {bottomBanner.isActive ? "Active (Visible)" : "Hidden"}
+                      </button>
+
+                      <Link
+                        href={`/dashboard/banners/${bottomBanner.id}`}
+                        className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 text-xs font-semibold text-neutral-800 shadow-2xs transition hover:bg-neutral-50"
+                      >
+                        <Pencil className="size-3.5" /> Edit Banner
+                      </Link>
+                    </>
+                  ) : (
+                    <Link
+                      href="/dashboard/banners/new?placement=BOTTOM"
+                      className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-black px-3.5 text-xs font-semibold text-white shadow-2xs transition hover:bg-neutral-800"
+                    >
+                      <Plus className="size-3.5" /> Create Banner
+                    </Link>
                   )}
                 </div>
-              </div>
-
-              {/* Right: Status Switch & Edit Button */}
-              <div className="flex items-center gap-2.5">
-                {bottomBanner ? (
-                  <>
-                    <button
-                      type="button"
-                      disabled={isPending}
-                      onClick={() => handleToggleActive(bottomBanner.id, bottomBanner.isActive)}
-                      className={`rounded-full px-2.5 py-1 text-xs font-medium transition cursor-pointer ${
-                        bottomBanner.isActive
-                          ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
-                          : "bg-neutral-200 text-neutral-600 hover:bg-neutral-300"
-                      }`}
-                    >
-                      {bottomBanner.isActive ? "Active (Visible)" : "Inactive (Hidden)"}
-                    </button>
-
-                    <Link
-                      href={`/dashboard/banners/${bottomBanner.id}`}
-                      className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-black/15 bg-white px-3 text-xs font-semibold text-neutral-800 hover:bg-neutral-50 transition shadow-2xs"
-                    >
-                      <Pencil className="size-3.5" /> Edit Banner
-                    </Link>
-                  </>
-                ) : (
-                  <Link
-                    href="/dashboard/banners/new?placement=BOTTOM"
-                    className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-black px-3.5 text-xs font-medium text-white transition hover:bg-black/85 shadow-sm"
-                  >
-                    <Plus className="size-3.5" /> Add Bottom Banner
-                  </Link>
-                )}
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        </div>
       </div>
 
       {/* Media Library Dialog */}
@@ -1432,9 +1406,9 @@ export function BannerManager({
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete slide?</AlertDialogTitle>
+            <AlertDialogTitle>Delete slide or banner?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this slide from the Hero Carousel? This action cannot be undone.
+              Are you sure you want to delete this slide? If it is a default slot, it will revert to the default template image.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -1443,7 +1417,7 @@ export function BannerManager({
               onClick={confirmDelete}
               className="bg-red-600 hover:bg-red-700 text-white"
             >
-              Delete Slide
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1451,3 +1425,4 @@ export function BannerManager({
     </main>
   )
 }
+
