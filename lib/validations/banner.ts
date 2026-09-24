@@ -1,6 +1,12 @@
 import { z } from "zod"
 
-export const bannerPlacementSchema = z.enum(["HERO", "MIDDLE", "BOTTOM"])
+export const bannerPlacementSchema = z.enum([
+  "HERO",
+  "MIDDLE",
+  "BOTTOM",
+  "EDITORIAL",
+  "DENIM_CAROUSEL",
+])
 export type BannerPlacement = z.infer<typeof bannerPlacementSchema>
 
 export const bannerTextAlignmentSchema = z.enum(["LEFT", "CENTER", "RIGHT"])

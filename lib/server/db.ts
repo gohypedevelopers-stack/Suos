@@ -5,8 +5,16 @@ import { PrismaPg } from "@prisma/adapter-pg"
 import { PrismaClient } from "@/generated/prisma/client"
 import { getDatabaseEnv } from "@/lib/server/env"
 
+const SCHEMA_VERSION = "2026-09-24-v2-editorial"
+
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
+  schemaVersion?: string
+}
+
+if (globalForPrisma.schemaVersion !== SCHEMA_VERSION) {
+  globalForPrisma.prisma = undefined
+  globalForPrisma.schemaVersion = SCHEMA_VERSION
 }
 
 let prisma = globalForPrisma.prisma

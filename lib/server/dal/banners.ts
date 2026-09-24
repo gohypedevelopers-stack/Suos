@@ -77,10 +77,34 @@ export type HomeBannerSectionItem = {
   overlayOpacity: number
 }
 
+export type HomeEditorialBanner = {
+  id: string
+  title: string | null
+  subtitle: string | null
+  desktopImageUrl: string
+  mobileImageUrl: string | null
+  ctaText: string | null
+  ctaLink: string | null
+  position: number
+}
+
+export type HomeCarouselSlide = {
+  id: string
+  title: string | null
+  subtitle: string | null
+  desktopImageUrl: string
+  mobileImageUrl: string | null
+  ctaText: string | null
+  ctaLink: string | null
+  position: number
+}
+
 export type HomeBanners = {
   hero: HomeHeroBanner[]
   middle: HomeBannerSectionItem | null
   bottom: HomeBannerSectionItem | null
+  editorial: HomeEditorialBanner[]
+  denimCarousel: HomeCarouselSlide[]
 }
 
 export async function listBannersForAdmin(): Promise<AdminBannerListItem[]> {
@@ -220,6 +244,90 @@ export async function getHomeBanners(): Promise<HomeBanners> {
       ctaLink: "/collections",
       overlayOpacity: 0,
     },
+    editorial: [
+      {
+        id: "default-editorial-0",
+        title: "Model sitting in a denim set on a chair",
+        subtitle: null,
+        desktopImageUrl: "/images/products/product6.png",
+        mobileImageUrl: null,
+        ctaText: null,
+        ctaLink: "/collections",
+        position: 0,
+      },
+      {
+        id: "default-editorial-1",
+        title: "Model sitting in denim beside greenery",
+        subtitle: null,
+        desktopImageUrl: "/images/products/product7.png",
+        mobileImageUrl: null,
+        ctaText: null,
+        ctaLink: "/collections",
+        position: 1,
+      },
+      {
+        id: "default-editorial-2",
+        title: "Model reclining in a denim look across stacked screens",
+        subtitle: null,
+        desktopImageUrl: "/images/products/product8.png",
+        mobileImageUrl: null,
+        ctaText: null,
+        ctaLink: "/collections",
+        position: 2,
+      },
+    ],
+    denimCarousel: [
+      {
+        id: "default-slide-skinny",
+        title: "Model wearing skinny denim",
+        subtitle: "Skinny",
+        desktopImageUrl: "/images/products/product5-white.png",
+        mobileImageUrl: null,
+        ctaText: null,
+        ctaLink: "/collections",
+        position: 0,
+      },
+      {
+        id: "default-slide-bootcut",
+        title: "Model wearing bootcut denim",
+        subtitle: "Bootcut",
+        desktopImageUrl: "/images/products/product5-white.png",
+        mobileImageUrl: null,
+        ctaText: null,
+        ctaLink: "/collections",
+        position: 1,
+      },
+      {
+        id: "default-slide-low-rise",
+        title: "Model wearing low-rise denim",
+        subtitle: "Low-Rise",
+        desktopImageUrl: "/images/products/product5-white.png",
+        mobileImageUrl: null,
+        ctaText: null,
+        ctaLink: "/collections",
+        position: 2,
+      },
+      {
+        id: "default-slide-straight",
+        title: "Model wearing straight denim",
+        subtitle: "Straight",
+        desktopImageUrl: "/images/products/product5-white.png",
+        mobileImageUrl: null,
+        ctaText: null,
+        ctaLink: "/collections",
+        position: 3,
+      },
+      {
+        id: "default-slide-relaxed",
+        title: "Model wearing relaxed denim",
+        subtitle: "Relaxed",
+        desktopImageUrl: "/images/products/product5-white.png",
+        mobileImageUrl: null,
+        ctaText: null,
+        ctaLink: "/collections",
+        position: 4,
+      },
+    ],
   }
 
   try {
@@ -237,6 +345,8 @@ export async function getHomeBanners(): Promise<HomeBanners> {
     const heroBanners = activeBanners.filter((b) => b.placement === "HERO")
     const middleBanners = activeBanners.filter((b) => b.placement === "MIDDLE")
     const bottomBanners = activeBanners.filter((b) => b.placement === "BOTTOM")
+    const editorialBanners = activeBanners.filter((b) => b.placement === "EDITORIAL")
+    const denimCarouselBanners = activeBanners.filter((b) => b.placement === "DENIM_CAROUSEL")
 
     const hero: HomeHeroBanner[] =
       heroBanners.length > 0
@@ -282,7 +392,35 @@ export async function getHomeBanners(): Promise<HomeBanners> {
         }
       : hasConfiguredBanners ? null : defaultFallback.bottom
 
-    return { hero, middle, bottom }
+    const editorial: HomeEditorialBanner[] =
+      editorialBanners.length > 0
+        ? editorialBanners.map((b) => ({
+            id: b.id,
+            title: b.title,
+            subtitle: b.subtitle,
+            desktopImageUrl: imageUrl(b.desktopImageKey) ?? b.desktopImageKey,
+            mobileImageUrl: imageUrl(b.mobileImageKey),
+            ctaText: b.ctaText,
+            ctaLink: b.ctaLink,
+            position: b.position,
+          }))
+        : defaultFallback.editorial
+
+    const denimCarousel: HomeCarouselSlide[] =
+      denimCarouselBanners.length > 0
+        ? denimCarouselBanners.map((b) => ({
+            id: b.id,
+            title: b.title,
+            subtitle: b.subtitle,
+            desktopImageUrl: imageUrl(b.desktopImageKey) ?? b.desktopImageKey,
+            mobileImageUrl: imageUrl(b.mobileImageKey),
+            ctaText: b.ctaText,
+            ctaLink: b.ctaLink,
+            position: b.position,
+          }))
+        : defaultFallback.denimCarousel
+
+    return { hero, middle, bottom, editorial, denimCarousel }
   } catch (error) {
     console.error("Error retrieving banners in getHomeBanners:", error)
     return defaultFallback

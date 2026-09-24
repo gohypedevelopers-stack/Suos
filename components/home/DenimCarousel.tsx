@@ -2,47 +2,53 @@
 
 import Image from "next/image"
 
+import Link from "next/link"
+
 import { useContinuousDraggableCarousel } from "./useContinuousDraggableCarousel"
+import type { HomeCarouselSlide } from "@/lib/server/dal/banners"
 
 type DenimSlide = {
   id: string
   image: string
   alt: string
+  ctaLink?: string | null
 }
 
-const denimSlides: DenimSlide[] = [
+const defaultDenimSlides: DenimSlide[] = [
   {
     id: "skinny",
     image: "/images/products/product5-white.png",
     alt: "Model wearing skinny denim",
+    ctaLink: "/collections",
   },
   {
     id: "bootcut",
     image: "/images/products/product5-white.png",
     alt: "Model wearing bootcut denim",
+    ctaLink: "/collections",
   },
   {
     id: "low-rise",
     image: "/images/products/product5-white.png",
     alt: "Model wearing low-rise denim",
+    ctaLink: "/collections",
   },
   {
     id: "straight",
     image: "/images/products/product5-white.png",
     alt: "Model wearing straight denim",
+    ctaLink: "/collections",
   },
   {
     id: "relaxed",
     image: "/images/products/product5-white.png",
     alt: "Model wearing relaxed denim",
+    ctaLink: "/collections",
   },
 ]
 
-// The first and last copies give a dragged carousel space to move in either direction.
-const loopingDenimSlides = [...denimSlides, ...denimSlides, ...denimSlides]
-
 function DenimSlideCard({ slide }: { slide: DenimSlide }) {
-  return (
+  const card = (
     <article className="relative h-[460px] w-[min(92vw,627px)] shrink-0 overflow-hidden bg-white sm:h-[530px] sm:w-[min(72vw,627px)] md:h-[590px] md:w-[min(58vw,627px)] lg:h-[640px] lg:w-[627px]">
       <Image
         src={slide.image}
@@ -53,9 +59,34 @@ function DenimSlideCard({ slide }: { slide: DenimSlide }) {
       />
     </article>
   )
+
+  if (slide.ctaLink) {
+    return (
+      <Link href={slide.ctaLink} className="block cursor-pointer">
+        {card}
+      </Link>
+    )
+  }
+
+  return card
 }
 
-export function DenimCarousel() {
+export function DenimCarousel({
+  slides,
+}: {
+  slides?: HomeCarouselSlide[]
+}) {
+  const activeSlides: DenimSlide[] =
+    slides && slides.length > 0
+      ? slides.map((s) => ({
+          id: s.id,
+          image: s.desktopImageUrl,
+          alt: s.title || "Denim collection slide",
+          ctaLink: s.ctaLink,
+        }))
+      : defaultDenimSlides
+
+  const loopingDenimSlides = [...activeSlides, ...activeSlides, ...activeSlides]
   const {
     viewportRef,
     trackRef,
@@ -66,7 +97,7 @@ export function DenimCarousel() {
     onPointerUp,
     onPointerCancel,
   } = useContinuousDraggableCarousel({
-    slideCount: denimSlides.length,
+    slideCount: activeSlides.length,
   })
 
   return (
@@ -86,7 +117,7 @@ export function DenimCarousel() {
       >
         <div ref={trackRef} className="denim-carousel-track continuous-carousel-track">
           {loopingDenimSlides.map((slide, index) => (
-            <div key={`${slide.id}-${index}`} aria-hidden={index >= denimSlides.length}>
+            <div key={`${slide.id}-${index}`} aria-hidden={index >= activeSlides.length}>
               <DenimSlideCard slide={slide} />
             </div>
           ))}

@@ -77,7 +77,7 @@ export function BannerEditor({
   const queryPlacement = searchParams?.get("placement") as BannerPlacement | null
   const defaultPlacement: BannerPlacement =
     banner?.placement ??
-    (queryPlacement === "MIDDLE" || queryPlacement === "BOTTOM"
+    (queryPlacement && ["HERO", "MIDDLE", "BOTTOM", "EDITORIAL", "DENIM_CAROUSEL"].includes(queryPlacement)
       ? queryPlacement
       : "HERO")
   const [placement, setPlacement] = useState<BannerPlacement>(defaultPlacement)
@@ -90,7 +90,9 @@ export function BannerEditor({
     banner?.overlayOpacity ?? 20,
   )
   const [isActive, setIsActive] = useState<boolean>(banner?.isActive ?? true)
-  const [position, setPosition] = useState<number>(banner?.position ?? 0)
+  const queryPosition = searchParams?.get("position")
+  const defaultPosition = banner?.position ?? (queryPosition ? parseInt(queryPosition, 10) : 0)
+  const [position, setPosition] = useState<number>(defaultPosition)
 
   // Image states
   const [desktopImage, setDesktopImage] = useState<{
@@ -1144,9 +1146,28 @@ export function BannerEditor({
                   >
                     <option value="HERO">Hero Banner (Top Carousel)</option>
                     <option value="MIDDLE">Middle Banner (Motion Section)</option>
+                    <option value="DENIM_CAROUSEL">Denim Carousel (Collection Slide)</option>
+                    <option value="EDITORIAL">Denim Editorial Grid (3 Images)</option>
                     <option value="BOTTOM">Bottom Banner (Product Section)</option>
                   </select>
                 </div>
+
+                {placement === "EDITORIAL" && (
+                  <div>
+                    <label className="block text-xs font-semibold text-neutral-800">
+                      Editorial Slot
+                    </label>
+                    <select
+                      value={position}
+                      onChange={(e) => setPosition(parseInt(e.target.value, 10))}
+                      className="mt-1.5 w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-xs font-medium text-neutral-900 shadow-xs focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+                    >
+                      <option value={0}>Slot 1: Top-Left Square (1:1 Ratio)</option>
+                      <option value={1}>Slot 2: Top-Right Square (1:1 Ratio)</option>
+                      <option value={2}>Slot 3: Bottom Wide Banner (20:9 Ratio)</option>
+                    </select>
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-xs font-semibold text-neutral-800">
@@ -1213,9 +1234,17 @@ export function BannerEditor({
               <div className="mt-4 flex justify-center">
                 <div
                   className={`overflow-hidden rounded-xl border border-neutral-800 bg-black shadow-2xl transition-all duration-300 relative ${
-                    previewDevice === "desktop"
-                      ? "w-full aspect-[16/9]"
-                      : "w-[240px] aspect-[9/16]"
+                    placement === "EDITORIAL"
+                      ? position === 2
+                        ? "w-full aspect-[20/9]"
+                        : "w-[280px] aspect-square"
+                      : placement === "DENIM_CAROUSEL"
+                        ? "w-[260px] aspect-[627/640]"
+                        : previewDevice === "desktop"
+                          ? placement === "HERO"
+                            ? "w-full aspect-[16/9]"
+                            : "w-full aspect-[16/7]"
+                          : "w-[240px] aspect-[9/16]"
                   }`}
                 >
                   {/* Banner Image */}

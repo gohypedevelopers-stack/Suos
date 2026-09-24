@@ -228,6 +228,46 @@ export async function addHeroSlideAction(input: {
   }
 }
 
+export async function addCarouselSlideAction(input: {
+  desktopImageKey: string
+  title?: string | null
+  subtitle?: string | null
+  ctaText?: string | null
+  ctaLink?: string | null
+}): Promise<BannerActionState> {
+  const prisma = getPrisma()
+  if (!prisma || !("banner" in prisma) || !prisma.banner) {
+    return { status: "error", message: "Database not connected." }
+  }
+
+  try {
+    const highest = await prisma.banner.findFirst({
+      where: { placement: "DENIM_CAROUSEL" },
+      orderBy: { position: "desc" },
+      select: { position: true },
+    })
+    const nextPos = (highest?.position ?? -1) + 1
+
+    const banner = await createBanner({
+      desktopImageKey: input.desktopImageKey,
+      placement: "DENIM_CAROUSEL",
+      isActive: true,
+      position: nextPos,
+      title: input.title?.trim() || null,
+      subtitle: input.subtitle?.trim() || null,
+      ctaText: input.ctaText?.trim() || null,
+      ctaLink: input.ctaLink?.trim() || "/collections",
+      textAlignment: "CENTER",
+      overlayOpacity: 0,
+    })
+
+    revalidateBannerPaths(banner.id)
+    return { status: "success", bannerId: banner.id }
+  } catch (error) {
+    return { status: "error", message: mutationError(error) }
+  }
+}
+
 export type StoreRouteOption = {
   label: string
   path: string

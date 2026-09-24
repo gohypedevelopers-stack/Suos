@@ -26,9 +26,9 @@ export default async function Home() {
       <LaunchOfferBar />
       <TrendingSection products={products.slice(0, 8)} />
       <MotionBannerSection banner={banners.middle} />
-      <DenimCarousel />
+      <DenimCarousel slides={banners.denimCarousel} />
       <EditsCarousel />
-      <DenimEditorialSection />
+      <DenimEditorialSection banners={banners.editorial} />
       <LookbookCarousel />
       <ProductBannerSection banner={banners.bottom} />
       <RecommendedSection products={products.slice(4, 8).length >= 4 ? products.slice(4, 8) : products.slice(0, 4)} />
