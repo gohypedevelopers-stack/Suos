@@ -13,7 +13,17 @@ function createAuth() {
     appName: "SUOS",
     baseURL: authEnv.BETTER_AUTH_URL,
     secret: authEnv.BETTER_AUTH_SECRET,
-    trustedOrigins: [authEnv.BETTER_AUTH_URL],
+    trustedOrigins: [
+      authEnv.BETTER_AUTH_URL,
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://localhost:3002",
+      "http://localhost:*",
+      "http://127.0.0.1:*",
+      "https://*.suosindia.com",
+      "https://suosindia.com",
+      "https://dev.suosindia.com",
+    ],
     database: prismaAdapter(getPrisma(), {
       provider: "postgresql",
     }),

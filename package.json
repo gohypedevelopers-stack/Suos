@@ -16,7 +16,8 @@
     "db:local:start": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-local-postgres.ps1",
     "env:backup": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/backup-env.ps1",
     "env:restore": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/restore-env.ps1",
-    "admin:promote": "tsx scripts/promote-admin.ts"
+    "admin:promote": "tsx scripts/promote-admin.ts",
+    "db:seed:orders": "tsx scripts/seed-orders.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1095.0",

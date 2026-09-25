@@ -39,7 +39,7 @@ export function LoginPanel() {
 
       if (result.error) {
         setIsPending(false)
-        toast.error("The email address or password is incorrect.")
+        toast.error(result.error.message || "The email address or password is incorrect.")
         return
       }
 
