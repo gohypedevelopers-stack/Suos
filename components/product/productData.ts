@@ -27,6 +27,7 @@ export type ProductCard = {
   swatches: string[]
   gallery?: string[]
   price?: string | null
+  compareAtPrice?: string | null
 }
 
 export type ProductDetail = {

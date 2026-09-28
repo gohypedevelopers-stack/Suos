@@ -187,15 +187,17 @@ export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
               <CartRecommendationsCarousel items={recommendations} />
 
               <div className="mt-6 pb-2">
-                <button
-                  type="button"
+                <Link
+                  href="/checkout"
+                  onClick={() => onOpenChange(false)}
                   className="flex h-12 w-full items-center justify-center bg-white text-[15px] font-normal uppercase text-black transition-opacity hover:opacity-90"
                 >
                   Checkout
-                </button>
+                </Link>
 
                 <Link
                   href="/cart"
+                  onClick={() => onOpenChange(false)}
                   className="mt-3 block text-center text-[15px] font-normal uppercase text-white underline underline-offset-4 transition-opacity hover:opacity-70"
                 >
                   View Shopping Cart

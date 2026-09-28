@@ -2,8 +2,10 @@
 
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import {
   CreditCard,
+  Heart,
   RefreshCcw,
   ShieldCheck,
   Star,
@@ -61,6 +63,7 @@ function OptionButton({
 }
 
 import { useCart } from "@/lib/cart-context"
+import { useWishlist } from "@/lib/wishlist-context"
 import type { ProductCard } from "@/components/product/productData"
 
 export function ProductSummary({
@@ -68,11 +71,13 @@ export function ProductSummary({
 }: {
   product: ProductDetail
 }) {
+  const router = useRouter()
   const [selectedColor, setSelectedColor] = useState(product.colorName)
   const [selectedSize, setSelectedSize] = useState(
     product.sizes[1] ?? product.sizes[0]
   )
   const { addToCart, setIsCartOpen } = useCart()
+  const { toggleWishlist, isInWishlist } = useWishlist()
 
   const productCard: ProductCard = {
     id: product.id || product.slug,
@@ -86,9 +91,16 @@ export function ProductSummary({
     price: product.price,
   }
 
+  const isWishlisted = isInWishlist(productCard.id)
+
   const handleAddToCart = () => {
     addToCart(productCard, selectedSize)
     setIsCartOpen(true)
+  }
+
+  const handleBuyNow = () => {
+    addToCart(productCard, selectedSize)
+    router.push("/checkout")
   }
 
   return (
@@ -199,16 +211,37 @@ export function ProductSummary({
         </section>
 
         <div className="flex flex-col gap-2.5 pt-1">
+          <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              className="flex h-12 flex-1 cursor-pointer items-center justify-center border border-black bg-white text-[13px] font-[500] uppercase tracking-normal transition-[background-color,color] duration-200 ease-out hover:bg-black hover:text-white active:scale-[0.99]"
+            >
+              Add To Cart
+            </button>
+            <button
+              type="button"
+              onClick={() => toggleWishlist(productCard)}
+              aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+              title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+              className={cn(
+                "flex size-12 shrink-0 cursor-pointer items-center justify-center border border-black transition-all duration-200 ease-out active:scale-[0.95]",
+                isWishlisted
+                  ? "bg-black text-white hover:bg-black/90"
+                  : "bg-white text-black hover:bg-black hover:text-white"
+              )}
+            >
+              <Heart
+                className={cn(
+                  "size-5 transition-transform duration-200",
+                  isWishlisted ? "fill-white text-white scale-110" : "stroke-[1.7]"
+                )}
+              />
+            </button>
+          </div>
           <button
             type="button"
-            onClick={handleAddToCart}
-            className="flex h-12 w-full cursor-pointer items-center justify-center border border-black bg-white text-[13px] font-[500] uppercase tracking-normal transition-[background-color,color] duration-200 ease-out hover:bg-black hover:text-white active:scale-[0.99]"
-          >
-            Add To Cart
-          </button>
-          <button
-            type="button"
-            onClick={handleAddToCart}
+            onClick={handleBuyNow}
             className="flex h-12 w-full cursor-pointer items-center justify-center bg-black text-white text-[13px] font-[500] uppercase tracking-normal transition-opacity duration-200 ease-out hover:opacity-90 active:scale-[0.99]"
           >
             Buy Now

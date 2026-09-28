@@ -344,39 +344,31 @@ export function ProductCardView({
             {product.title || "WASHED BLACK STRAIGHT FIT DENIM"}
           </Link>
 
-          <div className="relative flex-shrink-0 size-5 flex items-center justify-center">
-            {/* Wishlist Button */}
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Wishlist Button (always visible and clickable) */}
             <button
               type="button"
               onClick={handleWishlistClick}
               aria-label="Toggle wishlist"
-              className={cn(
-                "cursor-pointer p-0.5 text-black transition-all duration-200 hover:scale-110",
-                isExpanded
-                  ? "opacity-0 pointer-events-none scale-75"
-                  : "opacity-100 scale-100 md:group-hover:opacity-0 md:group-hover:pointer-events-none md:group-hover:scale-75"
-              )}
+              title={isWished ? "Remove from wishlist" : "Add to wishlist"}
+              className="cursor-pointer p-0.5 text-black transition-transform duration-200 hover:scale-110 active:scale-95"
             >
               <Bookmark
                 className={cn(
-                  "size-4",
+                  "size-4 transition-colors",
                   isWished ? "fill-black stroke-black" : "stroke-black"
                 )}
                 strokeWidth={1.8}
               />
             </button>
 
-            {/* Shopping Bag Button (shown on hover on desktop/laptop or when expanded) */}
+            {/* Shopping Bag Button (always visible and clickable) */}
             <button
               type="button"
               onClick={handleCartClick}
               aria-label="View Cart"
-              className={cn(
-                "absolute inset-0 m-auto cursor-pointer p-0.5 text-black transition-all duration-200 hover:scale-110",
-                isExpanded
-                  ? "opacity-100 scale-100 pointer-events-auto"
-                  : "opacity-0 pointer-events-none scale-75 md:group-hover:opacity-100 md:group-hover:pointer-events-auto md:group-hover:scale-100"
-              )}
+              title="View Cart"
+              className="cursor-pointer p-0.5 text-black transition-transform duration-200 hover:scale-110 active:scale-95"
             >
               <ShoppingBag className="size-4 stroke-[1.8]" />
             </button>
