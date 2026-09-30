@@ -29,7 +29,7 @@ import {
 import { useWishlist } from "@/lib/wishlist-context"
 import { useCart } from "@/lib/cart-context"
 
-type NavKey = "women" | "men" | "bestsellers"
+type NavKey = "women" | "men" | "bestsellers" | "collections"
 type ActiveMenu = NavKey | "wishlist"
 
 type PrimaryNavItem = {
@@ -40,11 +40,21 @@ type PrimaryNavItem = {
 
 const primaryNav: PrimaryNavItem[] = [
   // { key: "women", label: "Women", href: "/#women" },
+  { key: "collections", label: "Collections", href: "/collections" },
   { key: "men", label: "Men", href: "/#men" },
   { key: "bestsellers", label: "Bestsellers", href: "/#bestsellers" },
 ]
 
 const megaMenuFeatured = ["New", "Bestsellers", "Sale"]
+
+const megaMenuCollections = [
+  "All Collections",
+  "Signature Series",
+  "Off Beat Edit",
+  "Country Edit",
+  "After Dark 001",
+  "Atelier Essentials",
+]
 
 const megaMenuCategories = [
   "Bootcut Jeans",
@@ -218,14 +228,14 @@ function MenuSection({
       <ul className="mt-4 space-y-4">
         {items.map((item) => (
           <li key={item}>
-            <button
-              type="button"
+            <Link
+              href="/collections"
               tabIndex={open ? 0 : -1}
               onClick={onClose}
               className="inline-flex cursor-pointer items-start text-left text-[13px] font-[400] uppercase leading-none tracking-[0.01em] text-black/55 transition-colors duration-200 hover:text-black focus-visible:text-black focus-visible:outline-none"
             >
               {item}
-            </button>
+            </Link>
           </li>
         ))}
       </ul>
@@ -238,20 +248,28 @@ function MenuCard({
   alt,
   eyebrow,
   titleLines,
+  href = "/collections",
+  onClose,
 }: {
   src: string
   alt: string
   eyebrow: string
   titleLines: string[]
+  href?: string
+  onClose?: () => void
 }) {
   return (
-    <article className="relative aspect-[314/412] overflow-hidden bg-neutral-100">
+    <Link
+      href={href}
+      onClick={onClose}
+      className="group/card relative block aspect-[314/412] overflow-hidden bg-neutral-100 cursor-pointer"
+    >
       <Image
         src={src}
         alt={alt}
         fill
         sizes="(max-width: 1024px) 48vw, 314px"
-        className="object-cover"
+        className="object-cover transition-transform duration-500 group-hover/card:scale-105"
       />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.1)_0%,rgba(0,0,0,0.12)_58%,rgba(0,0,0,0.28)_100%)]" />
       <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center text-white drop-shadow-[0_2px_16px_rgba(0,0,0,0.45)]">
@@ -269,7 +287,7 @@ function MenuCard({
           ))}
         </div>
       </div>
-    </article>
+    </Link>
   )
 }
 
@@ -306,7 +324,8 @@ function getNavKeyFromHash(hash: string): NavKey | null {
   if (
     normalized === "women" ||
     normalized === "men" ||
-    normalized === "bestsellers"
+    normalized === "bestsellers" ||
+    normalized === "collections"
   ) {
     return normalized
   }
@@ -398,6 +417,10 @@ export function Navbar({
 
   useEffect(() => {
     const updateSelectedNav = () => {
+      if (pathname === "/collections" || pathname?.startsWith("/collections/")) {
+        setSelectedNav("collections")
+        return
+      }
       setSelectedNav(getNavKeyFromHash(window.location.hash) ?? defaultNavKey)
     }
 
@@ -413,7 +436,7 @@ export function Navbar({
       window.removeEventListener("hashchange", updateSelectedNav)
       window.removeEventListener("popstate", updateSelectedNav)
     }
-  }, [])
+  }, [pathname])
 
   useIsomorphicLayoutEffect(() => {
     const readAnnouncementHeight = () => {
@@ -767,8 +790,8 @@ export function Navbar({
                 >
                   <div className="grid h-full w-full gap-x-14 gap-y-8 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(10rem,12rem)_minmax(14rem,18rem)_minmax(0,1fr)] lg:px-8">
                     <MenuSection
-                      title="Featured"
-                      items={megaMenuFeatured}
+                      title={activeMenu === "collections" ? "Collections" : "Featured"}
+                      items={activeMenu === "collections" ? megaMenuCollections : megaMenuFeatured}
                       open={Boolean(activeMenu)}
                       onClose={closeMenu}
                     />
@@ -788,6 +811,7 @@ export function Navbar({
                           alt={card.alt}
                           eyebrow={card.eyebrow}
                           titleLines={card.titleLines}
+                          onClose={closeMenu}
                         />
                       ))}
                     </div>
@@ -867,15 +891,6 @@ export function Navbar({
                     <ChevronRight className="size-4 stroke-[1.5] text-white/40" />
                   </Link>
                 ))}
-
-                <Link
-                  href="/collections"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between py-2.5 text-[17px] font-normal uppercase tracking-[0.08em] text-white/80 transition-colors hover:text-white/70"
-                >
-                  <span>All Collections</span>
-                  <ChevronRight className="size-4 stroke-[1.5] text-white/40" />
-                </Link>
               </nav>
 
               <div className="my-1 h-px w-full bg-white/10" />
