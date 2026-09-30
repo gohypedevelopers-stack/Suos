@@ -702,10 +702,21 @@ export function CheckoutPage() {
     return (
       <main className="min-h-screen bg-white text-black">
         {/* Minimal Checkout Header */}
-        <header className="border-b border-black/15 px-6 py-6 sm:px-10">
+        <header className="border-b border-black/15 px-6 py-4 sm:px-10">
           <div className="mx-auto flex max-w-6xl items-center justify-between">
-            <Link href="/" className="font-heading text-[24px] uppercase tracking-[0.1em] text-black">
-              SUOS
+            <Link
+              href="/"
+              aria-label="SUOS home"
+              className="transition-opacity hover:opacity-70"
+            >
+              <Image
+                src="/logo.svg"
+                alt="SUOS"
+                width={160}
+                height={74}
+                priority
+                className="block h-auto w-[5.8rem] sm:w-[6.8rem]"
+              />
             </Link>
           </div>
         </header>
@@ -769,9 +780,17 @@ export function CheckoutPage() {
           {/* Logo */}
           <Link
             href="/"
-            className="font-heading text-[22px] font-normal uppercase tracking-[0.12em] text-black transition-opacity hover:opacity-70 sm:text-[26px]"
+            aria-label="SUOS home"
+            className="transition-opacity hover:opacity-70"
           >
-            SUOS
+            <Image
+              src="/logo.svg"
+              alt="SUOS"
+              width={160}
+              height={74}
+              priority
+              className="block h-auto w-[5.8rem] sm:w-[6.8rem]"
+            />
           </Link>
 
           {/* Help & Bag Icon with Item Count */}
