@@ -52,16 +52,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [cart, isLoaded])
 
   const addToCart = (product: ProductCard, size: string) => {
+    const resolvedProduct: ProductCard = {
+      ...product,
+      title: product.title || "WASHED BLACK STRAIGHT FIT DENIM",
+      price: product.price && product.price !== "N/A" ? product.price : "₹2,200",
+      image: product.image || "/images/products/product1.png",
+    }
+    const resolvedSize = size || (product.sizes && product.sizes.length > 0 ? product.sizes[0] : "M")
+
     setCart((prev) => {
-      const existing = prev.find((item) => item.id === product.id && item.size === size)
+      const existing = prev.find((item) => item.id === resolvedProduct.id && item.size === resolvedSize)
       if (existing) {
         return prev.map((item) =>
-          item.id === product.id && item.size === size
+          item.id === resolvedProduct.id && item.size === resolvedSize
             ? { ...item, quantity: item.quantity + 1 }
             : item
         )
       }
-      return [...prev, { ...product, size, quantity: 1 }]
+      return [...prev, { ...resolvedProduct, size: resolvedSize, quantity: 1 }]
     })
   }
 

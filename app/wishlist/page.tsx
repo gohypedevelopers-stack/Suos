@@ -6,10 +6,12 @@ import Link from "next/link"
 import { ShoppingBag } from "lucide-react"
 
 import { useWishlist } from "@/lib/wishlist-context"
+import { useCart } from "@/lib/cart-context"
 import { Button } from "@/components/ui/button"
 
 export default function WishlistPage() {
   const { wishlist, removeFromWishlist, clearWishlist, isLoaded } = useWishlist()
+  const { addToCart, setIsCartOpen } = useCart()
 
   if (!isLoaded) return null
 
@@ -87,7 +89,11 @@ export default function WishlistPage() {
                 </Button>
                 <Button
                   variant="default"
-                  className="h-8 rounded-none px-4 text-xs font-medium gap-1.5"
+                  className="h-8 rounded-none px-4 text-xs font-medium gap-1.5 cursor-pointer"
+                  onClick={() => {
+                    addToCart(product, "M")
+                    setIsCartOpen(true)
+                  }}
                 >
                   <ShoppingBag className="size-3.5" />
                   Add to Cart

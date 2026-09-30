@@ -94,12 +94,12 @@ export function ProductSummary({
   const isWishlisted = isInWishlist(productCard.id)
 
   const handleAddToCart = () => {
-    addToCart(productCard, selectedSize)
+    addToCart(productCard, selectedSize || product.sizes[0] || "M")
     setIsCartOpen(true)
   }
 
   const handleBuyNow = () => {
-    addToCart(productCard, selectedSize)
+    addToCart(productCard, selectedSize || product.sizes[0] || "M")
     router.push("/checkout")
   }
 

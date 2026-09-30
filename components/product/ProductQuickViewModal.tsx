@@ -14,8 +14,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
-import type { ProductDetail } from "@/components/product/productData"
+import type { ProductDetail, ProductCard } from "@/components/product/productData"
 import { SizeChartModal } from "@/components/product/SizeChartModal"
+import { useCart } from "@/lib/cart-context"
 
 type ProductQuickViewModalProps = {
   open: boolean
@@ -104,6 +105,25 @@ export function ProductQuickViewModal({
   const [selectedSize, setSelectedSize] = useState(
     product.sizes[1] ?? product.sizes[0] ?? ""
   )
+  const { addToCart, setIsCartOpen } = useCart()
+
+  const handleAddToCart = () => {
+    const sizeToAdd = selectedSize || product.sizes[0] || "M"
+    const productCard: ProductCard = {
+      id: product.id || product.slug,
+      title: product.title || "WASHED BLACK STRAIGHT FIT DENIM",
+      slug: product.slug,
+      image: galleryImages[0] || product.gallery[0]?.src || "/images/products/product1.png",
+      alt: product.title,
+      sizes: product.sizes,
+      swatches: product.colors.map((c) => c.value),
+      gallery: galleryImages,
+      price: product.price && product.price !== "N/A" ? product.price : "₹2,200",
+    }
+    addToCart(productCard, sizeToAdd)
+    onOpenChange(false)
+    setIsCartOpen(true)
+  }
 
   useEffect(() => {
     if (!open) {
@@ -305,6 +325,7 @@ export function ProductQuickViewModal({
 
               <button
                 type="button"
+                onClick={handleAddToCart}
                 className="mt-6 sm:mt-8 flex h-11 sm:h-12 w-full cursor-pointer items-center justify-center bg-black text-xs sm:text-sm font-medium uppercase tracking-wider text-white transition-opacity hover:opacity-90"
               >
                 Add To Cart

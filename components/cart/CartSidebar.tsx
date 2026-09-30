@@ -20,19 +20,22 @@ const promoStripText = "Additional Discount on Pre-paid | Free Return and Exchan
 
 const recommendations = [
   {
-    id: "recommendation-1",
-    image: trendingProducts[0].image,
-    alt: trendingProducts[0].alt,
+    id: trendingProducts[0]?.id || "recommendation-1",
+    slug: trendingProducts[0]?.slug || "product-1",
+    image: trendingProducts[0]?.image || "/images/products/product1.png",
+    alt: trendingProducts[0]?.alt || "Signature Denim",
   },
   {
-    id: "recommendation-2",
-    image: trendingProducts[0].image,
-    alt: trendingProducts[0].alt,
+    id: trendingProducts[1]?.id || "recommendation-2",
+    slug: trendingProducts[1]?.slug || "product-2",
+    image: trendingProducts[1]?.image || "/images/products/product2.png",
+    alt: trendingProducts[1]?.alt || "Denim Jacket",
   },
   {
-    id: "recommendation-3",
-    image: trendingProducts[0].image,
-    alt: trendingProducts[0].alt,
+    id: trendingProducts[2]?.id || "recommendation-3",
+    slug: trendingProducts[2]?.slug || "product-3",
+    image: trendingProducts[2]?.image || "/images/products/product3.png",
+    alt: trendingProducts[2]?.alt || "Tailored Trouser",
   },
 ]
 
@@ -149,8 +152,14 @@ export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
           {/* Header */}
           <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
             <div className="flex items-center gap-2 text-[14px] font-normal uppercase text-white">
-              <Check className="size-4 stroke-[2.4]" />
-              <span>{totalItems} ITEM{totalItems !== 1 && "S"} ADDED</span>
+              {totalItems > 0 ? (
+                <>
+                  <Check className="size-4 stroke-[2.4]" />
+                  <span>{totalItems} ITEM{totalItems !== 1 && "S"} ADDED</span>
+                </>
+              ) : (
+                <span>SHOPPING BAG (0)</span>
+              )}
             </div>
 
             <SheetClose asChild>
@@ -221,13 +230,23 @@ export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
               <span className="text-[15px] font-medium text-white">{subtotalFormatted}</span>
             </div>
 
-            <Link
-              href="/checkout"
-              onClick={() => onOpenChange(false)}
-              className="flex h-11 w-full items-center justify-center bg-white text-[14px] font-medium uppercase tracking-wider text-black transition-opacity hover:opacity-90"
-            >
-              Checkout
-            </Link>
+            {totalItems > 0 ? (
+              <Link
+                href="/checkout"
+                onClick={() => onOpenChange(false)}
+                className="flex h-11 w-full items-center justify-center bg-white text-[14px] font-medium uppercase tracking-wider text-black transition-opacity hover:opacity-90"
+              >
+                Checkout
+              </Link>
+            ) : (
+              <button
+                type="button"
+                disabled
+                className="flex h-11 w-full items-center justify-center border border-white/10 bg-white/10 text-[14px] font-normal uppercase tracking-wider text-white/40 cursor-not-allowed"
+              >
+                Checkout
+              </button>
+            )}
 
             <Link
               href="/cart"

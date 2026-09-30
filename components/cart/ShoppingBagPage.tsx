@@ -534,7 +534,10 @@ export function ShoppingBagPage() {
     <main className="min-h-screen bg-white text-black">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
         {cart.length === 0 ? (
-          <EmptyBagState />
+          <div>
+            <EmptyBagState />
+            <BeforeYouGoSection />
+          </div>
         ) : (
           <div>
             {/* Top Page Title & Total */}

@@ -125,7 +125,12 @@ export function ProductCardView({
     event.preventDefault()
     event.stopPropagation()
     setSelectedSize(size)
-    addToCart(product, size)
+    const productToAdd: ProductCard = {
+      ...product,
+      title: product.title || "WASHED BLACK STRAIGHT FIT DENIM",
+      price: displayPrice,
+    }
+    addToCart(productToAdd, size)
     setIsCartOpen(true)
   }
 
@@ -147,6 +152,13 @@ export function ProductCardView({
   const handleCartClick = (event: React.MouseEvent) => {
     event.preventDefault()
     event.stopPropagation()
+    const sizeToAdd = selectedSize || (sizesList && sizesList.length > 0 ? sizesList[0] : "M")
+    const productToAdd: ProductCard = {
+      ...product,
+      title: product.title || "WASHED BLACK STRAIGHT FIT DENIM",
+      price: displayPrice,
+    }
+    addToCart(productToAdd, sizeToAdd)
     setIsCartOpen(true)
   }
 
@@ -365,8 +377,8 @@ export function ProductCardView({
           <button
             type="button"
             onClick={handleCartClick}
-            aria-label="View Cart"
-            title="View Cart"
+            aria-label="Add to cart"
+            title="Add to cart"
             className="shrink-0 cursor-pointer p-0.5 text-black transition-transform duration-200 hover:scale-110 active:scale-95"
           >
             <ShoppingBag className="size-4 stroke-[1.8]" />
