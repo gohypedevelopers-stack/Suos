@@ -102,7 +102,7 @@ export function FooterSection() {
                 <div className="space-y-0.5">
                   <p className="font-normal">For customer care</p>
                   <p className="normal-case tracking-[-0.01em] break-all">
-                    customercare@suos.in
+                    info@suos.in
                   </p>
                 </div>
 

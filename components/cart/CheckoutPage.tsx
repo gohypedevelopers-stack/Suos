@@ -778,12 +778,8 @@ export function CheckoutPage() {
           <div className="flex items-center gap-5 text-[12px] tracking-[0.04em] text-black/60">
             <div className="hidden items-center gap-2 sm:flex">
               <span>Need help?</span>
-              <a href="mailto:care@suos.in" className="text-black underline underline-offset-2 hover:opacity-75">
+              <a href="mailto:info@suos.in" className="text-black underline underline-offset-2 hover:opacity-75">
                 Email us
-              </a>
-              <span>|</span>
-              <a href="tel:+919876543210" className="text-black hover:opacity-75">
-                +91 98765 43210
               </a>
             </div>
 
@@ -817,18 +813,18 @@ export function CheckoutPage() {
                 <p className="text-center text-[12px] uppercase tracking-[0.08em] text-black/60">
                   Express Checkout
                 </p>
-                <div className="mt-3 grid grid-cols-2 gap-3">
+                <div className="mt-3 grid grid-cols-2 gap-2 sm:gap-3">
                   <button
                     type="button"
                     onClick={() => setStep("payment")}
-                    className="flex h-12 items-center justify-center border border-black bg-white text-[12px] font-medium uppercase tracking-[0.08em] text-black transition-colors hover:bg-black hover:text-white"
+                    className="flex h-12 items-center justify-center border border-black bg-white px-1 sm:px-2 text-center text-[10.5px] min-[360px]:text-[11px] sm:text-[12px] font-medium uppercase tracking-[0.02em] sm:tracking-[0.06em] text-black transition-colors hover:bg-black hover:text-white"
                   >
                     UPI / GPay
                   </button>
                   <button
                     type="button"
                     onClick={() => setStep("payment")}
-                    className="flex h-12 items-center justify-center border border-black bg-white text-[12px] font-medium uppercase tracking-[0.08em] text-black transition-colors hover:bg-black hover:text-white"
+                    className="flex h-12 items-center justify-center border border-black bg-white px-1 sm:px-2 text-center text-[10.5px] min-[360px]:text-[11px] sm:text-[12px] font-medium uppercase tracking-[0.02em] sm:tracking-[0.06em] text-black transition-colors hover:bg-black hover:text-white"
                   >
                     Cards / Netbanking
                   </button>
@@ -1069,9 +1065,9 @@ export function CheckoutPage() {
                 </Link>
               </p>
               <p>
-                Need help? Call us at{" "}
-                <a href="tel:+919876543210" className="underline hover:text-black">
-                  +91 98765 43210
+                Need help?{" "}
+                <a href="mailto:info@suos.in" className="underline hover:text-black">
+                  Email us
                 </a>{" "}
                 or{" "}
                 <Link href="/contact" className="underline hover:text-black">

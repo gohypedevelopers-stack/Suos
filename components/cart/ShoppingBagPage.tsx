@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { Minus, Plus, ChevronDown, ShoppingBag, Tag, ArrowRight } from "lucide-react"
+import { Minus, Plus, ChevronDown, ShoppingBag, Tag, ArrowRight, Trash2 } from "lucide-react"
 import { useState } from "react"
 
 import { useCart, type CartItem } from "@/lib/cart-context"
@@ -28,6 +28,40 @@ function parseAmount(price: string | null | undefined): number {
   return parseFloat(raw) || 0
 }
 
+const COLOR_NAME_MAP: Record<string, string> = {
+  "#191970": "Midnight Blue",
+  "#000000": "Black",
+  "#171717": "Washed Black",
+  "#1a1a1a": "Jet Black",
+  "#ffffff": "White",
+  "#f5f5f5": "Off White",
+  "#2c3e50": "Dark Slate",
+  "#808080": "Grey",
+  "#4a5568": "Slate Grey",
+  "#718096": "Cool Grey",
+  "#1e3a8a": "Deep Navy",
+  "#3b82f6": "Classic Blue",
+  "#0f766e": "Deep Teal",
+  "#374151": "Charcoal",
+  "#6b7280": "Stone",
+  "#d1d5db": "Light Grey",
+  "#b45309": "Amber",
+  "#78350f": "Dark Tan",
+  "#a16207": "Olive",
+}
+
+function resolveColorInfo(rawColor?: string | null): { label: string; hex?: string } {
+  if (!rawColor) return { label: "Natural / Signature" }
+  if (rawColor.startsWith("#")) {
+    const hex = rawColor.toLowerCase()
+    return {
+      label: COLOR_NAME_MAP[hex] || "Signature Color",
+      hex: rawColor,
+    }
+  }
+  return { label: rawColor }
+}
+
 /* ─────────────────────────────────────────────
    Cart item row (SUOS Brand Style)
 ───────────────────────────────────────────── */
@@ -36,116 +70,140 @@ function CartItemRow({ item }: { item: CartItem }) {
   const itemPrice = parseAmount(item.price)
   const comparePrice = item.compareAtPrice ? parseAmount(item.compareAtPrice) : null
 
+  const rawColor =
+    (item as any).color ||
+    (item.swatches && item.swatches.length > 0 ? item.swatches[0] : null)
+  const colorInfo = resolveColorInfo(rawColor)
+
   return (
-    <article className="border-b border-black/15 pb-8 pt-4">
-      <div className="flex gap-5 sm:gap-7">
+    <article className="border-b border-black/15 py-5 sm:py-6">
+      <div className="flex gap-4 sm:gap-6">
         {/* Product image */}
-        <Link
-          href={item.slug ? `/products/${item.slug}` : "#"}
-          className="relative aspect-[3/4] w-[110px] shrink-0 overflow-hidden bg-neutral-100 sm:w-[130px]"
-          tabIndex={-1}
-          aria-hidden="true"
-        >
-          <Image
-            src={item.image}
-            alt={item.alt || item.title || "Product"}
-            fill
-            sizes="130px"
-            className="object-cover transition-transform duration-500 hover:scale-105"
-          />
-        </Link>
+        <div className="relative aspect-[3/4] w-[84px] sm:w-[105px] shrink-0 overflow-hidden bg-neutral-100">
+          <Link
+            href={item.slug ? `/products/${item.slug}` : "#"}
+            className="block h-full w-full"
+            tabIndex={-1}
+            aria-hidden="true"
+          >
+            <Image
+              src={item.image}
+              alt={item.alt || item.title || "Product"}
+              fill
+              sizes="105px"
+              className="object-cover transition-transform duration-500 hover:scale-105"
+            />
+          </Link>
+          {item.badge && (
+            <span className="absolute bottom-1.5 left-1.5 rounded-[2px] bg-slate-100/95 px-1.5 py-0.5 text-[9px] font-normal tracking-tight text-blue-900 shadow-xs">
+              {item.badge}
+            </span>
+          )}
+        </div>
 
-        {/* Details & controls */}
-        <div className="flex min-w-0 flex-1 flex-col justify-between">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0 space-y-1">
-              <Link
-                href={item.slug ? `/products/${item.slug}` : "#"}
-                className="block text-[14px] font-normal uppercase leading-tight tracking-[0.04em] text-black transition-opacity hover:opacity-60 sm:text-[15px]"
-              >
-                {item.title || "SIGNATURE ITEM"}
-              </Link>
+        {/* Details & Top-right stepper */}
+        <div className="flex min-w-0 flex-1 flex-col justify-start">
+          {/* Top row: Title and Stepper */}
+          <div className="flex items-start justify-between gap-3">
+            <Link
+              href={item.slug ? `/products/${item.slug}` : "#"}
+              className="min-w-0 text-[13px] sm:text-[14px] font-normal leading-snug text-black transition-opacity hover:opacity-60"
+            >
+              {item.title || "SIGNATURE ITEM"}
+            </Link>
 
-              {/* Price row */}
-              <div className="flex items-center gap-2 pt-0.5 text-[13px] tracking-[0.02em]">
-                {comparePrice && comparePrice > itemPrice && (
-                  <span className="text-black/40 line-through">
-                    {formatPrice(comparePrice)}
-                  </span>
-                )}
-                <span className="font-medium text-black">
-                  {formatPrice(itemPrice > 0 ? itemPrice : item.price)}
-                </span>
-              </div>
-
-              {/* Attributes (Color / Size) */}
-              <div className="pt-1 text-[12px] uppercase tracking-[0.05em] text-black/60">
-                <p>Color: <span className="text-black">Natural / Signature</span></p>
-                {item.size && (
-                  <p className="mt-0.5">Size: <span className="text-black">{item.size}</span></p>
-                )}
-              </div>
-
-              {/* Offer badge */}
-              <div className="pt-1">
-                <span className="inline-block text-[11px] uppercase tracking-[0.05em] text-black/70">
-                  {item.badge ? `${item.badge} · Pre-paid eligible` : "Complimentary Express Delivery Eligible"}
-                </span>
-              </div>
-            </div>
-
-            {/* Stepper on top right */}
+            {/* Stepper like before */}
             <div className="flex shrink-0 items-center border border-black/25 bg-white">
               <button
                 type="button"
                 onClick={() => updateQuantity(item.id, item.size, item.quantity - 1)}
                 aria-label="Decrease quantity"
-                className="flex size-8 items-center justify-center text-black transition-colors hover:bg-black/5"
+                className="flex size-7 items-center justify-center text-black transition-colors hover:bg-black/5 cursor-pointer"
               >
                 <Minus className="size-3" />
               </button>
-              <span className="w-8 text-center text-[13px] font-normal">{item.quantity}</span>
+              <span className="w-7 text-center text-[12px] font-normal text-black">
+                {item.quantity}
+              </span>
               <button
                 type="button"
                 onClick={() => updateQuantity(item.id, item.size, item.quantity + 1)}
                 aria-label="Increase quantity"
-                className="flex size-8 items-center justify-center text-black transition-colors hover:bg-black/5"
+                className="flex size-7 items-center justify-center text-black transition-colors hover:bg-black/5 cursor-pointer"
               >
                 <Plus className="size-3" />
               </button>
             </div>
           </div>
 
-          {/* Stock info and quick actions */}
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 pt-2">
-            <p className="text-[12px] font-normal uppercase tracking-[0.04em] text-black/60">
-              In Stock: Ships in 1–2 business days
+          {/* Price row */}
+          <div className="mt-1 flex items-baseline gap-2 text-[13px] sm:text-[14px]">
+            {comparePrice && comparePrice > itemPrice && (
+              <span className="text-neutral-400 line-through text-[12px]">
+                {formatPrice(comparePrice)}
+              </span>
+            )}
+            <span className="font-normal text-black">
+              {formatPrice(itemPrice > 0 ? itemPrice : item.price)}
+            </span>
+          </div>
+
+          {/* Attributes (Color & Size) */}
+          <div className="mt-1.5 space-y-0.5 text-[12px] font-normal text-neutral-600">
+            <p className="flex items-center gap-1.5">
+              <span>Color:</span>
+              {colorInfo.hex && (
+                <span
+                  className="size-2.5 rounded-full border border-black/20 shrink-0"
+                  style={{ backgroundColor: colorInfo.hex }}
+                  aria-hidden="true"
+                />
+              )}
+              <span className="text-black">{colorInfo.label}</span>
             </p>
 
-            <div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.08em] text-black/50">
-              <Link
-                href={item.slug ? `/products/${item.slug}` : "#"}
-                className="transition-colors hover:text-black hover:underline"
-              >
-                Edit
-              </Link>
-              <span>|</span>
-              <button
-                type="button"
-                className="transition-colors hover:text-black hover:underline"
-              >
-                Save for Later
-              </button>
-              <span>|</span>
-              <button
-                type="button"
-                onClick={() => removeFromCart(item.id, item.size)}
-                className="transition-colors hover:text-black hover:underline"
-              >
-                Remove
-              </button>
-            </div>
+            {item.size && (
+              <p>
+                Size: <span className="text-black">{item.size}</span>
+              </p>
+            )}
           </div>
+
+          {/* Delivery perk / badge */}
+          <div className="mt-1">
+            <span className="text-[11px] font-normal text-neutral-500">
+              {item.badge ? `${item.badge} · Pre-paid eligible` : "Complimentary Express Delivery Eligible"}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Stock info and Actions row (underneath) */}
+      <div className="mt-3.5 sm:mt-4 space-y-2">
+        <p className="text-[12px] font-normal text-neutral-700">
+          <span className="text-emerald-700 font-normal">In Stock:</span> Ships in 1–2 business days
+        </p>
+
+        <div className="flex items-center gap-5 text-[12px] font-normal text-neutral-500">
+          <Link
+            href={item.slug ? `/products/${item.slug}` : "#"}
+            className="hover:text-black transition-colors"
+          >
+            Edit
+          </Link>
+          <button
+            type="button"
+            className="hover:text-black transition-colors cursor-pointer"
+          >
+            Save for Later
+          </button>
+          <button
+            type="button"
+            onClick={() => removeFromCart(item.id, item.size)}
+            className="hover:text-black transition-colors cursor-pointer"
+          >
+            Remove
+          </button>
         </div>
       </div>
     </article>
@@ -223,7 +281,7 @@ function SuosRewardsCard({ subtotal }: { subtotal: number }) {
   const points = Math.max(100, Math.round(subtotal * 0.1))
 
   return (
-    <div className="border border-black bg-black p-5 text-white">
+    <div className="border border-black bg-black p-5 text-center sm:text-left text-white">
       <h3 className="text-[14px] font-normal uppercase tracking-[0.1em] text-white">
         SUOS <span className="font-light text-white/70">Rewards</span>
       </h3>
@@ -334,16 +392,16 @@ function ShoppingBagSummary({
         </div>
 
         {/* Express Payment Buttons */}
-        <div className="grid grid-cols-2 gap-2.5">
+        <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
           <Link
             href="/checkout"
-            className="flex h-10 items-center justify-center border border-black bg-white text-[12px] font-medium uppercase tracking-[0.08em] text-black transition-colors hover:bg-black hover:text-white"
+            className="flex h-10 items-center justify-center border border-black bg-white px-1 sm:px-2 text-center text-[10.5px] min-[360px]:text-[11px] sm:text-[12px] font-medium uppercase tracking-[0.02em] sm:tracking-[0.06em] text-black transition-colors hover:bg-black hover:text-white"
           >
             UPI / GPay
           </Link>
           <Link
             href="/checkout"
-            className="flex h-10 items-center justify-center border border-black bg-white text-[12px] font-medium uppercase tracking-[0.08em] text-black transition-colors hover:bg-black hover:text-white"
+            className="flex h-10 items-center justify-center border border-black bg-white px-1 sm:px-2 text-center text-[10.5px] min-[360px]:text-[11px] sm:text-[12px] font-medium uppercase tracking-[0.02em] sm:tracking-[0.06em] text-black transition-colors hover:bg-black hover:text-white"
           >
             Cards / Netbanking
           </Link>
@@ -354,9 +412,9 @@ function ShoppingBagSummary({
           <p className="font-medium text-black/80">SUOS members enjoy complimentary returns</p>
           <p>100% Authentic SUOS Atelier Guarantee</p>
           <p className="pt-1">
-            Need Help? Customer Care{" "}
-            <a href="tel:+919876543210" className="underline hover:text-black">
-              +91 98765 43210
+            Need Help?{" "}
+            <a href="mailto:info@suos.in" className="underline hover:text-black">
+              info@suos.in
             </a>
           </p>
           <div className="flex justify-center gap-3 pt-1 text-[10px]">
@@ -405,20 +463,21 @@ function BeforeYouGoSection() {
 
   return (
     <section className="mt-20 border-t border-black/15 pt-12">
-      <div className="flex items-baseline justify-between">
-        <div>
-          <h2 className="text-[20px] font-normal uppercase tracking-[0.06em] text-black sm:text-[22px]">
+      <div className="flex items-start sm:items-baseline justify-between gap-4">
+        <div className="min-w-0">
+          <h2 className="text-[18px] sm:text-[22px] font-normal uppercase tracking-[0.06em] text-black">
             Before You Go
           </h2>
-          <p className="mt-1 text-[12px] uppercase tracking-[0.06em] text-black/45">
+          <p className="mt-1 text-[11px] sm:text-[12px] uppercase tracking-[0.06em] text-black/45">
             Curated pieces to complete your wardrobe
           </p>
         </div>
         <Link
           href="/collections"
-          className="flex items-center gap-1.5 text-[12px] uppercase tracking-[0.08em] text-black transition-opacity hover:opacity-60"
+          className="flex shrink-0 items-center gap-1.5 whitespace-nowrap text-[11px] sm:text-[12px] uppercase tracking-[0.08em] text-black transition-opacity hover:opacity-60 pt-0.5 sm:pt-0"
         >
-          View All <ArrowRight className="size-3.5" />
+          <span>View All</span>
+          <ArrowRight className="size-3.5 shrink-0" />
         </Link>
       </div>
 
@@ -479,23 +538,26 @@ export function ShoppingBagPage() {
         ) : (
           <div>
             {/* Top Page Title & Total */}
-            <div className="border-b border-black/15 pb-6">
-              <div className="flex flex-wrap items-baseline justify-between gap-4">
-                <h1 className="text-[24px] font-normal uppercase tracking-[0.06em] text-black sm:text-[28px]">
-                  Shopping Bag{" "}
-                  <span className="text-[16px] font-light text-black/50 sm:text-[18px]">
+            <div className="border-b border-black/15 pb-5">
+              <div className="flex items-baseline justify-between gap-3">
+                <h1 className="flex flex-wrap items-baseline gap-1.5 sm:gap-2 text-[18px] sm:text-[22px] font-normal uppercase tracking-[0.06em] text-black">
+                  <span>Shopping Bag</span>
+                  <span className="text-[13px] sm:text-[15px] font-light text-black/50 tracking-[0.04em]">
                     ({totalItems} {totalItems === 1 ? "item" : "items"})
                   </span>
                 </h1>
-                <span className="text-[20px] font-semibold tracking-[-0.02em] text-black sm:text-[24px]">
+                <span className="shrink-0 text-[18px] sm:text-[22px] font-normal tracking-[0.02em] text-black">
                   {formatPrice(finalTotal)}
                 </span>
               </div>
 
               {/* Alert notice */}
-              <div className="mt-3 flex items-center gap-2 text-[12px] uppercase tracking-[0.05em] text-black/65">
-                <span className="size-1.5 shrink-0 rounded-full bg-black" />
-                Items in bag are not reserved and may sell out. Order now.
+              <div className="mt-2.5 flex items-center gap-1.5 text-[11px] sm:text-[12px] font-normal uppercase tracking-[0.05em] text-black/65">
+                <svg className="size-3.5 shrink-0" viewBox="0 0 16 16" fill="currentColor">
+                  <circle cx="8" cy="8" r="8" fill="black" />
+                  <path d="M8 3.75a.75.75 0 0 1 .75.75v4.5a.75.75 0 0 1-1.5 0v-4.5A.75.75 0 0 1 8 3.75zm0 8a.875.875 0 1 1 0-1.75.875.875 0 0 1 0 1.75z" fill="white" />
+                </svg>
+                <span>Items in bag are not reserved and may sell out. Order now.</span>
               </div>
             </div>
 

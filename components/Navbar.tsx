@@ -39,7 +39,7 @@ type PrimaryNavItem = {
 }
 
 const primaryNav: PrimaryNavItem[] = [
-  { key: "women", label: "Women", href: "/#women" },
+  // { key: "women", label: "Women", href: "/#women" },
   { key: "men", label: "Men", href: "/#men" },
   { key: "bestsellers", label: "Bestsellers", href: "/#bestsellers" },
 ]
@@ -626,8 +626,8 @@ export function Navbar({
         </div>
 
         {/* Mobile Header: Single row with Hamburger */}
-        <div className="flex h-full items-center justify-between lg:hidden">
-          <div className="flex items-center gap-1">
+        <div className="relative flex h-full items-center justify-between lg:hidden">
+          <div className="z-10 flex items-center gap-1">
             <button
               type="button"
               aria-label="Open menu"
@@ -654,7 +654,7 @@ export function Navbar({
           <Link
             href="/"
             aria-label="SUOS home"
-            className="transition-opacity hover:opacity-70"
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity hover:opacity-70"
           >
             <Image
               src="/logo.svg"
@@ -669,7 +669,7 @@ export function Navbar({
             />
           </Link>
 
-          <div className="flex items-center gap-1">
+          <div className="z-10 flex items-center gap-1">
             <button
               type="button"
               aria-label="Wishlist"
