@@ -145,10 +145,10 @@ export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
         side="right"
         showCloseButton={false}
         overlayClassName="!z-[10000] bg-black/50 backdrop-blur-[1px]"
-        className="!z-[10001] overflow-hidden border-l border-white/10 bg-black p-0 text-white shadow-[0_0_80px_rgba(0,0,0,0.45)] ease-in-out duration-300"
-        style={{ width: "min(100vw, 420px)", maxWidth: "none" }}
+        className="!z-[10001] !fixed !inset-y-0 !top-0 !bottom-0 !right-0 !h-screen !h-[100dvh] !max-h-screen !gap-0 !p-0 overflow-hidden border-l border-white/10 bg-black text-white shadow-[0_0_80px_rgba(0,0,0,0.45)] ease-in-out duration-300"
+        style={{ width: "min(100vw, 420px)", maxWidth: "none", height: "100dvh", top: 0, bottom: 0, right: 0 }}
       >
-        <div className="flex h-full min-h-0 flex-col overflow-hidden">
+        <div className="flex h-full min-h-0 flex-col overflow-hidden" style={{ height: "100%" }}>
           {/* Header */}
           <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
             <div className="flex items-center gap-2 text-[14px] font-normal uppercase text-white">
@@ -224,7 +224,7 @@ export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
           </div>
 
           {/* Fixed Bottom Checkout Footer */}
-          <div className="flex-none border-t border-white/10 bg-black px-5 py-4">
+          <div className="flex-none mt-auto border-t border-white/10 bg-black px-5 py-4">
             <div className="mb-3 flex items-center justify-between text-[13px] uppercase tracking-wider">
               <span className="text-white/70">Subtotal</span>
               <span className="text-[15px] font-medium text-white">{subtotalFormatted}</span>
