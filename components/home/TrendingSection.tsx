@@ -208,6 +208,23 @@ export function ProductCardView({
           </span>
         </div>
 
+        {/* Wishlist Button at Top-Right */}
+        <button
+          type="button"
+          onClick={handleWishlistClick}
+          aria-label="Toggle wishlist"
+          title={isWished ? "Remove from wishlist" : "Add to wishlist"}
+          className="pointer-events-auto absolute right-2.5 top-2.5 z-20 flex size-7 sm:size-8 items-center justify-center text-white transition-transform duration-200 hover:scale-110 active:scale-95 cursor-pointer"
+        >
+          <Bookmark
+            className={cn(
+              "size-[18px] transition-colors drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]",
+              isWished ? "fill-white stroke-white" : "fill-transparent stroke-white"
+            )}
+            strokeWidth={1.8}
+          />
+        </button>
+
         {/* Expand / Collapse Button (+ / -) in Bottom-Right Corner of Image */}
         <button
           type="button"
@@ -344,35 +361,16 @@ export function ProductCardView({
             {product.title || "WASHED BLACK STRAIGHT FIT DENIM"}
           </Link>
 
-          <div className="flex items-center gap-2 shrink-0">
-            {/* Wishlist Button (always visible and clickable) */}
-            <button
-              type="button"
-              onClick={handleWishlistClick}
-              aria-label="Toggle wishlist"
-              title={isWished ? "Remove from wishlist" : "Add to wishlist"}
-              className="cursor-pointer p-0.5 text-black transition-transform duration-200 hover:scale-110 active:scale-95"
-            >
-              <Bookmark
-                className={cn(
-                  "size-4 transition-colors",
-                  isWished ? "fill-black stroke-black" : "stroke-black"
-                )}
-                strokeWidth={1.8}
-              />
-            </button>
-
-            {/* Shopping Bag Button (always visible and clickable) */}
-            <button
-              type="button"
-              onClick={handleCartClick}
-              aria-label="View Cart"
-              title="View Cart"
-              className="cursor-pointer p-0.5 text-black transition-transform duration-200 hover:scale-110 active:scale-95"
-            >
-              <ShoppingBag className="size-4 stroke-[1.8]" />
-            </button>
-          </div>
+          {/* Shopping Bag Button (always visible and clickable) */}
+          <button
+            type="button"
+            onClick={handleCartClick}
+            aria-label="View Cart"
+            title="View Cart"
+            className="shrink-0 cursor-pointer p-0.5 text-black transition-transform duration-200 hover:scale-110 active:scale-95"
+          >
+            <ShoppingBag className="size-4 stroke-[1.8]" />
+          </button>
         </div>
 
         {/* Subtitle row */}
