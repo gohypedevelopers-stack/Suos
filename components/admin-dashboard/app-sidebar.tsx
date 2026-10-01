@@ -20,6 +20,7 @@ import {
   PackageIcon,
   UsersRoundIcon,
   ImageIcon,
+  ReceiptTextIcon,
 } from "lucide-react"
 
 const data = {
@@ -79,6 +80,11 @@ const data = {
           url: "/dashboard/analytics/reports",
         },
       ],
+    },
+    {
+      title: "Taxes & GST",
+      url: "/dashboard/taxes",
+      icon: <ReceiptTextIcon />,
     },
   ],
 }

@@ -559,8 +559,10 @@ function CheckoutRightSummary({
         )}
 
         <div className="flex items-center justify-between text-black/80">
-          <span className="uppercase tracking-[0.04em]">Tax</span>
-          <span>₹0.00</span>
+          <span className="uppercase tracking-[0.04em]">GST (Taxes)</span>
+          <span className="text-black/60 font-mono text-xs">
+            Included ({formatPrice(Math.max(0, Math.round(((subtotal - discount) * 12) / 112)))})
+          </span>
         </div>
 
         <div className="flex items-center justify-between text-black/80">

@@ -128,6 +128,9 @@ export const productInputSchema = z
       )
       .max(30)
       .default([]),
+    taxRate: z.number().min(0).max(100).optional().default(12),
+    hsnCode: z.string().trim().optional().default("6203"),
+    isTaxExempt: z.boolean().optional().default(false),
   })
   .superRefine((value, context) => {
     if (

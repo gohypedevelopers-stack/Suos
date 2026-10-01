@@ -2,6 +2,7 @@ import "server-only"
 
 import { Prisma } from "@/generated/prisma/client"
 import { assertAdmin } from "@/lib/server/dal/auth"
+import { calculateGst } from "@/lib/server/dal/taxes"
 import { getPrisma } from "@/lib/server/db"
 import type { OrderCreateInput } from "@/lib/validations/order"
 
@@ -10,7 +11,7 @@ export async function createOrder(input: OrderCreateInput) {
   const prisma = getPrisma()
 
   return prisma.$transaction(async (tx) => {
-    const [customer, variants] = await Promise.all([
+    const [customer, variants, taxSetting] = await Promise.all([
       input.customerId
         ? tx.user.findFirst({
             where: { id: input.customerId, role: "CUSTOMER" },
@@ -24,9 +25,18 @@ export async function createOrder(input: OrderCreateInput) {
           title: true,
           sku: true,
           price: true,
-          product: { select: { title: true, status: true } },
+          product: {
+            select: {
+              title: true,
+              status: true,
+              taxRate: true,
+              hsnCode: true,
+              isTaxExempt: true,
+            },
+          },
         },
       }),
+      tx.taxSetting.findFirst(),
     ])
 
     if (input.customerId && !customer) {
@@ -39,10 +49,41 @@ export async function createOrder(input: OrderCreateInput) {
       throw new Error("Archived products cannot be added to an order.")
     }
 
+    const originState = taxSetting?.originState ?? "Maharashtra"
+    const defaultRate = taxSetting?.defaultGstRate ? Number(taxSetting.defaultGstRate) : 12
+    const defaultHsn = taxSetting?.defaultHsn ?? "6203"
+    const priceInclusive = taxSetting?.priceInclusive ?? true
+
+    let orderTaxTotal = 0
+    let orderCgstTotal = 0
+    let orderSgstTotal = 0
+    let orderIgstTotal = 0
+
     const variantsById = new Map(variants.map((variant) => [variant.id, variant]))
     const items = input.items.map((item) => {
       const variant = variantsById.get(item.variantId)!
       const total = variant.price.mul(item.quantity)
+      const taxRate = variant.product.isTaxExempt
+        ? 0
+        : variant.product.taxRate !== null && variant.product.taxRate !== undefined
+        ? Number(variant.product.taxRate)
+        : defaultRate
+      const hsnCode = variant.product.hsnCode || defaultHsn
+
+      // Calculate GST for line item
+      const itemTax = calculateGst(
+        Number(total),
+        taxRate,
+        priceInclusive,
+        originState,
+        originState // intra-state for admin quick orders
+      )
+
+      orderTaxTotal += itemTax.totalGst
+      orderCgstTotal += itemTax.cgst
+      orderSgstTotal += itemTax.sgst
+      orderIgstTotal += itemTax.igst
+
       return {
         variantId: variant.id,
         title:
@@ -53,6 +94,9 @@ export async function createOrder(input: OrderCreateInput) {
         quantity: item.quantity,
         unitPrice: variant.price,
         total,
+        taxRate: new Prisma.Decimal(taxRate),
+        tax: new Prisma.Decimal(itemTax.totalGst),
+        hsnCode,
       }
     })
     const subtotal = items.reduce(
@@ -69,6 +113,10 @@ export async function createOrder(input: OrderCreateInput) {
         subtotal,
         discount: new Prisma.Decimal(0),
         shipping: new Prisma.Decimal(0),
+        tax: new Prisma.Decimal(orderTaxTotal),
+        cgst: new Prisma.Decimal(orderCgstTotal),
+        sgst: new Prisma.Decimal(orderSgstTotal),
+        igst: new Prisma.Decimal(orderIgstTotal),
         total: subtotal,
         items: { create: items },
       },

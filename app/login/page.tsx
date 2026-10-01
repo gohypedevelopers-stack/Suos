@@ -10,26 +10,22 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <main className="min-h-[calc(100svh-var(--header-stack-height))] bg-white text-black">
-      <div className="grid min-h-[calc(100svh-var(--header-stack-height))] lg:grid-cols-2">
-        <section className="relative hidden bg-[#101820] lg:block">
-          <div className="absolute inset-x-0 top-0 -bottom-2">
-            <Image
-              src="/images/products/product1.png"
-              alt="SUOS editorial"
-              fill
-              priority
-              sizes="(max-width: 1023px) 100vw, 69vh"
-              className="object-cover object-top grayscale-[12%]"
-            />
-          </div>
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,13,24,0.42)_0%,rgba(5,25,38,0.14)_42%,rgba(200,224,232,0.12)_100%)]" />
-        </section>
+    <main className="grid min-h-[calc(100svh-var(--header-stack-height))] bg-white lg:h-[calc(100svh-var(--header-stack-height))] lg:min-h-0 lg:grid-cols-2 lg:overflow-hidden">
+      <section className="relative hidden min-h-full overflow-hidden bg-[#b5aa9c] lg:block">
+        <Image
+          src="/images/hero-left.png"
+          alt="Model wearing a denim jacket from the SUOS collection"
+          fill
+          priority
+          sizes="50vw"
+          className="object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.03),rgba(0,0,0,0.14))]" />
+      </section>
 
-        <AuthFormPanel>
-          <LoginPanel />
-        </AuthFormPanel>
-      </div>
+      <AuthFormPanel>
+        <LoginPanel />
+      </AuthFormPanel>
     </main>
   )
 }

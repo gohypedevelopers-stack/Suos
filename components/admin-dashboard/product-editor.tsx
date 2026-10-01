@@ -12,6 +12,7 @@ import {
   ImagePlus,
   LoaderCircle,
   Pencil,
+  Receipt,
   Tag,
   Trash2,
   UploadCloud,
@@ -66,6 +67,9 @@ export type ProductEditorInitialProduct = {
   images: ProductEditorImage[]
   variants: ProductVariantDraft[]
   details: ProductDetailDraft[]
+  taxRate?: string
+  hsnCode?: string
+  isTaxExempt?: boolean
 }
 
 type UploadInstruction = {
@@ -158,6 +162,9 @@ export function ProductEditor({
   const [draggedImageKey, setDraggedImageKey] = useState<string | null>(null)
   const [dropImageKey, setDropImageKey] = useState<string | null>(null)
   const [variants, setVariants] = useState<ProductVariantDraft[]>(initialProduct?.variants ?? [])
+  const [taxRate, setTaxRate] = useState<number>(initialProduct?.taxRate ? Number(initialProduct.taxRate) : 12)
+  const [hsnCode, setHsnCode] = useState<string>(initialProduct?.hsnCode ?? "6203")
+  const [isTaxExempt, setIsTaxExempt] = useState<boolean>(initialProduct?.isTaxExempt ?? false)
   const [details, setDetails] = useState<ProductDetailDraft[]>(() =>
     (initialProduct?.details ?? []).map((detail) => ({
       name: toAdminUppercase(detail.name),
@@ -346,6 +353,9 @@ export function ProductEditor({
         images: images.map((image) => image.objectKey),
         variants,
         details: completeDetails,
+        taxRate,
+        hsnCode,
+        isTaxExempt,
       }
       const result = initialProduct
         ? await updateProductAction(initialProduct.id, input)
@@ -591,7 +601,7 @@ export function ProductEditor({
             <Card title="Price" className="mt-4">
               <div className="grid gap-4 px-4 pb-4 sm:grid-cols-2">
                 <label className="grid gap-1.5 text-sm text-black/75">
-                  <span>Price</span>
+                  <span>Price (MRP Inclusive)</span>
                   <span className="relative block">
                     <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-black/60">₹</span>
                     <input aria-label="Price" inputMode="decimal" value={price} onChange={(event) => { setPrice(event.target.value); markChanged() }} aria-invalid={Boolean(errorFor(fieldErrors, "price"))} className={`${inputClass} pl-7`} />
@@ -606,6 +616,101 @@ export function ProductEditor({
                   </span>
                   {errorFor(fieldErrors, "compareAtPrice") ? <span className="text-xs text-red-700">{errorFor(fieldErrors, "compareAtPrice")}</span> : null}
                 </label>
+              </div>
+
+              {/* GST & IGST Pricing Controls */}
+              <div className="border-t border-black/10 bg-neutral-50/70 px-4 py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-black/80">
+                    <Receipt className="size-3.5 text-black/60" />
+                    <span>GST &amp; IGST Tax Management</span>
+                  </div>
+                  <label className="flex cursor-pointer items-center gap-1.5 text-xs font-medium text-black/70">
+                    <input
+                      type="checkbox"
+                      checked={isTaxExempt}
+                      onChange={(e) => {
+                        setIsTaxExempt(e.target.checked)
+                        markChanged()
+                      }}
+                      className="size-3.5 rounded accent-black"
+                    />
+                    <span>Tax Exempt (0% GST)</span>
+                  </label>
+                </div>
+
+                {!isTaxExempt && (
+                  <>
+                    <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                      <label className="grid gap-1 text-xs text-black/75">
+                        <span className="font-medium">GST Rate Slab</span>
+                        <Select
+                          value={String(taxRate)}
+                          onValueChange={(val) => {
+                            setTaxRate(Number(val))
+                            markChanged()
+                          }}
+                        >
+                          <SelectTrigger className="h-9 w-full rounded-lg border-black/25 !bg-white text-xs text-black shadow-none">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white text-xs text-black">
+                            <SelectItem value="0">0% (Exempt)</SelectItem>
+                            <SelectItem value="5">5% GST (Apparel ≤ ₹1,000)</SelectItem>
+                            <SelectItem value="12">12% GST (SUOS Default — Apparel &gt; ₹1,000)</SelectItem>
+                            <SelectItem value="18">18% GST (Accessories &amp; Footwear)</SelectItem>
+                            <SelectItem value="28">28% GST (Luxury articles)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </label>
+
+                      <label className="grid gap-1 text-xs text-black/75">
+                        <span className="font-medium">HSN Code</span>
+                        <input
+                          type="text"
+                          value={hsnCode}
+                          onChange={(e) => {
+                            setHsnCode(e.target.value.trim())
+                            markChanged()
+                          }}
+                          placeholder="6203"
+                          className={`${inputClass} !h-9 font-mono text-xs`}
+                        />
+                      </label>
+                    </div>
+
+                    {/* Live GST & IGST Breakdown preview box */}
+                    {parseFloat(price) > 0 && (
+                      <div className="mt-3.5 rounded-lg border border-black/10 bg-white p-3 text-xs shadow-2xs">
+                        <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-black/60">
+                          <span>Live Tax Breakdown (Inclusive MRP)</span>
+                          <span className="font-bold text-emerald-700">{taxRate}% GST</span>
+                        </div>
+
+                        <div className="mt-2 grid grid-cols-3 gap-2 border-t border-black/5 pt-2">
+                          <div>
+                            <span className="block text-[10px] text-black/50">Taxable Base</span>
+                            <span className="font-mono font-semibold text-black">
+                              ₹{(parseFloat(price) / (1 + taxRate / 100)).toFixed(2)}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="block text-[10px] text-blue-700">Intra (CGST + SGST)</span>
+                            <span className="font-mono text-blue-800">
+                              2 × ₹{((parseFloat(price) - parseFloat(price) / (1 + taxRate / 100)) / 2).toFixed(2)}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="block text-[10px] text-amber-700">Inter (IGST)</span>
+                            <span className="font-mono font-bold text-amber-800">
+                              ₹{(parseFloat(price) - parseFloat(price) / (1 + taxRate / 100)).toFixed(2)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             </Card>
 

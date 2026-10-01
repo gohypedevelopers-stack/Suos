@@ -51,6 +51,9 @@ export type AdminProductDetail = {
   tags: string[]
   vendor: string
   details: { name: string; value: string }[]
+  taxRate: number
+  hsnCode: string
+  isTaxExempt: boolean
   images: {
     id: string
     objectKey: string
@@ -340,6 +343,9 @@ export async function getProductForAdmin(
       vendor: true,
       tags: true,
       details: true,
+      taxRate: true,
+      hsnCode: true,
+      isTaxExempt: true,
       createdAt: true,
       updatedAt: true,
       category: { select: { id: true, name: true } },
@@ -383,6 +389,9 @@ export async function getProductForAdmin(
     tags: product.tags,
     vendor: product.vendor,
     details: productDetails(product.details),
+    taxRate: product.taxRate ? Number(product.taxRate) : 12,
+    hsnCode: product.hsnCode ?? "6203",
+    isTaxExempt: product.isTaxExempt ?? false,
     images: product.images.map((image) => ({
       id: image.id,
       objectKey: image.objectKey,

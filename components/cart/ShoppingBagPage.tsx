@@ -338,8 +338,8 @@ function ShoppingBagSummary({
           )}
 
           <div className="flex items-center justify-between text-black/80">
-            <span className="uppercase tracking-[0.04em]">Tax</span>
-            <span className="text-[12px] uppercase text-black/55">Calculated in checkout</span>
+            <span className="uppercase tracking-[0.04em]">GST (Taxes)</span>
+            <span className="text-[12px] uppercase text-black/55">Included in MRP</span>
           </div>
 
           <div className="flex items-center justify-between text-black/80">

@@ -71,6 +71,9 @@ export default async function EditProductPage({
                 optionValues: variant.optionValues,
               })),
               details: product.details,
+              taxRate: String(product.taxRate ?? 12),
+              hsnCode: product.hsnCode ?? "6203",
+              isTaxExempt: product.isTaxExempt ?? false,
             }}
           />
         </SidebarInset>

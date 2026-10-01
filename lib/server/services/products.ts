@@ -137,6 +137,9 @@ export async function createProduct(input: ProductInput) {
       status: product.status,
       categoryId: product.categoryId || null,
       tags: product.tags,
+      taxRate: new Prisma.Decimal(product.taxRate ?? 12),
+      hsnCode: product.hsnCode || "6203",
+      isTaxExempt: product.isTaxExempt ?? false,
       details: product.details.length > 0
         ? (product.details as Prisma.InputJsonValue)
         : Prisma.JsonNull,
@@ -258,6 +261,9 @@ export async function updateProduct(productId: string, input: ProductInput) {
         status: product.status,
         categoryId: product.categoryId || null,
         tags: product.tags,
+        taxRate: new Prisma.Decimal(product.taxRate ?? 12),
+        hsnCode: product.hsnCode || "6203",
+        isTaxExempt: product.isTaxExempt ?? false,
         details: product.details.length > 0
           ? (product.details as Prisma.InputJsonValue)
           : Prisma.JsonNull,
