@@ -7,9 +7,12 @@ import {
   calculateGst,
   GST_SLABS,
   INDIAN_STATES,
+  numberToWordsINR,
   type IndianStateName,
   type MonthlyGstAnalytics,
   type MonthlyGstLedgerRow,
+  type MonthlyGstOrder,
+  type MonthlyGstOrderItem,
   type TaxCalculationResult,
   type TaxSettingData,
   type TaxSlab,
@@ -19,9 +22,12 @@ export {
   calculateGst,
   GST_SLABS,
   INDIAN_STATES,
+  numberToWordsINR,
   type IndianStateName,
   type MonthlyGstAnalytics,
   type MonthlyGstLedgerRow,
+  type MonthlyGstOrder,
+  type MonthlyGstOrderItem,
   type TaxCalculationResult,
   type TaxSettingData,
   type TaxSlab,
@@ -127,6 +133,13 @@ export async function getMonthlyGstAnalytics(targetYear?: number): Promise<Month
       status: { not: "CANCELLED" },
     },
     include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
       items: {
         include: {
           variant: {
@@ -174,6 +187,7 @@ export async function getMonthlyGstAnalytics(targetYear?: number): Promise<Month
       totalGst: 0,
       products: [],
       states: [],
+      orders: [],
     })
   }
 
@@ -331,6 +345,59 @@ export async function getMonthlyGstAnalytics(targetYear?: number): Promise<Month
         totalGst: Number(orderGst.toFixed(2)),
       })
     }
+
+    const orderItemsMapped = (order.items || []).map((it) => {
+      const prod = it.variant?.product
+      const itRate = prod?.isTaxExempt
+        ? 0
+        : it.taxRate !== null && it.taxRate !== undefined
+        ? Number(it.taxRate)
+        : prod?.taxRate !== null && prod?.taxRate !== undefined
+        ? Number(prod.taxRate)
+        : settings.defaultGstRate
+      const hsn = it.hsnCode || prod?.hsnCode || settings.defaultHsn
+      const itTotal = Number(it.total)
+      const itCalc = calculateGst(
+        itTotal,
+        itRate,
+        settings.priceInclusive,
+        settings.originState,
+        destinationState,
+      )
+      return {
+        id: it.id,
+        title: it.title,
+        sku: it.sku,
+        quantity: it.quantity,
+        unitPrice: Number(it.unitPrice),
+        total: itTotal,
+        hsnCode: hsn,
+        taxRate: itRate,
+        taxableAmount: itCalc.taxableAmount,
+        cgst: itCalc.cgst,
+        sgst: itCalc.sgst,
+        igst: itCalc.igst,
+        tax: itCalc.totalGst,
+      }
+    })
+
+    monthData.orders.push({
+      id: order.id,
+      number: order.number,
+      createdAt: order.createdAt.toISOString(),
+      customerName: order.user?.name || "Guest Customer",
+      email: order.email,
+      state: destinationState,
+      isIntraState: isIntra,
+      taxableAmount: Number(orderTaxable.toFixed(2)),
+      cgst: Number(orderCgst.toFixed(2)),
+      sgst: Number(orderSgst.toFixed(2)),
+      igst: Number(orderIgst.toFixed(2)),
+      totalGst: Number(orderGst.toFixed(2)),
+      total: orderSubtotal,
+      items: orderItemsMapped,
+      shippingAddress: (order.shippingAddress as any) ?? null,
+    })
 
     sumGross += orderSubtotal
     sumTaxable += orderTaxable

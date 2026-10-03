@@ -180,6 +180,118 @@ export type MonthlyGstLedgerRow = {
     igst: number
     totalGst: number
   }>
+  orders: MonthlyGstOrder[]
+}
+
+export type MonthlyGstOrderItem = {
+  id: string
+  title: string
+  sku: string
+  quantity: number
+  unitPrice: number
+  total: number
+  hsnCode: string
+  taxRate: number
+  taxableAmount: number
+  cgst: number
+  sgst: number
+  igst: number
+  tax: number
+}
+
+export type MonthlyGstOrder = {
+  id: string
+  number: number
+  createdAt: string
+  customerName: string
+  email: string
+  state: string
+  isIntraState: boolean
+  taxableAmount: number
+  cgst: number
+  sgst: number
+  igst: number
+  totalGst: number
+  total: number
+  items: MonthlyGstOrderItem[]
+  shippingAddress?: {
+    name?: string
+    address1?: string
+    address2?: string
+    city?: string
+    state?: string
+    postalCode?: string
+    country?: string
+    phone?: string
+  } | null
+}
+
+export function numberToWordsINR(amount: number): string {
+  if (isNaN(amount) || amount <= 0) return "Zero Rupees Only"
+
+  const singleDigits = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"]
+  const teens = [
+    "Ten",
+    "Eleven",
+    "Twelve",
+    "Thirteen",
+    "Fourteen",
+    "Fifteen",
+    "Sixteen",
+    "Seventeen",
+    "Eighteen",
+    "Nineteen",
+  ]
+  const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"]
+
+  function convertTwoDigits(n: number): string {
+    if (n === 0) return ""
+    if (n < 10) return singleDigits[n]
+    if (n >= 10 && n < 20) return teens[n - 10]
+    const rem = n % 10
+    return tens[Math.floor(n / 10)] + (rem !== 0 ? " " + singleDigits[rem] : "")
+  }
+
+  function convertThreeDigits(n: number): string {
+    const hundred = Math.floor(n / 100)
+    const rest = n % 100
+    let str = ""
+    if (hundred > 0) {
+      str += singleDigits[hundred] + " Hundred"
+      if (rest > 0) str += " and "
+    }
+    if (rest > 0) {
+      str += convertTwoDigits(rest)
+    }
+    return str
+  }
+
+  const [rupeesPart, paisePart] = amount.toFixed(2).split(".").map(Number)
+
+  let n = rupeesPart
+  const crore = Math.floor(n / 10000000)
+  n %= 10000000
+  const lakh = Math.floor(n / 100000)
+  n %= 100000
+  const thousand = Math.floor(n / 1000)
+  n %= 1000
+  const hundredAndBelow = n
+
+  let res = ""
+  if (crore > 0) res += convertThreeDigits(crore) + " Crore "
+  if (lakh > 0) res += convertThreeDigits(lakh) + " Lakh "
+  if (thousand > 0) res += convertThreeDigits(thousand) + " Thousand "
+  if (hundredAndBelow > 0) res += convertThreeDigits(hundredAndBelow)
+
+  res = res.trim()
+  if (!res) res = "Zero"
+  res += " Rupees"
+
+  if (paisePart > 0) {
+    res += " and " + convertTwoDigits(paisePart) + " Paise"
+  }
+  res += " Only"
+  return res
 }
 
 export type MonthlyGstAnalytics = {

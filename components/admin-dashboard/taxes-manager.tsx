@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useTransition } from "react"
+import Link from "next/link"
 import {
   Bar,
   BarChart,
@@ -16,7 +17,9 @@ import {
   CheckCircle2,
   ChevronRight,
   Download,
+  ExternalLink,
   FileSpreadsheet,
+  FileText,
   Info,
   Landmark,
   Layers,
@@ -27,6 +30,12 @@ import {
   TrendingUp,
 } from "lucide-react"
 import { toast } from "sonner"
+
+import {
+  BatchTaxInvoiceDialog,
+  exportInvoicesCsv,
+  TaxInvoiceDialog,
+} from "@/components/admin-dashboard/tax-invoice-dialog"
 
 import {
   fetchMonthlyGstAnalyticsAction,
@@ -84,6 +93,8 @@ export function TaxesManager({ initialAnalytics }: TaxesManagerProps) {
   const [selectedYear, setSelectedYear] = useState<number>(initialAnalytics.year)
   const [activeTab, setActiveTab] = useState<"reports" | "calculator" | "settings">("reports")
   const [inspectedMonth, setInspectedMonth] = useState<MonthlyGstLedgerRow | null>(null)
+  const [inspectorTab, setInspectorTab] = useState<"orders" | "states" | "products">("orders")
+  const [selectedMonthOrderIds, setSelectedMonthOrderIds] = useState<string[]>([])
 
   // Settings form state
   const [settingsForm, setSettingsForm] = useState<TaxSettingData>(initialAnalytics.settings)
@@ -496,14 +507,30 @@ export function TaxesManager({ initialAnalytics }: TaxesManagerProps) {
                         {formatCurrency(row.totalGst)}
                       </td>
                       <td className="px-4 py-3.5 text-center">
-                        <button
-                          type="button"
-                          onClick={() => setInspectedMonth(row)}
-                          className="inline-flex cursor-pointer items-center gap-1 rounded border border-black/15 bg-white px-2 py-1 text-[11px] font-medium text-black hover:bg-black hover:text-white"
-                        >
-                          <span>Details</span>
-                          <ChevronRight className="size-3" />
-                        </button>
+                        <div className="flex items-center justify-center gap-1.5">
+                          {row.orderCount > 0 && (
+                            <BatchTaxInvoiceDialog
+                              orders={row.orders}
+                              title={`${row.monthName} Tax Invoices`}
+                              buttonLabel="Invoices"
+                              className="h-7 px-2 text-[11px]"
+                              defaultOrigin={settingsForm.originState}
+                              defaultGstin={settingsForm.gstin}
+                            />
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setInspectedMonth(row)
+                              setSelectedMonthOrderIds([])
+                              setInspectorTab("orders")
+                            }}
+                            className="inline-flex cursor-pointer items-center gap-1 rounded border border-black/15 bg-white px-2 py-1 text-[11px] font-medium text-black hover:bg-black hover:text-white"
+                          >
+                            <span>Details</span>
+                            <ChevronRight className="size-3" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -1005,131 +1032,435 @@ export function TaxesManager({ initialAnalytics }: TaxesManagerProps) {
       )}
 
       {/* Month Inspector Dialog */}
-      <Dialog open={Boolean(inspectedMonth)} onOpenChange={(open) => !open && setInspectedMonth(null)}>
-        <DialogContent className="max-w-2xl bg-white p-6 text-black">
+      <Dialog
+        open={Boolean(inspectedMonth)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setInspectedMonth(null)
+            setSelectedMonthOrderIds([])
+            setInspectorTab("orders")
+          }
+        }}
+      >
+        <DialogContent className="max-h-[92vh] max-w-4xl overflow-y-auto bg-white p-6 pr-14 text-black shadow-2xl">
           {inspectedMonth && (
             <div>
-              <DialogHeader>
-                <DialogTitle className="text-lg font-bold text-black">
-                  {inspectedMonth.monthName} — GST Tax Breakdown
-                </DialogTitle>
-                <DialogDescription className="text-xs text-black/60">
-                  Comprehensive audit details for {inspectedMonth.monthName} across states and products.
-                </DialogDescription>
+              {/* Header */}
+              <DialogHeader className="pr-4">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex size-7 items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-800">
+                        <Landmark className="size-4" />
+                      </div>
+                      <DialogTitle className="text-xl font-bold tracking-tight text-black">
+                        {inspectedMonth.monthName} — GST Tax Breakdown
+                      </DialogTitle>
+                    </div>
+                    <DialogDescription className="mt-1 text-xs text-black/60">
+                      Fiscal compliance, monthly ledger breakdown, and downloadable tax invoices for {inspectedMonth.monthName}.
+                    </DialogDescription>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2 pt-1 sm:pt-0">
+                    <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 font-mono text-xs font-bold text-emerald-800 shadow-2xs">
+                      Total GST: {formatCurrency(inspectedMonth.totalGst)}
+                    </span>
+                    <span className="rounded-full border border-black/10 bg-neutral-100 px-2.5 py-1 text-xs font-semibold text-black/70">
+                      {inspectedMonth.orderCount} Orders
+                    </span>
+                  </div>
+                </div>
               </DialogHeader>
 
-              <div className="mt-4 grid grid-cols-3 gap-3 rounded-lg bg-neutral-50 p-3 text-xs">
-                <div>
-                  <span className="text-black/50">Taxable Turnover:</span>
-                  <p className="font-mono text-sm font-bold text-black">
+              {/* Top KPI Cards */}
+              <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4 text-xs">
+                <div className="rounded-xl border border-black/10 bg-neutral-50/70 p-3.5 shadow-2xs">
+                  <span className="text-black/55 font-medium">Gross Sales</span>
+                  <p className="mt-1 font-mono text-base font-bold text-black">
+                    {formatCurrency(inspectedMonth.grossSales)}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-black/10 bg-neutral-50/70 p-3.5 shadow-2xs">
+                  <span className="text-black/55 font-medium">Taxable Turnover</span>
+                  <p className="mt-1 font-mono text-base font-bold text-black">
                     {formatCurrency(inspectedMonth.taxableSales)}
                   </p>
                 </div>
-                <div>
-                  <span className="text-black/50">CGST + SGST (Local):</span>
-                  <p className="font-mono text-sm font-bold text-blue-700">
+                <div className="rounded-xl border border-blue-100 bg-blue-50/40 p-3.5 shadow-2xs">
+                  <span className="text-blue-900/70 font-medium">CGST + SGST (Local)</span>
+                  <p className="mt-1 font-mono text-base font-bold text-blue-800">
                     {formatCurrency(inspectedMonth.cgst + inspectedMonth.sgst)}
                   </p>
                 </div>
-                <div>
-                  <span className="text-black/50">IGST (Inter-State):</span>
-                  <p className="font-mono text-sm font-bold text-amber-700">
+                <div className="rounded-xl border border-amber-100 bg-amber-50/40 p-3.5 shadow-2xs">
+                  <span className="text-amber-900/70 font-medium">IGST (Inter-State)</span>
+                  <p className="mt-1 font-mono text-base font-bold text-amber-800">
                     {formatCurrency(inspectedMonth.igst)}
                   </p>
                 </div>
               </div>
 
-              {/* State distribution in month */}
-              <div className="mt-5">
-                <h4 className="text-xs font-semibold uppercase tracking-wider text-black">
-                  Destination States Distribution
-                </h4>
-                {inspectedMonth.states.length > 0 ? (
-                  <div className="mt-2 max-h-48 overflow-y-auto rounded-lg border border-black/10">
-                    <table className="w-full border-collapse text-left text-xs">
-                      <thead className="bg-black/[0.03] text-black/60">
-                        <tr>
-                          <th className="px-3 py-2 font-medium">State</th>
-                          <th className="px-3 py-2 font-medium">Type</th>
-                          <th className="px-3 py-2 text-center font-medium">Orders</th>
-                          <th className="px-3 py-2 text-right font-medium">Taxable</th>
-                          <th className="px-3 py-2 text-right font-medium">GST Amount</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-black/5">
-                        {inspectedMonth.states.map((st) => (
-                          <tr key={st.state}>
-                            <td className="px-3 py-2 font-medium">{st.state}</td>
-                            <td className="px-3 py-2">
-                              <span
-                                className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${
-                                  st.isIntraState
-                                    ? "bg-blue-50 text-blue-700"
-                                    : "bg-amber-50 text-amber-700"
-                                }`}
-                              >
-                                {st.isIntraState ? "Intra (CGST+SGST)" : "Inter (IGST)"}
-                              </span>
-                            </td>
-                            <td className="px-3 py-2 text-center">{st.orderCount}</td>
-                            <td className="px-3 py-2 text-right font-mono">
-                              {formatCurrency(st.taxableAmount)}
-                            </td>
-                            <td className="px-3 py-2 text-right font-mono font-bold text-emerald-700">
-                              {formatCurrency(st.totalGst)}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <p className="mt-2 text-xs text-black/50 italic">
-                    No state-specific shipments recorded this month.
-                  </p>
-                )}
+              {/* Segmented Tab Navigation */}
+              <div className="mt-6 flex border-b border-black/10">
+                <button
+                  type="button"
+                  onClick={() => setInspectorTab("orders")}
+                  className={`flex cursor-pointer items-center gap-2 border-b-2 px-4 py-2.5 text-xs font-semibold transition ${
+                    inspectorTab === "orders"
+                      ? "border-black text-black"
+                      : "border-transparent text-black/50 hover:text-black"
+                  }`}
+                >
+                  <Receipt className="size-3.5" />
+                  <span>Orders &amp; Tax Invoices</span>
+                  <span className="rounded-full bg-black/[0.06] px-2 py-0.5 text-[10px]">
+                    {inspectedMonth.orders?.length ?? 0}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setInspectorTab("states")}
+                  className={`flex cursor-pointer items-center gap-2 border-b-2 px-4 py-2.5 text-xs font-semibold transition ${
+                    inspectorTab === "states"
+                      ? "border-black text-black"
+                      : "border-transparent text-black/50 hover:text-black"
+                  }`}
+                >
+                  <Landmark className="size-3.5" />
+                  <span>Destination States</span>
+                  <span className="rounded-full bg-black/[0.06] px-2 py-0.5 text-[10px]">
+                    {inspectedMonth.states?.length ?? 0}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setInspectorTab("products")}
+                  className={`flex cursor-pointer items-center gap-2 border-b-2 px-4 py-2.5 text-xs font-semibold transition ${
+                    inspectorTab === "products"
+                      ? "border-black text-black"
+                      : "border-transparent text-black/50 hover:text-black"
+                  }`}
+                >
+                  <Package className="size-3.5" />
+                  <span>Product Sales</span>
+                  <span className="rounded-full bg-black/[0.06] px-2 py-0.5 text-[10px]">
+                    {inspectedMonth.products?.length ?? 0}
+                  </span>
+                </button>
               </div>
 
-              {/* Product breakdown in month */}
-              <div className="mt-5">
-                <h4 className="text-xs font-semibold uppercase tracking-wider text-black">
-                  Product Sales in Month
-                </h4>
-                {inspectedMonth.products.length > 0 ? (
-                  <div className="mt-2 max-h-48 overflow-y-auto rounded-lg border border-black/10">
-                    <table className="w-full border-collapse text-left text-xs">
-                      <thead className="bg-black/[0.03] text-black/60">
-                        <tr>
-                          <th className="px-3 py-2 font-medium">Product</th>
-                          <th className="px-3 py-2 font-medium">HSN</th>
-                          <th className="px-3 py-2 text-center font-medium">Units</th>
-                          <th className="px-3 py-2 text-right font-medium">Taxable</th>
-                          <th className="px-3 py-2 text-right font-medium">GST Amount</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-black/5">
-                        {inspectedMonth.products.map((pr) => (
-                          <tr key={pr.id}>
-                            <td className="px-3 py-2 font-medium">{pr.title}</td>
-                            <td className="px-3 py-2 font-mono text-black/60">{pr.hsn}</td>
-                            <td className="px-3 py-2 text-center">{pr.quantity}</td>
-                            <td className="px-3 py-2 text-right font-mono">
-                              {formatCurrency(pr.taxableAmount)}
-                            </td>
-                            <td className="px-3 py-2 text-right font-mono font-bold text-emerald-700">
-                              {formatCurrency(pr.gstAmount)}
-                            </td>
+              {/* TAB 1: Orders & Invoices */}
+              {inspectorTab === "orders" && (
+                <div className="mt-4">
+                  {inspectedMonth.orders && inspectedMonth.orders.length > 0 ? (
+                    <div>
+                      {/* Action Toolbar */}
+                      <div className="flex flex-wrap items-center justify-between gap-3 pb-3">
+                        <div className="flex items-center gap-2">
+                          <label className="flex cursor-pointer items-center gap-2 text-xs font-medium text-black">
+                            <input
+                              type="checkbox"
+                              checked={
+                                selectedMonthOrderIds.length > 0 &&
+                                selectedMonthOrderIds.length === inspectedMonth.orders.length
+                              }
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelectedMonthOrderIds(inspectedMonth.orders.map((o) => o.id))
+                                } else {
+                                  setSelectedMonthOrderIds([])
+                                }
+                              }}
+                              className="size-3.5 accent-black"
+                            />
+                            <span>
+                              {selectedMonthOrderIds.length > 0
+                                ? `${selectedMonthOrderIds.length} of ${inspectedMonth.orders.length} selected`
+                                : `Select All (${inspectedMonth.orders.length})`}
+                            </span>
+                          </label>
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              exportInvoicesCsv(
+                                selectedMonthOrderIds.length > 0
+                                  ? inspectedMonth.orders.filter((o) =>
+                                      selectedMonthOrderIds.includes(o.id)
+                                    )
+                                  : inspectedMonth.orders,
+                                `suos-tax-invoices-${inspectedMonth.monthKey}.csv`,
+                                settingsForm.originState,
+                                settingsForm.gstin
+                              )
+                            }
+                            className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg border border-black/20 bg-white px-2.5 text-xs font-medium text-black shadow-2xs transition hover:bg-black/[0.04]"
+                          >
+                            <FileSpreadsheet className="size-3.5 text-emerald-700" />
+                            <span>Export CSV</span>
+                          </button>
+
+                          {selectedMonthOrderIds.length > 0 ? (
+                            <BatchTaxInvoiceDialog
+                              orders={inspectedMonth.orders.filter((o) =>
+                                selectedMonthOrderIds.includes(o.id)
+                              )}
+                              title={`Selected (${selectedMonthOrderIds.length}) Invoices`}
+                              buttonLabel={`Download Selected (${selectedMonthOrderIds.length}) PDF`}
+                              defaultOrigin={settingsForm.originState}
+                              defaultGstin={settingsForm.gstin}
+                            />
+                          ) : (
+                            <BatchTaxInvoiceDialog
+                              orders={inspectedMonth.orders}
+                              title={`${inspectedMonth.monthName} Tax Invoices`}
+                              buttonLabel="Download All Invoices (Batch PDF)"
+                              defaultOrigin={settingsForm.originState}
+                              defaultGstin={settingsForm.gstin}
+                            />
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Orders & Invoices Table */}
+                      <div className="max-h-72 overflow-y-auto rounded-xl border border-black/10">
+                        <table className="w-full border-collapse text-left text-xs">
+                          <thead className="sticky top-0 z-10 bg-neutral-100 text-black/70 shadow-xs">
+                            <tr>
+                              <th className="w-8 px-3 py-2.5 text-center">
+                                <span className="sr-only">Select</span>
+                              </th>
+                              <th className="px-3 py-2.5 font-medium">Order</th>
+                              <th className="px-3 py-2.5 font-medium">Invoice No</th>
+                              <th className="px-3 py-2.5 font-medium">Customer</th>
+                              <th className="px-3 py-2.5 font-medium">State</th>
+                              <th className="px-3 py-2.5 text-right font-medium">Taxable</th>
+                              <th className="px-3 py-2.5 text-right font-medium">GST Amount</th>
+                              <th className="px-3 py-2.5 text-center font-medium">
+                                Individual Invoice
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-black/5">
+                            {inspectedMonth.orders.map((o) => (
+                              <tr
+                                key={o.id}
+                                className={`transition hover:bg-black/[0.02] ${
+                                  selectedMonthOrderIds.includes(o.id) ? "bg-black/[0.025]" : ""
+                                }`}
+                              >
+                                <td className="px-3 py-2 text-center">
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedMonthOrderIds.includes(o.id)}
+                                    onChange={(e) => {
+                                      if (e.target.checked) {
+                                        setSelectedMonthOrderIds((prev) => [...prev, o.id])
+                                      } else {
+                                        setSelectedMonthOrderIds((prev) =>
+                                          prev.filter((id) => id !== o.id)
+                                        )
+                                      }
+                                    }}
+                                    className="size-3.5 accent-black"
+                                  />
+                                </td>
+                                <td className="px-3 py-2 font-semibold text-black">
+                                  <Link
+                                    href={`/dashboard/orders/${o.id}`}
+                                    className="text-[#0c3152] hover:underline"
+                                  >
+                                    #{o.number}
+                                  </Link>
+                                </td>
+                                <td className="px-3 py-2 font-mono text-[11px] text-black/75">
+                                  INV-SUOS-{String(o.number).padStart(5, "0")}
+                                </td>
+                                <td className="px-3 py-2">
+                                  <p className="max-w-[140px] truncate font-medium text-black">
+                                    {o.customerName}
+                                  </p>
+                                  <p className="max-w-[140px] truncate text-[11px] text-black/50">
+                                    {o.email}
+                                  </p>
+                                </td>
+                                <td className="px-3 py-2">
+                                  <span
+                                    className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${
+                                      o.isIntraState
+                                        ? "bg-blue-50 text-blue-700"
+                                        : "bg-amber-50 text-amber-700"
+                                    }`}
+                                  >
+                                    {o.state}
+                                  </span>
+                                </td>
+                                <td className="px-3 py-2 text-right font-mono">
+                                  {formatCurrency(o.taxableAmount)}
+                                </td>
+                                <td className="px-3 py-2 text-right font-mono font-bold text-emerald-700">
+                                  {formatCurrency(o.totalGst)}
+                                </td>
+                                <td className="px-3 py-2 text-center">
+                                  <div className="flex items-center justify-center gap-1.5">
+                                    <TaxInvoiceDialog
+                                      order={o}
+                                      buttonVariant="compact"
+                                      buttonLabel="Invoice"
+                                      defaultOrigin={settingsForm.originState}
+                                      defaultGstin={settingsForm.gstin}
+                                    />
+                                    <Link
+                                      href={`/dashboard/orders/${o.id}`}
+                                      className="inline-flex size-7 items-center justify-center rounded border border-black/15 bg-white text-black/60 transition hover:bg-black hover:text-white"
+                                      title="Open Order Details"
+                                    >
+                                      <ExternalLink className="size-3" />
+                                    </Link>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-black/15 bg-neutral-50/60 px-6 py-12 text-center">
+                      <div className="flex size-12 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700 shadow-2xs">
+                        <Receipt className="size-6" />
+                      </div>
+                      <h3 className="mt-4 text-sm font-semibold text-black">
+                        No Orders or Invoices in {inspectedMonth.monthName}
+                      </h3>
+                      <p className="mt-1.5 max-w-md text-xs leading-relaxed text-black/55">
+                        There are no customer orders or taxable sales recorded for this fiscal month.
+                        When orders are placed, their individual tax invoices and month-wise batch downloads will be available here.
+                      </p>
+                      <div className="mt-5 flex items-center gap-2">
+                        <Link
+                          href="/dashboard/orders"
+                          className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-black/20 bg-white px-3 text-xs font-medium text-black shadow-2xs transition hover:bg-black/[0.04]"
+                        >
+                          <Package className="size-3.5" />
+                          <span>View All Store Orders</span>
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* TAB 2: Destination States */}
+              {inspectorTab === "states" && (
+                <div className="mt-4">
+                  {inspectedMonth.states.length > 0 ? (
+                    <div className="max-h-72 overflow-y-auto rounded-xl border border-black/10">
+                      <table className="w-full border-collapse text-left text-xs">
+                        <thead className="sticky top-0 bg-neutral-100 text-black/70 shadow-xs">
+                          <tr>
+                            <th className="px-3.5 py-2.5 font-medium">State</th>
+                            <th className="px-3.5 py-2.5 font-medium">Supply Type</th>
+                            <th className="px-3.5 py-2.5 text-center font-medium">Orders</th>
+                            <th className="px-3.5 py-2.5 text-right font-medium">Taxable Value</th>
+                            <th className="px-3.5 py-2.5 text-right font-medium">GST Amount</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <p className="mt-2 text-xs text-black/50 italic">
-                    No individual itemized records for this period.
-                  </p>
-                )}
-              </div>
+                        </thead>
+                        <tbody className="divide-y divide-black/5">
+                          {inspectedMonth.states.map((st) => (
+                            <tr key={st.state} className="hover:bg-black/[0.015]">
+                              <td className="px-3.5 py-2.5 font-medium text-black">{st.state}</td>
+                              <td className="px-3.5 py-2.5">
+                                <span
+                                  className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${
+                                    st.isIntraState
+                                      ? "bg-blue-50 text-blue-700"
+                                      : "bg-amber-50 text-amber-700"
+                                  }`}
+                                >
+                                  {st.isIntraState ? "Intra (CGST+SGST)" : "Inter (IGST)"}
+                                </span>
+                              </td>
+                              <td className="px-3.5 py-2.5 text-center font-medium">{st.orderCount}</td>
+                              <td className="px-3.5 py-2.5 text-right font-mono">
+                                {formatCurrency(st.taxableAmount)}
+                              </td>
+                              <td className="px-3.5 py-2.5 text-right font-mono font-bold text-emerald-700">
+                                {formatCurrency(st.totalGst)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-black/15 bg-neutral-50/60 px-6 py-10 text-center">
+                      <div className="flex size-10 items-center justify-center rounded-full bg-neutral-100 text-black/60">
+                        <Landmark className="size-5" />
+                      </div>
+                      <p className="mt-3 text-xs font-semibold text-black">
+                        No State-Specific Shipments in {inspectedMonth.monthName}
+                      </p>
+                      <p className="mt-1 text-[11px] text-black/50">
+                        State-wise tax distribution will populate automatically when orders are dispatched.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* TAB 3: Product Sales */}
+              {inspectorTab === "products" && (
+                <div className="mt-4">
+                  {inspectedMonth.products.length > 0 ? (
+                    <div className="max-h-72 overflow-y-auto rounded-xl border border-black/10">
+                      <table className="w-full border-collapse text-left text-xs">
+                        <thead className="sticky top-0 bg-neutral-100 text-black/70 shadow-xs">
+                          <tr>
+                            <th className="px-3.5 py-2.5 font-medium">Product</th>
+                            <th className="px-3.5 py-2.5 font-medium">HSN Code</th>
+                            <th className="px-3.5 py-2.5 text-center font-medium">Units Sold</th>
+                            <th className="px-3.5 py-2.5 text-right font-medium">Taxable Value</th>
+                            <th className="px-3.5 py-2.5 text-right font-medium">GST Amount</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-black/5">
+                          {inspectedMonth.products.map((pr) => (
+                            <tr key={pr.id} className="hover:bg-black/[0.015]">
+                              <td className="px-3.5 py-2.5 font-medium text-black">{pr.title}</td>
+                              <td className="px-3.5 py-2.5 font-mono text-black/60">{pr.hsn}</td>
+                              <td className="px-3.5 py-2.5 text-center font-medium">{pr.quantity}</td>
+                              <td className="px-3.5 py-2.5 text-right font-mono">
+                                {formatCurrency(pr.taxableAmount)}
+                              </td>
+                              <td className="px-3.5 py-2.5 text-right font-mono font-bold text-emerald-700">
+                                {formatCurrency(pr.gstAmount)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-black/15 bg-neutral-50/60 px-6 py-10 text-center">
+                      <div className="flex size-10 items-center justify-center rounded-full bg-neutral-100 text-black/60">
+                        <Package className="size-5" />
+                      </div>
+                      <p className="mt-3 text-xs font-semibold text-black">
+                        No Itemized Product Sales in {inspectedMonth.monthName}
+                      </p>
+                      <p className="mt-1 text-[11px] text-black/50">
+                        Product HSN codes and GST slab contributions will populate once items are ordered.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </DialogContent>

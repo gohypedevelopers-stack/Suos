@@ -2,6 +2,7 @@ import "server-only"
 
 import { assertAdmin } from "@/lib/server/dal/auth"
 import { getPrisma } from "@/lib/server/db"
+import { calculateGst, getTaxSettings, type TaxSettingData } from "@/lib/server/dal/taxes"
 
 type OrderStatus = "PENDING" | "CONFIRMED" | "FULFILLED" | "CANCELLED"
 
@@ -40,6 +41,26 @@ export type AdminOrderDetail = AdminOrderListItem & {
   subtotal: number
   discount: number
   shipping: number
+  tax: number
+  cgst: number
+  sgst: number
+  igst: number
+  taxableAmount: number
+  isIntraState: boolean
+  destinationState: string
+  originState: string
+  gstin: string
+  taxSettings: TaxSettingData
+  shippingAddress: {
+    name?: string
+    address1?: string
+    address2?: string
+    city?: string
+    state?: string
+    postalCode?: string
+    country?: string
+    phone?: string
+  } | null
   items: Array<{
     id: string
     title: string
@@ -48,6 +69,13 @@ export type AdminOrderDetail = AdminOrderListItem & {
     unitPrice: number
     total: number
     variantId: string | null
+    taxRate: number
+    tax: number
+    hsnCode: string
+    taxableAmount: number
+    cgst: number
+    sgst: number
+    igst: number
   }>
 }
 
@@ -130,50 +158,109 @@ export async function getOrderForAdmin(
 ): Promise<AdminOrderDetail | null> {
   await assertAdmin()
   const prisma = getPrisma()
-  const order = await prisma.order.findUnique({
-    where: { id: orderId },
-    select: {
-      id: true,
-      number: true,
-      createdAt: true,
-      email: true,
-      status: true,
-      currency: true,
-      total: true,
-      subtotal: true,
-      discount: true,
-      shipping: true,
-      user: { select: { id: true, name: true } },
-      items: {
-        select: {
-          id: true,
-          title: true,
-          sku: true,
-          quantity: true,
-          unitPrice: true,
-          total: true,
-          variantId: true,
+  const [order, taxSettings] = await Promise.all([
+    prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        user: { select: { id: true, name: true } },
+        items: {
+          include: {
+            variant: {
+              include: {
+                product: {
+                  select: {
+                    id: true,
+                    title: true,
+                    taxRate: true,
+                    hsnCode: true,
+                    isTaxExempt: true,
+                  },
+                },
+              },
+            },
+          },
         },
       },
-    },
-  })
+    }),
+    getTaxSettings(),
+  ])
 
   if (!order) return null
+
+  const shippingAddr = (order.shippingAddress as Record<string, unknown> | null) ?? {}
+  const destinationState =
+    typeof shippingAddr.state === "string" && shippingAddr.state.trim().length > 0
+      ? shippingAddr.state.trim()
+      : taxSettings.originState
+  const isIntraState =
+    destinationState.toLowerCase() === taxSettings.originState.toLowerCase()
+
+  const mappedItems = order.items.map((item) => {
+    const product = item.variant?.product
+    const itemRate = product?.isTaxExempt
+      ? 0
+      : item.taxRate !== null && item.taxRate !== undefined
+      ? Number(item.taxRate)
+      : product?.taxRate !== null && product?.taxRate !== undefined
+      ? Number(product.taxRate)
+      : taxSettings.defaultGstRate
+    const hsnCode = item.hsnCode || product?.hsnCode || taxSettings.defaultHsn
+    const itemTotal = Number(item.total)
+
+    const itemCalc = calculateGst(
+      itemTotal,
+      itemRate,
+      taxSettings.priceInclusive,
+      taxSettings.originState,
+      destinationState,
+    )
+
+    return {
+      id: item.id,
+      title: item.title,
+      sku: item.sku,
+      quantity: item.quantity,
+      unitPrice: Number(item.unitPrice),
+      total: itemTotal,
+      variantId: item.variantId,
+      taxRate: itemRate,
+      tax: itemCalc.totalGst,
+      hsnCode,
+      taxableAmount: itemCalc.taxableAmount,
+      cgst: itemCalc.cgst,
+      sgst: itemCalc.sgst,
+      igst: itemCalc.igst,
+    }
+  })
+
+  const calcTaxable = mappedItems.reduce((sum, i) => sum + i.taxableAmount, 0)
+  const calcTax = mappedItems.reduce((sum, i) => sum + i.tax, 0)
+  const calcCgst = mappedItems.reduce((sum, i) => sum + i.cgst, 0)
+  const calcSgst = mappedItems.reduce((sum, i) => sum + i.sgst, 0)
+  const calcIgst = mappedItems.reduce((sum, i) => sum + i.igst, 0)
+
+  const tax = Number(order.tax) > 0 ? Number(order.tax) : Number(calcTax.toFixed(2))
+  const cgst = Number(order.cgst) > 0 ? Number(order.cgst) : Number(calcCgst.toFixed(2))
+  const sgst = Number(order.sgst) > 0 ? Number(order.sgst) : Number(calcSgst.toFixed(2))
+  const igst = Number(order.igst) > 0 ? Number(order.igst) : Number(calcIgst.toFixed(2))
 
   return {
     ...mapOrder(order),
     subtotal: Number(order.subtotal),
     discount: Number(order.discount),
     shipping: Number(order.shipping),
-    items: order.items.map((item) => ({
-      id: item.id,
-      title: item.title,
-      sku: item.sku,
-      quantity: item.quantity,
-      unitPrice: Number(item.unitPrice),
-      total: Number(item.total),
-      variantId: item.variantId,
-    })),
+    tax,
+    cgst,
+    sgst,
+    igst,
+    taxableAmount: Number(calcTaxable.toFixed(2)),
+    isIntraState,
+    destinationState,
+    originState: taxSettings.originState,
+    gstin: taxSettings.gstin,
+    taxSettings,
+    shippingAddress: (order.shippingAddress as any) ?? null,
+    items: mappedItems,
   }
 }
 
