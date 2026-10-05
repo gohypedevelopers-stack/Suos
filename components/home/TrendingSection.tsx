@@ -422,12 +422,12 @@ export function ProductCardView({
       </div>
 
       {/* Info Area Below Image */}
-      <div className="mt-2.5 sm:mt-3 flex flex-col">
+      <div className="mt-2.5 md:mt-3 flex flex-col">
         {/* Title row with icon */}
-        <div className="flex items-center justify-between gap-1.5 sm:gap-2">
+        <div className="flex items-center justify-between gap-1.5 md:gap-2">
           <Link
             href={`/products/${product.slug}`}
-            className="truncate text-[10px] sm:text-[13px] font-normal uppercase tracking-normal sm:tracking-tight text-black transition-opacity hover:opacity-70 leading-none"
+            className="truncate text-[10px] md:text-[14px] font-normal uppercase tracking-normal md:tracking-tight text-black transition-opacity hover:opacity-70 leading-none md:leading-normal"
           >
             {product.title || "WASHED BLACK STRAIGHT FIT DENIM"}
           </Link>
@@ -447,7 +447,7 @@ export function ProductCardView({
               strokeWidth="1.6"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="size-[13px] sm:size-[16px]"
+              className="size-[13px] md:size-[18px]"
             >
               <rect x="4.5" y="9" width="15" height="12" />
               <path d="M7.5 9a4.5 4.5 0 0 1 9 0" />
@@ -456,28 +456,28 @@ export function ProductCardView({
         </div>
 
         {/* Subtitle row */}
-        <p className="mt-1 truncate text-[9px] sm:text-[11px] uppercase tracking-normal sm:tracking-wider text-neutral-400 font-normal leading-none">
+        <p className="mt-1 truncate text-[9px] md:text-[12px] uppercase tracking-normal md:tracking-wider text-neutral-400 font-normal leading-none md:leading-normal">
           {subtitle}
         </p>
 
-        {/* Pricing row (matches reference image: compare price first, current price second, discount third) */}
-        <div className="mt-1.5 flex items-baseline gap-1.5 sm:gap-2 flex-wrap text-[10px] sm:text-[12px] leading-none">
+        {/* Pricing row */}
+        <div className="mt-1.5 flex items-baseline gap-1.5 md:gap-2 flex-wrap text-[10px] md:text-[13px] leading-none md:leading-normal">
           {comparePriceStr ? (
-            <span className="font-normal text-neutral-400 line-through text-[9px] sm:text-[11px]">
+            <span className="font-normal text-neutral-400 line-through text-[9px] md:text-[12px]">
               {comparePriceStr}
             </span>
           ) : null}
-          <span className="font-normal sm:font-semibold text-black">
+          <span className="font-normal md:font-semibold text-black">
             {displayPrice}
           </span>
           {discountPercent && discountPercent > 0 ? (
-            <span className="text-[8.5px] sm:text-[10px] font-normal uppercase tracking-wide text-red-500">
+            <span className="text-[8.5px] md:text-[11px] font-normal uppercase tracking-wide text-red-500">
               SAVE {discountPercent}%
             </span>
           ) : null}
         </div>
 
-        {/* Size Selection Row (Smooth accordion animation on expand or hover) */}
+        {/* Size Selection Row (Figma Group 3 specs on mobile, original layout on desktop) */}
         <div
           className={cn(
             "grid transition-[grid-template-rows,opacity] duration-300 ease-out",
@@ -487,7 +487,7 @@ export function ProductCardView({
           )}
         >
           <div className="overflow-hidden">
-            <div className="flex flex-wrap items-center gap-1.5 pt-2.5">
+            <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 pt-1.5 md:pt-2.5">
               {sizesList.map((size) => {
                 const isSelected = selectedSize === size
                 return (
@@ -496,9 +496,9 @@ export function ProductCardView({
                     type="button"
                     onClick={(e) => handleSelectSize(size, e)}
                     className={cn(
-                      "flex min-w-[28px] h-7 px-1.5 items-center justify-center text-[11px] uppercase transition-colors cursor-pointer",
+                      "flex min-w-[19px] h-[16px] px-1 items-center justify-center text-[8px] font-normal uppercase leading-none transition-colors cursor-pointer select-none md:min-w-[28px] md:h-7 md:px-1.5 md:text-[11px] md:leading-normal",
                       isSelected
-                        ? "border border-black bg-white text-black font-semibold"
+                        ? "border border-black bg-neutral-100 text-black font-medium md:bg-white md:font-semibold"
                         : "border border-neutral-200 bg-white text-neutral-600 hover:border-black"
                     )}
                     title={`Select size ${size} and add to cart`}
