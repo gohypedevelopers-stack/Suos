@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ChevronLeft, ChevronRight, ShoppingBag, Bookmark } from "lucide-react"
+import { Heart } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { ProductQuickViewModal } from "@/components/product/ProductQuickViewModal"
@@ -94,26 +94,79 @@ export function ProductCardView({
 }) {
   const gallery = product.gallery?.length ? product.gallery : [product.image]
   const [activeImageIndex, setActiveImageIndex] = useState(0)
+  const [prevImageIndex, setPrevImageIndex] = useState(0)
   const [isExpanded, setIsExpanded] = useState(expanded)
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
   const [quickViewOpen, setQuickViewOpen] = useState(false)
+
+  const indicatorCount = Math.min(3, gallery.length)
+  const activeIndicatorIndex =
+    indicatorCount <= 1
+      ? 0
+      : gallery.length <= 3
+      ? activeImageIndex
+      : Math.min(
+          indicatorCount - 1,
+          Math.max(
+            0,
+            Math.round((activeImageIndex / (gallery.length - 1)) * (indicatorCount - 1))
+          )
+        )
   
   const { isInWishlist, toggleWishlist, setIsSidebarOpen } = useWishlist()
   const { addToCart, setIsCartOpen } = useCart()
   
   const isWished = isInWishlist(product.id)
   const activeImage = gallery[activeImageIndex] ?? product.image
-  const hasGalleryControls = gallery.length > 1
 
-  const handlePreviousImage = () => {
-    setActiveImageIndex(
-      (currentIndex) => (currentIndex - 1 + gallery.length) % gallery.length
-    )
+  const changeImage = (newIndex: number) => {
+    if (newIndex !== activeImageIndex && newIndex >= 0 && newIndex < gallery.length) {
+      setPrevImageIndex(activeImageIndex)
+      setActiveImageIndex(newIndex)
+    }
   }
 
-  const handleNextImage = () => {
-    setActiveImageIndex((currentIndex) => (currentIndex + 1) % gallery.length)
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (gallery.length <= 1) return
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    if (rect.width <= 0) return
+    const fraction = Math.max(0, Math.min(x / rect.width, 0.999))
+    const newIndex = Math.floor(fraction * gallery.length)
+    changeImage(newIndex)
   }
+
+  const handleMouseLeave = () => {
+    changeImage(0)
+  }
+
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null)
+
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (gallery.length <= 1) return
+    const touch = e.touches[0]
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY }
+  }
+
+  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!touchStartRef.current || gallery.length <= 1) return
+    const touch = e.changedTouches[0]
+    const deltaX = touch.clientX - touchStartRef.current.x
+    const deltaY = touch.clientY - touchStartRef.current.y
+    touchStartRef.current = null
+
+    // Require deliberate horizontal swipe of 30px that dominates vertical scroll
+    if (Math.abs(deltaX) > 30 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+      if (deltaX < 0) {
+        // Swipe left -> next image
+        changeImage((activeImageIndex + 1) % gallery.length)
+      } else {
+        // Swipe right -> previous image
+        changeImage((activeImageIndex - 1 + gallery.length) % gallery.length)
+      }
+    }
+  }
+
 
   const toggleExpand = (event: React.MouseEvent) => {
     event.preventDefault()
@@ -188,20 +241,45 @@ export function ProductCardView({
 
   return (
     <article
-      className="group relative flex flex-col bg-white text-black p-2 sm:p-2.5 transition-colors duration-200"
+      className={cn(
+        "group relative flex flex-col bg-white text-black p-0.5 sm:p-1 pb-2 sm:pb-2.5 transition-all duration-200 border hover:z-10",
+        isExpanded ? "border-black z-10" : "border-transparent hover:border-black"
+      )}
     >
-      <div className="relative aspect-[330/440] w-full overflow-hidden bg-neutral-100">
-        {activeImage ? (
-          <Image
-            key={`${product.id}-${activeImageIndex}`}
-            src={activeImage}
-            alt={product.alt || product.title}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.015]"
-          />
+      <div
+        className="relative aspect-[2/3] sm:aspect-[330/440] w-full overflow-hidden bg-neutral-900 touch-pan-y select-none"
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        {gallery.length > 0 ? (
+          gallery.map((imgSrc, idx) => {
+            const isActive = idx === activeImageIndex
+            const isPrev = idx === prevImageIndex
+
+            return (
+              <Image
+                key={`${product.id}-${idx}`}
+                src={imgSrc}
+                alt={product.alt || product.title}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                className={cn(
+                  "object-cover object-center group-hover:scale-[1.015]",
+                  isActive
+                    ? "z-10 opacity-100 transition-opacity duration-150 ease-out"
+                    : isPrev
+                    ? "z-[5] opacity-100 transition-none"
+                    : "z-0 opacity-0 pointer-events-none transition-none"
+                )}
+                priority={idx < 2}
+                loading={idx < 2 ? "eager" : "lazy"}
+              />
+            )
+          })
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-neutral-100">
+          <div className="absolute inset-0 flex items-center justify-center bg-neutral-900">
             <span className="text-xs uppercase text-neutral-400">No Image</span>
           </div>
         )}
@@ -213,9 +291,9 @@ export function ProductCardView({
           className="absolute inset-0 z-10 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-white"
         />
 
-        {/* Badge at Top-Left */}
-        <div className="pointer-events-none absolute left-2.5 top-2.5 z-20">
-          <span className="inline-block bg-black px-2 py-1 text-[10px] font-medium uppercase tracking-widest text-white leading-none">
+        {/* Badge at Top-Left (Smaller and corner-aligned on mobile) */}
+        <div className="pointer-events-none absolute left-1.5 top-1.5 sm:left-2.5 sm:top-2.5 z-20">
+          <span className="inline-block bg-black px-1.5 py-[2.5px] sm:px-2.5 sm:py-1 text-[7.5px] sm:text-[10px] font-medium uppercase tracking-[0.08em] sm:tracking-[0.14em] text-white leading-none shadow-xs">
             {product.badge || "NEW ARRIVAL"}
           </span>
         </div>
@@ -226,25 +304,25 @@ export function ProductCardView({
           onClick={handleWishlistClick}
           aria-label="Toggle wishlist"
           title={isWished ? "Remove from wishlist" : "Add to wishlist"}
-          className="pointer-events-auto absolute right-2.5 top-2.5 z-20 flex size-7 sm:size-8 items-center justify-center text-white transition-transform duration-200 hover:scale-110 active:scale-95 cursor-pointer"
+          className="pointer-events-auto absolute right-1.5 top-1.5 sm:right-2.5 sm:top-2.5 z-20 flex size-6 sm:size-8 items-center justify-center text-white transition-transform duration-200 hover:scale-110 active:scale-95 cursor-pointer"
         >
-          <Bookmark
+          <Heart
             className={cn(
-              "size-[18px] transition-colors drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]",
+              "size-3.5 sm:size-[18px] transition-colors drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]",
               isWished ? "fill-white stroke-white" : "fill-transparent stroke-white"
             )}
-            strokeWidth={1.8}
+            strokeWidth={1.6}
           />
         </button>
 
-        {/* Expand / Collapse Button (+ / -) in Bottom-Right Corner of Image */}
+        {/* Expand / Collapse Button (+ / -) in Bottom-Right Corner of Image - Mobile only */}
         <button
           type="button"
           aria-label={isExpanded ? "Collapse details" : "Expand size options"}
           onClick={toggleExpand}
-          className="pointer-events-auto absolute bottom-0 right-0 z-20 flex size-8 sm:size-9 items-center justify-center bg-white text-black shadow-sm transition-colors hover:bg-neutral-100 cursor-pointer"
+          className="pointer-events-auto absolute bottom-1.5 right-1.5 sm:bottom-2 sm:right-2 z-20 flex md:hidden size-[22px] sm:size-6 items-center justify-center bg-white text-black shadow-xs transition-transform duration-200 hover:scale-105 active:scale-95 cursor-pointer"
         >
-          <div className="relative size-4 flex items-center justify-center">
+          <div className="relative size-3 flex items-center justify-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -254,8 +332,8 @@ export function ProductCardView({
               strokeLinecap="round"
               strokeLinejoin="round"
               className={cn(
-                "size-4 transition-transform duration-300 ease-out",
-                isExpanded ? "rotate-180" : "rotate-0 md:group-hover:rotate-180"
+                "size-3 transition-transform duration-300 ease-out",
+                isExpanded ? "rotate-180" : "rotate-0"
               )}
             >
               {/* Horizontal line (stays in place as the minus bar) */}
@@ -270,110 +348,91 @@ export function ProductCardView({
                   "origin-center transition-all duration-300 ease-out",
                   isExpanded
                     ? "scale-y-0 opacity-0 rotate-90"
-                    : "scale-y-100 opacity-100 rotate-0 md:group-hover:scale-y-0 md:group-hover:opacity-0 md:group-hover:rotate-90"
+                    : "scale-y-100 opacity-100 rotate-0"
                 )}
               />
             </svg>
           </div>
         </button>
 
-        {/* Expanded Mode & Laptop/Desktop Hover Mode: QUICK VIEW & Gallery Indicators in Center Bottom */}
+        {/* Desktop Hover Quick View Button */}
         <div
-          className={cn(
-            "pointer-events-none absolute inset-x-0 bottom-10 sm:bottom-11 z-20 flex flex-col items-center justify-center gap-1.5 px-2 transition-[opacity,transform] duration-300 ease-out",
-            isExpanded
-              ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-2 pointer-events-none md:group-hover:opacity-100 md:group-hover:translate-y-0 md:group-hover:pointer-events-auto"
-          )}
+          className="pointer-events-none absolute inset-x-0 bottom-6 sm:bottom-7 z-20 hidden md:flex items-center justify-center px-2 transition-[opacity,transform] duration-200 ease-out opacity-0 translate-y-1 md:group-hover:opacity-100 md:group-hover:translate-y-0 md:group-hover:pointer-events-auto"
         >
           <button
             type="button"
             onClick={handleQuickView}
-            className={cn(
-              "bg-black px-3.5 sm:px-4 py-1.5 text-[10px] sm:text-[11px] font-medium uppercase tracking-widest text-white shadow-md hover:bg-neutral-800 transition-colors cursor-pointer whitespace-nowrap",
-              isExpanded
-                ? "pointer-events-auto"
-                : "pointer-events-none md:group-hover:pointer-events-auto"
-            )}
+            className="bg-black px-4 py-1.5 text-[10.5px] sm:text-[11px] font-medium uppercase tracking-[0.14em] text-white hover:bg-neutral-900 transition-colors cursor-pointer whitespace-nowrap shadow-md"
           >
             QUICK VIEW
           </button>
+        </div>
 
-          {gallery.length > 1 && (
-            <div
-              className={cn(
-                "flex items-center justify-center gap-1 transition-opacity duration-200",
-                isExpanded
-                  ? "pointer-events-auto"
-                  : "pointer-events-none md:group-hover:pointer-events-auto"
-              )}
+        {/* Mobile Expanded Quick View Button */}
+        {isExpanded && (
+          <div className="pointer-events-auto absolute inset-x-0 bottom-6.5 z-20 flex md:hidden items-center justify-center px-2">
+            <button
+              type="button"
+              onClick={handleQuickView}
+              className="bg-black px-4 py-1.5 text-[10px] font-medium uppercase tracking-[0.14em] text-white hover:bg-neutral-900 transition-colors cursor-pointer whitespace-nowrap shadow-md"
             >
-              {gallery.map((_, idx) => (
+              QUICK VIEW
+            </button>
+          </div>
+        )}
+
+        {/* Gallery Indicator Lines (Max 3 indicators, even if gallery has more images) */}
+        {indicatorCount > 1 && (
+          <div className="pointer-events-auto absolute inset-x-0 bottom-2 sm:bottom-3 z-20 flex items-center justify-center gap-1 sm:gap-1.5 px-2">
+            {Array.from({ length: indicatorCount }).map((_, dashIdx) => {
+              const targetImageIndex = Math.round(
+                (dashIdx / (indicatorCount - 1)) * (gallery.length - 1)
+              )
+
+              return (
                 <button
-                  key={idx}
+                  key={dashIdx}
                   type="button"
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
-                    setActiveImageIndex(idx)
+                    changeImage(targetImageIndex)
                   }}
-                  className={cn(
-                    "h-[2px] transition-colors cursor-pointer",
-                    idx === activeImageIndex
-                      ? "w-5 bg-black"
-                      : "w-3 bg-black/30 hover:bg-black/60"
-                  )}
-                  aria-label={`Slide ${idx + 1}`}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Gallery Prev / Next Arrows on Hover */}
-        {hasGalleryControls && (
-          <div className="pointer-events-none absolute inset-x-2 top-1/2 z-20 flex -translate-y-1/2 items-center justify-between opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-            <button
-              type="button"
-              aria-label="Previous product image"
-              onClick={(event) => {
-                event.preventDefault()
-                event.stopPropagation()
-                handlePreviousImage()
-              }}
-              className="pointer-events-auto flex size-7 items-center justify-center bg-white/80 text-black shadow transition-colors hover:bg-white cursor-pointer"
-            >
-              <ChevronLeft className="size-4" strokeWidth={2.2} />
-            </button>
-
-            <button
-              type="button"
-              aria-label="Next product image"
-              onClick={(event) => {
-                event.preventDefault()
-                event.stopPropagation()
-                handleNextImage()
-              }}
-              className="pointer-events-auto flex size-7 items-center justify-center bg-white/80 text-black shadow transition-colors hover:bg-white cursor-pointer"
-            >
-              <ChevronRight className="size-4" strokeWidth={2.2} />
-            </button>
+                  onMouseEnter={(e) => {
+                    e.stopPropagation()
+                    changeImage(targetImageIndex)
+                  }}
+                  className="group/ind flex items-center justify-center py-1.5 px-0.5 cursor-pointer"
+                  aria-label={`Slide ${dashIdx + 1}`}
+                >
+                  <span
+                    className={cn(
+                      "block h-[0.5px] sm:h-[1px] transition-all duration-200 rounded-full",
+                      dashIdx === activeIndicatorIndex
+                        ? "w-[26px] sm:w-8 bg-white drop-shadow-[0_0.5px_0.5px_rgba(0,0,0,0.5)]"
+                        : "w-[26px] sm:w-8 bg-white/40 group-hover/ind:bg-white/70"
+                    )}
+                  />
+                </button>
+              )
+            })}
           </div>
         )}
+
       </div>
 
       {/* Info Area Below Image */}
-      <div className="mt-2.5 flex flex-col">
+      <div className="mt-2.5 sm:mt-3 flex flex-col">
         {/* Title row with icon */}
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-1.5 sm:gap-2">
           <Link
             href={`/products/${product.slug}`}
-            className="truncate text-[13px] sm:text-[14px] font-normal uppercase tracking-tight text-black transition-opacity hover:opacity-70"
+            className="truncate text-[10px] sm:text-[13px] font-normal uppercase tracking-normal sm:tracking-tight text-black transition-opacity hover:opacity-70 leading-none"
           >
             {product.title || "WASHED BLACK STRAIGHT FIT DENIM"}
           </Link>
 
-          {/* Shopping Bag Button (always visible and clickable) */}
+          {/* Shopping Tote Bag Button */}
           <button
             type="button"
             onClick={handleCartClick}
@@ -381,25 +440,38 @@ export function ProductCardView({
             title="Add to cart"
             className="shrink-0 cursor-pointer p-0.5 text-black transition-transform duration-200 hover:scale-110 active:scale-95"
           >
-            <ShoppingBag className="size-4 stroke-[1.8]" />
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="size-[13px] sm:size-[16px]"
+            >
+              <rect x="4.5" y="9" width="15" height="12" />
+              <path d="M7.5 9a4.5 4.5 0 0 1 9 0" />
+            </svg>
           </button>
         </div>
 
         {/* Subtitle row */}
-        <p className="mt-0.5 truncate text-[11px] sm:text-[12px] uppercase tracking-wider text-neutral-500 font-normal">
+        <p className="mt-1 truncate text-[9px] sm:text-[11px] uppercase tracking-normal sm:tracking-wider text-neutral-400 font-normal leading-none">
           {subtitle}
         </p>
 
-        {/* Pricing row (stable, no layout shift or jitter) */}
-        <div className="mt-1 flex items-baseline gap-1.5 sm:gap-2 flex-wrap text-[12px] sm:text-[14px]">
-          <span className="font-semibold text-black">
+        {/* Pricing row (matches reference image: compare price first, current price second, discount third) */}
+        <div className="mt-1.5 flex items-baseline gap-1.5 sm:gap-2 flex-wrap text-[10px] sm:text-[12px] leading-none">
+          {comparePriceStr ? (
+            <span className="font-normal text-neutral-400 line-through text-[9px] sm:text-[11px]">
+              {comparePriceStr}
+            </span>
+          ) : null}
+          <span className="font-normal sm:font-semibold text-black">
             {displayPrice}
           </span>
-          <span className="font-normal text-neutral-400 line-through text-[11px] sm:text-[13px]">
-            {comparePriceStr}
-          </span>
           {discountPercent && discountPercent > 0 ? (
-            <span className="text-[10px] sm:text-[11px] font-medium uppercase tracking-wide text-red-600">
+            <span className="text-[8.5px] sm:text-[10px] font-normal uppercase tracking-wide text-red-500">
               SAVE {discountPercent}%
             </span>
           ) : null}
@@ -415,7 +487,7 @@ export function ProductCardView({
           )}
         >
           <div className="overflow-hidden">
-            <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 pt-2 pb-1.5 sm:pt-2.5 sm:pb-2">
+            <div className="flex flex-wrap items-center gap-1.5 pt-2.5">
               {sizesList.map((size) => {
                 const isSelected = selectedSize === size
                 return (
@@ -424,10 +496,10 @@ export function ProductCardView({
                     type="button"
                     onClick={(e) => handleSelectSize(size, e)}
                     className={cn(
-                      "flex min-w-[24px] sm:min-w-[28px] h-6 sm:h-7 px-1 sm:px-1.5 items-center justify-center text-[10px] sm:text-[12px] font-medium uppercase transition-colors cursor-pointer",
+                      "flex min-w-[28px] h-7 px-1.5 items-center justify-center text-[11px] uppercase transition-colors cursor-pointer",
                       isSelected
-                        ? "border-2 border-black bg-white text-black font-semibold"
-                        : "border border-neutral-300 bg-white text-neutral-800 hover:border-black"
+                        ? "border border-black bg-white text-black font-semibold"
+                        : "border border-neutral-200 bg-white text-neutral-600 hover:border-black"
                     )}
                     title={`Select size ${size} and add to cart`}
                   >
@@ -481,7 +553,7 @@ export function TrendingSection({ products = [] }: { products?: ProductCard[] })
 
       </div>
 
-      <div className="mt-6 sm:mt-8 grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-6 sm:mt-8 grid grid-cols-2 gap-0.5 sm:gap-1 md:grid-cols-2 lg:grid-cols-4 items-start">
         {products.map((product) => (
           <ProductCardView key={product.id} product={product} />
         ))}

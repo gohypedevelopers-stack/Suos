@@ -107,7 +107,7 @@ export function Hero({ banners }: { banners?: HomeHeroBanner[] }) {
             {(slide.title || slide.subtitle || slide.ctaText) && (
               <div
                 className={cn(
-                  "absolute inset-x-0 bottom-8 sm:bottom-12 lg:bottom-16 z-20 px-4 sm:px-8 flex flex-col pointer-events-none",
+                  "absolute inset-x-0 bottom-15 sm:bottom-12 lg:bottom-16 z-20 px-4 sm:px-8 flex flex-col pointer-events-none",
                   slide.textAlignment === "LEFT"
                     ? "items-start text-left max-w-7xl mx-auto"
                     : slide.textAlignment === "RIGHT"
@@ -144,7 +144,7 @@ export function Hero({ banners }: { banners?: HomeHeroBanner[] }) {
 
       {/* Subtle Slide Indicator Dots (when multiple slides exist, no arrows) */}
       {slides.length > 1 && (
-        <div className="absolute bottom-5 right-6 z-30 flex items-center gap-1.5 bg-black/40 backdrop-blur-xs px-2.5 py-1 rounded-full">
+        <div className="absolute bottom-3.5 right-4 sm:bottom-5 sm:right-6 z-30 flex items-center gap-1.5 bg-black/40 backdrop-blur-xs px-2.5 py-1 rounded-full">
           {slides.map((_, idx) => (
             <button
               key={idx}
