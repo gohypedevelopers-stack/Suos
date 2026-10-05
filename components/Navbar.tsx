@@ -399,7 +399,7 @@ export function Navbar({
 
     menuCloseTimeoutRef.current = window.setTimeout(() => {
       closeMenu()
-    }, 90)
+    }, 280)
   }
 
   const cancelMenuClose = () => {
@@ -509,6 +509,8 @@ export function Navbar({
   const headerContent = (
     <header
       ref={headerRef}
+      onMouseEnter={cancelMenuClose}
+      onMouseLeave={scheduleMenuClose}
       className={cn(
         "main-navbar navbar-shell border-b",
         "h-14 sm:h-16 lg:h-[98px]",
@@ -525,9 +527,8 @@ export function Navbar({
         <div className="hidden h-full lg:grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-0">
           <nav
             aria-label="Primary"
-            className="flex items-center gap-10 justify-self-start"
+            className="flex h-full items-center gap-10 justify-self-start"
             onMouseEnter={cancelMenuClose}
-            onMouseLeave={scheduleMenuClose}
           >
             {primaryNav.map((item) => (
               <NavLink
@@ -577,7 +578,10 @@ export function Navbar({
             />
           </Link>
 
-          <div className="flex items-center justify-self-end gap-2 xl:gap-3">
+          <div
+            className="flex items-center justify-self-end gap-2 xl:gap-3"
+            onMouseEnter={scheduleMenuClose}
+          >
             <IconButton
               label="Search products"
               tone={tone}
