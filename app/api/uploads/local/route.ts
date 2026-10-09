@@ -3,6 +3,7 @@ import { dirname, resolve } from "node:path"
 
 import { z } from "zod"
 
+import { hasPermission, type PermissionKey } from "@/lib/permissions"
 import { getCurrentUser } from "@/lib/server/dal/auth"
 import {
   imageContentTypeSchema,
@@ -27,7 +28,7 @@ export async function PUT(request: Request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  if (user.role !== "ADMIN") {
+  if (user.role !== "ADMIN" && user.role !== "SUB_ADMIN") {
     return Response.json({ error: "Forbidden" }, { status: 403 })
   }
 
@@ -39,6 +40,21 @@ export async function PUT(request: Request) {
 
   if (!input.success) {
     return Response.json({ error: "Invalid upload request" }, { status: 400 })
+  }
+
+  const folderPermission: Record<string, PermissionKey> = {
+    products: "products.manage",
+    categories: "categories.manage",
+    collections: "collections.manage",
+    banners: "banners.manage",
+  }
+  const folder = input.data.objectKey.split("/")[1] ?? "products"
+  const requiredPermission = folderPermission[folder] ?? "products.manage"
+  if (!hasPermission(user, requiredPermission)) {
+    return Response.json(
+      { error: `You don't have the "${requiredPermission}" permission.` },
+      { status: 403 },
+    )
   }
 
   const requestContentType = request.headers.get("content-type")?.split(";", 1)[0]

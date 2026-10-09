@@ -1,6 +1,6 @@
 import "server-only"
 
-import { getCurrentUser, requireAdmin } from "@/lib/server/dal/auth"
+import { requirePermission, assertPermission } from "@/lib/server/dal/auth"
 import { getPrisma } from "@/lib/server/db"
 
 import {
@@ -85,7 +85,7 @@ export async function updateTaxSettings(input: {
   priceInclusive?: boolean
   defaultHsn?: string
 }): Promise<TaxSettingData> {
-  await requireAdmin()
+  await assertPermission("taxes.manage")
   const prisma = getPrisma()
 
   try {
@@ -185,7 +185,7 @@ export function getEmptyGstAnalytics(targetYear?: number): MonthlyGstAnalytics {
 }
 
 export async function getMonthlyGstAnalytics(targetYear?: number): Promise<MonthlyGstAnalytics> {
-  await requireAdmin()
+  await requirePermission("taxes.view")
   const prisma = getPrisma()
   const settings = await getTaxSettings()
 

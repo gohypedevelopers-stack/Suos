@@ -1,11 +1,11 @@
 import "server-only"
 
-import { assertAdmin } from "@/lib/server/dal/auth"
+import { assertPermission } from "@/lib/server/dal/auth"
 import { getPrisma } from "@/lib/server/db"
 import type { BannerInput, BannerPlacement } from "@/lib/validations/banner"
 
 export async function createBanner(input: BannerInput) {
-  await assertAdmin()
+  await assertPermission("banners.manage")
   const prisma = getPrisma()
 
   let position = input.position
@@ -36,7 +36,7 @@ export async function createBanner(input: BannerInput) {
 }
 
 export async function updateBanner(id: string, input: BannerInput) {
-  await assertAdmin()
+  await assertPermission("banners.manage")
   const prisma = getPrisma()
 
   const existing = await prisma.banner.findUnique({
@@ -66,7 +66,7 @@ export async function updateBanner(id: string, input: BannerInput) {
 }
 
 export async function updateBannerActive(id: string, isActive: boolean) {
-  await assertAdmin()
+  await assertPermission("banners.manage")
   const prisma = getPrisma()
 
   const banner = await prisma.banner.findUnique({ where: { id } })
@@ -81,7 +81,7 @@ export async function updateBannerActive(id: string, isActive: boolean) {
 }
 
 export async function deleteBanners(ids: string[]) {
-  await assertAdmin()
+  await assertPermission("banners.delete")
   const prisma = getPrisma()
 
   return prisma.banner.deleteMany({
@@ -90,7 +90,7 @@ export async function deleteBanners(ids: string[]) {
 }
 
 export async function reorderBanners(items: { id: string; position: number }[]) {
-  await assertAdmin()
+  await assertPermission("banners.manage")
   const prisma = getPrisma()
 
   return prisma.$transaction(
@@ -117,7 +117,7 @@ export type StoredBannerImage = {
 }
 
 export async function listStoredBannerImages(): Promise<StoredBannerImage[]> {
-  await assertAdmin()
+  await assertPermission("banners.view")
   const prisma = getPrisma()
 
   // 1. Get all banners to know which images are currently in use
@@ -235,7 +235,7 @@ export async function listStoredBannerImages(): Promise<StoredBannerImage[]> {
 }
 
 export async function deleteStoredBannerImage(key: string) {
-  await assertAdmin()
+  await assertPermission("banners.delete")
   const prisma = getPrisma()
 
   // 1. Delete from Cloudflare R2

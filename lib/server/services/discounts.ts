@@ -1,7 +1,7 @@
 import "server-only"
 
 import { Prisma } from "@/generated/prisma/client"
-import { assertAdmin } from "@/lib/server/dal/auth"
+import { assertPermission } from "@/lib/server/dal/auth"
 import { getPrisma } from "@/lib/server/db"
 import type { DiscountInput } from "@/lib/validations/discount"
 
@@ -52,7 +52,7 @@ function discountData(input: DiscountInput) {
 }
 
 export async function createDiscount(input: DiscountInput) {
-  await assertAdmin()
+  await assertPermission("discounts.manage")
   return getPrisma().$transaction(async (tx) => {
     await validateTargets(tx, input)
     return tx.discount.create({ data: discountData(input), select: { id: true } })
@@ -60,7 +60,7 @@ export async function createDiscount(input: DiscountInput) {
 }
 
 export async function updateDiscount(id: string, input: DiscountInput) {
-  await assertAdmin()
+  await assertPermission("discounts.manage")
   return getPrisma().$transaction(async (tx) => {
     const existing = await tx.discount.findUnique({ where: { id }, select: { id: true } })
     if (!existing) throw new Error("This discount no longer exists.")
@@ -70,13 +70,13 @@ export async function updateDiscount(id: string, input: DiscountInput) {
 }
 
 export async function setDiscountStatus(ids: string[], status: "ACTIVE" | "INACTIVE") {
-  await assertAdmin()
+  await assertPermission("discounts.manage")
   const updated = await getPrisma().discount.updateMany({ where: { id: { in: ids } }, data: { status } })
   return { count: updated.count, ids }
 }
 
 export async function deleteDiscounts(ids: string[]) {
-  await assertAdmin()
+  await assertPermission("discounts.delete")
   const deleted = await getPrisma().discount.deleteMany({ where: { id: { in: ids } } })
   return { count: deleted.count, ids }
 }

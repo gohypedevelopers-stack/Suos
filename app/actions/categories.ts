@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
-import { assertAdmin } from "@/lib/server/dal/auth"
+import { assertPermission, permissionErrorMessage } from "@/lib/server/dal/auth"
 import {
   createCategory,
   deleteCategories,
@@ -31,11 +31,13 @@ function revalidateCategoryPaths(categoryId?: string) {
 }
 
 function mutationError(error: unknown) {
+  const denied = permissionErrorMessage(error)
+  if (denied) return denied
   if (error instanceof Error) {
     if (error.message === "Unauthorized") {
       return "Sign in to continue."
     }
-    if (error.message === "Forbidden") {
+    if (error.message === "Forbidden" || error.message === "SuperAdminRequired" || error.message.startsWith("PermissionDenied:")) {
       return "Administrator access is required."
     }
     if (
@@ -64,7 +66,7 @@ export async function createCategoryAction(
   }
 
   try {
-    await assertAdmin()
+    await assertPermission("categories.manage")
     const category = await createCategory(result.data)
     revalidateCategoryPaths(category.id)
 
@@ -92,7 +94,7 @@ export async function updateCategoryAction(
   }
 
   try {
-    await assertAdmin()
+    await assertPermission("categories.manage")
     const category = await updateCategory(id.data, result.data)
     revalidateCategoryPaths(category.id)
 
@@ -113,7 +115,7 @@ export async function updateCategoryVisibilityAction(
   }
 
   try {
-    await assertAdmin()
+    await assertPermission("categories.manage")
     await updateCategoryVisibility(id.data, z.boolean().parse(visible))
     revalidateCategoryPaths(id.data)
     return { success: true }
@@ -130,7 +132,7 @@ export async function deleteCategoriesAction(categoryIds: unknown) {
   }
 
   try {
-    await assertAdmin()
+    await assertPermission("categories.manage")
     const deleted = await deleteCategories([...new Set(ids.data)])
     revalidateCategoryPaths()
     return { success: true, count: deleted.count }

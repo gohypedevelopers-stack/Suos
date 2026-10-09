@@ -1,6 +1,6 @@
 import "server-only"
 
-import { assertAdmin } from "@/lib/server/dal/auth"
+import { requirePermission } from "@/lib/server/dal/auth"
 import { getPrisma } from "@/lib/server/db"
 import { calculateGst, getTaxSettings, type TaxSettingData } from "@/lib/server/dal/taxes"
 
@@ -119,7 +119,7 @@ function mapOrder(order: {
 }
 
 export async function listOrdersForAdmin(): Promise<AdminOrderDashboard> {
-  await assertAdmin()
+  await requirePermission("orders.view")
   const prisma = getPrisma()
   const orders = await prisma.order.findMany({
     orderBy: { createdAt: "desc" },
@@ -156,7 +156,7 @@ export async function listOrdersForAdmin(): Promise<AdminOrderDashboard> {
 export async function getOrderForAdmin(
   orderId: string,
 ): Promise<AdminOrderDetail | null> {
-  await assertAdmin()
+  await requirePermission("orders.view")
   const prisma = getPrisma()
   const [order, taxSettings] = await Promise.all([
     prisma.order.findUnique({
@@ -268,7 +268,7 @@ export async function listOrderCreationOptionsForAdmin(): Promise<{
   variants: AdminOrderCreateOption[]
   customers: AdminOrderCustomerOption[]
 }> {
-  await assertAdmin()
+  await requirePermission("orders.view")
   const prisma = getPrisma()
   const [variants, customers] = await Promise.all([
     prisma.productVariant.findMany({

@@ -1,7 +1,7 @@
 import "server-only"
 
 import { Prisma } from "@/generated/prisma/client"
-import { assertAdmin } from "@/lib/server/dal/auth"
+import { assertPermission } from "@/lib/server/dal/auth"
 import { getPrisma } from "@/lib/server/db"
 import {
   productInputSchema,
@@ -84,7 +84,7 @@ async function createAvailableSku(
 }
 
 export async function createProduct(input: ProductInput) {
-  await assertAdmin()
+  await assertPermission("products.manage")
   const prisma = getPrisma()
   const product = productInputSchema.parse(input)
   const slug = await createAvailableSlug(product.slug ?? product.title)
@@ -184,7 +184,7 @@ export async function createProduct(input: ProductInput) {
 }
 
 export async function updateProduct(productId: string, input: ProductInput) {
-  await assertAdmin()
+  await assertPermission("products.manage")
   const prisma = getPrisma()
   const product = productInputSchema.parse(input)
   const existing = await prisma.product.findUnique({
@@ -336,7 +336,7 @@ export async function updateProduct(productId: string, input: ProductInput) {
 }
 
 export async function deleteProducts(productIds: string[]) {
-  await assertAdmin()
+  await assertPermission("products.delete")
   const prisma = getPrisma()
 
   return prisma.product.deleteMany({
@@ -348,7 +348,7 @@ export async function updateProductsStatus(
   productIds: string[],
   status: "DRAFT" | "ACTIVE" | "ARCHIVED",
 ) {
-  await assertAdmin()
+  await assertPermission("products.manage")
   const prisma = getPrisma()
 
   return prisma.product.updateMany({
@@ -358,7 +358,7 @@ export async function updateProductsStatus(
 }
 
 export async function attachProductImage(input: unknown) {
-  await assertAdmin()
+  await assertPermission("products.manage")
   const prisma = getPrisma()
   const image = attachProductImageSchema.parse(input)
 

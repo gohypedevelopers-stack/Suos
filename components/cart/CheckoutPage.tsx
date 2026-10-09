@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
   ChevronDown,
   Check,
@@ -20,6 +20,10 @@ import {
 } from "lucide-react"
 
 import { useCart } from "@/lib/cart-context"
+import { toast } from "sonner"
+
+import { placeOrderAction } from "@/app/actions/checkout"
+import { getSessionId, track } from "@/lib/analytics-client"
 
 /* ─────────────────────────────────────────────
    Helpers & Options
@@ -673,6 +677,16 @@ export function CheckoutPage() {
   const [orderComplete, setOrderComplete] = useState(false)
   const [orderId, setOrderId] = useState("")
 
+  useEffect(() => {
+    if (cart.length > 0) {
+      track("BEGIN_CHECKOUT", {
+        payload: { items: cart.reduce((sum, item) => sum + item.quantity, 0) },
+      })
+    }
+    // Only once per checkout visit.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const selectedShipping =
     SHIPPING_OPTIONS.find((o) => o.id === shippingMethodId) ?? SHIPPING_OPTIONS[0]
 
@@ -690,10 +704,39 @@ export function CheckoutPage() {
   }
 
   const handlePlaceOrder = async () => {
+    if (isSubmitting) return
     setIsSubmitting(true)
-    await new Promise((r) => setTimeout(r, 1600))
-    const generatedId = `SUOS-${Math.floor(100000 + Math.random() * 900000)}`
-    setOrderId(generatedId)
+
+    const result = await placeOrderAction({
+      email,
+      firstName,
+      lastName,
+      phone,
+      address1: address,
+      address2: apartment,
+      city,
+      state,
+      postalCode: pincode,
+      country: "India",
+      shippingMethod: shippingMethodId,
+      paymentMethod: selectedPaymentMethod,
+      giftMessage: giftNote && giftMessage ? giftMessage : undefined,
+      newsletter,
+      analyticsSessionId: getSessionId(),
+      items: cart.map((item) => ({
+        productId: item.id,
+        size: item.size,
+        quantity: item.quantity,
+      })),
+    })
+
+    if (!result.success) {
+      setIsSubmitting(false)
+      toast.error(result.message)
+      return
+    }
+
+    setOrderId(result.reference)
     setIsSubmitting(false)
     setOrderComplete(true)
     clearCart()

@@ -1,5 +1,7 @@
 import "server-only"
 
+import { assertPermission } from "@/lib/server/dal/auth"
+
 import { Prisma } from "@/generated/prisma/client"
 import { toAdminUppercase } from "@/lib/content-case"
 import { getPrisma } from "@/lib/server/db"
@@ -190,6 +192,7 @@ export async function updateCategoryVisibility(
 }
 
 export async function deleteCategories(categoryIds: string[]) {
+  await assertPermission("categories.delete")
   const prisma = getPrisma()
 
   return prisma.category.deleteMany({

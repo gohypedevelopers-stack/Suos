@@ -1,13 +1,13 @@
 import "server-only"
 
 import { Prisma } from "@/generated/prisma/client"
-import { assertAdmin } from "@/lib/server/dal/auth"
+import { assertPermission } from "@/lib/server/dal/auth"
 import { calculateGst } from "@/lib/server/dal/taxes"
 import { getPrisma } from "@/lib/server/db"
 import type { OrderCreateInput } from "@/lib/validations/order"
 
 export async function createOrder(input: OrderCreateInput) {
-  await assertAdmin()
+  await assertPermission("orders.manage")
   const prisma = getPrisma()
 
   return prisma.$transaction(async (tx) => {
@@ -128,7 +128,7 @@ export async function createOrder(input: OrderCreateInput) {
 }
 
 export async function markOrdersPaid(orderIds: string[]) {
-  await assertAdmin()
+  await assertPermission("orders.manage")
   const prisma = getPrisma()
   const updated = await prisma.order.updateMany({
     where: { id: { in: orderIds }, status: "PENDING" },
@@ -143,7 +143,7 @@ export async function markOrdersPaid(orderIds: string[]) {
 }
 
 export async function fulfillOrders(orderIds: string[]) {
-  await assertAdmin()
+  await assertPermission("orders.manage")
   const prisma = getPrisma()
 
   return prisma.$transaction(async (tx) => {
@@ -152,11 +152,15 @@ export async function fulfillOrders(orderIds: string[]) {
       select: {
         id: true,
         userId: true,
+        source: true,
         items: { select: { variantId: true, quantity: true } },
       },
     })
     const requestedByVariant = new Map<string, number>()
     for (const order of orders) {
+      // Storefront orders reserve stock at checkout; only admin-created orders
+      // draw down inventory at fulfilment.
+      if (order.source === "STOREFRONT") continue
       for (const item of order.items) {
         if (!item.variantId) continue
         requestedByVariant.set(
@@ -189,20 +193,48 @@ export async function fulfillOrders(orderIds: string[]) {
 }
 
 export async function cancelOrders(orderIds: string[]) {
-  await assertAdmin()
+  await assertPermission("orders.manage")
   const prisma = getPrisma()
-  const orders = await prisma.order.findMany({
-    where: { id: { in: orderIds }, status: { in: ["PENDING", "CONFIRMED"] } },
-    select: { id: true, userId: true },
-  })
-  const updated = await prisma.order.updateMany({
-    where: { id: { in: orders.map((order) => order.id) } },
-    data: { status: "CANCELLED" },
-  })
 
-  return {
-    count: updated.count,
-    orderIds: orders.map((order) => order.id),
-    customerIds: orders.flatMap((order) => order.userId ? [order.userId] : []),
-  }
+  return prisma.$transaction(async (tx) => {
+    const orders = await tx.order.findMany({
+      where: { id: { in: orderIds }, status: { in: ["PENDING", "CONFIRMED"] } },
+      select: {
+        id: true,
+        userId: true,
+        source: true,
+        items: { select: { variantId: true, quantity: true } },
+      },
+    })
+
+    // Storefront orders reserved stock at checkout; release it again.
+    const releaseByVariant = new Map<string, number>()
+    for (const order of orders) {
+      if (order.source !== "STOREFRONT") continue
+      for (const item of order.items) {
+        if (!item.variantId) continue
+        releaseByVariant.set(
+          item.variantId,
+          (releaseByVariant.get(item.variantId) ?? 0) + item.quantity,
+        )
+      }
+    }
+    for (const [variantId, quantity] of releaseByVariant) {
+      await tx.productVariant.updateMany({
+        where: { id: variantId },
+        data: { inventoryQuantity: { increment: quantity } },
+      })
+    }
+
+    const updated = await tx.order.updateMany({
+      where: { id: { in: orders.map((order) => order.id) } },
+      data: { status: "CANCELLED" },
+    })
+
+    return {
+      count: updated.count,
+      orderIds: orders.map((order) => order.id),
+      customerIds: orders.flatMap((order) => order.userId ? [order.userId] : []),
+    }
+  })
 }

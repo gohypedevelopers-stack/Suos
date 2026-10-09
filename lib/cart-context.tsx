@@ -1,7 +1,9 @@
 "use client"
 
-import { createContext, useContext, useEffect, useState } from "react"
+import { createContext, useContext, useEffect, useRef, useState } from "react"
 import { ProductCard } from "@/components/product/productData"
+import { syncCartAction } from "@/app/actions/cart"
+import { track } from "@/lib/analytics-client"
 
 export type CartItem = ProductCard & {
   size: string
@@ -51,6 +53,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [cart, isLoaded])
 
+  // Mirror the cart to the server for signed-in shoppers (abandoned checkouts).
+  const hasSyncedRef = useRef(false)
+  useEffect(() => {
+    if (!isLoaded) return
+    if (cart.length === 0 && !hasSyncedRef.current) return
+
+    const timer = setTimeout(() => {
+      hasSyncedRef.current = true
+      void syncCartAction(
+        cart.map((item) => ({ productId: item.id, size: item.size, quantity: item.quantity })),
+      )
+    }, 1500)
+
+    return () => clearTimeout(timer)
+  }, [cart, isLoaded])
+
   const addToCart = (product: ProductCard, size: string) => {
     const resolvedProduct: ProductCard = {
       ...product,
@@ -59,6 +77,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       image: product.image || "/images/products/product1.png",
     }
     const resolvedSize = size || (product.sizes && product.sizes.length > 0 ? product.sizes[0] : "M")
+
+    track("ADD_TO_CART", {
+      name: resolvedProduct.title,
+      payload: { productId: resolvedProduct.id, size: resolvedSize },
+    })
 
     setCart((prev) => {
       const existing = prev.find((item) => item.id === resolvedProduct.id && item.size === resolvedSize)

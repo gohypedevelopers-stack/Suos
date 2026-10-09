@@ -1,6 +1,6 @@
 import "server-only"
 
-import { assertAdmin } from "@/lib/server/dal/auth"
+import { requirePermission } from "@/lib/server/dal/auth"
 import { getPrisma } from "@/lib/server/db"
 
 function imageUrl(objectKey: string | null) {
@@ -72,7 +72,7 @@ function toCollectionProduct(product: {
 export async function listCollectionsForAdmin(): Promise<
   AdminCollectionListItem[]
 > {
-  await assertAdmin()
+  await requirePermission("collections.view")
   const prisma = getPrisma()
   const collections = await prisma.collection.findMany({
     orderBy: { updatedAt: "desc" },
@@ -107,7 +107,7 @@ export async function listCollectionsForAdmin(): Promise<
 export async function listProductsForCollectionAssignment(): Promise<
   AdminCollectionProduct[]
 > {
-  await assertAdmin()
+  await requirePermission("collections.view")
   const prisma = getPrisma()
   const products = await prisma.product.findMany({
     orderBy: { title: "asc" },
@@ -134,7 +134,7 @@ export async function listProductsForCollectionAssignment(): Promise<
 export async function getCollectionForAdmin(
   collectionId: string,
 ): Promise<AdminCollectionEditor | null> {
-  await assertAdmin()
+  await requirePermission("collections.view")
   const prisma = getPrisma()
   const collection = await prisma.collection.findUnique({
     where: { id: collectionId },

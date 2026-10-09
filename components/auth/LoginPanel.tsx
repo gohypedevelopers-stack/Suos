@@ -43,7 +43,8 @@ export function LoginPanel() {
         return
       }
 
-      const destination = result.data?.user.role === "ADMIN" ? "/dashboard" : "/"
+      const role = result.data?.user.role
+      const destination = role === "ADMIN" || role === "SUB_ADMIN" ? "/dashboard" : "/"
       window.location.replace(destination)
     } catch {
       setIsPending(false)

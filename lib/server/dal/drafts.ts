@@ -1,6 +1,6 @@
 import "server-only"
 
-import { assertAdmin } from "@/lib/server/dal/auth"
+import { requirePermission } from "@/lib/server/dal/auth"
 import { getPrisma } from "@/lib/server/db"
 
 export type AdminDraftListItem = {
@@ -16,7 +16,7 @@ export type AdminDraftListItem = {
 }
 
 export async function listDraftsForAdmin(): Promise<AdminDraftListItem[]> {
-  await assertAdmin()
+  await requirePermission("orders.view")
   const drafts = await getPrisma().draftOrder.findMany({
     orderBy: { createdAt: "desc" },
     select: {

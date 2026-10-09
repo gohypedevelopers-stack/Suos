@@ -2,7 +2,7 @@ import "server-only"
 
 import { Prisma } from "@/generated/prisma/client"
 import { toAdminUppercase } from "@/lib/content-case"
-import { assertAdmin } from "@/lib/server/dal/auth"
+import { assertPermission } from "@/lib/server/dal/auth"
 import { getPrisma } from "@/lib/server/db"
 import type { CollectionInput } from "@/lib/validations/collection"
 
@@ -72,7 +72,7 @@ function collectionData(input: CollectionInput, slug: string) {
 }
 
 export async function createCollection(input: CollectionInput) {
-  await assertAdmin()
+  await assertPermission("collections.manage")
   const prisma = getPrisma()
 
   return prisma.$transaction(async (tx) => {
@@ -102,7 +102,7 @@ export async function updateCollection(
   collectionId: string,
   input: CollectionInput,
 ) {
-  await assertAdmin()
+  await assertPermission("collections.manage")
   const prisma = getPrisma()
 
   return prisma.$transaction(async (tx) => {
@@ -141,7 +141,7 @@ export async function updateCollectionPublished(
   collectionId: string,
   isPublished: boolean,
 ) {
-  await assertAdmin()
+  await assertPermission("collections.manage")
   const prisma = getPrisma()
 
   return prisma.collection.update({
@@ -152,7 +152,7 @@ export async function updateCollectionPublished(
 }
 
 export async function deleteCollections(collectionIds: string[]) {
-  await assertAdmin()
+  await assertPermission("collections.delete")
   const prisma = getPrisma()
 
   return prisma.collection.deleteMany({

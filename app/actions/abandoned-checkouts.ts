@@ -1,8 +1,11 @@
 "use server"
 
+import { permissionErrorMessage } from "@/lib/server/dal/auth"
 import { revalidatePath } from "next/cache"
+import { after } from "next/server"
 import { z } from "zod"
 
+import { notifyOrderEvents } from "@/lib/server/notifications"
 import {
   clearAbandonedCheckouts,
   recoverAbandonedCheckouts,
@@ -30,9 +33,12 @@ function revalidateCheckoutPaths(cartIds: string[] = [], customerIds: string[] =
 }
 
 function mutationError(error: unknown) {
+  const denied = permissionErrorMessage(error)
+  if (denied) return denied
   if (error instanceof Error) {
     if (error.message === "Unauthorized") return "Sign in to continue."
     if (error.message === "Forbidden") return "Administrator access is required."
+    if (error.message === "SuperAdminRequired") return "Only a full administrator can do this."
   }
 
   return "The abandoned checkout could not be updated. Try again."
@@ -65,7 +71,12 @@ async function runCheckoutAction(
 }
 
 export async function recoverAbandonedCheckoutsAction(input: unknown) {
-  return runCheckoutAction(input, recoverAbandonedCheckouts)
+  const result = await runCheckoutAction(input, recoverAbandonedCheckouts)
+  if (result.success && result.orderIds?.length) {
+    const orderIds = result.orderIds
+    after(() => notifyOrderEvents(orderIds, "ORDER_PLACED"))
+  }
+  return result
 }
 
 export async function clearAbandonedCheckoutsAction(input: unknown) {

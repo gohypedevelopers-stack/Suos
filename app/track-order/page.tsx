@@ -1,7 +1,45 @@
 import Link from "next/link"
 
+import { trackOrderAction } from "@/app/actions/track-order"
+import { findOrderForTracking } from "@/lib/server/dal/order-tracking"
+import { trackOrderLookupSchema } from "@/lib/validations/contact"
+
 export const metadata = {
   title: "Track Your Order | SUOS",
+}
+
+export const dynamic = "force-dynamic"
+
+type TrackOrderSearchParams = {
+  order?: string
+  email?: string
+  postcode?: string
+  status?: string
+}
+
+async function resolveLookup(params: TrackOrderSearchParams) {
+  if (params.status === "invalid") {
+    return { message: "Enter your order number and the email used at checkout.", order: null }
+  }
+  if (!params.order || !params.email) {
+    return { message: null, order: null }
+  }
+  const parsed = trackOrderLookupSchema.safeParse({
+    order: params.order,
+    email: params.email,
+    postcode: params.postcode || undefined,
+  })
+  if (!parsed.success) {
+    return { message: "Enter your order number and the email used at checkout.", order: null }
+  }
+  try {
+    const order = await findOrderForTracking(parsed.data)
+    return order
+      ? { message: null, order }
+      : { message: "We couldn’t find an order matching those details. Check the order number and email and try again.", order: null }
+  } catch {
+    return { message: "Order tracking is temporarily unavailable. Please try again shortly.", order: null }
+  }
 }
 
 const inputClassName =
@@ -10,7 +48,14 @@ const inputClassName =
 const actionClassName =
   "flex h-[59px] w-full items-center justify-center bg-black px-5 text-[13px] font-normal uppercase text-white transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
 
-export default function TrackOrderPage() {
+export default async function TrackOrderPage({
+  searchParams,
+}: {
+  searchParams: Promise<TrackOrderSearchParams>
+}) {
+  const params = await searchParams
+  const lookup = await resolveLookup(params)
+
   return (
     <main className="flex min-h-[calc(100svh-var(--header-stack-height))] bg-white text-black">
       <div className="mx-auto grid w-full max-w-[1600px] px-5 py-16 sm:px-8 lg:grid-cols-2 lg:px-20 lg:py-[6.25rem]">
@@ -22,7 +67,45 @@ export default function TrackOrderPage() {
             Enter your details below to view your order status
           </p>
 
-          <form className="mt-7 space-y-3" noValidate>
+          {lookup.message ? (
+            <p role="status" className="mt-5 text-[13px] font-normal text-black">
+              {lookup.message}
+            </p>
+          ) : null}
+
+          {lookup.order ? (
+            <section
+              aria-live="polite"
+              className="mt-7 border border-black p-5 text-[13px] font-normal text-black"
+            >
+              <p className="uppercase">
+                Order {lookup.order.reference} · {lookup.order.statusLabel}
+              </p>
+              <p className="mt-2 text-black/60">{lookup.order.statusDetail}</p>
+              <p className="mt-4 text-black/60">
+                Placed on{" "}
+                {new Date(lookup.order.placedAt).toLocaleDateString("en-IN", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+                {lookup.order.shippingMethod ? ` · ${lookup.order.shippingMethod} delivery` : ""}
+                {lookup.order.city ? ` · ${lookup.order.city}` : ""}
+              </p>
+              <ul className="mt-4 space-y-1 text-black/60">
+                {lookup.order.items.map((item, index) => (
+                  <li key={`${item.title}-${index}`}>
+                    {item.title} × {item.quantity}
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-4">
+                Total ₹{lookup.order.total.toLocaleString("en-IN")}
+              </p>
+            </section>
+          ) : null}
+
+          <form action={trackOrderAction} className="mt-7 space-y-3" noValidate>
             <label className="sr-only" htmlFor="order-number">
               Order number
             </label>
@@ -31,6 +114,7 @@ export default function TrackOrderPage() {
               name="order-number"
               type="text"
               autoComplete="off"
+              defaultValue={params.order ?? ""}
               placeholder="Order Number (from order confirmation email)*"
               className={inputClassName}
             />
@@ -43,6 +127,7 @@ export default function TrackOrderPage() {
               name="email"
               type="email"
               autoComplete="email"
+              defaultValue={params.email ?? ""}
               placeholder="Email*"
               className={inputClassName}
             />

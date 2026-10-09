@@ -1,6 +1,6 @@
 import "server-only"
 
-import { assertAdmin } from "@/lib/server/dal/auth"
+import { requirePermission } from "@/lib/server/dal/auth"
 import { getPrisma } from "@/lib/server/db"
 
 function imageUrl(objectKey: string | null) {
@@ -34,7 +34,7 @@ export type AdminInventoryItem = {
 }
 
 export async function listInventoryForAdmin(): Promise<AdminInventoryItem[]> {
-  await assertAdmin()
+  await requirePermission("inventory.view")
   const prisma = getPrisma()
   const variants = await prisma.productVariant.findMany({
     orderBy: [{ product: { title: "asc" } }, { createdAt: "asc" }],

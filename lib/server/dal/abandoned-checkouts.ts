@@ -1,6 +1,6 @@
 import "server-only"
 
-import { assertAdmin } from "@/lib/server/dal/auth"
+import { requirePermission } from "@/lib/server/dal/auth"
 import { getPrisma } from "@/lib/server/db"
 
 export type AdminAbandonedCheckout = {
@@ -15,7 +15,7 @@ export type AdminAbandonedCheckout = {
 export async function listAbandonedCheckoutsForAdmin(): Promise<
   AdminAbandonedCheckout[]
 > {
-  await assertAdmin()
+  await requirePermission("orders.view")
   const carts = await getPrisma().cart.findMany({
     where: { items: { some: {} } },
     orderBy: { updatedAt: "desc" },
@@ -46,7 +46,7 @@ export async function listAbandonedCheckoutsForAdmin(): Promise<
 }
 
 export async function getAbandonedCheckoutForAdmin(cartId: string) {
-  await assertAdmin()
+  await requirePermission("orders.view")
   const cart = await getPrisma().cart.findFirst({
     where: { id: cartId, items: { some: {} } },
     select: {

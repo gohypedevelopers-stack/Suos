@@ -49,7 +49,7 @@ export async function createProductAction(
       return { status: "error", message: "Sign in to continue." }
     }
 
-    if (error instanceof Error && error.message === "Forbidden") {
+    if (error instanceof Error && (error.message === "Forbidden" || error.message === "SuperAdminRequired" || error.message.startsWith("PermissionDenied:"))) {
       return { status: "error", message: "Administrator access is required." }
     }
 
@@ -94,7 +94,7 @@ export async function updateProductAction(
       return { status: "error", message: "Sign in to continue." }
     }
 
-    if (error instanceof Error && error.message === "Forbidden") {
+    if (error instanceof Error && (error.message === "Forbidden" || error.message === "SuperAdminRequired" || error.message.startsWith("PermissionDenied:"))) {
       return { status: "error", message: "Administrator access is required." }
     }
 
@@ -126,7 +126,7 @@ export async function deleteProductsAction(productIds: unknown) {
     if (error instanceof Error && error.message === "Unauthorized") {
       return { success: false, message: "Sign in to continue." }
     }
-    if (error instanceof Error && error.message === "Forbidden") {
+    if (error instanceof Error && (error.message === "Forbidden" || error.message === "SuperAdminRequired" || error.message.startsWith("PermissionDenied:"))) {
       return { success: false, message: "Administrator access is required." }
     }
 
@@ -158,7 +158,7 @@ export async function updateProductsStatusAction(
     if (error instanceof Error && error.message === "Unauthorized") {
       return { success: false, message: "Sign in to continue." }
     }
-    if (error instanceof Error && error.message === "Forbidden") {
+    if (error instanceof Error && (error.message === "Forbidden" || error.message === "SuperAdminRequired" || error.message.startsWith("PermissionDenied:"))) {
       return { success: false, message: "Administrator access is required." }
     }
 
@@ -189,7 +189,7 @@ export async function importProductsAction(input: unknown) {
     if (error instanceof Error && error.message === "Unauthorized") {
       return { success: false, message: "Sign in to continue." }
     }
-    if (error instanceof Error && error.message === "Forbidden") {
+    if (error instanceof Error && (error.message === "Forbidden" || error.message === "SuperAdminRequired" || error.message.startsWith("PermissionDenied:"))) {
       return { success: false, message: "Administrator access is required." }
     }
 

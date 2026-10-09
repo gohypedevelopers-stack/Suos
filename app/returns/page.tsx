@@ -2,24 +2,23 @@ import Image from "next/image"
 import Link from "next/link"
 import { Check } from "lucide-react"
 
+import { getSiteContent } from "@/lib/server/dal/site-content"
+
 export const metadata = {
   title: "Returns & Exchanges | SUOS",
 }
 
-const conditions = [
-  "No Returns/ Only Exchanges are acceptable for products purchased on sale",
-  "Sizes in exchange are subject to availability. The difference in amount (if any) will be sent back as a redeemable gift card.",
-  "Do not hand over the product to the pick-up executive without the pickup slip or SMS confirmation.",
-  "Self-Ship if your PIN code is not in the serviceable area. (Docket slip required for free refund)",
-]
+export const dynamic = "force-dynamic"
 
-export default function ReturnsPage() {
+export default async function ReturnsPage() {
+  const { returnsPage } = await getSiteContent()
+
   return (
     <main className="min-h-[calc(100svh-var(--header-stack-height))] bg-white text-black">
       <div className="grid min-h-[calc(100svh-var(--header-stack-height))] lg:grid-cols-2">
         <section className="relative hidden min-h-full overflow-hidden bg-[#091019] lg:block">
           <Image
-            src="/images/products/product1.png"
+            src={returnsPage.image}
             alt="SUOS denim editorial"
             fill
             priority
@@ -31,7 +30,7 @@ export default function ReturnsPage() {
         <section className="flex items-center justify-center px-6 py-14 sm:px-12 lg:px-20 xl:px-24">
           <div className="w-full max-w-[474px]">
             <h1 className="font-heading text-[24px] font-normal uppercase leading-none">
-              Place a refund/ exchange request
+              {returnsPage.title}
             </h1>
 
             <form className="mt-5 space-y-2" noValidate>
@@ -65,7 +64,7 @@ export default function ReturnsPage() {
             </form>
 
             <ul className="mt-10 space-y-4 text-[13px] font-normal leading-[1.45]">
-              {conditions.map((condition) => (
+              {returnsPage.conditions.map((condition) => (
                 <li key={condition} className="flex items-start gap-4">
                   <span className="mt-0.5 inline-flex size-3 shrink-0 items-center justify-center border border-black">
                     <Check aria-hidden="true" className="size-2 stroke-[2]" />

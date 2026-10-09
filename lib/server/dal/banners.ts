@@ -1,6 +1,6 @@
 import "server-only"
 
-import { assertAdmin } from "@/lib/server/dal/auth"
+import { requirePermission } from "@/lib/server/dal/auth"
 import { getPrisma } from "@/lib/server/db"
 import type { BannerPlacement, BannerTextAlignment } from "@/lib/validations/banner"
 
@@ -108,7 +108,7 @@ export type HomeBanners = {
 }
 
 export async function listBannersForAdmin(): Promise<AdminBannerListItem[]> {
-  await assertAdmin()
+  await requirePermission("banners.view")
   const prisma = getPrisma()
 
   if (!prisma || !("banner" in prisma) || !prisma.banner) {
@@ -143,7 +143,7 @@ export async function listBannersForAdmin(): Promise<AdminBannerListItem[]> {
 }
 
 export async function listHeroSlidesForAdmin(): Promise<AdminBannerListItem[]> {
-  await assertAdmin()
+  await requirePermission("banners.view")
   const prisma = getPrisma()
 
   if (!prisma || !("banner" in prisma) || !prisma.banner) {
@@ -178,7 +178,7 @@ export async function listHeroSlidesForAdmin(): Promise<AdminBannerListItem[]> {
 }
 
 export async function getBannerForAdmin(id: string): Promise<AdminBannerDetail | null> {
-  await assertAdmin()
+  await requirePermission("banners.view")
   const prisma = getPrisma()
 
   if (!prisma || !("banner" in prisma) || !prisma.banner) {

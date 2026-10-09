@@ -1,11 +1,11 @@
 import "server-only"
 
 import { Prisma } from "@/generated/prisma/client"
-import { assertAdmin } from "@/lib/server/dal/auth"
+import { assertPermission } from "@/lib/server/dal/auth"
 import { getPrisma } from "@/lib/server/db"
 
 export async function recoverAbandonedCheckouts(cartIds: string[]) {
-  await assertAdmin()
+  await assertPermission("orders.manage")
   const prisma = getPrisma()
 
   return prisma.$transaction(async (tx) => {
@@ -78,7 +78,7 @@ export async function recoverAbandonedCheckouts(cartIds: string[]) {
 }
 
 export async function clearAbandonedCheckouts(cartIds: string[]) {
-  await assertAdmin()
+  await assertPermission("orders.manage")
   const prisma = getPrisma()
   const carts = await prisma.cart.findMany({
     where: { id: { in: cartIds }, items: { some: {} } },

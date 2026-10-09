@@ -1,33 +1,14 @@
 import { Mail, MessageCircle, Phone } from "lucide-react"
 
+import { submitContactAction } from "@/app/actions/contact"
 import { ContactSubjectSelect } from "@/components/storefront/contact-subject-select"
+import { getSiteContent } from "@/lib/server/dal/site-content"
 
 export const metadata = {
   title: "Contact Us | SUOS",
 }
 
-const faqs = [
-  {
-    question: "How long does delivery take?",
-    answer:
-      "Orders are typically dispatched within 1–2 business days. Delivery timelines are shown at checkout and vary by destination.",
-  },
-  {
-    question: "What is the return policy?",
-    answer:
-      "Unworn items with original tags can be returned within 14 days of delivery. Please refer to our returns policy for full details.",
-  },
-  {
-    question: "Do you offer alterations?",
-    answer:
-      "We do not currently offer alterations. Our client services team can help you select the right fit before you place an order.",
-  },
-  {
-    question: "How do I track my order?",
-    answer:
-      "Once your order has shipped, we will email your tracking link. You can also find the latest status in your order confirmation.",
-  },
-]
+export const dynamic = "force-dynamic"
 
 function ContactMethod({
   icon,
@@ -51,23 +32,38 @@ function ContactMethod({
   )
 }
 
-export default function ContactPage() {
+const STATUS_MESSAGES: Record<string, string> = {
+  sent: "Thank you. Your message has been received and we will reply within 24 hours.",
+  invalid: "Please fill in your name, email, a subject and a message before sending.",
+  error: "We couldn’t send your message right now. Please email us directly instead.",
+}
+
+export default async function ContactPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>
+}) {
+  const [{ status }, { contact }] = await Promise.all([searchParams, getSiteContent()])
+  const statusMessage = status ? STATUS_MESSAGES[status] : undefined
+
   return (
     <main className="bg-white text-black">
       <div className="mx-auto w-full max-w-[1600px] px-5 pb-24 pt-28 sm:px-8 lg:px-20 lg:pb-32 lg:pt-[8.5rem]">
         <section aria-labelledby="contact-heading">
-          <p className="text-[1rem] uppercase">Contact us</p>
+          <p className="text-[1rem] uppercase">{contact.eyebrow}</p>
           <h1
             id="contact-heading"
             className="mt-8 max-w-[32rem] text-6xl font-normal uppercase leading-[1.1] tracking-tight sm:text-[68px]"
           >
-            Let’s
-            <br />
-            connect.
+            {contact.titleLines.map((line, index) => (
+              <span key={index}>
+                {index > 0 ? <br /> : null}
+                {line}
+              </span>
+            ))}
           </h1>
           <p className="mt-5 max-w-[31rem] text-[1rem] leading-[1.65] text-black/60">
-            Our client services team is available to assist you with orders,
-            styling advice, and any questions about the collection.
+            {contact.description}
           </p>
         </section>
 
@@ -78,24 +74,24 @@ export default function ContactPage() {
               title="Call us"
               className="md:justify-self-start"
             >
-              <p>+ 91 1800 123 4567</p>
-              <p className="text-black/55">Mon - Fri, 9 AM - 9 PM IST</p>
+              <p>{contact.phone}</p>
+              <p className="text-black/55">{contact.phoneHours}</p>
             </ContactMethod>
             <ContactMethod
               icon={<Mail aria-hidden="true" className="size-5 stroke-[1.25]" />}
               title="Email"
               className="md:justify-self-center"
             >
-              <p>info@suos.in</p>
-              <p className="text-black/55">Response within 24 hours</p>
+              <p>{contact.email}</p>
+              <p className="text-black/55">{contact.emailResponse}</p>
             </ContactMethod>
             <ContactMethod
               icon={<MessageCircle aria-hidden="true" className="size-5 stroke-[1.25]" />}
               title="Live chat"
               className="md:justify-self-end"
             >
-              <p>Available on site</p>
-              <p className="text-black/55">Mon - Fri, 10 AM - 7 PM IST</p>
+              <p>{contact.chatLabel}</p>
+              <p className="text-black/55">{contact.chatHours}</p>
             </ContactMethod>
           </section>
 
@@ -108,7 +104,15 @@ export default function ContactPage() {
                 Send a message
               </h2>
 
-              <form className="mt-20 space-y-14" noValidate>
+              <form action={submitContactAction} className="mt-20 space-y-14" noValidate>
+                <input
+                  type="text"
+                  name="website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  className="hidden"
+                />
                 <div className="grid gap-12 sm:grid-cols-2 sm:gap-6">
                   <label className="block border-b border-black/55 pb-3 text-sm text-black/55">
                     <span className="sr-only">Full name</span>
@@ -149,6 +153,11 @@ export default function ContactPage() {
                 >
                   Send message
                 </button>
+                {statusMessage ? (
+                  <p role="status" className="text-[13px] leading-[1.65] text-black/60">
+                    {statusMessage}
+                  </p>
+                ) : null}
               </form>
             </section>
 
@@ -161,7 +170,7 @@ export default function ContactPage() {
               </h2>
 
               <div className="mt-14 divide-y divide-black/55">
-                {faqs.map((faq) => (
+                {contact.faqs.map((faq) => (
                   <details key={faq.question} className="group py-0">
                     <summary className="flex cursor-pointer list-none items-center justify-between gap-5 py-7 text-[18px] leading-tight marker:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30">
                       {faq.question}

@@ -1,6 +1,6 @@
 import "server-only"
 
-import { assertAdmin } from "@/lib/server/dal/auth"
+import { requirePermission } from "@/lib/server/dal/auth"
 import { getPrisma } from "@/lib/server/db"
 
 type AddressRecord = Record<string, unknown>
@@ -59,7 +59,7 @@ export type AdminCustomerDetail = AdminCustomerListItem & {
 }
 
 export async function listCustomersForAdmin(): Promise<AdminCustomerListItem[]> {
-  await assertAdmin()
+  await requirePermission("customers.view")
   const prisma = getPrisma()
   const customers = await prisma.user.findMany({
     where: { role: "CUSTOMER" },
@@ -96,7 +96,7 @@ export async function listCustomersForAdmin(): Promise<AdminCustomerListItem[]> 
 export async function getCustomerForAdmin(
   customerId: string,
 ): Promise<AdminCustomerDetail | null> {
-  await assertAdmin()
+  await requirePermission("customers.view")
   const prisma = getPrisma()
   const customer = await prisma.user.findFirst({
     where: { id: customerId, role: "CUSTOMER" },

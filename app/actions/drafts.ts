@@ -1,8 +1,11 @@
 "use server"
 
+import { permissionErrorMessage } from "@/lib/server/dal/auth"
 import { revalidatePath } from "next/cache"
+import { after } from "next/server"
 import { z } from "zod"
 
+import { notifyDraftOrdersSent } from "@/lib/server/notifications"
 import {
   convertDraftOrders,
   createDraftOrder,
@@ -26,9 +29,12 @@ function revalidateDraftPaths(draftIds: string[] = [], customerIds: string[] = [
 }
 
 function mutationError(error: unknown) {
+  const denied = permissionErrorMessage(error)
+  if (denied) return denied
   if (error instanceof Error) {
     if (error.message === "Unauthorized") return "Sign in to continue."
     if (error.message === "Forbidden") return "Administrator access is required."
+    if (error.message === "SuperAdminRequired") return "Only a full administrator can do this."
     if (
       error.message.includes("no longer exists") ||
       error.message.includes("cannot be added")
@@ -88,7 +94,15 @@ async function runBulkDraftAction(
 }
 
 export async function sendDraftOrdersAction(input: unknown) {
-  return runBulkDraftAction(input, sendDraftOrders)
+  const result = await runBulkDraftAction(input, sendDraftOrders)
+  if (result.success) {
+    const ids = orderIdsSchema.safeParse(input)
+    if (ids.success) {
+      const draftIds = [...new Set(ids.data)]
+      after(() => notifyDraftOrdersSent(draftIds))
+    }
+  }
+  return result
 }
 
 export async function convertDraftOrdersAction(input: unknown) {

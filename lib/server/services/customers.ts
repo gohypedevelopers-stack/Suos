@@ -1,6 +1,6 @@
 import "server-only"
 
-import { assertAdmin } from "@/lib/server/dal/auth"
+import { assertPermission } from "@/lib/server/dal/auth"
 import { getPrisma } from "@/lib/server/db"
 import type {
   CustomerImport,
@@ -26,7 +26,7 @@ async function ensureEmailIsAvailable(
 }
 
 export async function createCustomer(input: CustomerInput) {
-  await assertAdmin()
+  await assertPermission("customers.manage")
   await ensureEmailIsAvailable(input.email)
 
   return getPrisma().user.create({
@@ -41,7 +41,7 @@ export async function createCustomer(input: CustomerInput) {
 }
 
 export async function updateCustomer(customerId: string, input: CustomerInput) {
-  await assertAdmin()
+  await assertPermission("customers.manage")
   const prisma = getPrisma()
   const customer = await prisma.user.findFirst({
     where: { id: customerId, role: "CUSTOMER" },
@@ -68,14 +68,14 @@ export async function updateCustomer(customerId: string, input: CustomerInput) {
 }
 
 export async function deleteCustomers(customerIds: string[]) {
-  await assertAdmin()
+  await assertPermission("customers.delete")
   return getPrisma().user.deleteMany({
     where: { id: { in: customerIds }, role: "CUSTOMER" },
   })
 }
 
 export async function importCustomers(customers: CustomerImport) {
-  await assertAdmin()
+  await assertPermission("customers.manage")
   const prisma = getPrisma()
   const emails = customers.map((customer) => customer.email)
   const existing = await prisma.user.findMany({

@@ -1,6 +1,9 @@
+"use client"
+
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 
+import { useSiteContent } from "@/lib/site-content-context"
 import { cn } from "@/lib/utils"
 
 const companyLinks = [
@@ -62,6 +65,7 @@ function FooterGroup({
 }
 
 export function FooterSection() {
+  const { footer } = useSiteContent()
   return (
     <footer className="w-full bg-white text-black">
       <div className="px-4 pb-6 pt-4 sm:px-6 lg:px-8">
@@ -102,19 +106,19 @@ export function FooterSection() {
                 <div className="space-y-0.5">
                   <p className="font-normal">For customer care</p>
                   <p className="normal-case tracking-[-0.01em] break-all">
-                    info@suos.in
+                    {footer.careEmail}
                   </p>
                 </div>
 
                 <div className="space-y-0.5">
                   <p className="font-normal">For online orders</p>
-                  <p className="normal-case tracking-[-0.01em]">+91 000000000</p>
+                  <p className="normal-case tracking-[-0.01em]">{footer.ordersPhone}</p>
                 </div>
 
                 <div className="space-y-0.5">
                   <p className="font-normal">Timings</p>
                   <p className="normal-case tracking-[-0.01em]">
-                    Mon-Sat : 9AM - 8PM
+                    {footer.timings}
                   </p>
                 </div>
               </div>

@@ -1,5 +1,6 @@
 "use server"
 
+import { permissionErrorMessage } from "@/lib/server/dal/auth"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
@@ -27,9 +28,12 @@ function revalidateCustomerPaths(customerId?: string) {
 }
 
 function mutationError(error: unknown) {
+  const denied = permissionErrorMessage(error)
+  if (denied) return denied
   if (error instanceof Error) {
     if (error.message === "Unauthorized") return "Sign in to continue."
     if (error.message === "Forbidden") return "Administrator access is required."
+    if (error.message === "SuperAdminRequired") return "Only a full administrator can do this."
     if (
       error.message === "Customer not found." ||
       error.message.includes("already exists")

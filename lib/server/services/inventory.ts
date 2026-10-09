@@ -1,6 +1,6 @@
 import "server-only"
 
-import { assertAdmin } from "@/lib/server/dal/auth"
+import { assertPermission } from "@/lib/server/dal/auth"
 import { getPrisma } from "@/lib/server/db"
 import type {
   InventoryAdjustment,
@@ -10,7 +10,7 @@ import type {
 export async function updateInventoryQuantities(
   updates: InventoryAdjustment[],
 ) {
-  await assertAdmin()
+  await assertPermission("inventory.manage")
   const prisma = getPrisma()
   const variantIds = updates.map((update) => update.variantId)
 
@@ -37,7 +37,7 @@ export async function updateInventoryQuantities(
 }
 
 export async function importInventoryQuantities(updates: InventoryImport) {
-  await assertAdmin()
+  await assertPermission("inventory.manage")
   const prisma = getPrisma()
   const skus = updates.map((update) => update.sku)
 

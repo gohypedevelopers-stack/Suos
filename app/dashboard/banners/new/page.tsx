@@ -5,13 +5,16 @@ import { AppSidebar } from "@/components/admin-dashboard/app-sidebar"
 import { BannerEditor } from "@/components/admin-dashboard/banner-editor"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { TooltipProvider } from "@/components/ui/tooltip"
+import { requirePermission } from "@/lib/server/dal/auth"
 
 export const metadata: Metadata = {
   title: "Add Banner | SUOS Admin",
   description: "Create and publish a new homepage banner.",
 }
 
-export default function NewBannerPage() {
+export default async function NewBannerPage() {
+  await requirePermission("banners.manage")
+
   return (
     <TooltipProvider>
       <SidebarProvider className="min-h-svh">

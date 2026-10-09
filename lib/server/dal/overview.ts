@@ -9,6 +9,7 @@ import {
   subDays,
 } from "date-fns"
 
+import { channelLabel } from "@/lib/analytics/channels"
 import { assertAdmin } from "@/lib/server/dal/auth"
 import { getPrisma } from "@/lib/server/db"
 
@@ -261,13 +262,13 @@ export async function getAdminOverviewData(
         createdAt: true,
       },
     }),
-    // Sessions current
-    prisma.session.count({
-      where: { createdAt: { gte: currentStart, lte: currentEnd } },
+    // Storefront visitor sessions current (first-party analytics beacon)
+    prisma.analyticsSession.count({
+      where: { startedAt: { gte: currentStart, lte: currentEnd } },
     }),
-    // Sessions previous
-    prisma.session.count({
-      where: { createdAt: { gte: prevStart, lte: prevEnd } },
+    // Storefront visitor sessions previous
+    prisma.analyticsSession.count({
+      where: { startedAt: { gte: prevStart, lte: prevEnd } },
     }),
     // Orders to fulfil (CONFIRMED)
     prisma.order.count({
@@ -541,12 +542,22 @@ export async function getAdminOverviewData(
   // Customer Growth
   const customerGrowth = calculateChange(newCustomersCurrent, newCustomersPrev)
 
-  // Traffic / channel distribution
-  // Computed dynamically based on registered customers vs direct checkouts
-  const trafficSources: OverviewTrafficSource[] = [
-    { source: "Direct store", percentage: "64%", count: currentOrderCount },
-    { source: "Search / Social", percentage: "36%", count: Math.max(0, currentSessionsCount) },
-  ]
+  // Traffic by attributed channel (Instagram, Facebook, WhatsApp, Google…)
+  const channelGroups = await prisma.analyticsSession.groupBy({
+    by: ["channel"],
+    where: { startedAt: { gte: currentStart, lte: currentEnd } },
+    _count: { _all: true },
+    orderBy: { _count: { channel: "desc" } },
+    take: 5,
+  })
+  const channelTotal = channelGroups.reduce((sum, group) => sum + group._count._all, 0)
+  const trafficSources: OverviewTrafficSource[] = channelGroups.length
+    ? channelGroups.map((group) => ({
+        source: channelLabel(group.channel),
+        percentage: `${channelTotal ? Math.round((group._count._all / channelTotal) * 100) : 0}%`,
+        count: group._count._all,
+      }))
+    : [{ source: "No visits yet", percentage: "0%", count: 0 }]
 
   return {
     adminName: admin.name || "Admin",

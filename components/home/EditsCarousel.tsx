@@ -1,69 +1,19 @@
 import Image from "next/image"
+import Link from "next/link"
 
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel"
+import { getSiteContent } from "@/lib/server/dal/site-content"
+import type { EditsContent } from "@/lib/site-content"
 import { cn } from "@/lib/utils"
 
-type EditSlide = {
-  id: string
-  image: string
-  alt: string
-}
-
-const editTabs = [
-  { label: "ALL", active: false },
-  { label: "WOMEN", active: false },
-  { label: "MEN", active: true },
-] as const
-
-const editSlides: EditSlide[] = [
-  {
-    id: "edit-1",
-    image: "/images/products/product1.png",
-    alt: "Model wearing a blue denim outfit",
-  },
-  {
-    id: "edit-2",
-    image: "/images/products/product2.png",
-    alt: "Model wearing a denim jacket in monochrome",
-  },
-  {
-    id: "edit-3",
-    image: "/images/products/product3.png",
-    alt: "Model seated in a black tailored look",
-  },
-  {
-    id: "edit-4",
-    image: "/images/products/product4.png",
-    alt: "Model wearing an all-black outfit",
-  },
-  {
-    id: "edit-5",
-    image: "/images/products/product1.png",
-    alt: "Model wearing a blue denim outfit",
-  },
-  {
-    id: "edit-6",
-    image: "/images/products/product2.png",
-    alt: "Model wearing a denim jacket in monochrome",
-  },
-  {
-    id: "edit-7",
-    image: "/images/products/product3.png",
-    alt: "Model seated in a black tailored look",
-  },
-  {
-    id: "edit-8",
-    image: "/images/products/product4.png",
-    alt: "Model wearing an all-black outfit",
-  },
-]
+type EditSlide = EditsContent["slides"][number]
 
 function EditCard({ slide }: { slide: EditSlide }) {
-  return (
+  const card = (
     <article className="relative aspect-[330/479] overflow-hidden bg-[#eef2f2]">
       <Image
         src={slide.image}
@@ -75,11 +25,13 @@ function EditCard({ slide }: { slide: EditSlide }) {
 
       <div className="absolute inset-x-3 bottom-3 z-10">
         <p className="inline-block bg-white/0 px-1 py-0.5 text-[13px] font-normal uppercase tracking-normal text-black">
-          Edit Name
+          {slide.label}
         </p>
       </div>
     </article>
   )
+
+  return slide.href ? <Link href={slide.href}>{card}</Link> : card
 }
 
 function TabLabel({
@@ -106,16 +58,18 @@ function TabLabel({
   )
 }
 
-export function EditsCarousel() {
+export async function EditsCarousel() {
+  const { edits } = await getSiteContent()
+
   return (
     <section className="w-full bg-white px-4 py-14 text-black sm:px-6 lg:px-8 md:py-16">
       <div className="flex w-full flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <h2 className="font-heading text-[24px] font-normal uppercase leading-none tracking-[-0.04em]">
-          Edits
+          {edits.heading}
         </h2>
 
         <div className="flex items-center gap-6 sm:gap-8">
-          {editTabs.map((tab) => (
+          {edits.tabs.map((tab) => (
             <TabLabel key={tab.label} label={tab.label} active={tab.active} />
           ))}
         </div>
@@ -130,7 +84,7 @@ export function EditsCarousel() {
         aria-label="Edit collection carousel"
       >
         <CarouselContent>
-          {editSlides.map((slide) => (
+          {edits.slides.map((slide) => (
             <CarouselItem
               key={slide.id}
               className="basis-[88%] sm:basis-[56%] md:basis-[38%] lg:basis-[24%]"

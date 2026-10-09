@@ -2,68 +2,9 @@
 
 import Image from "next/image"
 
-import { cn } from "@/lib/utils"
+import type { LookbookSlideContent } from "@/lib/site-content"
+import { useSiteContent } from "@/lib/site-content-context"
 import { useContinuousDraggableCarousel } from "./useContinuousDraggableCarousel"
-
-type LookbookSlide = {
-  id: string
-  image: string
-  alt: string
-  imageClassName?: string
-}
-
-const lookbookSlides: LookbookSlide[] = [
-  {
-    id: "lookbook-1",
-    image: "/images/products/product9.png",
-    alt: "Model in blue denim standing against a dark gradient background",
-    imageClassName: "object-[center_16%]",
-  },
-  {
-    id: "lookbook-2",
-    image: "/images/products/product10.png",
-    alt: "Model in a denim jacket in a monochrome setting",
-    imageClassName: "object-[center_14%]",
-  },
-  {
-    id: "lookbook-3",
-    image: "/images/products/product11.png",
-    alt: "Model in a striped shirt holding a cup indoors",
-    imageClassName: "object-[center_20%]",
-  },
-  {
-    id: "lookbook-4",
-    image: "/images/products/product12.png",
-    alt: "Model in an all-black outfit seated on a chair",
-    imageClassName: "object-[center_22%]",
-  },
-  {
-    id: "lookbook-5",
-    image: "/images/products/product13.png",
-    alt: "Model in a light denim jacket and jeans against a bright backdrop",
-    imageClassName: "object-[center_18%]",
-  },
-  {
-    id: "lookbook-6",
-    image: "/images/products/product14.png",
-    alt: "Model wearing blue denim seated on a stool",
-    imageClassName: "object-[center_24%]",
-  },
-  {
-    id: "lookbook-7",
-    image: "/images/products/product5-white.png",
-    alt: "Model in denim seated beside greenery",
-    imageClassName: "object-[center_32%]",
-  },
-  {
-    id: "lookbook-8",
-    image: "/images/products/product9.png",
-    alt: "Model reclining in a denim look across stacked screens",
-    imageClassName: "object-[center_44%]",
-  },
-]
-
-const loopingLookbookSlides = [...lookbookSlides, ...lookbookSlides, ...lookbookSlides]
 
 function PlayBadge() {
   return (
@@ -75,7 +16,7 @@ function PlayBadge() {
   )
 }
 
-function LookbookCard({ slide }: { slide: LookbookSlide }) {
+function LookbookCard({ slide }: { slide: LookbookSlideContent }) {
   return (
     <div className="w-[68vw] shrink-0 bg-black/70 p-px sm:w-[40vw] md:w-[28vw] lg:w-[16.2vw]">
       <article className="group relative aspect-[7/12] overflow-hidden bg-[#e6e8eb]">
@@ -84,10 +25,8 @@ function LookbookCard({ slide }: { slide: LookbookSlide }) {
           alt={slide.alt}
           fill
           sizes="(max-width: 640px) 82vw, (max-width: 1024px) 36vw, (max-width: 1280px) 18vw, 16vw"
-          className={cn(
-            "pointer-events-none object-cover transition-transform duration-500 group-hover:scale-[1.015]",
-            slide.imageClassName
-          )}
+          className="pointer-events-none object-cover transition-transform duration-500 group-hover:scale-[1.015]"
+          style={{ objectPosition: slide.objectPosition || "center" }}
         />
 
         <PlayBadge />
@@ -97,6 +36,10 @@ function LookbookCard({ slide }: { slide: LookbookSlide }) {
 }
 
 export function LookbookCarousel() {
+  const { lookbook } = useSiteContent()
+  const slides = lookbook.slides
+  const loopingSlides = [...slides, ...slides, ...slides]
+
   const {
     viewportRef,
     trackRef,
@@ -107,7 +50,7 @@ export function LookbookCarousel() {
     onPointerUp,
     onPointerCancel,
   } = useContinuousDraggableCarousel({
-    slideCount: lookbookSlides.length,
+    slideCount: slides.length,
   })
 
   return (
@@ -126,8 +69,8 @@ export function LookbookCarousel() {
         onPointerCancel={onPointerCancel}
       >
         <div ref={trackRef} className="continuous-carousel-track">
-          {loopingLookbookSlides.map((slide, index) => (
-            <div key={`${slide.id}-${index}`} aria-hidden={index >= lookbookSlides.length}>
+          {loopingSlides.map((slide, index) => (
+            <div key={`${slide.id}-${index}`} aria-hidden={index >= slides.length}>
               <LookbookCard slide={slide} />
             </div>
           ))}

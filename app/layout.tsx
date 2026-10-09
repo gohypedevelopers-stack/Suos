@@ -6,6 +6,10 @@ import { SiteChrome } from "@/components/SiteChrome";
 import { Toaster } from "@/components/ui/sonner";
 import { WishlistProvider } from "@/lib/wishlist-context";
 import { CartProvider } from "@/lib/cart-context";
+import { AnalyticsBeacon } from "@/components/analytics/AnalyticsBeacon";
+import { SessionRecorder } from "@/components/analytics/SessionRecorder";
+import { SiteContentProvider } from "@/lib/site-content-context";
+import { getSiteContent } from "@/lib/server/dal/site-content";
 
 export const metadata: Metadata = {
   title: "SUOS",
@@ -15,11 +19,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const siteContent = await getSiteContent();
+
   return (
     <html
       lang="en"
@@ -34,12 +40,16 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-white text-black">
         <Toaster position="bottom-right" />
+        <AnalyticsBeacon />
+        <SessionRecorder />
         <div className="relative flex flex-1 flex-col overflow-x-clip">
+          <SiteContentProvider content={siteContent}>
           <CartProvider>
           <WishlistProvider>
             <SiteChrome>{children}</SiteChrome>
           </WishlistProvider>
           </CartProvider>
+          </SiteContentProvider>
         </div>
       </body>
     </html>

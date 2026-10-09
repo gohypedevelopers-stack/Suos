@@ -1,6 +1,6 @@
 import "server-only"
 
-import { assertAdmin } from "@/lib/server/dal/auth"
+import { requirePermission } from "@/lib/server/dal/auth"
 import { getPrisma } from "@/lib/server/db"
 
 export type AdminDiscountListItem = {
@@ -108,7 +108,7 @@ const discountSelect = {
 } as const
 
 export async function listDiscountsForAdmin(): Promise<AdminDiscountListItem[]> {
-  await assertAdmin()
+  await requirePermission("discounts.view")
   const discounts = await getPrisma().discount.findMany({
     orderBy: { updatedAt: "desc" },
     select: discountSelect,
@@ -127,7 +127,7 @@ export async function listDiscountsForAdmin(): Promise<AdminDiscountListItem[]> 
 }
 
 export async function getDiscountForAdmin(id: string): Promise<AdminDiscountEditor | null> {
-  await assertAdmin()
+  await requirePermission("discounts.view")
   const discount = await getPrisma().discount.findUnique({ where: { id }, select: discountSelect })
   return discount ? mapDiscount(discount) : null
 }
@@ -136,7 +136,7 @@ export async function listDiscountEditorOptionsForAdmin(): Promise<{
   products: AdminDiscountOption[]
   collections: AdminDiscountOption[]
 }> {
-  await assertAdmin()
+  await requirePermission("discounts.view")
   const prisma = getPrisma()
   const [products, collections] = await Promise.all([
     prisma.product.findMany({

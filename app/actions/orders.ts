@@ -1,8 +1,14 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
+import { after } from "next/server"
 import { z } from "zod"
 
+import {
+  notifyOrderEvent,
+  notifyOrderEvents,
+  type OrderNotificationEvent,
+} from "@/lib/server/notifications"
 import {
   cancelOrders,
   createOrder,
@@ -30,6 +36,7 @@ function mutationError(error: unknown) {
   if (error instanceof Error) {
     if (error.message === "Unauthorized") return "Sign in to continue."
     if (error.message === "Forbidden") return "Administrator access is required."
+    if (error.message === "SuperAdminRequired") return "Only a full administrator can do this."
     if (
       error.message.includes("no longer exists") ||
       error.message.includes("cannot be added") ||
@@ -54,6 +61,9 @@ export async function createOrderAction(input: unknown) {
   try {
     const order = await createOrder(result.data)
     revalidateOrderPaths([order.id], order.userId ? [order.userId] : [])
+    const event: OrderNotificationEvent =
+      result.data.status === "CONFIRMED" ? "ORDER_CONFIRMED" : "ORDER_PLACED"
+    after(() => notifyOrderEvent(order.id, event))
     return { success: true, orderId: order.id, number: order.number }
   } catch (error) {
     return { success: false, message: mutationError(error) }
@@ -67,6 +77,7 @@ async function runBulkOrderAction(
     orderIds: string[]
     customerIds: string[]
   }>,
+  event: OrderNotificationEvent,
 ) {
   const result = orderIdsSchema.safeParse(input)
   if (!result.success) {
@@ -79,6 +90,7 @@ async function runBulkOrderAction(
       return { success: false, message: "No selected orders are eligible for this action." }
     }
     revalidateOrderPaths(updated.orderIds, updated.customerIds)
+    after(() => notifyOrderEvents(updated.orderIds, event))
     return { success: true, count: updated.count }
   } catch (error) {
     return { success: false, message: mutationError(error) }
@@ -86,13 +98,13 @@ async function runBulkOrderAction(
 }
 
 export async function markOrdersPaidAction(input: unknown) {
-  return runBulkOrderAction(input, markOrdersPaid)
+  return runBulkOrderAction(input, markOrdersPaid, "ORDER_CONFIRMED")
 }
 
 export async function fulfillOrdersAction(input: unknown) {
-  return runBulkOrderAction(input, fulfillOrders)
+  return runBulkOrderAction(input, fulfillOrders, "ORDER_FULFILLED")
 }
 
 export async function cancelOrdersAction(input: unknown) {
-  return runBulkOrderAction(input, cancelOrders)
+  return runBulkOrderAction(input, cancelOrders, "ORDER_CANCELLED")
 }

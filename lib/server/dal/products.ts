@@ -1,7 +1,7 @@
 import "server-only"
 
 import { getPrisma } from "@/lib/server/db"
-import { assertAdmin } from "@/lib/server/dal/auth"
+import { requirePermission } from "@/lib/server/dal/auth"
 
 function imageUrl(objectKey: string) {
   if (objectKey.startsWith("/")) {
@@ -76,7 +76,7 @@ export type AdminProductDetail = {
 export async function listCollectionOptionsForAdmin(): Promise<
   AdminCollectionOption[]
 > {
-  await assertAdmin()
+  await requirePermission("products.view")
   const prisma = getPrisma()
 
   return prisma.collection.findMany({
@@ -217,7 +217,7 @@ export async function listPublishedProducts() {
 }
 
 export async function listProductsForAdmin(): Promise<AdminProductListItem[]> {
-  await assertAdmin()
+  await requirePermission("products.view")
 
   const prisma = getPrisma()
   const products = await prisma.product.findMany({
@@ -330,7 +330,7 @@ function variantOptionValues(value: unknown): Record<string, any> {
 export async function getProductForAdmin(
   productId: string,
 ): Promise<AdminProductDetail | null> {
-  await assertAdmin()
+  await requirePermission("products.view")
   const prisma = getPrisma()
   const product = await prisma.product.findUnique({
     where: { id: productId },

@@ -359,6 +359,20 @@ export async function searchCatalog(rawQuery: string): Promise<SearchResponse> {
     )
   })
 
+  // Behavioural analytics: what shoppers search for and what returns nothing.
+  if (query.length >= 2) {
+    void prisma.searchLog
+      .create({
+        data: {
+          query: rawQuery.trim().slice(0, 200),
+          normalized: query.slice(0, 200),
+          resultCount: scoredProducts.length,
+          suggestion: suggestion && suggestion !== query ? suggestion.slice(0, 200) : null,
+        },
+      })
+      .catch(() => {})
+  }
+
   return {
     query: rawQuery,
     suggestion: suggestion && suggestion.toLowerCase() !== query.toLowerCase() ? suggestion : null,

@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto"
 import { PutObjectCommand } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 
+import { hasPermission, type PermissionKey } from "@/lib/permissions"
 import { getCurrentUser } from "@/lib/server/dal/auth"
 import { getR2Env } from "@/lib/server/env"
 import { getR2Client } from "@/lib/server/r2"
@@ -47,7 +48,7 @@ export async function POST(request: Request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  if (user.role !== "ADMIN") {
+  if (user.role !== "ADMIN" && user.role !== "SUB_ADMIN") {
     return Response.json({ error: "Forbidden" }, { status: 403 })
   }
 
@@ -67,6 +68,20 @@ export async function POST(request: Request) {
         details: input.error.flatten(),
       },
       { status: 400 },
+    )
+  }
+
+  const scopePermission: Record<string, PermissionKey> = {
+    product: "products.manage",
+    category: "categories.manage",
+    collection: "collections.manage",
+    banner: "banners.manage",
+  }
+  const requiredPermission = scopePermission[input.data.scope] ?? "products.manage"
+  if (!hasPermission(user, requiredPermission)) {
+    return Response.json(
+      { error: `You don't have the "${requiredPermission}" permission.` },
+      { status: 403 },
     )
   }
 

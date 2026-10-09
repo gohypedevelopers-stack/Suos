@@ -1,12 +1,12 @@
 import "server-only"
 
 import { Prisma } from "@/generated/prisma/client"
-import { assertAdmin } from "@/lib/server/dal/auth"
+import { assertPermission } from "@/lib/server/dal/auth"
 import { getPrisma } from "@/lib/server/db"
 import type { OrderCreateInput } from "@/lib/validations/order"
 
 export async function createDraftOrder(input: OrderCreateInput) {
-  await assertAdmin()
+  await assertPermission("orders.manage")
   const prisma = getPrisma()
 
   return prisma.$transaction(async (tx) => {
@@ -77,7 +77,7 @@ export async function createDraftOrder(input: OrderCreateInput) {
 }
 
 export async function sendDraftOrders(draftIds: string[]) {
-  await assertAdmin()
+  await assertPermission("orders.manage")
   const prisma = getPrisma()
   const drafts = await prisma.draftOrder.findMany({
     where: { id: { in: draftIds }, status: "DRAFT" },
@@ -92,7 +92,7 @@ export async function sendDraftOrders(draftIds: string[]) {
 }
 
 export async function convertDraftOrders(draftIds: string[]) {
-  await assertAdmin()
+  await assertPermission("orders.manage")
   const prisma = getPrisma()
 
   return prisma.$transaction(async (tx) => {
@@ -152,7 +152,7 @@ export async function convertDraftOrders(draftIds: string[]) {
 }
 
 export async function deleteDraftOrders(draftIds: string[]) {
-  await assertAdmin()
+  await assertPermission("orders.manage")
   const prisma = getPrisma()
   const drafts = await prisma.draftOrder.findMany({
     where: { id: { in: draftIds }, status: { in: ["DRAFT", "SENT"] } },

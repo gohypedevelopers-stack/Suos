@@ -1,7 +1,7 @@
 import "server-only"
 
 import { getPrisma } from "@/lib/server/db"
-import { assertAdmin } from "@/lib/server/dal/auth"
+import { requirePermission } from "@/lib/server/dal/auth"
 
 function imageUrl(objectKey: string | null) {
   if (!objectKey) return null
@@ -58,7 +58,7 @@ export type AdminCategoryOption = {
 export async function listCategoriesForAdmin(): Promise<
   AdminCategoryListItem[]
 > {
-  await assertAdmin()
+  await requirePermission("categories.view")
   const prisma = getPrisma()
   const categories = await prisma.category.findMany({
     orderBy: [{ name: "asc" }],
@@ -95,7 +95,7 @@ export async function listCategoriesForAdmin(): Promise<
 export async function listCategoryOptionsForAdmin(
   excludingCategoryId?: string,
 ): Promise<AdminCategoryOption[]> {
-  await assertAdmin()
+  await requirePermission("categories.view")
   const prisma = getPrisma()
 
   return prisma.category.findMany({
@@ -108,7 +108,7 @@ export async function listCategoryOptionsForAdmin(
 export async function listProductsForCategoryAssignment(): Promise<
   AdminCategoryProduct[]
 > {
-  await assertAdmin()
+  await requirePermission("categories.view")
   const prisma = getPrisma()
   const products = await prisma.product.findMany({
     orderBy: { title: "asc" },
@@ -149,7 +149,7 @@ export async function listProductsForCategoryAssignment(): Promise<
 export async function getCategoryForAdmin(
   categoryId: string,
 ): Promise<AdminCategoryEditor | null> {
-  await assertAdmin()
+  await requirePermission("categories.view")
   const prisma = getPrisma()
   const category = await prisma.category.findUnique({
     where: { id: categoryId },

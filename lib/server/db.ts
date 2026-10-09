@@ -5,7 +5,7 @@ import { PrismaPg } from "@prisma/adapter-pg"
 import { PrismaClient } from "@/generated/prisma/client"
 import { getDatabaseEnv } from "@/lib/server/env"
 
-const SCHEMA_VERSION = "2026-09-24-v2-editorial"
+const SCHEMA_VERSION = "2026-10-08-v3-notifications-analytics"
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
@@ -31,7 +31,7 @@ function createPrismaClient() {
 }
 
 export function getPrisma() {
-  if (!prisma || !("banner" in prisma)) {
+  if (!prisma || !("notification" in prisma)) {
     prisma = createPrismaClient()
     if (process.env.NODE_ENV !== "production") {
       globalForPrisma.prisma = prisma
