@@ -24,6 +24,7 @@ import {
 import { toast } from "sonner"
 
 import { BannerMediaLibraryDialog } from "@/components/admin-dashboard/banner-media-library-dialog"
+import { BannerMediaPreview } from "@/components/admin-dashboard/banner-media-preview"
 import {
   addCarouselSlideAction,
   addHeroSlideAction,
@@ -92,6 +93,7 @@ export function BannerManager({
   const heroBanners = banners
     .filter((b) => b.placement === "HERO")
     .sort((a, b) => a.position - b.position)
+  const featureBanner = banners.find((b) => b.placement === "FEATURE")
   const middleBanner = banners.find((b) => b.placement === "MIDDLE")
   const denimCarouselBanners = banners
     .filter((b) => b.placement === "DENIM_CAROUSEL")
@@ -506,7 +508,7 @@ export function BannerManager({
           </div>
         </div>
 
-        {/* The 5 Homepage Sections in visual order */}
+        {/* The 6 Homepage Sections in visual order */}
         <div className="space-y-4">
           {/* ================================================================ */}
           {/* SECTION 1: HERO TOP CAROUSEL                                     */}
@@ -801,7 +803,7 @@ export function BannerManager({
           </section>
 
           {/* ================================================================ */}
-          {/* SECTION 2: MIDDLE MOTION BANNER                                  */}
+          {/* SECTION 2: FEATURE BANNER (BELOW LAUNCH OFFER, IMAGE OR VIDEO)   */}
           {/* ================================================================ */}
           <section className="overflow-hidden rounded-xl border border-neutral-200/90 bg-white shadow-xs transition hover:border-neutral-300">
             <div className="p-4 sm:p-5">
@@ -813,13 +815,94 @@ export function BannerManager({
                   </div>
 
                   <div className="relative aspect-[16/9] w-24 shrink-0 overflow-hidden rounded-lg border border-neutral-200 bg-neutral-900 shadow-2xs">
+                    {featureBanner?.desktopImageUrl ? (
+                      <BannerMediaPreview
+                        src={featureBanner.desktopImageUrl}
+                        alt="Feature Banner"
+                        sizes="96px"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-[10px] text-white/50">
+                        Not set
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h2 className="text-sm font-bold text-neutral-900">
+                        Feature Banner
+                      </h2>
+                      <span className="rounded-md bg-neutral-100 px-2 py-0.5 text-[10px] font-medium text-neutral-700">
+                        Image or Video
+                      </span>
+                    </div>
+                    <p className="mt-0.5 text-xs text-neutral-500">
+                      Full-width, fully clickable banner directly below the launch offer bar.
+                    </p>
+                    {featureBanner?.ctaLink && (
+                      <p className="mt-0.5 font-mono text-[10px] text-neutral-400 truncate max-w-xs">
+                        Target link: {featureBanner.ctaLink}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Right Actions */}
+                <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                  {featureBanner ? (
+                    <>
+                      <button
+                        type="button"
+                        disabled={isPending}
+                        onClick={() => handleToggleActive(featureBanner.id, featureBanner.isActive)}
+                        className={`rounded-full px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+                          featureBanner.isActive
+                            ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/60"
+                            : "bg-neutral-100 text-neutral-500 hover:bg-neutral-200 border border-neutral-200"
+                        }`}
+                      >
+                        {featureBanner.isActive ? "Active (Visible)" : "Hidden"}
+                      </button>
+
+                      <Link
+                        href={`/dashboard/banners/${featureBanner.id}`}
+                        className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 text-xs font-semibold text-neutral-800 shadow-2xs transition hover:bg-neutral-50"
+                      >
+                        <Pencil className="size-3.5" /> Edit Banner
+                      </Link>
+                    </>
+                  ) : (
+                    <Link
+                      href="/dashboard/banners/new?placement=FEATURE"
+                      className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-black px-3.5 text-xs font-semibold text-white shadow-2xs transition hover:bg-neutral-800"
+                    >
+                      <Plus className="size-3.5" /> Create Banner
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* ================================================================ */}
+          {/* SECTION 3: MIDDLE MOTION BANNER                                  */}
+          {/* ================================================================ */}
+          <section className="overflow-hidden rounded-xl border border-neutral-200/90 bg-white shadow-xs transition hover:border-neutral-300">
+            <div className="p-4 sm:p-5">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                {/* Left Info */}
+                <div className="flex items-start sm:items-center gap-3.5 min-w-0">
+                  <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-neutral-200 font-mono text-xs font-bold text-neutral-800 shadow-2xs">
+                    03
+                  </div>
+
+                  <div className="relative aspect-[16/9] w-24 shrink-0 overflow-hidden rounded-lg border border-neutral-200 bg-neutral-900 shadow-2xs">
                     {middleBanner?.desktopImageUrl ? (
-                      <Image
+                      <BannerMediaPreview
                         src={middleBanner.desktopImageUrl}
                         alt="Middle Motion Banner"
-                        fill
                         sizes="96px"
-                        className="object-cover"
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center text-[10px] text-white/50">
@@ -886,7 +969,7 @@ export function BannerManager({
           </section>
 
           {/* ================================================================ */}
-          {/* SECTION 3: DENIM CAROUSEL (COLLECTION CUTOUTS)                   */}
+          {/* SECTION 4: DENIM CAROUSEL (COLLECTION CUTOUTS)                   */}
           {/* ================================================================ */}
           <section className="overflow-hidden rounded-xl border border-neutral-200/90 bg-white shadow-xs transition hover:border-neutral-300">
             <div className="p-4 sm:p-5">
@@ -894,7 +977,7 @@ export function BannerManager({
                 {/* Left Info */}
                 <div className="flex items-start sm:items-center gap-3.5 min-w-0">
                   <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-neutral-200 font-mono text-xs font-bold text-neutral-800 shadow-2xs">
-                    03
+                    04
                   </div>
 
                   <div className="relative aspect-[3/4] w-12 shrink-0 overflow-hidden rounded-lg border border-neutral-200 bg-neutral-100 shadow-2xs">
@@ -1114,7 +1197,7 @@ export function BannerManager({
           </section>
 
           {/* ================================================================ */}
-          {/* SECTION 4: EDITORIAL 3-PHOTO GRID                                */}
+          {/* SECTION 5: EDITORIAL 3-PHOTO GRID                                */}
           {/* ================================================================ */}
           <section className="overflow-hidden rounded-xl border border-neutral-200/90 bg-white shadow-xs transition hover:border-neutral-300">
             <div className="p-4 sm:p-5">
@@ -1122,7 +1205,7 @@ export function BannerManager({
                 {/* Left Info */}
                 <div className="flex items-start sm:items-center gap-3.5 min-w-0">
                   <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-neutral-200 font-mono text-xs font-bold text-neutral-800 shadow-2xs">
-                    04
+                    05
                   </div>
 
                   <div className="min-w-0">
@@ -1289,7 +1372,7 @@ export function BannerManager({
           </section>
 
           {/* ================================================================ */}
-          {/* SECTION 5: BOTTOM PRODUCT BANNER                                 */}
+          {/* SECTION 6: BOTTOM PRODUCT BANNER                                 */}
           {/* ================================================================ */}
           <section className="overflow-hidden rounded-xl border border-neutral-200/90 bg-white shadow-xs transition hover:border-neutral-300">
             <div className="p-4 sm:p-5">
@@ -1297,17 +1380,15 @@ export function BannerManager({
                 {/* Left Info */}
                 <div className="flex items-start sm:items-center gap-3.5 min-w-0">
                   <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-neutral-200 font-mono text-xs font-bold text-neutral-800 shadow-2xs">
-                    05
+                    06
                   </div>
 
                   <div className="relative aspect-[16/9] w-24 shrink-0 overflow-hidden rounded-lg border border-neutral-200 bg-neutral-900 shadow-2xs">
                     {bottomBanner?.desktopImageUrl ? (
-                      <Image
+                      <BannerMediaPreview
                         src={bottomBanner.desktopImageUrl}
                         alt="Bottom Product Banner"
-                        fill
                         sizes="96px"
-                        className="object-cover"
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center text-[10px] text-white/50">

@@ -2,9 +2,10 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { ShoppingBag, X } from "lucide-react"
+import { X } from "lucide-react"
 import { toast } from "sonner"
 
+import { CartIcon } from "@/components/icons/CartIcon"
 import { useWishlist } from "@/lib/wishlist-context"
 import { useCart } from "@/lib/cart-context"
 import { Button } from "@/components/ui/button"
@@ -78,7 +79,7 @@ export function WishlistSidebar() {
                           removeFromWishlist(item.id)
                         }}
                       >
-                        <ShoppingBag className="size-3" /> Add
+                        <CartIcon className="size-3" /> Add
                       </Button>
                     </div>
                   </div>

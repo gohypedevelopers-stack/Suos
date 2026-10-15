@@ -36,9 +36,29 @@ import {
   updateBannerAction,
 } from "@/app/actions/banners"
 import { BannerMediaLibraryDialog } from "@/components/admin-dashboard/banner-media-library-dialog"
+import { BannerMediaPreview } from "@/components/admin-dashboard/banner-media-preview"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import {
+  BANNER_IMAGE_CONTENT_TYPES,
+  BANNER_VIDEO_CONTENT_TYPES,
+  isBannerVideoContentType,
+  MAX_BANNER_IMAGE_BYTES,
+  MAX_BANNER_VIDEO_BYTES,
+} from "@/lib/banner-media"
 import type { AdminBannerDetail, AdminBannerListItem } from "@/lib/server/dal/banners"
 import type { BannerPlacement, BannerTextAlignment } from "@/lib/validations/banner"
+
+const BANNER_PLACEMENTS: BannerPlacement[] = [
+  "HERO",
+  "FEATURE",
+  "MIDDLE",
+  "BOTTOM",
+  "EDITORIAL",
+  "DENIM_CAROUSEL",
+]
+
+// Full-width banners render through FullWidthBanner, which can play video.
+const VIDEO_PLACEMENTS = new Set<BannerPlacement>(["FEATURE", "MIDDLE", "BOTTOM"])
 
 type UploadInstruction = {
   objectKey?: string
@@ -77,7 +97,7 @@ export function BannerEditor({
   const queryPlacement = searchParams?.get("placement") as BannerPlacement | null
   const defaultPlacement: BannerPlacement =
     banner?.placement ??
-    (queryPlacement && ["HERO", "MIDDLE", "BOTTOM", "EDITORIAL", "DENIM_CAROUSEL"].includes(queryPlacement)
+    (queryPlacement && BANNER_PLACEMENTS.includes(queryPlacement)
       ? queryPlacement
       : "HERO")
   const [placement, setPlacement] = useState<BannerPlacement>(defaultPlacement)
@@ -328,12 +348,22 @@ export function BannerEditor({
     file: File,
     type: "desktop" | "mobile",
   ) => {
-    const allowed = new Set(["image/avif", "image/jpeg", "image/png", "image/webp"])
-    if (!allowed.has(file.type)) {
-      toast.error("Please upload an AVIF, JPG, PNG, or WebP image.")
+    const allowsVideo = VIDEO_PLACEMENTS.has(placement)
+    const isVideo = isBannerVideoContentType(file.type)
+    const isImage = (BANNER_IMAGE_CONTENT_TYPES as readonly string[]).includes(file.type)
+    if (!isImage && !(allowsVideo && isVideo)) {
+      toast.error(
+        allowsVideo
+          ? "Please upload an AVIF, JPG, PNG or WebP image, or an MP4 / WebM video."
+          : "Please upload an AVIF, JPG, PNG, or WebP image.",
+      )
       return
     }
-    if (file.size > 10 * 1024 * 1024) {
+    if (isVideo && file.size > MAX_BANNER_VIDEO_BYTES) {
+      toast.error("Video file size must be less than 50 MB.")
+      return
+    }
+    if (!isVideo && file.size > MAX_BANNER_IMAGE_BYTES) {
       toast.error("Image file size must be less than 10 MB.")
       return
     }
@@ -428,6 +458,12 @@ export function BannerEditor({
       router.refresh()
     })
   }
+
+  const allowsVideo = VIDEO_PLACEMENTS.has(placement)
+  const mediaAccept = [
+    ...BANNER_IMAGE_CONTENT_TYPES,
+    ...(allowsVideo ? BANNER_VIDEO_CONTENT_TYPES : []),
+  ].join(",")
 
   const currentPreviewImage =
     previewDevice === "mobile" && mobileImage?.url
@@ -648,9 +684,15 @@ export function BannerEditor({
             <div className="rounded-xl border border-black/10 bg-white p-5 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-sm font-semibold text-neutral-900">Slide Image</h2>
+                  <h2 className="text-sm font-semibold text-neutral-900">
+                    {allowsVideo ? "Banner Image or Video" : "Slide Image"}
+                  </h2>
                   <p className="text-xs text-neutral-500">
-                    High-resolution widescreen visual (16:9 ratio recommended).
+                    {placement === "FEATURE"
+                      ? "Desktop 1920 × 840 px (16:7), mobile 1080 × 1350 px (4:5). Image or MP4/WebM video up to 50 MB."
+                      : allowsVideo
+                        ? "High-resolution widescreen visual. Image or MP4/WebM video up to 50 MB."
+                        : "High-resolution widescreen visual (16:9 ratio recommended)."}
                   </p>
                 </div>
                 <button
@@ -670,7 +712,7 @@ export function BannerEditor({
                 <input
                   type="file"
                   ref={desktopInputRef}
-                  accept="image/png,image/jpeg,image/webp,image/avif"
+                  accept={mediaAccept}
                   className="hidden"
                   onChange={(e) => {
                     const f = e.target.files?.[0]
@@ -681,11 +723,10 @@ export function BannerEditor({
                 {desktopImage?.url ? (
                   <div>
                     <div className="relative aspect-[16/9] max-h-[260px] w-full overflow-hidden rounded-lg border border-black/15 bg-neutral-900 shadow-xs">
-                      <Image
+                      <BannerMediaPreview
                         src={desktopImage.url}
                         alt="Slide Desktop Visual"
-                        fill
-                        className="object-cover"
+                        sizes="(max-width: 1024px) 100vw, 640px"
                       />
                     </div>
 
@@ -740,7 +781,9 @@ export function BannerEditor({
                           Click to upload slide image, or drag and drop
                         </p>
                         <p className="text-[11px] text-neutral-400 mt-0.5">
-                          PNG, JPG, WebP, or AVIF (1672 × 941 px recommended)
+                          {allowsVideo
+                            ? "PNG, JPG, WebP, AVIF, MP4 or WebM"
+                            : "PNG, JPG, WebP, or AVIF (1672 × 941 px recommended)"}
                         </p>
                       </>
                     )}
@@ -758,7 +801,7 @@ export function BannerEditor({
                 <input
                   type="file"
                   ref={mobileInputRef}
-                  accept="image/png,image/jpeg,image/webp,image/avif"
+                  accept={mediaAccept}
                   className="hidden"
                   onChange={(e) => {
                     const f = e.target.files?.[0]
@@ -781,11 +824,10 @@ export function BannerEditor({
                       </button>
                     </div>
                     <div className="relative h-44 w-32 overflow-hidden rounded-lg border border-black/15 bg-neutral-900 shadow-xs group">
-                      <Image
+                      <BannerMediaPreview
                         src={mobileImage.url}
                         alt="Mobile Variant"
-                        fill
-                        className="object-cover"
+                        sizes="128px"
                       />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <button
@@ -1145,6 +1187,7 @@ export function BannerEditor({
                     className="mt-1.5 w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-xs font-medium text-neutral-900 shadow-xs focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
                   >
                     <option value="HERO">Hero Banner (Top Carousel)</option>
+                    <option value="FEATURE">Feature Banner (Below Launch Offer · Image or Video)</option>
                     <option value="MIDDLE">Middle Banner (Motion Section)</option>
                     <option value="DENIM_CAROUSEL">Denim Carousel (Collection Slide)</option>
                     <option value="EDITORIAL">Denim Editorial Grid (3 Images)</option>
@@ -1247,12 +1290,11 @@ export function BannerEditor({
                           : "w-[240px] aspect-[9/16]"
                   }`}
                 >
-                  {/* Banner Image */}
-                  <Image
+                  {/* Banner Image / Video */}
+                  <BannerMediaPreview
                     src={currentPreviewImage}
                     alt="Banner preview"
-                    fill
-                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 480px"
                   />
 
                   {/* Dynamic Dark Gradient Overlay */}

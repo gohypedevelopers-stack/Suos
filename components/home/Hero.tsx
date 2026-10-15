@@ -94,12 +94,13 @@ export function Hero({ banners }: { banners?: HomeHeroBanner[] }) {
               />
             </div>
 
-            {/* Clickable full-slide link when button text is omitted */}
-            {!slide.ctaText && slide.ctaLink && (
+            {/* The whole slide is clickable; the button below sits on top of it */}
+            {slide.ctaLink && (
               <Link
                 href={slide.ctaLink}
+                tabIndex={slide.ctaText || !isActive ? -1 : undefined}
                 className="absolute inset-0 z-10"
-                aria-label={slide.title || "Hero banner"}
+                aria-label={slide.title || slide.ctaText || "Hero banner"}
               />
             )}
 
@@ -169,9 +170,6 @@ export function Hero({ banners }: { banners?: HomeHeroBanner[] }) {
       </span>
       <span id="men" className="sr-only">
         Men
-      </span>
-      <span id="bestsellers" className="sr-only">
-        Bestsellers
       </span>
       <span id="contact" className="sr-only">
         Contact Us

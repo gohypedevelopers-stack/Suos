@@ -38,12 +38,32 @@ export const policyContentSchema = z.object({
   sections: z.array(policySectionSchema).min(1, "Add at least one section.").max(40),
 })
 
+const navHref = z.string().trim().min(1, "Enter a link.").max(500)
+const navMenuLinkSchema = z.object({ label: shortText.min(1, "Enter a label."), href: navHref })
+
 export const siteContentSchemas = {
   announcements: z.object({
     left: shortText,
     center: shortText,
     right: shortText,
     mobile: z.array(shortText.min(1)).min(1, "Add at least one mobile message.").max(10),
+  }),
+  navigation: z.object({
+    collections: z.array(navMenuLinkSchema).max(12),
+    menFeatured: z.array(navMenuLinkSchema).max(12),
+    categories: z.array(navMenuLinkSchema).max(12),
+    cards: z
+      .array(
+        z.object({
+          image: imagePath,
+          alt: shortText,
+          eyebrow: shortText,
+          title: shortText,
+          href: navHref,
+        }),
+      )
+      .max(2),
+    bestsellersHref: navHref,
   }),
   launchOffer: z.object({
     enabled: z.boolean(),
@@ -117,6 +137,7 @@ export type SiteContentSchemas = typeof siteContentSchemas
 
 export const siteContentKeySchema = z.enum([
   "announcements",
+  "navigation",
   "launchOffer",
   "lookbook",
   "edits",

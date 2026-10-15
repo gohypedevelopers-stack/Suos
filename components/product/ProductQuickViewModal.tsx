@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
+import { CartIcon } from "@/components/icons/CartIcon"
 import type { ProductDetail, ProductCard } from "@/components/product/productData"
 import { SizeChartModal } from "@/components/product/SizeChartModal"
 import { useCart } from "@/lib/cart-context"
@@ -326,8 +327,9 @@ export function ProductQuickViewModal({
               <button
                 type="button"
                 onClick={handleAddToCart}
-                className="mt-6 sm:mt-8 flex h-11 sm:h-12 w-full cursor-pointer items-center justify-center bg-black text-xs sm:text-sm font-medium uppercase tracking-wider text-white transition-opacity hover:opacity-90"
+                className="mt-6 sm:mt-8 flex h-11 sm:h-12 w-full cursor-pointer items-center justify-center gap-2 bg-black text-xs sm:text-sm font-medium uppercase tracking-wider text-white transition-opacity hover:opacity-90"
               >
+                <CartIcon className="size-4" />
                 Add To Cart
               </button>
 

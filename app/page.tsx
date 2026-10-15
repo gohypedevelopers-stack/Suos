@@ -7,6 +7,7 @@ import { ResponsibleDenimSection } from "@/components/home/ResponsibleDenimSecti
 import { ProductBannerSection } from "@/components/home/ProductBannerSection"
 import { LookbookCarousel } from "@/components/home/LookbookCarousel"
 import { LaunchOfferBar } from "@/components/home/LaunchOfferBar"
+import { FeatureBannerSection } from "@/components/home/FeatureBannerSection"
 import { EditsCarousel } from "@/components/home/EditsCarousel"
 import { TrendingSection } from "@/components/home/TrendingSection"
 import { listPublishedProducts } from "@/lib/server/dal/products"
@@ -24,6 +25,7 @@ export default async function Home() {
     <main className="flex-1 bg-black">
       <Hero banners={banners.hero} />
       <LaunchOfferBar />
+      <FeatureBannerSection banner={banners.feature} />
       <TrendingSection products={products.slice(0, 8)} />
       <MotionBannerSection banner={banners.middle} />
       <DenimCarousel slides={banners.denimCarousel} />

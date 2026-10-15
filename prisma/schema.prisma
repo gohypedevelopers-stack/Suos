@@ -104,6 +104,7 @@ enum BannerPlacement {
   BOTTOM
   EDITORIAL
   DENIM_CAROUSEL
+  FEATURE
 }
 
 model User {

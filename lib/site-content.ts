@@ -36,6 +36,32 @@ export type AnnouncementsContent = {
   mobile: string[]
 }
 
+export type NavMenuLink = {
+  label: string
+  href: string
+}
+
+export type NavMenuCard = {
+  image: string
+  alt: string
+  eyebrow: string
+  title: string
+  href: string
+}
+
+export type NavigationContent = {
+  /** "Collections" mega menu, left column. */
+  collections: NavMenuLink[]
+  /** "Men" mega menu, left column ("Featured"). */
+  menFeatured: NavMenuLink[]
+  /** Shared "Categories" column in both mega menus. */
+  categories: NavMenuLink[]
+  /** Landscape promo images on the right of both mega menus. */
+  cards: NavMenuCard[]
+  /** "Bestsellers" is a plain link, no dropdown. */
+  bestsellersHref: string
+}
+
 export type LaunchOfferContent = {
   enabled: boolean
   label: string
@@ -96,6 +122,7 @@ export type SizeGuideContent = {
 
 export type SiteContent = {
   announcements: AnnouncementsContent
+  navigation: NavigationContent
   launchOffer: LaunchOfferContent
   lookbook: LookbookContent
   edits: EditsContent
@@ -112,6 +139,7 @@ export type SiteContentKey = keyof SiteContent
 
 export const SITE_CONTENT_KEYS: SiteContentKey[] = [
   "announcements",
+  "navigation",
   "launchOffer",
   "lookbook",
   "edits",
@@ -126,6 +154,7 @@ export const SITE_CONTENT_KEYS: SiteContentKey[] = [
 
 export const SITE_CONTENT_LABELS: Record<SiteContentKey, string> = {
   announcements: "Announcement bar",
+  navigation: "Navigation menu",
   launchOffer: "Launch offer",
   lookbook: "Lookbook carousel",
   edits: "Edits carousel",
@@ -153,8 +182,44 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
       "Easy Exchanges & Returns",
     ],
   },
+  navigation: {
+    collections: [
+      { label: "All Collections", href: "/collections" },
+      { label: "Originals", href: "/collections/originals" },
+      { label: "Freedom", href: "/collections/freedom" },
+      { label: "Timeless", href: "/collections/timeless" },
+    ],
+    menFeatured: [
+      { label: "New", href: "/collections" },
+      { label: "Bestsellers", href: "/#bestsellers" },
+      { label: "Sale", href: "/collections" },
+    ],
+    categories: [
+      { label: "Bootcut Jeans", href: "/collections" },
+      { label: "Straight-Fit Jeans", href: "/collections" },
+      { label: "Regular-Fit Jeans", href: "/collections" },
+    ],
+    cards: [
+      {
+        image: "/images/nav1.png",
+        alt: "Editorial preview for the Off Beat Edit collection",
+        eyebrow: "Spotlight",
+        title: "Off Beat Edit",
+        href: "/collections",
+      },
+      {
+        image: "/images/nav2.png",
+        alt: "Editorial preview for the Country Edit collection",
+        eyebrow: "New Launch",
+        title: "Country Edit",
+        href: "/collections",
+      },
+    ],
+    bestsellersHref: "/#bestsellers",
+  },
   launchOffer: {
-    enabled: true,
+    // Hidden for now; switch on from Dashboard → Content → Launch offer.
+    enabled: false,
     label: "Launch Offer Live Now",
     endsAt: "2026-10-18T00:00:00.000Z",
     ctaText: "Shop Now",

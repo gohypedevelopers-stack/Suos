@@ -147,6 +147,70 @@ function AnnouncementsEditor({ value, onChange }: SectionProps<"announcements">)
   )
 }
 
+type NavLinkList = SiteContent["navigation"]["collections"]
+
+function NavLinksEditor({ title, items, onChange }: { title: string; items: NavLinkList; onChange: (items: NavLinkList) => void }) {
+  return (
+    <div className="space-y-2 rounded-lg border border-black/10 p-3">
+      <p className="text-xs font-semibold uppercase tracking-wide text-black/70">{title}</p>
+      {items.map((item, index) => (
+        <div key={index} className="grid items-end gap-2 md:grid-cols-[1fr_1fr_auto]">
+          <Field label="Label"><Input value={item.label} onChange={(e) => onChange(items.map((it, j) => (j === index ? { ...it, label: e.target.value } : it)))} /></Field>
+          <Field label="Link"><Input value={item.href} placeholder="/collections/originals" onChange={(e) => onChange(items.map((it, j) => (j === index ? { ...it, href: e.target.value } : it)))} /></Field>
+          <ListControls index={index} count={items.length} onMove={(from, to) => onChange(move(items, from, to))} onRemove={(i) => onChange(items.filter((_, j) => j !== i))} />
+        </div>
+      ))}
+      <Button type="button" variant="outline" size="sm" onClick={() => onChange([...items, { label: "", href: "/collections" }])}>
+        <Plus className="size-3.5" /> Add link
+      </Button>
+    </div>
+  )
+}
+
+function NavigationEditor({ value, onChange }: SectionProps<"navigation">) {
+  const cards = value.cards
+  const setCards = (next: typeof cards) => onChange({ ...value, cards: next })
+  return (
+    <div className="space-y-4">
+      <p className="text-xs text-black/55">
+        Controls the desktop mega menus in the header. &ldquo;Categories&rdquo; and the images are shared by the Collections and Men menus.
+      </p>
+      <div className="grid gap-4 lg:grid-cols-3">
+        <NavLinksEditor title="Collections menu" items={value.collections} onChange={(collections) => onChange({ ...value, collections })} />
+        <NavLinksEditor title="Men menu · Featured" items={value.menFeatured} onChange={(menFeatured) => onChange({ ...value, menFeatured })} />
+        <NavLinksEditor title="Categories" items={value.categories} onChange={(categories) => onChange({ ...value, categories })} />
+      </div>
+      <Field label="Bestsellers button link" hint="Bestsellers is a plain button (no dropdown).">
+        <Input value={value.bestsellersHref} onChange={(e) => onChange({ ...value, bestsellersHref: e.target.value })} />
+      </Field>
+      <div className="space-y-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-black/70">Menu images (landscape, up to 2)</p>
+        <p className="text-[11px] text-black/50">Recommended size: 1200 × 800 px (3:2, landscape). Text is centred on the image.</p>
+        {cards.map((card, index) => (
+          <div key={index} className="rounded-lg border border-black/10 p-3">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs font-medium text-black/60">Image {index + 1}</p>
+              <ListControls index={index} count={cards.length} onMove={(from, to) => setCards(move(cards, from, to))} onRemove={(i) => setCards(cards.filter((_, j) => j !== i))} />
+            </div>
+            <div className="mt-3 grid gap-3 md:grid-cols-2">
+              <ImageField value={card.image} onChange={(image) => setCards(cards.map((c, j) => (j === index ? { ...c, image } : c)))} />
+              <Field label="Alt text"><Input value={card.alt} onChange={(e) => setCards(cards.map((c, j) => (j === index ? { ...c, alt: e.target.value } : c)))} /></Field>
+              <Field label="Small heading" hint='e.g. "New Launch"'><Input value={card.eyebrow} onChange={(e) => setCards(cards.map((c, j) => (j === index ? { ...c, eyebrow: e.target.value } : c)))} /></Field>
+              <Field label="Title"><Input value={card.title} onChange={(e) => setCards(cards.map((c, j) => (j === index ? { ...c, title: e.target.value } : c)))} /></Field>
+              <Field label="Link"><Input value={card.href} onChange={(e) => setCards(cards.map((c, j) => (j === index ? { ...c, href: e.target.value } : c)))} /></Field>
+            </div>
+          </div>
+        ))}
+        {cards.length < 2 ? (
+          <Button type="button" variant="outline" onClick={() => setCards([...cards, { image: "", alt: "", eyebrow: "", title: "", href: "/collections" }])}>
+            <Plus className="size-3.5" /> Add image
+          </Button>
+        ) : null}
+      </div>
+    </div>
+  )
+}
+
 function LaunchOfferEditor({ value, onChange }: SectionProps<"launchOffer">) {
   const local = value.endsAt ? new Date(value.endsAt) : null
   const localValue = local && !Number.isNaN(local.getTime())
@@ -387,6 +451,7 @@ function PolicyEditor({ value, onChange }: { value: PolicyContent; onChange: (va
 
 const TAB_GROUPS: Array<{ key: SiteContentKey; title: string }> = [
   { key: "announcements", title: SITE_CONTENT_LABELS.announcements },
+  { key: "navigation", title: SITE_CONTENT_LABELS.navigation },
   { key: "launchOffer", title: SITE_CONTENT_LABELS.launchOffer },
   { key: "lookbook", title: SITE_CONTENT_LABELS.lookbook },
   { key: "edits", title: SITE_CONTENT_LABELS.edits },
@@ -450,6 +515,8 @@ export function ContentManager({ initial }: { initial: SiteContentAdminView }) {
     switch (key) {
       case "announcements":
         return <AnnouncementsEditor value={content.announcements} onChange={(v) => update("announcements", v)} />
+      case "navigation":
+        return <NavigationEditor value={content.navigation} onChange={(v) => update("navigation", v)} />
       case "launchOffer":
         return <LaunchOfferEditor value={content.launchOffer} onChange={(v) => update("launchOffer", v)} />
       case "lookbook":

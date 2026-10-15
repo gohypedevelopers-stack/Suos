@@ -26,6 +26,7 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel"
 import { cn } from "@/lib/utils"
+import { CartIcon } from "@/components/icons/CartIcon"
 import type { ProductDetail } from "@/components/product/productData"
 import { SizeChartModal } from "@/components/product/SizeChartModal"
 
@@ -215,8 +216,9 @@ export function ProductSummary({
             <button
               type="button"
               onClick={handleAddToCart}
-              className="flex h-12 flex-1 cursor-pointer items-center justify-center border border-black bg-white text-[13px] font-[500] uppercase tracking-normal transition-[background-color,color] duration-200 ease-out hover:bg-black hover:text-white active:scale-[0.99]"
+              className="flex h-12 flex-1 cursor-pointer items-center justify-center gap-2 border border-black bg-white text-[13px] font-[500] uppercase tracking-normal transition-[background-color,color] duration-200 ease-out hover:bg-black hover:text-white active:scale-[0.99]"
             >
+              <CartIcon className="size-4" />
               Add To Cart
             </button>
             <button

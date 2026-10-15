@@ -6,15 +6,18 @@ import { z } from "zod"
 import { hasPermission, type PermissionKey } from "@/lib/permissions"
 import { getCurrentUser } from "@/lib/server/dal/auth"
 import {
-  imageContentTypeSchema,
+  isBannerVideoContentType,
+  MAX_BANNER_IMAGE_BYTES,
+  MAX_BANNER_VIDEO_BYTES,
+} from "@/lib/banner-media"
+import {
   localImageObjectKeySchema,
+  uploadContentTypeSchema,
 } from "@/lib/validations/upload"
-
-const maxImageSize = 10 * 1024 * 1024
 
 const localUploadSchema = z.object({
   objectKey: localImageObjectKeySchema,
-  contentType: imageContentTypeSchema,
+  contentType: uploadContentTypeSchema,
 })
 
 export async function PUT(request: Request) {
@@ -62,9 +65,18 @@ export async function PUT(request: Request) {
     return Response.json({ error: "Invalid image content type" }, { status: 400 })
   }
 
+  const isVideo = isBannerVideoContentType(input.data.contentType)
+  if (isVideo !== /\.(?:mp4|webm)$/.test(input.data.objectKey)) {
+    return Response.json({ error: "Invalid upload request" }, { status: 400 })
+  }
+
+  const maxSize = isVideo ? MAX_BANNER_VIDEO_BYTES : MAX_BANNER_IMAGE_BYTES
   const image = new Uint8Array(await request.arrayBuffer())
-  if (image.byteLength === 0 || image.byteLength > maxImageSize) {
-    return Response.json({ error: "Image must be between 1 byte and 10 MB." }, { status: 400 })
+  if (image.byteLength === 0 || image.byteLength > maxSize) {
+    return Response.json(
+      { error: isVideo ? "Video must be between 1 byte and 50 MB." : "Image must be between 1 byte and 10 MB." },
+      { status: 400 },
+    )
   }
 
   const destination = resolve(process.cwd(), "public", input.data.objectKey)

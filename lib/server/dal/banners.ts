@@ -101,6 +101,8 @@ export type HomeCarouselSlide = {
 
 export type HomeBanners = {
   hero: HomeHeroBanner[]
+  /** Full-width image/video banner directly below the launch offer bar. */
+  feature: HomeBannerSectionItem | null
   middle: HomeBannerSectionItem | null
   bottom: HomeBannerSectionItem | null
   editorial: HomeEditorialBanner[]
@@ -224,6 +226,7 @@ export async function getHomeBanners(): Promise<HomeBanners> {
         overlayOpacity: 15,
       },
     ],
+    feature: null,
     middle: {
       id: "default-middle",
       title: null,
@@ -343,6 +346,7 @@ export async function getHomeBanners(): Promise<HomeBanners> {
     })
 
     const heroBanners = activeBanners.filter((b) => b.placement === "HERO")
+    const featureBanners = activeBanners.filter((b) => b.placement === "FEATURE")
     const middleBanners = activeBanners.filter((b) => b.placement === "MIDDLE")
     const bottomBanners = activeBanners.filter((b) => b.placement === "BOTTOM")
     const editorialBanners = activeBanners.filter((b) => b.placement === "EDITORIAL")
@@ -364,6 +368,19 @@ export async function getHomeBanners(): Promise<HomeBanners> {
         : defaultFallback.hero
 
     const hasConfiguredBanners = activeBanners.length > 0
+    const featureBanner = featureBanners[0]
+    const feature: HomeBannerSectionItem | null = featureBanner
+      ? {
+          id: featureBanner.id,
+          title: featureBanner.title,
+          subtitle: featureBanner.subtitle,
+          desktopImageUrl: imageUrl(featureBanner.desktopImageKey) ?? featureBanner.desktopImageKey,
+          mobileImageUrl: imageUrl(featureBanner.mobileImageKey),
+          ctaText: featureBanner.ctaText,
+          ctaLink: featureBanner.ctaLink,
+          overlayOpacity: featureBanner.overlayOpacity,
+        }
+      : null
     const middleBanner = middleBanners[0]
     const middle: HomeBannerSectionItem | null = middleBanner
       ? {
@@ -420,7 +437,7 @@ export async function getHomeBanners(): Promise<HomeBanners> {
           }))
         : defaultFallback.denimCarousel
 
-    return { hero, middle, bottom, editorial, denimCarousel }
+    return { hero, feature, middle, bottom, editorial, denimCarousel }
   } catch (error) {
     console.error("Error retrieving banners in getHomeBanners:", error)
     return defaultFallback

@@ -6,6 +6,7 @@ import Link from "next/link"
 import { Heart } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { CartIcon } from "@/components/icons/CartIcon"
 import { ProductQuickViewModal } from "@/components/product/ProductQuickViewModal"
 import { useWishlist } from "@/lib/wishlist-context"
 import { useCart } from "@/lib/cart-context"
@@ -432,7 +433,7 @@ export function ProductCardView({
             {product.title || "WASHED BLACK STRAIGHT FIT DENIM"}
           </Link>
 
-          {/* Shopping Tote Bag Button */}
+          {/* Add to cart: same bag icon as the navbar cart */}
           <button
             type="button"
             onClick={handleCartClick}
@@ -440,18 +441,7 @@ export function ProductCardView({
             title="Add to cart"
             className="shrink-0 cursor-pointer p-0.5 text-black transition-transform duration-200 hover:scale-110 active:scale-95"
           >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="size-[13px] md:size-[18px]"
-            >
-              <rect x="4.5" y="9" width="15" height="12" />
-              <path d="M7.5 9a4.5 4.5 0 0 1 9 0" />
-            </svg>
+            <CartIcon className="size-[13px] md:size-[18px]" />
           </button>
         </div>
 
@@ -526,7 +516,10 @@ export function ProductCardView({
 
 export function TrendingSection({ products = [] }: { products?: ProductCard[] }) {
   return (
-    <section className="w-full bg-white px-3 sm:px-6 lg:px-8 py-10 md:py-16 text-black">
+    <section
+      id="bestsellers"
+      className="w-full scroll-mt-[var(--main-navbar-height)] bg-white px-3 sm:px-6 lg:px-8 py-10 md:py-16 text-black"
+    >
       <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <h2 className="font-heading text-[22px] sm:text-[24px] font-normal uppercase leading-none tracking-[-0.04em]">
           Trending

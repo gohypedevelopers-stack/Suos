@@ -6,6 +6,7 @@ export const bannerPlacementSchema = z.enum([
   "BOTTOM",
   "EDITORIAL",
   "DENIM_CAROUSEL",
+  "FEATURE",
 ])
 export type BannerPlacement = z.infer<typeof bannerPlacementSchema>
 
@@ -23,8 +24,8 @@ export const bannerImageObjectKeySchema = z
       key.startsWith("banners/") ||
       key.startsWith("images/") ||
       key.startsWith("home-page-content/") ||
-      /^(?:banners|uploads\/banners)\/\d{4}\/[0-9a-f-]{36}\.(?:avif|jpg|png|webp)$/i.test(key) ||
-      /\.(?:avif|jpg|jpeg|png|webp|svg)$/i.test(key),
+      /^(?:banners|uploads\/banners)\/\d{4}\/[0-9a-f-]{36}\.(?:avif|jpg|png|webp|mp4|webm)$/i.test(key) ||
+      /\.(?:avif|jpg|jpeg|png|webp|svg|mp4|webm)$/i.test(key),
     "Invalid banner image key",
   )
 

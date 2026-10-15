@@ -1,8 +1,8 @@
-import { CornerUpLeft, Lock, ShoppingCart } from "lucide-react"
+import { CornerUpLeft, Lock, ShoppingBag } from "lucide-react"
 
 const benefits = [
   {
-    icon: ShoppingCart,
+    icon: ShoppingBag,
     title: "FREE SHIPPING",
     description: "On orders over $250 CAD",
     mobileDesc: "Over $250 CAD",

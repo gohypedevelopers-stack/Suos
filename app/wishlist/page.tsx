@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ShoppingBag } from "lucide-react"
+import { CartIcon } from "@/components/icons/CartIcon"
 
 import { useWishlist } from "@/lib/wishlist-context"
 import { useCart } from "@/lib/cart-context"
@@ -95,7 +95,7 @@ export default function WishlistPage() {
                     setIsCartOpen(true)
                   }}
                 >
-                  <ShoppingBag className="size-3.5" />
+                  <CartIcon className="size-3.5" />
                   Add to Cart
                 </Button>
               </div>

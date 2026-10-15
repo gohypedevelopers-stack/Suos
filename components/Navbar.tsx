@@ -3,7 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Heart, Search, ShoppingBag, UserRound, Menu, X, ChevronRight } from "lucide-react"
+import { Heart, Search, UserRound, Menu, X, ChevronRight } from "lucide-react"
 import { AnimatePresence, motion, useReducedMotion, type Transition } from "motion/react"
 import {
   useEffect,
@@ -17,6 +17,7 @@ import {
 
 import { cn } from "@/lib/utils"
 import { CartSidebar } from "@/components/cart/CartSidebar"
+import { CartIcon } from "@/components/icons/CartIcon"
 import { SearchSidebar } from "@/components/home/SearchSidebar"
 import { WishlistSidebar } from "@/components/wishlist/WishlistSidebar"
 import {
@@ -28,59 +29,22 @@ import {
 } from "@/components/ui/sheet"
 import { useWishlist } from "@/lib/wishlist-context"
 import { useCart } from "@/lib/cart-context"
+import { useSiteContent } from "@/lib/site-content-context"
+import type { NavMenuCard, NavMenuLink } from "@/lib/site-content"
 
 type NavKey = "women" | "men" | "bestsellers" | "collections"
-type ActiveMenu = NavKey | "wishlist"
+type MegaMenuKey = "collections" | "men"
+type ActiveMenu = MegaMenuKey | "wishlist"
 
 type PrimaryNavItem = {
   key: NavKey
   label: string
   href: string
+  /** Items without a mega menu (Bestsellers) render as a plain link. */
+  hasMenu: boolean
 }
 
-const primaryNav: PrimaryNavItem[] = [
-  // { key: "women", label: "Women", href: "/#women" },
-  { key: "collections", label: "Collections", href: "/collections" },
-  { key: "men", label: "Men", href: "/#men" },
-  { key: "bestsellers", label: "Bestsellers", href: "/#bestsellers" },
-]
-
-const megaMenuFeatured = ["New", "Bestsellers", "Sale"]
-
-const megaMenuCollections = [
-  "All Collections",
-  "Signature Series",
-  "Off Beat Edit",
-  "Country Edit",
-  "After Dark 001",
-  "Atelier Essentials",
-]
-
-const megaMenuCategories = [
-  "Bootcut Jeans",
-  "Low Waist Jeans",
-  "Straight-Leg Jeans",
-  "Wide-Leg Jeans",
-  "Baggy / Loose Fit Jeans",
-  "Mom Jeans",
-  "Dad Jeans",
-  "Flared Jeans",
-]
-
-const megaMenuCards = [
-  {
-    src: "/images/nav1.png",
-    alt: "Editorial preview for the Off Beat Edit collection",
-    eyebrow: "Spotlight",
-    titleLines: ["Off Beat", "Edit"],
-  },
-  {
-    src: "/images/nav2.png",
-    alt: "Editorial preview for the Country Edit collection",
-    eyebrow: "New Launch",
-    titleLines: ["Country", "Edit"],
-  },
-]
+const megaMenuOrder: MegaMenuKey[] = ["collections", "men"]
 
 const megaMenuRevealTransition: Transition = {
   type: "spring",
@@ -215,7 +179,7 @@ function MenuSection({
   onClose,
 }: {
   title: string
-  items: string[]
+  items: NavMenuLink[]
   open: boolean
   onClose: () => void
 }) {
@@ -227,14 +191,14 @@ function MenuSection({
 
       <ul className="mt-4 space-y-4">
         {items.map((item) => (
-          <li key={item}>
+          <li key={`${item.label}-${item.href}`}>
             <Link
-              href="/collections"
+              href={item.href}
               tabIndex={open ? 0 : -1}
               onClick={onClose}
               className="inline-flex cursor-pointer items-start text-left text-[13px] font-[400] uppercase leading-none tracking-[0.01em] text-black/55 transition-colors duration-200 hover:text-black focus-visible:text-black focus-visible:outline-none"
             >
-              {item}
+              {item.label}
             </Link>
           </li>
         ))}
@@ -243,49 +207,41 @@ function MenuSection({
   )
 }
 
+// Landscape promo card. Recommended upload: 1200 × 800 px (3:2).
 function MenuCard({
-  src,
-  alt,
-  eyebrow,
-  titleLines,
-  href = "/collections",
+  card,
   onClose,
 }: {
-  src: string
-  alt: string
-  eyebrow: string
-  titleLines: string[]
-  href?: string
+  card: NavMenuCard
   onClose?: () => void
 }) {
+  const { image, alt, eyebrow, title, href } = card
+
   return (
     <Link
-      href={href}
+      href={href || "/collections"}
       onClick={onClose}
-      className="group/card relative block aspect-[314/412] overflow-hidden bg-neutral-100 cursor-pointer"
+      className="group/card relative block h-full min-h-0 overflow-hidden bg-neutral-100 cursor-pointer"
     >
       <Image
-        src={src}
+        src={image}
         alt={alt}
         fill
-        sizes="(max-width: 1024px) 48vw, 314px"
+        sizes="(max-width: 1280px) 30vw, 440px"
         className="object-cover transition-transform duration-500 group-hover/card:scale-105"
       />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.1)_0%,rgba(0,0,0,0.12)_58%,rgba(0,0,0,0.28)_100%)]" />
       <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center text-white drop-shadow-[0_2px_16px_rgba(0,0,0,0.45)]">
-        <span className="text-[0.95rem] font-light uppercase tracking-[0.16em]">
-          {eyebrow}
-        </span>
-        <div className="mt-3 space-y-0.5">
-          {titleLines.map((line) => (
-            <div
-              key={line}
-              className="text-[clamp(2rem,2.7vw,3.05rem)] font-light uppercase leading-[0.9] tracking-[-0.05em]"
-            >
-              {line}
-            </div>
-          ))}
-        </div>
+        {eyebrow ? (
+          <span className="text-[0.85rem] font-light uppercase tracking-[0.16em]">
+            {eyebrow}
+          </span>
+        ) : null}
+        {title ? (
+          <div className="mt-2 text-[clamp(1.75rem,2.3vw,2.6rem)] font-light uppercase leading-[0.95] tracking-[-0.05em]">
+            {title}
+          </div>
+        ) : null}
       </div>
     </Link>
   )
@@ -340,6 +296,12 @@ export function Navbar({
 }) {
   const defaultNavKey: NavKey = "men"
   const pathname = usePathname()
+  const { navigation } = useSiteContent()
+  const primaryNav: PrimaryNavItem[] = [
+    { key: "collections", label: "Collections", href: "/collections", hasMenu: true },
+    { key: "men", label: "Men", href: "/#men", hasMenu: true },
+    { key: "bestsellers", label: "Bestsellers", href: navigation.bestsellersHref || "/#bestsellers", hasMenu: false },
+  ]
   const isOverlay = pathname === "/"
   const { wishlist, isLoaded, setIsSidebarOpen } = useWishlist()
   const { isCartOpen, setIsCartOpen, totalItems } = useCart()
@@ -363,17 +325,15 @@ export function Navbar({
   const tone: "dark" | "light" = isLightSurface ? "dark" : "light"
   const isWishlistOpen = activeMenu === "wishlist"
 
-  const openMenu = (menu: NavKey) => {
+  const openMenu = (menu: MegaMenuKey) => {
     if (menuCloseTimeoutRef.current !== null) {
       window.clearTimeout(menuCloseTimeoutRef.current)
       menuCloseTimeoutRef.current = null
     }
 
     setIsHovered(true)
-    const currentMenuIndex = primaryNav.findIndex(
-      (item) => item.key === activeMenu
-    )
-    const nextMenuIndex = primaryNav.findIndex((item) => item.key === menu)
+    const currentMenuIndex = megaMenuOrder.indexOf(activeMenu as MegaMenuKey)
+    const nextMenuIndex = megaMenuOrder.indexOf(menu)
 
     if (currentMenuIndex !== -1 && currentMenuIndex !== nextMenuIndex) {
       setMenuSlideDirection(nextMenuIndex > currentMenuIndex ? 1 : -1)
@@ -530,16 +490,27 @@ export function Navbar({
             className="flex h-full items-center gap-10 justify-self-start"
             onMouseEnter={cancelMenuClose}
           >
-            {primaryNav.map((item) => (
+            {primaryNav.map((item) => {
+              const menuKey = item.hasMenu ? (item.key as MegaMenuKey) : null
+
+              return (
               <NavLink
                 key={item.key}
                 href={item.href}
-                active={activeMenu === item.key}
+                active={menuKey !== null && activeMenu === menuKey}
                 selected={selectedNav === item.key}
-                ariaHaspopup="menu"
-                ariaExpanded={activeMenu === item.key}
-                onMouseEnter={() => openMenu(item.key)}
-                onFocus={() => openMenu(item.key)}
+                ariaHaspopup={menuKey ? "menu" : undefined}
+                ariaExpanded={menuKey ? activeMenu === menuKey : undefined}
+                // Bestsellers has no dropdown: hovering it closes any open menu.
+                onMouseEnter={() => {
+                  if (menuKey) {
+                    openMenu(menuKey)
+                    return
+                  }
+                  cancelMenuClose()
+                  setActiveMenu(null)
+                }}
+                onFocus={() => (menuKey ? openMenu(menuKey) : setActiveMenu(null))}
                 onBlur={(event) => {
                   const nextTarget = event.relatedTarget as Node | null
 
@@ -557,7 +528,8 @@ export function Navbar({
               >
                 {item.label}
               </NavLink>
-            ))}
+              )
+            })}
           </nav>
 
           <Link
@@ -634,7 +606,7 @@ export function Navbar({
               onClick={() => setIsCartOpen(true)}
             >
               <span className="relative inline-flex items-center justify-center">
-                <ShoppingBag className="size-[18px] stroke-[1.7]" />
+                <CartIcon />
                 {totalItems > 0 && isLoaded && (
                   <span
                     className={cn(
@@ -731,7 +703,7 @@ export function Navbar({
               onClick={() => setIsCartOpen(true)}
             >
               <span className="relative inline-flex items-center justify-center">
-                <ShoppingBag className="size-[18px] stroke-[1.7]" />
+                <CartIcon />
                 {totalItems > 0 && isLoaded && (
                   <span
                     className={cn(
@@ -750,7 +722,7 @@ export function Navbar({
         </div>
 
         <AnimatePresence>
-          {activeMenu && (
+          {activeMenu && activeMenu !== "wishlist" && (
             <motion.div
               aria-hidden={false}
               initial={
@@ -770,7 +742,7 @@ export function Navbar({
               transition={
                 prefersReducedMotion ? { duration: 0 } : megaMenuRevealTransition
               }
-              className="absolute left-0 top-full hidden h-[460px] w-full overflow-hidden !bg-white text-black shadow-[0_24px_60px_rgba(0,0,0,0.08)] [will-change:clip-path] lg:block"
+              className="absolute left-0 top-full hidden h-[340px] w-full overflow-hidden !bg-white text-black shadow-[0_24px_60px_rgba(0,0,0,0.08)] [will-change:clip-path] lg:block"
               onMouseEnter={cancelMenuClose}
               onMouseLeave={scheduleMenuClose}
             >
@@ -792,33 +764,39 @@ export function Navbar({
                   }
                   className="absolute inset-0"
                 >
-                  <div className="grid h-full w-full gap-x-14 gap-y-8 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(10rem,12rem)_minmax(14rem,18rem)_minmax(0,1fr)] lg:px-8">
+                  <div className="grid h-full w-full gap-x-14 gap-y-8 px-4 py-7 sm:px-6 lg:grid-cols-[minmax(10rem,12rem)_minmax(12rem,16rem)_minmax(0,1fr)] lg:px-8">
                     <MenuSection
                       title={activeMenu === "collections" ? "Collections" : "Featured"}
-                      items={activeMenu === "collections" ? megaMenuCollections : megaMenuFeatured}
+                      items={activeMenu === "collections" ? navigation.collections : navigation.menFeatured}
                       open={Boolean(activeMenu)}
                       onClose={closeMenu}
                     />
 
                     <MenuSection
                       title="Categories"
-                      items={megaMenuCategories}
+                      items={navigation.categories}
                       open={Boolean(activeMenu)}
                       onClose={closeMenu}
                     />
 
-                    <div className="grid w-full max-w-[652px] min-w-0 grid-cols-2 gap-6 justify-self-end">
-                      {megaMenuCards.map((card) => (
-                        <MenuCard
-                          key={card.src}
-                          src={card.src}
-                          alt={card.alt}
-                          eyebrow={card.eyebrow}
-                          titleLines={card.titleLines}
-                          onClose={closeMenu}
-                        />
-                      ))}
-                    </div>
+                    {navigation.cards.length > 0 ? (
+                      <div
+                        className={cn(
+                          "grid h-full w-full min-w-0 gap-6 justify-self-end",
+                          navigation.cards.length > 1
+                            ? "max-w-[904px] grid-cols-2"
+                            : "max-w-[440px] grid-cols-1"
+                        )}
+                      >
+                        {navigation.cards.map((card, index) => (
+                          <MenuCard
+                            key={`${card.image}-${index}`}
+                            card={card}
+                            onClose={closeMenu}
+                          />
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
                 </motion.div>
               </AnimatePresence>
@@ -953,7 +931,7 @@ export function Navbar({
                   className="flex items-center justify-between py-2 text-left transition-colors hover:text-white cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
-                    <ShoppingBag className="size-4 stroke-[1.8]" />
+                    <CartIcon className="size-4" strokeWidth={1.8} />
                     <span>Bag / Cart</span>
                   </div>
                   {totalItems > 0 && (
