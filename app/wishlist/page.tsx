@@ -19,19 +19,19 @@ export default function WishlistPage() {
     <main className="mx-auto min-h-screen max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="mb-10 flex flex-col items-start justify-between gap-4 border-b pb-6 sm:flex-row sm:items-center">
-        <h1 className="font-heading text-lg font-medium uppercase tracking-wider text-black">
+        <h1 className="font-heading text-[20px] font-normal uppercase leading-[1.15] tracking-[0.02em] text-black sm:text-[24px]">
           My Wishlist
         </h1>
         <div className="flex w-full items-center justify-end gap-3 sm:w-auto">
           <Button 
             variant="default" 
-            className="h-9 w-full rounded-none px-6 text-sm font-medium sm:w-auto"
+            className="h-10 w-full rounded-none px-6 text-[13px] font-normal uppercase tracking-[0.04em] sm:w-auto"
           >
             Share Wishlist
           </Button>
           <Button
             variant="default"
-            className="h-9 w-full rounded-none px-6 text-sm font-medium sm:w-auto"
+            className="h-10 w-full rounded-none px-6 text-[13px] font-normal uppercase tracking-[0.04em] sm:w-auto"
             onClick={clearWishlist}
           >
             Clear all
@@ -62,18 +62,18 @@ export default function WishlistPage() {
               <div className="flex flex-col items-center text-center px-4">
                 <Link
                   href={`/products/${product.id}`}
-                  className="mb-2 text-[11px] font-normal uppercase leading-snug tracking-wide text-black transition-colors hover:text-black/70"
+                  className="mb-1 text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black transition-colors hover:text-black/70"
                 >
                   {product.alt.length > 60 ? product.alt.substring(0, 60) + "..." : product.alt}
                 </Link>
                 
                 {/* Simulated Size / Color */}
-                <p className="mb-2 text-[10px] font-normal uppercase tracking-wider text-black/50">
+                <p className="mb-1.5 text-[12px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black/50">
                   M / BLUE
                 </p>
 
                 {/* Price */}
-                <p className="mb-4 text-[12px] font-medium text-black">
+                <p className="mb-4 text-[14px] font-normal tracking-[0.04em] text-black">
                   ₹5999
                 </p>
               </div>
@@ -82,14 +82,14 @@ export default function WishlistPage() {
               <div className="mt-auto flex items-center justify-center gap-1">
                 <Button
                   variant="default"
-                  className="h-8 rounded-none px-4 text-xs font-medium"
+                  className="h-10 rounded-none px-4 text-[13px] font-normal uppercase tracking-[0.04em]"
                   onClick={() => removeFromWishlist(product.id)}
                 >
                   Remove
                 </Button>
                 <Button
                   variant="default"
-                  className="h-8 rounded-none px-4 text-xs font-medium gap-1.5 cursor-pointer"
+                  className="h-10 cursor-pointer gap-1.5 rounded-none px-4 text-[13px] font-normal uppercase tracking-[0.04em]"
                   onClick={() => {
                     addToCart(product, "M")
                     setIsCartOpen(true)
@@ -104,10 +104,10 @@ export default function WishlistPage() {
         </div>
       ) : (
         <div className="flex min-h-[40vh] flex-col items-center justify-center text-center">
-          <p className="mb-4 text-sm font-medium uppercase tracking-wide text-black/50">
+          <p className="mb-5 text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black/55">
             Your wishlist is empty
           </p>
-          <Button asChild variant="outline" className="uppercase">
+          <Button asChild variant="outline" className="h-11 rounded-none px-6 text-[14px] font-normal uppercase tracking-[0.04em]">
             <Link href="/">Continue Shopping</Link>
           </Button>
         </div>

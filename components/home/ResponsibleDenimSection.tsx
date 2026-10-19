@@ -46,23 +46,23 @@ export function ResponsibleDenimSection() {
 
         {/* Middle: Mission Statement Card */}
         <div className="flex flex-col justify-center items-center text-center lg:items-start lg:text-left px-6 py-12 sm:px-10 lg:px-12 xl:px-16">
-          <p className="text-[11px] sm:text-[12px] font-medium uppercase tracking-[0.14em] text-neutral-500">
+          <p className="text-[12px] sm:text-[13px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-neutral-500">
             Considered Beyond The Surface
           </p>
 
-          <h2 className="mt-4 font-heading text-[26px] sm:text-[32px] lg:text-[36px] font-normal uppercase leading-[1.12] tracking-[-0.03em] text-black">
+          <h2 className="mt-4 font-heading text-[24px] sm:text-[28px] font-normal uppercase leading-[1.15] tracking-[-0.01em] text-black">
             What Touches
             <br className="hidden sm:inline" />{" "}
             Your Skin Matters
           </h2>
 
-          <p className="mt-5 max-w-[440px] mx-auto lg:mx-0 text-[13px] sm:text-[14px] leading-relaxed text-neutral-700">
+          <p className="mt-5 max-w-[440px] mx-auto lg:mx-0 text-[14px] leading-[1.5] tracking-[0.01em] text-neutral-700">
             Our denim is washed and finished using inputs selected to meet
             recognised textile and chemical safety standards.
           </p>
 
           <div className="mt-6 sm:mt-10 pt-5 sm:pt-6 border-t border-black/10 w-full text-center lg:text-left">
-            <p className="text-[12px] sm:text-[14px] font-medium tracking-[0.1em] text-black">
+            <p className="text-[13px] sm:text-[14px] font-normal tracking-[0.04em] text-black">
               OEKO-TEX® &nbsp;|&nbsp; RoHS &nbsp;|&nbsp; GOTS
             </p>
           </div>
@@ -83,7 +83,7 @@ export function ResponsibleDenimSection() {
 
           {/* Top-Left Text Overlay */}
           <div className="absolute left-6 top-6 sm:left-8 sm:top-8 z-10">
-            <p className="text-[11px] sm:text-[12px] font-semibold uppercase tracking-[0.18em] text-white/90 drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] leading-tight">
+            <p className="text-[12px] sm:text-[13px] font-normal uppercase tracking-[0.04em] text-white/90 drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] leading-[1.4]">
               To A<br />
               Brighter<br />
               Tomorrow
@@ -113,10 +113,10 @@ export function ResponsibleDenimSection() {
 
             {/* Card Content Overlay */}
             <div className={cn("relative z-10 max-w-[180px] sm:max-w-[240px] flex flex-col items-center justify-center", feature.textColor)}>
-              <h3 className="font-heading text-[12px] sm:text-[16px] lg:text-[17px] font-semibold uppercase tracking-[0.05em] leading-tight drop-shadow-sm">
+              <h3 className="font-heading text-[13px] sm:text-[14px] lg:text-[16px] font-normal uppercase tracking-[0.04em] leading-[1.15] drop-shadow-sm">
                 {feature.title}
               </h3>
-              <p className="mt-1.5 sm:mt-2 text-[10px] sm:text-[12px] lg:text-[13px] leading-snug opacity-90 drop-shadow-sm">
+              <p className="mt-1.5 sm:mt-2 text-[11px] sm:text-[12px] lg:text-[13px] leading-[1.4] opacity-90 drop-shadow-sm">
                 {feature.description}
               </p>
             </div>

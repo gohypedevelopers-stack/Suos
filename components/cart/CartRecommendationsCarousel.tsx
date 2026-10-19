@@ -31,7 +31,7 @@ function RecommendationCard({ image, alt, slug }: CartRecommendation) {
         className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
       />
 
-      <span className="absolute left-1.5 top-1.5 bg-black px-1.5 py-0.5 text-[0.4rem] font-normal uppercase tracking-[0.14em] text-white">
+      <span className="absolute left-1 top-1 bg-black px-1 py-[3px] text-[11px] font-normal uppercase leading-none tracking-[0.06em] text-white whitespace-nowrap">
         NEW ARRIVAL
       </span>
     </div>
@@ -55,7 +55,7 @@ export function CartRecommendationsCarousel({
 
   return (
     <section>
-      <h3 className="text-[15px] font-normal uppercase leading-none tracking-[0.08em]">
+      <h3 className="text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em]">
         You May Also Like
       </h3>
 

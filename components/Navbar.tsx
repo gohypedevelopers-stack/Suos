@@ -3,7 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Heart, Search, UserRound, Menu, X, ChevronRight } from "lucide-react"
+import { Heart, Search, UserRound, Menu, X, ChevronRight, ChevronDown } from "lucide-react"
 import { AnimatePresence, motion, useReducedMotion, type Transition } from "motion/react"
 import {
   useEffect,
@@ -75,6 +75,15 @@ const megaMenuContentVariants = {
   }),
 }
 
+/**
+ * Height of the landscape promo cards in the mega menus. Derived from the
+ * viewport width so three 3:2 cards plus the link column always fit the row:
+ * 3 x (1.5 x h) = 100vw - 384px (page padding + link column + gaps).
+ */
+const NAV_CARD_HEIGHT = "clamp(150px, calc((100vw - 384px) / 4.5), 300px)"
+/** Mega menu panel = card row + its vertical padding (py-7). */
+const MEGA_MENU_HEIGHT = `calc(${NAV_CARD_HEIGHT} + 56px)`
+
 const useIsomorphicLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect
 
@@ -119,12 +128,12 @@ function NavLink({
       className={cn(
         "group/link inline-flex flex-col items-start whitespace-nowrap pb-0.5 font-[400] uppercase text-current transition-[color,opacity] duration-300 ease-out",
         mobile
-          ? "flex-none text-[0.75rem] tracking-[0.18em]"
-          : "text-[13px] tracking-normal",
+          ? "flex-none text-[12px] tracking-[0.06em]"
+          : "text-[15px] tracking-[0.04em]",
         active ? "opacity-100" : "hover:opacity-60"
       )}
     >
-      <span className="leading-none">{children}</span>
+      <span className="leading-[1.2]">{children}</span>
       <span
         aria-hidden="true"
         className={cn(
@@ -185,18 +194,18 @@ function MenuSection({
 }) {
   return (
     <section className="min-w-0">
-      <p className="text-[13px] font-[400] uppercase tracking-[0.08em] text-black">
+      <p className="text-[13px] font-[400] uppercase leading-[1.4] tracking-[0.04em] text-black">
         {title}
       </p>
 
-      <ul className="mt-4 space-y-4">
+      <ul className="mt-4 space-y-3">
         {items.map((item) => (
           <li key={`${item.label}-${item.href}`}>
             <Link
               href={item.href}
               tabIndex={open ? 0 : -1}
               onClick={onClose}
-              className="inline-flex cursor-pointer items-start text-left text-[13px] font-[400] uppercase leading-none tracking-[0.01em] text-black/55 transition-colors duration-200 hover:text-black focus-visible:text-black focus-visible:outline-none"
+              className="inline-flex cursor-pointer items-start text-left text-[14px] font-[400] uppercase leading-[1.4] tracking-[0.04em] text-black/55 transition-colors duration-200 hover:text-black focus-visible:text-black focus-visible:outline-none"
             >
               {item.label}
             </Link>
@@ -207,12 +216,15 @@ function MenuSection({
   )
 }
 
-// Landscape promo card. Recommended upload: 1200 × 800 px (3:2).
+// Landscape promo card, locked to a 3:2 aspect ratio (height comes from
+// NAV_CARD_HEIGHT, width from the ratio). Recommended upload: 1200 × 800 px (3:2).
 function MenuCard({
   card,
+  open = true,
   onClose,
 }: {
   card: NavMenuCard
+  open?: boolean
   onClose?: () => void
 }) {
   const { image, alt, eyebrow, title, href } = card
@@ -220,25 +232,29 @@ function MenuCard({
   return (
     <Link
       href={href || "/collections"}
+      tabIndex={open ? 0 : -1}
       onClick={onClose}
-      className="group/card relative block h-full min-h-0 overflow-hidden bg-neutral-100 cursor-pointer"
+      style={{ height: NAV_CARD_HEIGHT }}
+      className="group/card relative block aspect-[3/2] shrink-0 cursor-pointer overflow-hidden bg-neutral-100"
     >
       <Image
         src={image}
         alt={alt}
         fill
-        sizes="(max-width: 1280px) 30vw, 440px"
+        sizes="(max-width: 1280px) 25vw, 450px"
+        // Load with the page so the cards are ready the moment a menu opens.
+        loading="eager"
         className="object-cover transition-transform duration-500 group-hover/card:scale-105"
       />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.1)_0%,rgba(0,0,0,0.12)_58%,rgba(0,0,0,0.28)_100%)]" />
       <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center text-white drop-shadow-[0_2px_16px_rgba(0,0,0,0.45)]">
         {eyebrow ? (
-          <span className="text-[0.85rem] font-light uppercase tracking-[0.16em]">
+          <span className="text-[12px] font-[400] uppercase leading-[1.4] tracking-[0.08em]">
             {eyebrow}
           </span>
         ) : null}
         {title ? (
-          <div className="mt-2 text-[clamp(1.75rem,2.3vw,2.6rem)] font-light uppercase leading-[0.95] tracking-[-0.05em]">
+          <div className="mt-1.5 text-[clamp(1.25rem,1.8vw,2rem)] font-[400] uppercase leading-[1.15] tracking-[0.01em]">
             {title}
           </div>
         ) : null}
@@ -299,15 +315,31 @@ export function Navbar({
   const { navigation } = useSiteContent()
   const primaryNav: PrimaryNavItem[] = [
     { key: "collections", label: "Collections", href: "/collections", hasMenu: true },
-    { key: "men", label: "Men", href: "/#men", hasMenu: true },
-    { key: "bestsellers", label: "Bestsellers", href: navigation.bestsellersHref || "/#bestsellers", hasMenu: false },
+    { key: "men", label: "Men", href: "/shop", hasMenu: true },
+    { key: "bestsellers", label: "Bestsellers", href: navigation.bestsellersHref || "/shop?filter=bestsellers", hasMenu: false },
   ]
+  // Link columns per mega menu; the mobile drawer reuses the same structure.
+  const menuGroups: Record<MegaMenuKey, { title: string; items: NavMenuLink[] }[]> = {
+    collections: [{ title: "Edits", items: navigation.edits }],
+    men: [
+      { title: "Collection", items: navigation.menCollections },
+      { title: "Categories", items: navigation.categories },
+      { title: "Featured", items: navigation.menFeatured },
+    ],
+  }
+  // Collections: image 1 left, images 2-3 right. Men: images 2-3 right.
+  // Older saved content may have fewer images, so every slot is optional.
+  const navCards = navigation.cards.slice(0, 3)
+  const collectionsLeftCard = navCards[0]
+  const collectionsRightCards = navCards.slice(1, 3)
+  const menCards = navCards.length > 2 ? navCards.slice(1, 3) : navCards.slice(0, 2)
   const isOverlay = pathname === "/"
   const { wishlist, isLoaded, setIsSidebarOpen } = useWishlist()
   const { isCartOpen, setIsCartOpen, totalItems } = useCart()
   const [isScrolled, setIsScrolled] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [mobileExpanded, setMobileExpanded] = useState<MegaMenuKey | null>(null)
   const [selectedNav, setSelectedNav] = useState<NavKey>(defaultNavKey)
   const [activeMenu, setActiveMenu] = useState<ActiveMenu | null>(null)
   const [isHovered, setIsHovered] = useState(false)
@@ -324,6 +356,14 @@ export function Navbar({
   const isLightSurface = !isHeroTransparent
   const tone: "dark" | "light" = isLightSurface ? "dark" : "light"
   const isWishlistOpen = activeMenu === "wishlist"
+  // Home page only: a large logo sits over the hero and docks into the header
+  // logo slot as the user scrolls (scroll-linked, transform only). Reduced
+  // motion users just get the normal header logo.
+  const heroLogoEnabled = isOverlay && !prefersReducedMotion
+  const heroLogoVisible = heroLogoEnabled && !isScrolled && !isInteractiveSurface
+  const heroLogoRef = useRef<HTMLDivElement | null>(null)
+  const desktopLogoRef = useRef<HTMLAnchorElement | null>(null)
+  const mobileLogoRef = useRef<HTMLAnchorElement | null>(null)
 
   const openMenu = (menu: MegaMenuKey) => {
     if (menuCloseTimeoutRef.current !== null) {
@@ -381,6 +421,11 @@ export function Navbar({
         setSelectedNav("collections")
         return
       }
+      if (pathname === "/shop") {
+        const filter = new URLSearchParams(window.location.search).get("filter")
+        setSelectedNav(filter === "bestsellers" ? "bestsellers" : "men")
+        return
+      }
       setSelectedNav(getNavKeyFromHash(window.location.hash) ?? defaultNavKey)
     }
 
@@ -417,12 +462,32 @@ export function Navbar({
       scrollFrameRef.current = null
 
       const announcementHeight = announcementHeightRef.current
-      const navbarScrollOffset = Math.min(
-        announcementHeight,
-        Math.max(0, window.scrollY)
-      )
-      const nextIsScrolled = navbarScrollOffset >= announcementHeight
+      const scrollY = Math.max(0, window.scrollY)
+      const navbarScrollOffset = Math.min(announcementHeight, scrollY)
+      let nextIsScrolled = navbarScrollOffset >= announcementHeight
       const navbarTranslateY = -navbarScrollOffset
+
+      const heroLogo = heroLogoRef.current
+      if (heroLogoEnabled && heroLogo && headerRef.current) {
+        // Header-relative coordinates. The logo rests at the hero's centre
+        // and moves 1:1 with the page until its centre meets the header's
+        // (the header itself already absorbs the first navbarScrollOffset px).
+        const navbarHeight = headerRef.current.offsetHeight
+        const heroHeight = Math.max(window.innerHeight, 580)
+        const dockDistance = Math.max(1, heroHeight / 2 - navbarHeight / 2)
+        const travel = Math.min(scrollY, dockDistance) - navbarScrollOffset
+        const progress = Math.min(1, scrollY / dockDistance)
+        const bigWidth = heroLogo.offsetWidth || 1
+        const smallWidth =
+          desktopLogoRef.current?.offsetWidth ||
+          mobileLogoRef.current?.offsetWidth ||
+          bigWidth * 0.2
+        const scale = 1 + (smallWidth / bigWidth - 1) * progress
+
+        heroLogo.style.transform = `translate3d(0, ${-travel}px, 0) scale(${scale})`
+        // Keep the header transparent until the logo has docked.
+        nextIsScrolled = scrollY >= dockDistance
+      }
 
       if (headerRef.current) {
         headerRef.current.style.transform = `translate3d(0, ${navbarTranslateY}px, 0)`
@@ -464,7 +529,7 @@ export function Navbar({
       window.removeEventListener("pageshow", syncScrollState)
       window.removeEventListener("resize", syncScrollState)
     }
-  }, [isOverlay])
+  }, [isOverlay, heroLogoEnabled])
 
   const headerContent = (
     <header
@@ -484,7 +549,31 @@ export function Navbar({
       )}
     >
       <div className="relative h-full w-full px-4 sm:px-6 lg:px-8">
-        <div className="hidden h-full lg:grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-0">
+        {heroLogoEnabled ? (
+          <div
+            ref={heroLogoRef}
+            aria-hidden="true"
+            style={{
+              top: "calc(max(100svh, 580px) / 2 - var(--announcement-height))",
+            }}
+            className={cn(
+              "pointer-events-none absolute left-1/2 z-0 w-[72vw] max-w-[880px] -translate-x-1/2 -translate-y-1/2 origin-center transition-opacity duration-300 ease-out [will-change:transform] motion-reduce:hidden sm:w-[60vw] lg:w-[56vw]",
+              heroLogoVisible ? "opacity-100" : "opacity-0"
+            )}
+          >
+            {/* logo.svg is black; invert renders it white over the hero. */}
+            <Image
+              src="/logo.svg"
+              alt=""
+              width={1185}
+              height={549}
+              priority
+              className="block h-auto w-full invert"
+            />
+          </div>
+        ) : null}
+
+        <div className="relative z-[1] hidden h-full lg:grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-0">
           <nav
             aria-label="Primary"
             className="flex h-full items-center gap-10 justify-self-start"
@@ -533,6 +622,7 @@ export function Navbar({
           </nav>
 
           <Link
+            ref={desktopLogoRef}
             href="/"
             aria-label="SUOS home"
             className="justify-self-center transition-opacity hover:opacity-70"
@@ -544,8 +634,9 @@ export function Navbar({
               height={120}
               priority
               className={cn(
-                "block h-auto w-[8.5rem] max-w-none transition-[filter] duration-300 ease-out",
-                isOverlay && !isLightSurface && "invert"
+                "block h-auto w-[8.5rem] max-w-none transition-[filter,opacity] duration-300 ease-out",
+                isOverlay && !isLightSurface && "invert",
+                heroLogoVisible && "opacity-0 motion-reduce:opacity-100"
               )}
             />
           </Link>
@@ -625,7 +716,7 @@ export function Navbar({
         </div>
 
         {/* Mobile Header: Single row with Hamburger */}
-        <div className="relative flex h-full items-center justify-between lg:hidden">
+        <div className="relative z-[1] flex h-full items-center justify-between lg:hidden">
           <div className="z-10 flex items-center gap-1">
             <button
               type="button"
@@ -651,6 +742,7 @@ export function Navbar({
           </div>
 
           <Link
+            ref={mobileLogoRef}
             href="/"
             aria-label="SUOS home"
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity hover:opacity-70"
@@ -662,8 +754,9 @@ export function Navbar({
               height={70}
               priority
               className={cn(
-                "block h-auto w-[6rem] max-w-none transition-[filter] duration-300 ease-out",
-                isOverlay && !isLightSurface && "invert"
+                "block h-auto w-[6rem] max-w-none transition-[filter,opacity] duration-300 ease-out",
+                isOverlay && !isLightSurface && "invert",
+                heroLogoVisible && "opacity-0 motion-reduce:opacity-100"
               )}
             />
           </Link>
@@ -742,7 +835,8 @@ export function Navbar({
               transition={
                 prefersReducedMotion ? { duration: 0 } : megaMenuRevealTransition
               }
-              className="absolute left-0 top-full hidden h-[340px] w-full overflow-hidden !bg-white text-black shadow-[0_24px_60px_rgba(0,0,0,0.08)] [will-change:clip-path] lg:block"
+              style={{ height: MEGA_MENU_HEIGHT }}
+              className="absolute left-0 top-full hidden w-full overflow-hidden !bg-white text-black shadow-[0_24px_60px_rgba(0,0,0,0.08)] [will-change:clip-path] lg:block"
               onMouseEnter={cancelMenuClose}
               onMouseLeave={scheduleMenuClose}
             >
@@ -764,40 +858,69 @@ export function Navbar({
                   }
                   className="absolute inset-0"
                 >
-                  <div className="grid h-full w-full gap-x-14 gap-y-8 px-4 py-7 sm:px-6 lg:grid-cols-[minmax(10rem,12rem)_minmax(12rem,16rem)_minmax(0,1fr)] lg:px-8">
-                    <MenuSection
-                      title={activeMenu === "collections" ? "Collections" : "Featured"}
-                      items={activeMenu === "collections" ? navigation.collections : navigation.menFeatured}
-                      open={Boolean(activeMenu)}
-                      onClose={closeMenu}
-                    />
+                  {activeMenu === "collections" ? (
+                    <div className="flex h-full w-full items-start gap-12 px-4 py-7 sm:px-6 lg:px-8">
+                      {collectionsLeftCard ? (
+                        <MenuCard
+                          card={collectionsLeftCard}
+                          open={Boolean(activeMenu)}
+                          onClose={closeMenu}
+                        />
+                      ) : null}
 
-                    <MenuSection
-                      title="Categories"
-                      items={navigation.categories}
-                      open={Boolean(activeMenu)}
-                      onClose={closeMenu}
-                    />
-
-                    {navigation.cards.length > 0 ? (
-                      <div
-                        className={cn(
-                          "grid h-full w-full min-w-0 gap-6 justify-self-end",
-                          navigation.cards.length > 1
-                            ? "max-w-[904px] grid-cols-2"
-                            : "max-w-[440px] grid-cols-1"
-                        )}
-                      >
-                        {navigation.cards.map((card, index) => (
-                          <MenuCard
-                            key={`${card.image}-${index}`}
-                            card={card}
+                      <div className="min-w-[10rem] flex-1">
+                        {menuGroups.collections.map((group) => (
+                          <MenuSection
+                            key={group.title}
+                            title={group.title}
+                            items={group.items}
+                            open={Boolean(activeMenu)}
                             onClose={closeMenu}
                           />
                         ))}
                       </div>
-                    ) : null}
-                  </div>
+
+                      {collectionsRightCards.length > 0 ? (
+                        <div className="flex shrink-0 gap-4">
+                          {collectionsRightCards.map((card, index) => (
+                            <MenuCard
+                              key={`${card.image}-${index}`}
+                              card={card}
+                              open={Boolean(activeMenu)}
+                              onClose={closeMenu}
+                            />
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : (
+                    <div className="flex h-full w-full items-start gap-12 px-4 py-7 sm:px-6 lg:px-8">
+                      <div className="grid min-w-0 flex-1 grid-cols-3 gap-x-8 xl:gap-x-12">
+                        {menuGroups.men.map((group) => (
+                          <MenuSection
+                            key={group.title}
+                            title={group.title}
+                            items={group.items}
+                            open={Boolean(activeMenu)}
+                            onClose={closeMenu}
+                          />
+                        ))}
+                      </div>
+
+                      {menCards.length > 0 ? (
+                        <div className="flex shrink-0 gap-4">
+                          {menCards.map((card, index) => (
+                            <MenuCard
+                              key={`${card.image}-${index}`}
+                              card={card}
+                              open={Boolean(activeMenu)}
+                              onClose={closeMenu}
+                            />
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  )}
                 </motion.div>
               </AnimatePresence>
             </motion.div>
@@ -852,36 +975,91 @@ export function Navbar({
           {/* Navigation Links */}
           <div className="flex-1 overflow-y-auto px-6 py-6">
             <div className="flex flex-col gap-6">
-              <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-white/40">
+              <p className="text-[11px] font-medium uppercase leading-[1.4] tracking-[0.08em] text-white/40">
                 Menu
               </p>
               <nav className="flex flex-col gap-2">
-                {primaryNav.map((item) => (
-                  <Link
-                    key={item.key}
-                    href={item.href}
-                    onClick={() => {
-                      setSelectedNav(item.key)
-                      setMobileMenuOpen(false)
-                    }}
-                    className={cn(
-                      "flex items-center justify-between py-2.5 text-[17px] font-normal uppercase tracking-[0.08em] transition-colors hover:text-white/70",
-                      selectedNav === item.key ? "text-white font-semibold" : "text-white/80"
-                    )}
-                  >
-                    <span>{item.label}</span>
-                    <ChevronRight className="size-4 stroke-[1.5] text-white/40" />
-                  </Link>
-                ))}
+                {primaryNav.map((item) => {
+                  const menuKey = item.hasMenu ? (item.key as MegaMenuKey) : null
+                  const groups = menuKey ? menuGroups[menuKey] : null
+                  const expanded = menuKey !== null && mobileExpanded === menuKey
+
+                  return (
+                    <div key={item.key}>
+                      <div className="flex items-center justify-between gap-2">
+                        <Link
+                          href={item.href}
+                          onClick={() => {
+                            setSelectedNav(item.key)
+                            setMobileMenuOpen(false)
+                          }}
+                          className={cn(
+                            "flex-1 py-2.5 text-[17px] font-normal uppercase leading-[1.2] tracking-[0.06em] transition-colors hover:text-white/70",
+                            selectedNav === item.key ? "text-white" : "text-white/80"
+                          )}
+                        >
+                          {item.label}
+                        </Link>
+                        {groups ? (
+                          <button
+                            type="button"
+                            aria-label={`${expanded ? "Hide" : "Show"} ${item.label} menu`}
+                            aria-expanded={expanded}
+                            onClick={() =>
+                              setMobileExpanded((current) =>
+                                current === menuKey ? null : menuKey
+                              )
+                            }
+                            className="inline-flex size-9 cursor-pointer items-center justify-center text-white/50 transition-colors hover:text-white"
+                          >
+                            <ChevronDown
+                              className={cn(
+                                "size-4 stroke-[1.5] transition-transform duration-200",
+                                expanded && "rotate-180"
+                              )}
+                            />
+                          </button>
+                        ) : (
+                          <ChevronRight className="mr-2.5 size-4 stroke-[1.5] text-white/40" />
+                        )}
+                      </div>
+
+                      {groups && expanded ? (
+                        <div className="space-y-5 pb-3 pl-1 pt-1">
+                          {groups.map((group) => (
+                            <div key={group.title}>
+                              <p className="text-[11px] uppercase leading-[1.4] tracking-[0.08em] text-white/40">
+                                {group.title}
+                              </p>
+                              <ul className="mt-2 space-y-1">
+                                {group.items.map((link) => (
+                                  <li key={`${link.label}-${link.href}`}>
+                                    <Link
+                                      href={link.href}
+                                      onClick={() => setMobileMenuOpen(false)}
+                                      className="block py-1.5 text-[14px] uppercase leading-[1.4] tracking-[0.04em] text-white/75 transition-colors hover:text-white"
+                                    >
+                                      {link.label}
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  )
+                })}
               </nav>
 
               <div className="my-1 h-px w-full bg-white/10" />
 
-              <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-white/40">
+              <p className="text-[11px] font-medium uppercase leading-[1.4] tracking-[0.08em] text-white/40">
                 Account & Utilities
               </p>
 
-              <div className="flex flex-col gap-2 text-[14px] uppercase tracking-[0.1em] text-white/75">
+              <div className="flex flex-col gap-2 text-[14px] uppercase leading-[1.4] tracking-[0.04em] text-white/75">
                 <button
                   type="button"
                   onClick={() => {
@@ -946,7 +1124,7 @@ export function Navbar({
 
           {/* Footer in Drawer */}
           <div className="border-t border-white/10 p-5">
-            <p className="text-[11px] uppercase tracking-wider text-white/40">
+            <p className="text-[11px] uppercase leading-[1.4] tracking-[0.06em] text-white/40">
               SUOS ORIGINALS — FREE SHIPPING OVER ₹2,900
             </p>
           </div>

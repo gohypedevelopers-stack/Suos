@@ -84,17 +84,17 @@ export function FullWidthBanner({
       {banner.title || banner.subtitle || banner.ctaText ? (
         <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center p-3 text-center sm:p-6">
           {banner.title ? (
-            <h3 className="text-white text-xs sm:text-xl md:text-2xl lg:text-3xl font-serif uppercase tracking-[0.12em] sm:tracking-[0.18em] drop-shadow-md leading-tight">
+            <h3 className="font-heading text-[16px] font-normal uppercase leading-[1.15] tracking-[0.04em] text-white drop-shadow-md sm:text-[22px] lg:text-[28px]">
               {banner.title}
             </h3>
           ) : null}
           {banner.subtitle ? (
-            <p className="mt-0.5 sm:mt-1 text-white/90 text-[8px] sm:text-xs md:text-sm uppercase tracking-wider sm:tracking-widest font-light">
+            <p className="mt-1.5 text-[11px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-white/90 sm:mt-2 sm:text-[13px] md:text-[14px]">
               {banner.subtitle}
             </p>
           ) : null}
           {banner.ctaText ? (
-            <span className="mt-2 sm:mt-4 inline-flex items-center justify-center border border-white/85 bg-black/30 backdrop-blur-sm px-3 py-1 sm:px-5 sm:py-2 text-[10px] sm:text-xs uppercase tracking-wider text-white shadow-sm transition group-hover/banner:bg-white/10">
+            <span className="mt-3 inline-flex h-9 items-center justify-center border border-white/85 bg-black/30 px-4 text-[12px] font-normal uppercase leading-none tracking-[0.04em] text-white shadow-sm backdrop-blur-sm transition group-hover/banner:bg-white/10 sm:mt-5 sm:h-11 sm:px-6 sm:text-[14px]">
               {banner.ctaText}
             </span>
           ) : null}

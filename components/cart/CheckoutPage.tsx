@@ -133,11 +133,11 @@ function FloatingField({
         placeholder=" "
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="peer h-[54px] w-full border border-black/25 bg-white px-3.5 pt-4 text-[13px] font-normal tracking-[0.02em] text-black placeholder-transparent outline-none transition focus:border-black"
+        className="peer h-[54px] w-full border border-black/25 bg-white px-3.5 pt-4 text-[14px] font-normal tracking-[0.01em] text-black placeholder-transparent outline-none transition focus:border-black"
       />
       <label
         htmlFor={id}
-        className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[13px] text-black/45 transition-all peer-focus:top-3 peer-focus:text-[10px] peer-focus:uppercase peer-focus:tracking-[0.06em] peer-focus:text-black/60 peer-[:not(:placeholder-shown)]:top-3 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:uppercase peer-[:not(:placeholder-shown)]:tracking-[0.06em]"
+        className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[14px] text-black/45 transition-all peer-focus:top-3 peer-focus:text-[11px] peer-focus:uppercase peer-focus:tracking-[0.04em] peer-focus:text-black/60 peer-[:not(:placeholder-shown)]:top-3 peer-[:not(:placeholder-shown)]:text-[11px] peer-[:not(:placeholder-shown)]:uppercase peer-[:not(:placeholder-shown)]:tracking-[0.04em]"
       >
         {label}
       </label>
@@ -174,7 +174,7 @@ function FloatingSelect({
         required={required}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="peer h-[54px] w-full appearance-none border border-black/25 bg-white px-3.5 pt-4 text-[13px] font-normal text-black outline-none transition focus:border-black"
+        className="peer h-[54px] w-full appearance-none border border-black/25 bg-white px-3.5 pt-4 text-[14px] font-normal tracking-[0.01em] text-black outline-none transition focus:border-black"
       >
         <option value="" disabled hidden />
         {options.map((opt) => (
@@ -185,9 +185,9 @@ function FloatingSelect({
       </select>
       <label
         htmlFor={id}
-        className={`pointer-events-none absolute left-3.5 text-[13px] text-black/45 transition-all ${
+        className={`pointer-events-none absolute left-3.5 text-[14px] text-black/45 transition-all ${
           value
-            ? "top-3 text-[10px] uppercase tracking-[0.06em] text-black/60"
+            ? "top-3 text-[11px] uppercase tracking-[0.04em] text-black/60"
             : "top-1/2 -translate-y-1/2"
         }`}
       >
@@ -230,7 +230,7 @@ function ShippingMethodCards({
                 )}
               </div>
               <div>
-                <p className="text-[13px] font-medium uppercase tracking-[0.04em] text-black">
+                <p className="text-[13px] font-normal uppercase tracking-[0.04em] text-black">
                   {opt.label}
                 </p>
                 <p className="mt-0.5 text-[12px] tracking-[0.02em] text-black/55">
@@ -239,7 +239,7 @@ function ShippingMethodCards({
               </div>
             </div>
 
-            <span className="text-[13px] font-medium tracking-[0.04em] text-black">
+            <span className="text-[13px] font-normal tracking-[0.04em] text-black">
               {opt.price === 0 ? "FREE" : formatPrice(opt.price)}
             </span>
           </label>
@@ -271,7 +271,7 @@ function PaymentSection({
   return (
     <div className="space-y-6 pt-4">
       <div className="space-y-3">
-        <h2 className="text-[20px] font-normal uppercase tracking-[0.06em] text-black sm:text-[22px]">
+        <h2 className="text-[20px] font-normal uppercase tracking-[0.04em] text-black sm:text-[22px]">
           Payment
         </h2>
         <p className="text-[12px] uppercase tracking-[0.04em] text-black/50">
@@ -298,7 +298,7 @@ function PaymentSection({
               )}
             </div>
             <div>
-              <span className="text-[13px] font-medium uppercase tracking-[0.04em] text-black">
+              <span className="text-[13px] font-normal uppercase tracking-[0.04em] text-black">
                 UPI / QR Code (Google Pay, PhonePe, Paytm)
               </span>
               <p className="text-[11px] text-black/50">Instant verification · No convenience fee</p>
@@ -339,7 +339,7 @@ function PaymentSection({
               )}
             </div>
             <div>
-              <span className="text-[13px] font-medium uppercase tracking-[0.04em] text-black">
+              <span className="text-[13px] font-normal uppercase tracking-[0.04em] text-black">
                 Credit or Debit Card
               </span>
               <p className="text-[11px] text-black/50">Visa, Mastercard, RuPay, Amex</p>
@@ -403,7 +403,7 @@ function PaymentSection({
               )}
             </div>
             <div>
-              <span className="text-[13px] font-medium uppercase tracking-[0.04em] text-black">
+              <span className="text-[13px] font-normal uppercase tracking-[0.04em] text-black">
                 Net Banking
               </span>
               <p className="text-[11px] text-black/50">All Indian major banks supported</p>
@@ -429,7 +429,7 @@ function PaymentSection({
               )}
             </div>
             <div>
-              <span className="text-[13px] font-medium uppercase tracking-[0.04em] text-black">
+              <span className="text-[13px] font-normal uppercase tracking-[0.04em] text-black">
                 Cash on Delivery (Pay on Delivery)
               </span>
               <p className="text-[11px] text-black/50">Pay cash or UPI upon delivery at doorstep</p>
@@ -441,7 +441,7 @@ function PaymentSection({
 
       {/* Billing Address Option */}
       <div className="space-y-3 pt-2">
-        <h3 className="text-[14px] font-medium uppercase tracking-[0.06em] text-black">
+        <h3 className="text-[14px] font-normal uppercase tracking-[0.04em] text-black">
           Billing Address
         </h3>
         <div className="divide-y divide-black/15 border border-black/25">
@@ -500,7 +500,7 @@ function CheckoutRightSummary({
         <button
           type="button"
           onClick={() => setBagOpen((b) => !b)}
-          className="flex w-full items-center justify-between text-[15px] font-medium uppercase tracking-[0.06em] text-black transition-opacity hover:opacity-75"
+          className="flex w-full items-center justify-between text-[15px] font-normal uppercase tracking-[0.04em] text-black transition-opacity hover:opacity-75"
         >
           <span>
             Shopping Bag ({totalItemCount} {totalItemCount === 1 ? "item" : "items"})
@@ -527,19 +527,19 @@ function CheckoutRightSummary({
                     sizes="64px"
                     className="object-cover"
                   />
-                  <span className="absolute right-0 top-0 flex size-4 items-center justify-center bg-black text-[9px] font-bold text-white">
+                  <span className="absolute right-0 top-0 flex size-4 items-center justify-center bg-black text-[11px] font-normal text-white">
                     {item.quantity}
                   </span>
                 </div>
                 <div className="min-w-0 flex-1 space-y-0.5">
-                  <p className="truncate text-[12px] font-medium uppercase tracking-[0.04em] text-black">
+                  <p className="truncate text-[12px] font-normal uppercase tracking-[0.04em] text-black">
                     {item.title}
                   </p>
                   <p className="text-[11px] uppercase tracking-[0.04em] text-black/55">
                     Size: {item.size}
                   </p>
                 </div>
-                <p className="text-[13px] font-medium text-black">
+                <p className="text-[13px] font-normal text-black">
                   {formatPrice(parseAmount(item.price) * item.quantity)}
                 </p>
               </div>
@@ -556,7 +556,7 @@ function CheckoutRightSummary({
         </div>
 
         {discount > 0 && (
-          <div className="flex items-center justify-between text-black font-medium">
+          <div className="flex items-center justify-between text-black font-normal">
             <span className="uppercase tracking-[0.04em]">Extra 10% off ₹2,999+</span>
             <span>-{formatPrice(discount)}</span>
           </div>
@@ -564,14 +564,14 @@ function CheckoutRightSummary({
 
         <div className="flex items-center justify-between text-black/80">
           <span className="uppercase tracking-[0.04em]">GST (Taxes)</span>
-          <span className="text-black/60 font-mono text-xs">
+          <span className="text-black/60 font-mono text-[12px]">
             Included ({formatPrice(Math.max(0, Math.round(((subtotal - discount) * 12) / 112)))})
           </span>
         </div>
 
         <div className="flex items-center justify-between text-black/80">
           <span className="uppercase tracking-[0.04em]">Standard Shipping</span>
-          <span className="font-medium text-black uppercase tracking-[0.04em]">
+          <span className="font-normal text-black uppercase tracking-[0.04em]">
             {shippingCost === 0 ? "FREE" : formatPrice(shippingCost)}
           </span>
         </div>
@@ -607,14 +607,14 @@ function CheckoutRightSummary({
             <button
               type="button"
               onClick={() => setPromoApplied(true)}
-              className="border border-black bg-black px-4 text-[12px] uppercase tracking-[0.08em] text-white transition-opacity hover:opacity-85"
+              className="border border-black bg-black px-4 text-[12px] uppercase tracking-[0.04em] text-white transition-opacity hover:opacity-85"
             >
               Apply
             </button>
           </div>
         )}
         {promoApplied && (
-          <p className="mt-2 text-[11px] uppercase tracking-[0.04em] text-black font-medium">
+          <p className="mt-2 text-[11px] uppercase tracking-[0.04em] text-black font-normal">
             ✓ Code applied
           </p>
         )}
@@ -623,22 +623,22 @@ function CheckoutRightSummary({
       {/* Total */}
       <div className="mt-5 border-t border-black pt-4">
         <div className="flex items-baseline justify-between">
-          <span className="text-[15px] font-normal uppercase tracking-[0.08em] text-black">
+          <span className="text-[15px] font-normal uppercase tracking-[0.04em] text-black">
             Total
           </span>
-          <span className="text-[22px] font-semibold tracking-[-0.02em] text-black">
+          <span className="text-[22px] font-normal tracking-[0.02em] text-black">
             {formatPrice(total)}
           </span>
         </div>
 
-        <p className="mt-2 text-[11px] leading-relaxed tracking-[0.02em] text-black/65">
+        <p className="mt-2 text-[11px] leading-[1.5] tracking-[0.02em] text-black/65">
           4 payments of <strong className="text-black">{formatPrice(installment)}</strong> with UPI or Netbanking ⓘ
         </p>
       </div>
 
       {/* Authenticity & Perks */}
-      <div className="mt-8 space-y-2 border-t border-black/15 pt-5 text-center text-[11px] uppercase tracking-[0.06em] text-black/55">
-        <div className="flex items-center justify-center gap-1.5 text-black/80 font-medium">
+      <div className="mt-8 space-y-2 border-t border-black/15 pt-5 text-center text-[11px] uppercase tracking-[0.04em] text-black/55">
+        <div className="flex items-center justify-center gap-1.5 text-black/80 font-normal">
           <Lock className="size-3.5" />
           <span>Encrypted 256-bit Secure Checkout</span>
         </div>
@@ -770,19 +770,19 @@ export function CheckoutPage() {
           <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-black text-white">
             <CheckCircle2 className="size-10" />
           </div>
-          <h1 className="mt-6 text-[26px] font-normal uppercase tracking-[0.06em] text-black sm:text-[32px]">
+          <h1 className="mt-6 text-[24px] font-normal uppercase leading-[1.15] tracking-[0.02em] text-black sm:text-[28px]">
             Thank You For Your Order
           </h1>
-          <p className="mt-2 text-[14px] uppercase tracking-[0.06em] text-black/60">
+          <p className="mt-2 text-[14px] uppercase tracking-[0.04em] text-black/60">
             Order Reference: <strong className="text-black">{orderId}</strong>
           </p>
-          <p className="mx-auto mt-4 max-w-md text-[13px] leading-relaxed text-black/60">
+          <p className="mx-auto mt-4 max-w-md text-[13px] leading-[1.5] text-black/60">
             A confirmation receipt and tracking updates have been dispatched to{" "}
             <strong className="text-black">{email || "your email"}</strong>.
           </p>
 
           <div className="mt-10 border border-black/15 bg-neutral-50 p-6 text-left">
-            <h3 className="text-[13px] font-medium uppercase tracking-[0.06em] text-black">
+            <h3 className="text-[13px] font-normal uppercase tracking-[0.04em] text-black">
               Delivery Destination
             </h3>
             <p className="mt-2 text-[13px] text-black/80">
@@ -793,7 +793,7 @@ export function CheckoutPage() {
             <p className="text-[12px] text-black/60">
               {city}, {state} - {pincode}
             </p>
-            <p className="mt-3 text-[12px] uppercase tracking-[0.04em] text-black font-medium">
+            <p className="mt-3 text-[12px] uppercase tracking-[0.04em] text-black font-normal">
               Estimated Delivery: {selectedShipping.label} (3–5 business days)
             </p>
           </div>
@@ -801,13 +801,13 @@ export function CheckoutPage() {
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               href="/collections"
-              className="inline-flex h-12 w-full items-center justify-center bg-black px-8 text-[13px] uppercase tracking-[0.12em] text-white transition-opacity hover:opacity-90 sm:w-auto"
+              className="inline-flex h-12 w-full items-center justify-center bg-black px-8 text-[14px] uppercase tracking-[0.04em] text-white transition-opacity hover:opacity-90 sm:w-auto"
             >
               Continue Shopping
             </Link>
             <Link
               href="/"
-              className="inline-flex h-12 w-full items-center justify-center border border-black px-8 text-[13px] uppercase tracking-[0.12em] text-black transition-colors hover:bg-black hover:text-white sm:w-auto"
+              className="inline-flex h-12 w-full items-center justify-center border border-black px-8 text-[14px] uppercase tracking-[0.04em] text-black transition-colors hover:bg-black hover:text-white sm:w-auto"
             >
               Return to Home
             </Link>
@@ -855,7 +855,7 @@ export function CheckoutPage() {
             >
               <ShoppingBag className="size-5" strokeWidth={1.5} />
               {totalItems > 0 && (
-                <span className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-black text-[9px] font-bold text-white">
+                <span className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-black text-[11px] font-normal text-white">
                   {totalItems}
                 </span>
               )}
@@ -874,21 +874,21 @@ export function CheckoutPage() {
             {/* Express Checkout Section */}
             {step === "details" && (
               <div>
-                <p className="text-center text-[12px] uppercase tracking-[0.08em] text-black/60">
+                <p className="text-center text-[12px] uppercase tracking-[0.04em] text-black/60">
                   Express Checkout
                 </p>
                 <div className="mt-3 grid grid-cols-2 gap-2 sm:gap-3">
                   <button
                     type="button"
                     onClick={() => setStep("payment")}
-                    className="flex h-12 items-center justify-center border border-black bg-white px-1 sm:px-2 text-center text-[10.5px] min-[360px]:text-[11px] sm:text-[12px] font-medium uppercase tracking-[0.02em] sm:tracking-[0.06em] text-black transition-colors hover:bg-black hover:text-white"
+                    className="flex h-12 items-center justify-center border border-black bg-white px-1 sm:px-2 text-center text-[11px] min-[360px]:text-[11px] sm:text-[12px] font-normal uppercase tracking-[0.02em] sm:tracking-[0.04em] text-black transition-colors hover:bg-black hover:text-white"
                   >
                     UPI / GPay
                   </button>
                   <button
                     type="button"
                     onClick={() => setStep("payment")}
-                    className="flex h-12 items-center justify-center border border-black bg-white px-1 sm:px-2 text-center text-[10.5px] min-[360px]:text-[11px] sm:text-[12px] font-medium uppercase tracking-[0.02em] sm:tracking-[0.06em] text-black transition-colors hover:bg-black hover:text-white"
+                    className="flex h-12 items-center justify-center border border-black bg-white px-1 sm:px-2 text-center text-[11px] min-[360px]:text-[11px] sm:text-[12px] font-normal uppercase tracking-[0.02em] sm:tracking-[0.04em] text-black transition-colors hover:bg-black hover:text-white"
                   >
                     Cards / Netbanking
                   </button>
@@ -898,7 +898,7 @@ export function CheckoutPage() {
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-black/15" />
                   </div>
-                  <span className="relative bg-white px-4 text-[11px] uppercase tracking-[0.08em] text-black/50">
+                  <span className="relative bg-white px-4 text-[11px] uppercase tracking-[0.04em] text-black/50">
                     or
                   </span>
                 </div>
@@ -910,7 +910,7 @@ export function CheckoutPage() {
               <button
                 type="button"
                 onClick={() => setStep("details")}
-                className="inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.08em] text-black/60 transition-colors hover:text-black"
+                className="inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.04em] text-black/60 transition-colors hover:text-black"
               >
                 <ArrowLeft className="size-3.5" /> Back to Shipping Details
               </button>
@@ -920,7 +920,7 @@ export function CheckoutPage() {
               <form onSubmit={handleContinueToPayment} className="space-y-10">
                 {/* 1. Email Address */}
                 <section className="space-y-4">
-                  <h2 className="text-[20px] font-normal uppercase tracking-[0.06em] text-black sm:text-[22px]">
+                  <h2 className="text-[20px] font-normal uppercase tracking-[0.04em] text-black sm:text-[22px]">
                     Email Address
                   </h2>
                   <FloatingField
@@ -938,7 +938,7 @@ export function CheckoutPage() {
                       onChange={(e) => setNewsletter(e.target.checked)}
                       className="mt-0.5 size-4 accent-black"
                     />
-                    <span className="text-[12px] leading-relaxed text-black/60">
+                    <span className="text-[12px] leading-[1.5] text-black/60">
                       I would like to receive updates on the latest products and promotions
                       via email or other channels. See{" "}
                       <Link href="/privacy" className="underline hover:text-black">
@@ -956,7 +956,7 @@ export function CheckoutPage() {
                 {/* 2. Shipping To */}
                 <section className="space-y-4">
                   <div>
-                    <h2 className="text-[20px] font-normal uppercase tracking-[0.06em] text-black sm:text-[22px]">
+                    <h2 className="text-[20px] font-normal uppercase tracking-[0.04em] text-black sm:text-[22px]">
                       Shipping To
                     </h2>
                     <p className="mt-1 text-[12px] uppercase tracking-[0.04em] text-black/50">
@@ -1054,7 +1054,7 @@ export function CheckoutPage() {
                           maxLength={300}
                           rows={3}
                           placeholder="Enter your personal message for the recipient..."
-                          className="mt-3 w-full border border-black/25 bg-white p-3 text-[13px] leading-relaxed placeholder:text-black/35 focus:border-black focus:outline-none"
+                          className="mt-3 w-full border border-black/25 bg-white p-3 text-[13px] leading-[1.5] placeholder:text-black/35 focus:border-black focus:outline-none"
                         />
                       )}
                     </div>
@@ -1064,7 +1064,7 @@ export function CheckoutPage() {
                 {/* 3. Shipping Method */}
                 <section className="space-y-4">
                   <div>
-                    <h2 className="text-[20px] font-normal uppercase tracking-[0.06em] text-black sm:text-[22px]">
+                    <h2 className="text-[20px] font-normal uppercase tracking-[0.04em] text-black sm:text-[22px]">
                       Shipping Method
                     </h2>
                     <p className="mt-1 text-[12px] uppercase tracking-[0.04em] text-black/50">
@@ -1077,7 +1077,7 @@ export function CheckoutPage() {
                     onChange={setShippingMethodId}
                   />
 
-                  <p className="text-[11px] leading-relaxed tracking-[0.02em] text-black/55">
+                  <p className="text-[11px] leading-[1.5] tracking-[0.02em] text-black/55">
                     Orders placed by 12:00 pm IST Monday-Friday usually process the same day.
                     Shipping price may update once the address is entered.
                   </p>
@@ -1087,7 +1087,7 @@ export function CheckoutPage() {
                 <div>
                   <button
                     type="submit"
-                    className="flex h-12 w-full items-center justify-center bg-black text-[13px] font-medium uppercase tracking-[0.12em] text-white transition-opacity hover:opacity-90 active:scale-[0.99]"
+                    className="flex h-12 w-full items-center justify-center bg-black text-[14px] font-normal uppercase tracking-[0.04em] text-white transition-opacity hover:opacity-90 active:scale-[0.99]"
                   >
                     Continue to Payment
                   </button>
@@ -1106,7 +1106,7 @@ export function CheckoutPage() {
                   type="button"
                   disabled={isSubmitting}
                   onClick={handlePlaceOrder}
-                  className="flex h-12 w-full items-center justify-center gap-2 bg-black text-[13px] font-medium uppercase tracking-[0.12em] text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                  className="flex h-12 w-full items-center justify-center gap-2 bg-black text-[14px] font-normal uppercase tracking-[0.04em] text-white transition-opacity hover:opacity-90 disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <>

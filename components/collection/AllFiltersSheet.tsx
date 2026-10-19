@@ -119,21 +119,21 @@ function FilterGroupSection({
 
   return (
     <details
-      className="group border-b border-white/35"
+      className="group border-b border-white/20"
       open={isOpen}
       onToggle={(event) => setIsOpen(event.currentTarget.open)}
     >
       <summary
-        className="flex h-[72px] cursor-pointer list-none items-center justify-between px-5 text-[15px] font-normal uppercase leading-5 outline-none transition-colors hover:bg-white/[0.04] focus-visible:bg-white/[0.08] [&::-webkit-details-marker]:hidden"
+        className="flex h-[64px] cursor-pointer list-none items-center justify-between text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em] outline-none transition-colors hover:bg-white/[0.04] focus-visible:bg-white/[0.08] [&::-webkit-details-marker]:hidden"
       >
         <span>{group.label}</span>
         <ChevronDown
           aria-hidden="true"
-          className="size-5 shrink-0 stroke-[2.5] transition-transform duration-200 group-open:rotate-180"
+          className="size-4 shrink-0 stroke-[2] transition-transform duration-200 group-open:rotate-180"
         />
       </summary>
 
-      <div className="space-y-3 px-5 pb-8">
+      <div className="space-y-3.5 pb-7">
         {group.options.map((option) => {
           const checkboxId = `filter-${option.value}`
 
@@ -141,7 +141,7 @@ function FilterGroupSection({
             <label
               key={option.value}
               htmlFor={checkboxId}
-              className="flex w-fit cursor-pointer items-center gap-3 text-[13px] font-normal leading-5 text-white"
+              className="flex w-fit cursor-pointer items-center gap-3 text-[13px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-white"
             >
               <Checkbox
                 id={checkboxId}
@@ -149,7 +149,7 @@ function FilterGroupSection({
                 onCheckedChange={(checked) =>
                   onFilterChange(option.value, checked === true)
                 }
-                className="size-[21px] rounded-none border-white bg-black shadow-none focus-visible:border-white focus-visible:ring-2 focus-visible:ring-white/60 dark:bg-black data-checked:border-white data-checked:bg-black data-checked:text-white dark:data-checked:bg-black"
+                className="size-[18px] rounded-none border-white bg-black shadow-none focus-visible:border-white focus-visible:ring-2 focus-visible:ring-white/60 dark:bg-black data-checked:border-white data-checked:bg-black data-checked:text-white dark:data-checked:bg-black"
               />
               <span>{option.label}</span>
             </label>
@@ -216,10 +216,10 @@ function FilterSheet({ groups, trigger }: FilterSheetProps) {
         showCloseButton={false}
         overlayClassName="bg-black/55 supports-backdrop-filter:backdrop-blur-[2px]"
         className="gap-0 overflow-hidden border-l border-white/10 bg-black p-0 text-white shadow-[0_0_80px_rgba(0,0,0,0.45)]"
-        style={{ width: "min(100vw, 420px)", maxWidth: "none" }}
+        style={{ width: "min(100vw, max(480px, 32vw))", maxWidth: "none" }}
       >
-        <div className="flex shrink-0 items-center justify-between px-5 py-5">
-          <SheetTitle className="text-[15px] font-normal uppercase text-white">
+        <div className="flex shrink-0 items-center justify-between border-b border-white/15 px-6 py-5">
+          <SheetTitle className="text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-white">
             FILTER
           </SheetTitle>
           <SheetDescription className="sr-only">
@@ -229,15 +229,15 @@ function FilterSheet({ groups, trigger }: FilterSheetProps) {
           <SheetClose asChild>
             <button
               type="button"
-              className="inline-flex items-center gap-2 text-[15px] font-normal uppercase text-white/90 transition-opacity hover:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+              className="inline-flex items-center gap-2 text-[13px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-white/90 transition-opacity hover:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
             >
               <span>CLOSE</span>
-              <X aria-hidden="true" className="size-5 stroke-2" />
+              <X aria-hidden="true" className="size-4 stroke-2" />
             </button>
           </SheetClose>
         </div>
 
-        <div className="filters-panel-scrollbar min-h-0 flex-1 overflow-y-auto px-5">
+        <div className="filters-panel-scrollbar min-h-0 flex-1 overflow-y-auto px-6">
           {groups.map((group) => (
             <FilterGroupSection
               key={group.id}
@@ -248,11 +248,11 @@ function FilterSheet({ groups, trigger }: FilterSheetProps) {
           ))}
         </div>
 
-        <div className="shrink-0 bg-black px-5 pb-[max(24px,env(safe-area-inset-bottom))] pt-6 text-center">
+        <div className="shrink-0 border-t border-white/15 bg-black px-6 pb-[max(24px,env(safe-area-inset-bottom))] pt-6 text-center">
           <SheetClose asChild>
             <button
               type="button"
-              className="flex h-12 w-full items-center justify-center bg-white px-4 text-[15px] font-normal uppercase text-black transition-colors hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              className="flex h-12 w-full items-center justify-center bg-white px-4 text-[14px] font-normal uppercase leading-none tracking-[0.04em] text-black transition-colors hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               VIEW 190 ITEMS
             </button>
@@ -261,7 +261,7 @@ function FilterSheet({ groups, trigger }: FilterSheetProps) {
           <button
             type="button"
             onClick={() => setSelectedFilters(new Set())}
-            className="mt-3 min-h-4 text-[15px] font-normal uppercase leading-5 text-white underline underline-offset-2 transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-40"
+            className="mt-4 min-h-4 text-[13px] font-normal uppercase leading-5 tracking-[0.04em] text-white underline underline-offset-4 transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-40"
             disabled={selectedFilters.size === 0}
           >
             CLEAR ALL
@@ -345,7 +345,7 @@ export function CollectionFilterDropdown({
           aria-label={`${group.label} filters`}
           className="absolute left-0 top-[calc(100%+8px)] z-50 min-w-[250px] border border-black bg-white p-4 text-[13px] font-normal text-black shadow-[0_12px_28px_rgba(0,0,0,0.16)]"
         >
-          <div className="mb-3 flex items-center justify-between border-b border-black/15 pb-3 font-normal uppercase tracking-[0.08em]">
+          <div className="mb-3 flex items-center justify-between border-b border-black/15 pb-3 font-normal uppercase tracking-[0.04em]">
             <span>{group.label}</span>
             <button
               type="button"

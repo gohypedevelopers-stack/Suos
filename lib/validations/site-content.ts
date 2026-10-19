@@ -1,5 +1,7 @@
 import { z } from "zod"
 
+import { DEFAULT_SITE_CONTENT } from "@/lib/site-content"
+
 const shortText = z.string().trim().max(200)
 const mediumText = z.string().trim().max(1000)
 const longText = z.string().trim().max(10000)
@@ -48,23 +50,53 @@ export const siteContentSchemas = {
     right: shortText,
     mobile: z.array(shortText.min(1)).min(1, "Add at least one mobile message.").max(10),
   }),
-  navigation: z.object({
-    collections: z.array(navMenuLinkSchema).max(12),
-    menFeatured: z.array(navMenuLinkSchema).max(12),
-    categories: z.array(navMenuLinkSchema).max(12),
-    cards: z
-      .array(
-        z.object({
-          image: imagePath,
-          alt: shortText,
-          eyebrow: shortText,
-          title: shortText,
-          href: navHref,
-        }),
-      )
-      .max(2),
-    bestsellersHref: navHref,
-  }),
+  // Every field has a default so navigation rows saved by older versions of
+  // the admin (which had a single `collections` list and at most 2 images)
+  // still parse instead of silently falling back to the code defaults.
+  navigation: z.preprocess(
+    (raw) => {
+      if (!raw || typeof raw !== "object" || Array.isArray(raw)) return raw
+      const value = { ...(raw as Record<string, unknown>) }
+      // Legacy: the old "Collections" list becomes the Men menu "Collection" column.
+      if (value.menCollections === undefined && Array.isArray(value.collections)) {
+        value.menCollections = value.collections
+      }
+      delete value.collections
+      // Legacy default pointed at a homepage anchor; the Shop All page replaces it.
+      if (value.bestsellersHref === "/#bestsellers") {
+        value.bestsellersHref = DEFAULT_SITE_CONTENT.navigation.bestsellersHref
+      }
+      return value
+    },
+    z.object({
+      edits: z.array(navMenuLinkSchema).max(12).default(() => structuredClone(DEFAULT_SITE_CONTENT.navigation.edits)),
+      menCollections: z
+        .array(navMenuLinkSchema)
+        .max(12)
+        .default(() => structuredClone(DEFAULT_SITE_CONTENT.navigation.menCollections)),
+      categories: z
+        .array(navMenuLinkSchema)
+        .max(12)
+        .default(() => structuredClone(DEFAULT_SITE_CONTENT.navigation.categories)),
+      menFeatured: z
+        .array(navMenuLinkSchema)
+        .max(12)
+        .default(() => structuredClone(DEFAULT_SITE_CONTENT.navigation.menFeatured)),
+      cards: z
+        .array(
+          z.object({
+            image: imagePath,
+            alt: shortText,
+            eyebrow: shortText,
+            title: shortText,
+            href: navHref,
+          }),
+        )
+        .max(3)
+        .default(() => structuredClone(DEFAULT_SITE_CONTENT.navigation.cards)),
+      bestsellersHref: navHref.default(DEFAULT_SITE_CONTENT.navigation.bestsellersHref),
+    }),
+  ),
   launchOffer: z.object({
     enabled: z.boolean(),
     label: shortText,

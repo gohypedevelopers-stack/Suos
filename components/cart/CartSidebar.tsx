@@ -43,7 +43,7 @@ function CartItemRow({ item }: { item: CartItem }) {
   const { removeFromCart, updateQuantity } = useCart()
   
   return (
-    <article className="grid grid-cols-[90px_minmax(0,1fr)] gap-3.5 border-b border-white/10 pb-4">
+    <article className="grid grid-cols-[104px_minmax(0,1fr)] gap-5 border-b border-white/10 pb-6 last:border-b-0 last:pb-0">
       <Link
         href={item.slug ? `/products/${item.slug}` : "#"}
         className="relative aspect-[3/4] overflow-hidden bg-[#1a1a1a]"
@@ -52,7 +52,7 @@ function CartItemRow({ item }: { item: CartItem }) {
           src={item.image}
           alt={item.alt || item.title || "Cart product"}
           fill
-          sizes="90px"
+          sizes="104px"
           className="object-cover object-center"
         />
       </Link>
@@ -62,13 +62,13 @@ function CartItemRow({ item }: { item: CartItem }) {
           <div className="min-w-0">
             <Link
               href={item.slug ? `/products/${item.slug}` : "#"}
-              className="truncate block text-[13px] font-normal uppercase leading-[1.2] tracking-[0.04em] text-white/95 hover:opacity-80 transition-opacity"
+              className="line-clamp-2 block text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-white/95 hover:opacity-80 transition-opacity"
             >
               {item.title || "NAME OF THE PRODUCT"}
             </Link>
 
-            <div className="mt-1 flex items-center gap-3 text-[11px] uppercase tracking-[0.04em] text-white/60">
-              <span>SIZE: <span className="text-white font-medium">{item.size}</span></span>
+            <div className="mt-1.5 flex items-center gap-3 text-[13px] uppercase leading-[1.4] tracking-[0.04em] text-white/60">
+              <span>SIZE: <span className="text-white">{item.size}</span></span>
             </div>
           </div>
 
@@ -78,7 +78,7 @@ function CartItemRow({ item }: { item: CartItem }) {
             aria-label={`Remove ${item.title}`}
             className="shrink-0 p-1 text-white/60 transition-colors hover:text-white cursor-pointer"
           >
-            <X aria-hidden="true" className="size-3.5 stroke-2" />
+            <X aria-hidden="true" className="size-4 stroke-[1.8]" />
           </button>
         </div>
 
@@ -88,22 +88,22 @@ function CartItemRow({ item }: { item: CartItem }) {
               type="button"
               onClick={() => updateQuantity(item.id, item.size, item.quantity - 1)}
               aria-label="Decrease quantity"
-              className="flex size-6 items-center justify-center text-white/80 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+              className="flex size-8 items-center justify-center text-white/80 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
             >
               <Minus className="size-3" />
             </button>
-            <span className="w-6 text-center text-[12px] font-medium text-white">{item.quantity}</span>
+            <span className="w-8 text-center text-[13px] font-normal text-white">{item.quantity}</span>
             <button
               type="button"
               onClick={() => updateQuantity(item.id, item.size, item.quantity + 1)}
               aria-label="Increase quantity"
-              className="flex size-6 items-center justify-center text-white/80 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+              className="flex size-8 items-center justify-center text-white/80 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
             >
               <Plus className="size-3" />
             </button>
           </div>
 
-          <p className="text-[13px] font-medium uppercase text-white/95">
+          <p className="text-[14px] font-normal uppercase tracking-[0.04em] text-white/95">
             {item.price || "₹2,200"}
           </p>
         </div>
@@ -114,7 +114,7 @@ function CartItemRow({ item }: { item: CartItem }) {
 
 function PromoMarqueeRow() {
   return (
-    <div className="flex shrink-0 items-center gap-10 whitespace-nowrap pr-10 text-[13px] font-normal uppercase tracking-[0.04em]">
+    <div className="flex shrink-0 items-center gap-10 whitespace-nowrap pr-10 text-[12px] font-normal uppercase leading-[1.4] tracking-[0.04em]">
       {Array.from({ length: 4 }).map((_, index) => (
         <span key={`promo-${index}`} className="whitespace-nowrap">
           {promoStripText}
@@ -146,12 +146,12 @@ export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
         showCloseButton={false}
         overlayClassName="!z-[10000] bg-black/50 backdrop-blur-[1px]"
         className="!z-[10001] !fixed !inset-y-0 !top-0 !bottom-0 !right-0 !h-screen !h-[100dvh] !max-h-screen !gap-0 !p-0 overflow-hidden border-l border-white/10 bg-black text-white shadow-[0_0_80px_rgba(0,0,0,0.45)] ease-in-out duration-300"
-        style={{ width: "min(100vw, 420px)", maxWidth: "none", height: "100dvh", top: 0, bottom: 0, right: 0 }}
+        style={{ width: "min(100vw, max(480px, 32vw))", maxWidth: "none", height: "100dvh", top: 0, bottom: 0, right: 0 }}
       >
         <div className="flex h-full min-h-0 flex-col overflow-hidden" style={{ height: "100%" }}>
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
-            <div className="flex items-center gap-2 text-[14px] font-normal uppercase text-white">
+          <div className="flex items-center justify-between border-b border-white/10 px-6 py-5">
+            <div className="flex items-center gap-2 text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-white">
               {totalItems > 0 ? (
                 <>
                   <Check className="size-4 stroke-[2.4]" />
@@ -165,7 +165,7 @@ export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
             <SheetClose asChild>
               <button
                 type="button"
-                className="inline-flex cursor-pointer items-center gap-1.5 text-[13px] font-normal uppercase text-white/80 transition-opacity hover:opacity-100"
+                className="inline-flex cursor-pointer items-center gap-1.5 text-[13px] font-normal uppercase tracking-[0.04em] text-white/80 transition-opacity hover:opacity-100"
               >
                 <span>CLOSE</span>
                 <X aria-hidden="true" className="size-4 stroke-2" />
@@ -181,27 +181,27 @@ export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
           {/* Scrollable Container with Offer, Cart Items, Marquee & Recommendations */}
           <div className="cart-item-scrollbar min-h-0 flex-1 overflow-y-auto">
             {/* Cart Offer Progress */}
-            <div className="border-b border-white/10 px-5 py-4">
+            <div className="border-b border-white/10 px-6 py-5">
               <CartOfferProgress />
             </div>
 
             {/* Cart Items List */}
-            <div className="px-5 py-4">
+            <div className="px-6 py-6">
               {cart.length > 0 ? (
-                <section className="space-y-4">
+                <section className="space-y-6">
                   {cart.map((item) => (
                     <CartItemRow key={`scroll-${item.id}-${item.size}`} item={item} />
                   ))}
                 </section>
               ) : (
                 <div className="py-12 text-center">
-                  <p className="text-[13px] uppercase tracking-wider text-white/60">
+                  <p className="text-[14px] uppercase tracking-[0.04em] text-white/60">
                     Your cart is empty
                   </p>
                   <button
                     type="button"
                     onClick={() => onOpenChange(false)}
-                    className="mt-4 inline-block border border-white px-5 py-2 text-[12px] uppercase tracking-widest text-white transition-colors hover:bg-white hover:text-black cursor-pointer"
+                    className="mt-5 inline-flex h-11 items-center border border-white px-6 text-[14px] uppercase tracking-[0.04em] text-white transition-colors hover:bg-white hover:text-black cursor-pointer"
                   >
                     Continue Shopping
                   </button>
@@ -218,23 +218,23 @@ export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
             </div>
 
             {/* Recommendations (You May Also Like) in scroll body */}
-            <div className="border-t border-white/10 px-5 py-5">
+            <div className="border-t border-white/10 px-6 py-6">
               <CartRecommendationsCarousel items={recommendations} />
             </div>
           </div>
 
           {/* Fixed Bottom Checkout Footer */}
-          <div className="flex-none mt-auto border-t border-white/10 bg-black px-5 py-4">
-            <div className="mb-3 flex items-center justify-between text-[13px] uppercase tracking-wider">
+          <div className="flex-none mt-auto border-t border-white/10 bg-black px-6 pb-[max(20px,env(safe-area-inset-bottom))] pt-5">
+            <div className="mb-4 flex items-center justify-between text-[13px] uppercase tracking-[0.04em]">
               <span className="text-white/70">Subtotal</span>
-              <span className="text-[15px] font-medium text-white">{subtotalFormatted}</span>
+              <span className="text-[14px] font-normal tracking-[0.04em] text-white">{subtotalFormatted}</span>
             </div>
 
             {totalItems > 0 ? (
               <Link
                 href="/checkout"
                 onClick={() => onOpenChange(false)}
-                className="flex h-11 w-full items-center justify-center bg-white text-[14px] font-medium uppercase tracking-wider text-black transition-opacity hover:opacity-90"
+                className="flex h-12 w-full items-center justify-center bg-white text-[14px] font-normal uppercase tracking-[0.04em] text-black transition-opacity hover:opacity-90"
               >
                 Checkout
               </Link>
@@ -242,7 +242,7 @@ export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
               <button
                 type="button"
                 disabled
-                className="flex h-11 w-full items-center justify-center border border-white/10 bg-white/10 text-[14px] font-normal uppercase tracking-wider text-white/40 cursor-not-allowed"
+                className="flex h-12 w-full items-center justify-center border border-white/10 bg-white/10 text-[14px] font-normal uppercase tracking-[0.04em] text-white/40 cursor-not-allowed"
               >
                 Checkout
               </button>
@@ -251,7 +251,7 @@ export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
             <Link
               href="/cart"
               onClick={() => onOpenChange(false)}
-              className="mt-2.5 block text-center text-[13px] font-normal uppercase tracking-wider text-white/80 underline underline-offset-4 transition-opacity hover:text-white"
+              className="mt-3.5 block text-center text-[13px] font-normal uppercase tracking-[0.04em] text-white/80 underline underline-offset-4 transition-opacity hover:text-white"
             >
               View Shopping Cart
             </Link>

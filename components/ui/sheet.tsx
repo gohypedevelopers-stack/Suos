@@ -60,8 +60,9 @@ function SheetContent({
   const sideClasses = {
     top: "inset-x-0 top-0 border-b",
     bottom: "inset-x-0 bottom-0 border-t",
-    left: "inset-y-0 left-0 h-full border-r sm:max-w-sm",
-    right: "inset-y-0 right-0 h-full border-l sm:max-w-sm",
+    // Side panels: full width on mobile, at least 480px / ~32% of the viewport on desktop.
+    left: "inset-y-0 left-0 h-full w-[min(100vw,max(480px,32vw))] max-w-full border-r",
+    right: "inset-y-0 right-0 h-full w-[min(100vw,max(480px,32vw))] max-w-full border-l",
   }
 
   return (

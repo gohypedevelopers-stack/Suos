@@ -3,6 +3,12 @@ import path from "node:path";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  async redirects() {
+    return [
+      // Banners saved in admin may still point at the old "/products" listing.
+      { source: "/products", destination: "/shop", permanent: false },
+    ];
+  },
   turbopack: {
     root: path.resolve(__dirname),
   },

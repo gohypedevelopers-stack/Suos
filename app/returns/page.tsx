@@ -29,11 +29,11 @@ export default async function ReturnsPage() {
 
         <section className="flex items-center justify-center px-6 py-14 sm:px-12 lg:px-20 xl:px-24">
           <div className="w-full max-w-[474px]">
-            <h1 className="font-heading text-[24px] font-normal uppercase leading-none">
+            <h1 className="font-heading text-[18px] font-normal uppercase leading-[1.15] tracking-[0.02em] sm:text-[20px]">
               {returnsPage.title}
             </h1>
 
-            <form className="mt-5 space-y-2" noValidate>
+            <form className="mt-6 space-y-3" noValidate>
               <label className="sr-only" htmlFor="return-order-number">
                 Order number
               </label>
@@ -42,7 +42,7 @@ export default async function ReturnsPage() {
                 name="order-number"
                 type="text"
                 placeholder="Order number"
-                className="h-[42px] w-full border border-black px-4 text-[13px] outline-none placeholder:text-black/60 focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                className="h-12 w-full border border-black px-4 text-[14px] leading-[1.4] tracking-[0.01em] outline-none placeholder:text-black/50 focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
               />
               <label className="sr-only" htmlFor="return-email">
                 Email address
@@ -53,28 +53,28 @@ export default async function ReturnsPage() {
                 type="email"
                 autoComplete="email"
                 placeholder="Email"
-                className="h-[42px] w-full border border-black px-4 text-[13px] outline-none placeholder:text-black/60 focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                className="h-12 w-full border border-black px-4 text-[14px] leading-[1.4] tracking-[0.01em] outline-none placeholder:text-black/50 focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
               />
               <button
                 type="submit"
-                className="mt-3 flex h-[42px] w-full items-center justify-center bg-black text-[13px] font-normal uppercase text-white transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                className="mt-4 flex h-12 w-full items-center justify-center bg-black text-[14px] font-normal uppercase leading-none tracking-[0.04em] text-white transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
               >
                 Proceed
               </button>
             </form>
 
-            <ul className="mt-10 space-y-4 text-[13px] font-normal leading-[1.45]">
+            <ul className="mt-10 space-y-3.5 text-[13px] font-normal leading-[1.5] tracking-[0.01em]">
               {returnsPage.conditions.map((condition) => (
-                <li key={condition} className="flex items-start gap-4">
-                  <span className="mt-0.5 inline-flex size-3 shrink-0 items-center justify-center border border-black">
-                    <Check aria-hidden="true" className="size-2 stroke-[2]" />
+                <li key={condition} className="flex items-start gap-3">
+                  <span className="mt-[3px] inline-flex size-3.5 shrink-0 items-center justify-center border border-black">
+                    <Check aria-hidden="true" className="size-2.5 stroke-[2]" />
                   </span>
                   <span>{condition}</span>
                 </li>
               ))}
             </ul>
 
-            <div className="mt-9 space-y-2 text-[13px] text-black/60">
+            <div className="mt-9 space-y-2 text-[13px] leading-[1.5] tracking-[0.01em] text-black/60">
               <p>
                 Our full{" "}
                 <Link href="/returns-policy" className="underline underline-offset-2 hover:text-black">

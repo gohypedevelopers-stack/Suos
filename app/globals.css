@@ -135,14 +135,38 @@
     scrollbar-color: var(--brand-black) var(--brand-white);
   }
 
+  /*
+   * Type base: 14px body copy (client spec / Figma). The html root stays at the
+   * browser default 16px so rem-based Tailwind utilities keep their sizes.
+   */
   body {
     @apply bg-background text-foreground;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+    font-kerning: normal;
+    font-feature-settings: "kern" 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   html {
     @apply font-sans;
     overflow-y: scroll;
     scrollbar-gutter: stable;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  /* Form controls don't inherit type by default; keep them on the 14px scale. */
+  input,
+  select,
+  textarea,
+  button {
+    font-kerning: normal;
+    letter-spacing: inherit;
   }
 
   body[data-scroll-locked] {

@@ -22,10 +22,13 @@ export function WishlistSidebar() {
 
   return (
     <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-      <SheetContent className="flex w-full flex-col p-0 sm:max-w-md [&>button]:hidden">
+      <SheetContent
+        className="flex flex-col gap-0 p-0 [&>button]:hidden"
+        style={{ width: "min(100vw, max(480px, 32vw))", maxWidth: "none" }}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-black/10 px-6 py-4">
-          <SheetTitle className="font-heading text-lg font-medium uppercase tracking-wider text-black">
+        <div className="flex items-center justify-between border-b border-black/10 px-6 py-5">
+          <SheetTitle className="font-heading text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black">
             Wishlist ({wishlist.length})
           </SheetTitle>
           <SheetClose className="inline-flex size-8 items-center justify-center rounded-none text-black transition-opacity hover:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black">
@@ -35,16 +38,17 @@ export function WishlistSidebar() {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto px-6 py-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex-1 overflow-y-auto px-6 py-6 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {wishlist.length > 0 ? (
             <div className="space-y-6">
               {wishlist.map((item) => (
-                <div key={item.id} className="flex gap-4">
-                  <div className="relative aspect-[3/4] w-24 flex-none bg-[#f7f7f7]">
+                <div key={item.id} className="flex gap-5 border-b border-black/10 pb-6 last:border-b-0 last:pb-0">
+                  <div className="relative aspect-[3/4] w-[104px] flex-none bg-[#f7f7f7]">
                     <Image
                       src={item.image}
                       alt={item.alt}
                       fill
+                      sizes="104px"
                       className="object-cover object-center"
                     />
                   </div>
@@ -54,32 +58,32 @@ export function WishlistSidebar() {
                         <Link 
                           href={`/products/${item.id}`}
                           onClick={() => setIsSidebarOpen(false)}
-                          className="text-xs font-normal uppercase leading-snug tracking-wide text-black hover:opacity-70"
+                          className="line-clamp-2 text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black hover:opacity-70"
                         >
-                          {item.alt.length > 40 ? item.alt.substring(0, 40) + "..." : item.alt}
+                          {item.alt}
                         </Link>
                         <button
                           onClick={() => removeFromWishlist(item.id)}
-                          className="text-black/50 hover:text-black transition-colors"
+                          className="shrink-0 p-1 text-black/50 transition-colors hover:text-black"
                           aria-label="Remove from wishlist"
                         >
                           <X className="size-4" />
                         </button>
                       </div>
-                      <p className="mt-1 text-[10px] uppercase text-black/50">M / BLUE</p>
+                      <p className="mt-1.5 text-[13px] uppercase leading-[1.4] tracking-[0.04em] text-black/55">M / BLUE</p>
                     </div>
                     <div className="flex items-center justify-between mt-4">
-                      <span className="text-sm font-medium">₹5999</span>
+                      <span className="text-[14px] font-normal tracking-[0.04em]">₹5999</span>
                       <Button 
                         variant="default" 
-                        className="h-8 rounded-none px-3 text-[10px] uppercase gap-1.5"
+                        className="h-9 gap-2 rounded-none px-4 text-[13px] font-normal uppercase tracking-[0.04em]"
                         onClick={() => {
                           addToCart(item, "M")
                           toast.success("Added to cart!")
                           removeFromWishlist(item.id)
                         }}
                       >
-                        <CartIcon className="size-3" /> Add
+                        <CartIcon className="size-3.5" /> Add
                       </Button>
                     </div>
                   </div>
@@ -88,10 +92,10 @@ export function WishlistSidebar() {
             </div>
           ) : (
             <div className="flex h-full flex-col items-center justify-center text-center">
-              <p className="mb-4 text-sm font-medium uppercase tracking-wide text-black/50">
+              <p className="mb-5 text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black/55">
                 Your wishlist is empty
               </p>
-              <Button asChild variant="outline" className="uppercase" onClick={() => setIsSidebarOpen(false)}>
+              <Button asChild variant="outline" className="h-11 rounded-none px-6 text-[14px] font-normal uppercase tracking-[0.04em]" onClick={() => setIsSidebarOpen(false)}>
                 <Link href="/">Continue Shopping</Link>
               </Button>
             </div>
@@ -103,7 +107,7 @@ export function WishlistSidebar() {
           <div className="border-t border-black/10 bg-white p-6">
             <Button
               asChild
-              className="w-full rounded-none h-12 text-sm font-medium uppercase tracking-wider"
+              className="h-12 w-full rounded-none text-[14px] font-normal uppercase tracking-[0.04em]"
               onClick={() => setIsSidebarOpen(false)}
             >
               <Link href="/wishlist">View Full Wishlist</Link>

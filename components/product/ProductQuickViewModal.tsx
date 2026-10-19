@@ -78,7 +78,7 @@ function QuickViewSizeButton({
       type="button"
       aria-pressed={active}
       className={cn(
-        "inline-flex h-[34px] cursor-pointer items-center justify-center border text-[13px] font-normal leading-none transition-[background-color,border-color,color,transform,font-weight] duration-200 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45",
+        "inline-flex h-[34px] cursor-pointer items-center justify-center border text-[13px] font-normal leading-none tracking-[0.02em] transition-[background-color,border-color,color,transform,font-weight] duration-200 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45",
         active
           ? "border-black bg-[#ededed] font-[500] text-black"
           : "border-black/10 bg-white text-black hover:border-black hover:bg-black/[0.04]",
@@ -239,10 +239,10 @@ export function ProductQuickViewModal({
           {/* Details Column */}
           <div className="quick-view-details flex-1 px-4 py-5 sm:p-6 lg:overflow-y-auto lg:h-full lg:py-7 lg:pr-8 lg:pl-0">
             <div className="w-full">
-              <p className="w-fit text-[12px] sm:text-[13px] font-normal uppercase leading-[17px] tracking-normal text-black/45">
+              <p className="w-fit text-[12px] sm:text-[13px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black/55">
                 {product.editLabel}
               </p>
-              <h2 className="mt-1 font-heading text-[20px] sm:text-[24px] font-normal uppercase leading-[1.05] tracking-[-0.04em] sm:tracking-[-0.06em]">
+              <h2 className="mt-1 font-heading text-[22px] sm:text-[26px] font-normal uppercase leading-[1.15] tracking-[0.01em]">
                 {product.title}
               </h2>
 
@@ -268,7 +268,7 @@ export function ProductQuickViewModal({
                 </div>
               </div>
 
-              <p className="mt-3 sm:mt-5 max-w-none text-justify font-sans text-[12px] sm:text-[13px] font-normal uppercase leading-[1.4] text-black/65">
+              <p className="mt-3 sm:mt-5 max-w-none text-left font-sans text-[13px] sm:text-[14px] font-normal uppercase leading-[1.5] tracking-[0.02em] text-black/65">
                 {product.description}{" "}
                 <Link
                   href="/products#details"
@@ -279,7 +279,7 @@ export function ProductQuickViewModal({
               </p>
 
               <section className="mt-5 sm:mt-7 space-y-2.5 sm:space-y-3">
-                <p className="text-[12px] sm:text-[13px] font-normal uppercase text-black/45">
+                <p className="text-[12px] sm:text-[13px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black/55">
                   Color{" "}
                   <span className="font-[500] text-black">{selectedColor}</span>
                 </p>
@@ -293,14 +293,14 @@ export function ProductQuickViewModal({
 
               <section className="mt-4 sm:mt-5 space-y-2.5 sm:space-y-3">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-[12px] sm:text-[13px] font-normal uppercase text-black/45">
+                  <p className="text-[12px] sm:text-[13px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black/55">
                     Size{" "}
                     <span className="font-[500] text-black">{selectedSize}</span>
                   </p>
                   <SizeChartModal images={product.sizeGuideImages} fitType={product.fitType}>
                     <button
                       type="button"
-                      className="group inline-flex flex-col items-start pb-0.5 text-[12px] sm:text-[13px] font-normal uppercase leading-none text-black/45 transition-colors duration-200 hover:text-black focus-visible:text-black cursor-pointer"
+                      className="group inline-flex flex-col items-start pb-0.5 text-[12px] sm:text-[13px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black/55 transition-colors duration-200 hover:text-black focus-visible:text-black cursor-pointer"
                     >
                       <span>View Size Chart</span>
                       <span
@@ -327,7 +327,7 @@ export function ProductQuickViewModal({
               <button
                 type="button"
                 onClick={handleAddToCart}
-                className="mt-6 sm:mt-8 flex h-11 sm:h-12 w-full cursor-pointer items-center justify-center gap-2 bg-black text-xs sm:text-sm font-medium uppercase tracking-wider text-white transition-opacity hover:opacity-90"
+                className="mt-6 sm:mt-8 flex h-11 sm:h-12 w-full cursor-pointer items-center justify-center gap-2 bg-black text-[13px] sm:text-[14px] font-normal uppercase leading-none tracking-[0.06em] text-white transition-opacity hover:opacity-90"
               >
                 <CartIcon className="size-4" />
                 Add To Cart
@@ -336,7 +336,7 @@ export function ProductQuickViewModal({
               <div className="mt-3 sm:mt-4 text-center pb-2 sm:pb-0">
                 <Link
                   href="/products"
-                  className="group inline-flex flex-col items-center pb-0.5 text-xs sm:text-[13px] font-normal uppercase leading-none tracking-wider text-black/60 transition-colors duration-200 hover:text-black focus-visible:text-black"
+                  className="group inline-flex flex-col items-center pb-0.5 text-[12px] sm:text-[13px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black/60 transition-colors duration-200 hover:text-black focus-visible:text-black"
                 >
                   <span>View Full Details</span>
                   <span

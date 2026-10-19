@@ -43,10 +43,10 @@ async function resolveLookup(params: TrackOrderSearchParams) {
 }
 
 const inputClassName =
-  "h-[59px] w-full border border-black bg-white px-5 text-[13px] font-normal text-black outline-none placeholder:text-black/60 focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+  "h-12 w-full border border-black bg-white px-4 text-[14px] font-normal leading-[1.4] tracking-[0.01em] text-black outline-none placeholder:text-black/50 focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
 
 const actionClassName =
-  "flex h-[59px] w-full items-center justify-center bg-black px-5 text-[13px] font-normal uppercase text-white transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+  "flex h-12 w-full items-center justify-center bg-black px-5 text-[14px] font-normal uppercase leading-none tracking-[0.04em] text-white transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
 
 export default async function TrackOrderPage({
   searchParams,
@@ -60,10 +60,10 @@ export default async function TrackOrderPage({
     <main className="flex min-h-[calc(100svh-var(--header-stack-height))] bg-white text-black">
       <div className="mx-auto grid w-full max-w-[1600px] px-5 py-16 sm:px-8 lg:grid-cols-2 lg:px-20 lg:py-[6.25rem]">
         <section className="lg:border-r lg:border-black/55 lg:pr-[6rem]">
-          <h1 className="font-heading text-[24px] font-normal uppercase leading-none tracking-[-0.04em]">
+          <h1 className="font-heading text-[20px] font-normal uppercase leading-[1.15] tracking-[0.02em] sm:text-[24px]">
             Track your order
           </h1>
-          <p className="mt-5 text-[13px] font-normal text-black/60">
+          <p className="mt-3 text-[14px] font-normal leading-[1.4] text-black/60">
             Enter your details below to view your order status
           </p>
 
@@ -76,9 +76,9 @@ export default async function TrackOrderPage({
           {lookup.order ? (
             <section
               aria-live="polite"
-              className="mt-7 border border-black p-5 text-[13px] font-normal text-black"
+              className="mt-7 border border-black p-6 text-[14px] font-normal leading-[1.5] text-black"
             >
-              <p className="uppercase">
+              <p className="uppercase tracking-[0.04em]">
                 Order {lookup.order.reference} · {lookup.order.statusLabel}
               </p>
               <p className="mt-2 text-black/60">{lookup.order.statusDetail}</p>
@@ -144,24 +144,24 @@ export default async function TrackOrderPage({
               className={inputClassName}
             />
 
-            <button type="submit" className={`${actionClassName} mt-11`}>
+            <button type="submit" className={`${actionClassName} mt-6`}>
               Check order status
             </button>
           </form>
 
           <Link
             href="/privacy"
-            className="mt-7 inline-block text-[13px] font-normal text-black/60 underline underline-offset-2 transition-colors hover:text-black"
+            className="mt-7 inline-block text-[13px] font-normal text-black/60 underline underline-offset-4 transition-colors hover:text-black"
           >
             Privacy Policy
           </Link>
         </section>
 
         <section className="mt-16 lg:mt-0 lg:pl-[6rem]">
-          <h2 className="font-heading text-[24px] font-normal uppercase leading-none tracking-[-0.04em]">
+          <h2 className="font-heading text-[20px] font-normal uppercase leading-[1.15] tracking-[0.02em] sm:text-[24px]">
             Have an account
           </h2>
-          <p className="mt-5 text-[13px] font-normal text-black/60">
+          <p className="mt-3 text-[14px] font-normal leading-[1.4] text-black/60">
             Sign in below to view your order history
           </p>
 
@@ -203,16 +203,16 @@ export default async function TrackOrderPage({
               </Link>
             </div>
 
-            <button type="submit" className={`${actionClassName} mt-9`}>
+            <button type="submit" className={`${actionClassName} mt-6`}>
               Sign in
             </button>
-            <p className="py-0.5 text-center text-[13px] font-normal uppercase text-black/60">Or</p>
+            <p className="py-0.5 text-center text-[13px] font-normal uppercase tracking-[0.04em] text-black/60">Or</p>
             <button type="button" className={actionClassName}>
               Email me a verification code
             </button>
           </form>
 
-          <p className="mx-auto mt-3 max-w-[31rem] text-center text-[13px] font-normal leading-[1.65] text-black/60">
+          <p className="mx-auto mt-3 max-w-[31rem] text-center text-[12px] font-normal leading-[1.6] text-black/60 sm:text-[13px]">
             By submitting my information I agree to the SUOS{" "}
             <Link href="/terms" className="underline underline-offset-2 hover:text-black">
               Terms

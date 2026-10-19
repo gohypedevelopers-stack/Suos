@@ -8,7 +8,6 @@ import { ProductBannerSection } from "@/components/home/ProductBannerSection"
 import { LookbookCarousel } from "@/components/home/LookbookCarousel"
 import { LaunchOfferBar } from "@/components/home/LaunchOfferBar"
 import { FeatureBannerSection } from "@/components/home/FeatureBannerSection"
-import { EditsCarousel } from "@/components/home/EditsCarousel"
 import { TrendingSection } from "@/components/home/TrendingSection"
 import { listPublishedProducts } from "@/lib/server/dal/products"
 import { getHomeBanners } from "@/lib/server/dal/banners"
@@ -29,7 +28,6 @@ export default async function Home() {
       <TrendingSection products={products.slice(0, 8)} />
       <MotionBannerSection banner={banners.middle} />
       <DenimCarousel slides={banners.denimCarousel} />
-      <EditsCarousel />
       <DenimEditorialSection banners={banners.editorial} />
       <LookbookCarousel />
       <ProductBannerSection banner={banners.bottom} />

@@ -23,15 +23,15 @@ export function PolicyDocument({
     >
       <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-4 py-14 sm:px-6 sm:py-16 lg:grid-cols-[240px_minmax(0,800px)] lg:gap-20 lg:px-8 lg:py-20">
         <header className="self-start lg:sticky lg:top-[calc(var(--header-stack-height)+2rem)]">
-          <p className="text-[13px] font-normal uppercase text-black/45">
+          <p className="text-[12px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black/45 sm:text-[13px]">
             SUOS policies
           </p>
-          <h1 className="mt-3 font-heading text-[24px] font-normal uppercase leading-[1.05] tracking-[-0.04em]">
+          <h1 className="mt-3 font-heading text-[22px] font-normal uppercase leading-[1.15] tracking-[-0.01em] sm:text-[24px]">
             {title}
           </h1>
 
           <nav aria-label={`${title} sections`} className="mt-7 border-t border-black/15 pt-5">
-            <ul className="grid gap-x-5 gap-y-3 text-[13px] font-normal text-black/60 sm:grid-cols-2 lg:grid-cols-1">
+            <ul className="grid gap-x-5 gap-y-2.5 text-[13px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black/60 sm:grid-cols-2 lg:grid-cols-1">
               {navigation.map((item) => (
                 <li key={item.href}>
                   <a
@@ -54,7 +54,7 @@ export function PolicyDocument({
 
 export function PolicyIntroduction({ children }: { children: ReactNode }) {
   return (
-    <div className="space-y-4 pb-9 text-[13px] font-normal leading-[1.7] text-black/70">
+    <div className="space-y-4 pb-9 text-[14px] font-normal leading-[1.6] tracking-[0.01em] text-black/75">
       {children}
     </div>
   )
@@ -74,8 +74,8 @@ export function PolicySection({
       id={id}
       className="scroll-mt-[calc(var(--header-stack-height)+2rem)] border-t border-black/15 py-9"
     >
-      <h2 className="text-[15px] font-[500] uppercase leading-tight">{title}</h2>
-      <div className="mt-5 space-y-4 text-[13px] font-normal leading-[1.7] text-black/70">
+      <h2 className="text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em] sm:text-[16px]">{title}</h2>
+      <div className="mt-4 space-y-4 text-[14px] font-normal leading-[1.6] tracking-[0.01em] text-black/75">
         {children}
       </div>
     </section>
@@ -91,7 +91,7 @@ export function PolicySubsection({
 }) {
   return (
     <section className="pt-4">
-      <h3 className="text-[13px] font-[500] uppercase text-black">{title}</h3>
+      <h3 className="text-[13px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black">{title}</h3>
       <div className="mt-3 space-y-4">{children}</div>
     </section>
   )

@@ -25,25 +25,25 @@ export function CollectionBenefitsBar() {
   return (
     <section
       aria-label="Store benefits"
-      className="-mx-4 bg-accent px-2.5 py-4 sm:-mx-6 sm:px-6 sm:py-7 lg:-mx-8 lg:px-8"
+      className="w-full bg-accent px-3 py-5 sm:px-6 sm:py-7 lg:px-8"
     >
-      <ul className="mx-auto grid grid-cols-3 max-w-[980px] gap-2 sm:gap-8 items-center">
+      <ul className="mx-auto grid max-w-[980px] grid-cols-3 items-center gap-2 sm:gap-8">
         {benefits.map(({ icon: Icon, title, description, mobileDesc }) => (
-          <li key={title} className="flex justify-center">
-            <div className="flex items-center sm:items-start gap-1.5 sm:gap-3 text-black">
+          <li key={title} className="flex min-w-0 justify-center">
+            <div className="flex min-w-0 flex-col items-center gap-1.5 text-center text-black sm:flex-row sm:items-start sm:gap-3 sm:text-left">
               <Icon
                 aria-hidden="true"
-                className="size-4 sm:size-6 shrink-0 stroke-[1.8]"
+                className="size-5 shrink-0 stroke-[1.5] sm:size-6"
               />
 
               <div className="min-w-0">
-                <p className="text-[10px] sm:text-[13px] font-semibold uppercase leading-tight tracking-[0.01em] truncate">
+                <p className="text-[11px] font-normal uppercase leading-[1.3] tracking-[0.04em] sm:text-[14px]">
                   {title}
                 </p>
-                <p className="hidden sm:block text-[12px] leading-tight text-black/90">
+                <p className="mt-0.5 hidden text-[13px] leading-[1.4] text-black/70 sm:block">
                   {description}
                 </p>
-                <p className="block sm:hidden text-[9px] leading-tight text-black/70 truncate">
+                <p className="mt-0.5 block text-[11px] leading-[1.3] text-black/60 sm:hidden">
                   {mobileDesc}
                 </p>
               </div>

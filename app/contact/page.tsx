@@ -23,11 +23,11 @@ function ContactMethod({
 }) {
   return (
     <article className={`space-y-3 ${className ?? ""}`}>
-      <div className="flex items-center gap-4 text-[18px] text-black/55">
+      <div className="flex items-center gap-4 text-[13px] uppercase leading-[1.4] tracking-[0.04em] text-black/55">
         {icon}
         <h2 className="font-normal uppercase">{title}</h2>
       </div>
-      <div className="pl-10 text-[18px] leading-[1.65] text-black">{children}</div>
+      <div className="pl-9 text-[14px] leading-[1.6] text-black">{children}</div>
     </article>
   )
 }
@@ -50,10 +50,10 @@ export default async function ContactPage({
     <main className="bg-white text-black">
       <div className="mx-auto w-full max-w-[1600px] px-5 pb-24 pt-28 sm:px-8 lg:px-20 lg:pb-32 lg:pt-[8.5rem]">
         <section aria-labelledby="contact-heading">
-          <p className="text-[1rem] uppercase">{contact.eyebrow}</p>
+          <p className="text-[13px] uppercase leading-[1.4] tracking-[0.04em]">{contact.eyebrow}</p>
           <h1
             id="contact-heading"
-            className="mt-8 max-w-[32rem] text-6xl font-normal uppercase leading-[1.1] tracking-tight sm:text-[68px]"
+            className="mt-5 max-w-[32rem] font-heading text-[24px] font-normal uppercase leading-[1.15] tracking-[-0.01em] sm:text-[28px]"
           >
             {contact.titleLines.map((line, index) => (
               <span key={index}>
@@ -62,7 +62,7 @@ export default async function ContactPage({
               </span>
             ))}
           </h1>
-          <p className="mt-5 max-w-[31rem] text-[1rem] leading-[1.65] text-black/60">
+          <p className="mt-4 max-w-[31rem] text-[14px] leading-[1.6] text-black/60">
             {contact.description}
           </p>
         </section>
@@ -99,12 +99,12 @@ export default async function ContactPage({
             <section aria-labelledby="message-heading">
               <h2
                 id="message-heading"
-                className="text-[18px] font-normal uppercase text-black/55"
+                className="text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black/55"
               >
                 Send a message
               </h2>
 
-              <form action={submitContactAction} className="mt-20 space-y-14" noValidate>
+              <form action={submitContactAction} className="mt-10 space-y-10" noValidate>
                 <input
                   type="text"
                   name="website"
@@ -113,43 +113,43 @@ export default async function ContactPage({
                   aria-hidden="true"
                   className="hidden"
                 />
-                <div className="grid gap-12 sm:grid-cols-2 sm:gap-6">
-                  <label className="block border-b border-black/55 pb-3 text-sm text-black/55">
+                <div className="grid gap-10 sm:grid-cols-2 sm:gap-6">
+                  <label className="block border-b border-black/55 pb-3 text-[14px] leading-[1.4] tracking-[0.04em] text-black/55">
                     <span className="sr-only">Full name</span>
                     <input
                       name="name"
                       type="text"
                       placeholder="FULL NAME"
-                      className="w-full bg-transparent uppercase outline-none placeholder:text-black/55"
+                      className="w-full bg-transparent uppercase text-black outline-none placeholder:text-black/50"
                     />
                   </label>
-                  <label className="block border-b border-black/55 pb-3 text-sm text-black/55">
+                  <label className="block border-b border-black/55 pb-3 text-[14px] leading-[1.4] tracking-[0.04em] text-black/55">
                     <span className="sr-only">Email address</span>
                     <input
                       name="email"
                       type="email"
                       autoComplete="email"
                       placeholder="EMAIL ADDRESS"
-                      className="w-full bg-transparent uppercase outline-none placeholder:text-black/55"
+                      className="w-full bg-transparent uppercase text-black outline-none placeholder:text-black/50"
                     />
                   </label>
                 </div>
 
                 <ContactSubjectSelect />
 
-                <label className="block border-b border-black/55 pb-3 text-sm text-black/55">
+                <label className="block border-b border-black/55 pb-3 text-[14px] leading-[1.4] tracking-[0.04em] text-black/55">
                   <span className="sr-only">Your message</span>
                   <textarea
                     name="message"
                     rows={5}
                     placeholder="YOUR MESSAGE"
-                    className="w-full resize-none bg-transparent uppercase outline-none placeholder:text-black/55"
+                    className="w-full resize-none bg-transparent uppercase text-black outline-none placeholder:text-black/50"
                   />
                 </label>
 
                 <button
                   type="submit"
-                  className="flex h-[59px] w-full items-center justify-center bg-black text-sm uppercase text-white transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                  className="flex h-12 w-full items-center justify-center bg-black text-[14px] uppercase leading-none tracking-[0.04em] text-white transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
                 >
                   Send message
                 </button>
@@ -164,24 +164,24 @@ export default async function ContactPage({
             <section aria-labelledby="faq-heading">
               <h2
                 id="faq-heading"
-                className="text-[18px] font-normal uppercase text-black/55"
+                className="text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black/55"
               >
                 Frequently asked
               </h2>
 
-              <div className="mt-14 divide-y divide-black/55">
+              <div className="mt-8 divide-y divide-black/20 border-y border-black/20">
                 {contact.faqs.map((faq) => (
                   <details key={faq.question} className="group py-0">
-                    <summary className="flex cursor-pointer list-none items-center justify-between gap-5 py-7 text-[18px] leading-tight marker:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-5 py-5 text-[14px] uppercase leading-[1.4] tracking-[0.04em] marker:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30">
                       {faq.question}
                       <span
                         aria-hidden="true"
-                        className="text-[1.6rem] font-light leading-none transition-transform duration-200 group-open:rotate-45"
+                        className="text-[20px] font-normal leading-none transition-transform duration-200 group-open:rotate-45"
                       >
                         +
                       </span>
                     </summary>
-                    <p className="max-w-[35rem] pb-7 text-[1rem] leading-[1.65] text-black/60">
+                    <p className="max-w-[35rem] pb-6 text-[14px] leading-[1.6] text-black/60">
                       {faq.answer}
                     </p>
                   </details>

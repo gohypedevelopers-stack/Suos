@@ -28,6 +28,12 @@ const bottomLinks = [
   { label: "Returns Policy", href: "/returns-policy" },
 ] as const
 
+const headingClass =
+  "text-[12px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black sm:text-[13px]"
+
+const bodyClass =
+  "text-[13px] font-normal uppercase leading-[1.6] tracking-[0.04em] text-black/80 sm:text-[14px]"
+
 function FooterLink({
   href,
   children,
@@ -38,10 +44,26 @@ function FooterLink({
   return (
     <Link
       href={href}
-      className="inline-flex w-fit shrink-0 transition-opacity hover:opacity-65"
+      className="inline-flex w-fit shrink-0 transition-colors hover:text-black hover:underline hover:underline-offset-4"
     >
       {children}
     </Link>
+  )
+}
+
+function FooterLinkList({
+  links,
+}: {
+  links: ReadonlyArray<{ label: string; href: string }>
+}) {
+  return (
+    <ul className="space-y-2">
+      {links.map((link) => (
+        <li key={link.label}>
+          <FooterLink href={link.href}>{link.label}</FooterLink>
+        </li>
+      ))}
+    </ul>
   )
 }
 
@@ -54,12 +76,8 @@ function FooterGroup({
 }) {
   return (
     <div>
-      <h3 className="text-[14px] sm:text-[15px] font-[500] uppercase tracking-[0.01em]">
-        {title}
-      </h3>
-      <div className="mt-4 sm:mt-5 text-[12px] sm:text-[13px] font-normal uppercase tracking-[0.02em] text-black/90">
-        {children}
-      </div>
+      <h3 className={headingClass}>{title}</h3>
+      <div className={cn("mt-4", bodyClass)}>{children}</div>
     </div>
   )
 }
@@ -68,91 +86,75 @@ export function FooterSection() {
   const { footer } = useSiteContent()
   return (
     <footer className="w-full bg-white text-black">
-      <div className="px-4 pb-6 pt-4 sm:px-6 lg:px-8">
-        <div className="border-b border-black/55 pb-2">
-          <h2 className="font-heading text-[1.15rem] font-semibold uppercase tracking-[-0.02em] sm:text-[1.3rem]">
+      <div className="px-4 pb-6 pt-8 sm:px-6 lg:px-8 lg:pt-10">
+        <div className="border-b border-black/20 pb-3">
+          <h2 className="font-heading text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em]">
             More About SUOS
           </h2>
         </div>
 
-        <div className="grid grid-cols-2 gap-x-6 gap-y-10 py-7 sm:gap-x-10 lg:grid-cols-4 lg:gap-12">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 py-10 sm:gap-x-10 lg:grid-cols-4 lg:gap-x-12">
           <FooterGroup title="Company">
-            <div className="space-y-3 sm:space-y-4">
-              {companyLinks.map((link) => (
-                <div key={link.label}>
-                  <FooterLink href={link.href}>{link.label}</FooterLink>
-                </div>
-              ))}
-            </div>
+            <FooterLinkList links={companyLinks} />
           </FooterGroup>
 
-          <div className="flex flex-col gap-8 lg:contents">
+          <div className="flex flex-col gap-10 lg:contents">
             <FooterGroup title="Quick Links">
-              <div className="space-y-3 sm:space-y-4">
-                {quickLinks.map((link) => (
-                  <div key={link.label}>
-                    <FooterLink href={link.href}>{link.label}</FooterLink>
-                  </div>
-                ))}
-              </div>
+              <FooterLinkList links={quickLinks} />
             </FooterGroup>
 
-            <div>
-              <h3 className="text-[14px] sm:text-[15px] font-[500] uppercase tracking-[0.01em]">
-                Contact
-              </h3>
-
-              <div className="mt-4 sm:mt-5 space-y-4 sm:space-y-5 text-[12px] sm:text-[13px] font-normal uppercase tracking-[0.02em] text-black/90">
-                <div className="space-y-0.5">
-                  <p className="font-normal">For customer care</p>
-                  <p className="normal-case tracking-[-0.01em] break-all">
+            <FooterGroup title="Contact">
+              <div className="space-y-4">
+                <div>
+                  <p>For customer care</p>
+                  <p className="break-all normal-case tracking-[0.01em] text-black">
                     {footer.careEmail}
                   </p>
                 </div>
 
-                <div className="space-y-0.5">
-                  <p className="font-normal">For online orders</p>
-                  <p className="normal-case tracking-[-0.01em]">{footer.ordersPhone}</p>
+                <div>
+                  <p>For online orders</p>
+                  <p className="normal-case tracking-[0.01em] text-black">
+                    {footer.ordersPhone}
+                  </p>
                 </div>
 
-                <div className="space-y-0.5">
-                  <p className="font-normal">Timings</p>
-                  <p className="normal-case tracking-[-0.01em]">
+                <div>
+                  <p>Timings</p>
+                  <p className="normal-case tracking-[0.01em] text-black">
                     {footer.timings}
                   </p>
                 </div>
               </div>
-            </div>
+            </FooterGroup>
           </div>
 
           <div className="col-span-2 lg:col-span-1">
-            <h3 className="text-[14px] sm:text-[15px] font-normal uppercase tracking-[0.01em]">
-              Subscribe to our newsletter
-            </h3>
+            <h3 className={headingClass}>Subscribe to our newsletter</h3>
 
-            <div className="mt-5 sm:mt-6">
-              <div className="flex items-center gap-3 border-b border-black/55 pb-2">
+            <div className="mt-4">
+              <div className="flex items-center gap-3 border-b border-black/40 pb-2">
                 <input
                   type="email"
                   aria-label="Email address"
                   placeholder="Enter your email address"
                   className={cn(
-                    "min-w-0 flex-1 bg-transparent text-[13px] font-normal text-black outline-none placeholder:text-black/75",
+                    "h-8 min-w-0 flex-1 bg-transparent text-[14px] font-normal leading-[1.4] tracking-[0.01em] text-black outline-none placeholder:text-black/55",
                     "selection:bg-black selection:text-white"
                   )}
                 />
                 <button
                   type="button"
                   aria-label="Submit newsletter email"
-                  className="inline-flex size-8 items-center justify-center text-black transition-opacity hover:opacity-65 cursor-pointer"
+                  className="inline-flex size-8 cursor-pointer items-center justify-center text-black transition-opacity hover:opacity-65"
                 >
-                  <ArrowRight className="size-5 stroke-[1.8]" />
+                  <ArrowRight className="size-[18px] stroke-[1.5]" />
                 </button>
               </div>
 
               <button
                 type="button"
-                className="mt-5 flex h-12 sm:h-14 w-full items-center justify-center bg-black text-[14px] sm:text-[15px] font-normal uppercase tracking-normal text-white transition-opacity hover:opacity-90 cursor-pointer"
+                className="mt-5 flex h-12 w-full cursor-pointer items-center justify-center bg-black text-[14px] font-normal uppercase leading-none tracking-[0.04em] text-white transition-opacity hover:opacity-90"
               >
                 Subscribe
               </button>
@@ -160,13 +162,15 @@ export function FooterSection() {
           </div>
         </div>
 
-        <div className="border-t border-black/55 py-4">
-          <div className="flex w-full flex-nowrap items-center justify-between gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden whitespace-nowrap text-[9.5px] min-[360px]:text-[10.5px] min-[400px]:text-[11.5px] sm:text-[12px] lg:text-[13px] font-normal uppercase tracking-normal sm:tracking-[0.04em]">
-            {bottomLinks.map((link) => (
-              <FooterLink key={link.label} href={link.href}>
-                {link.label}
-              </FooterLink>
-            ))}
+        <div className="border-t border-black/20 pt-5 pb-1">
+          <div className="flex w-full flex-wrap items-center justify-between gap-x-6 gap-y-3 text-[11px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black/80 sm:text-[12px] lg:text-[13px]">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+              {bottomLinks.map((link) => (
+                <FooterLink key={link.label} href={link.href}>
+                  {link.label}
+                </FooterLink>
+              ))}
+            </div>
             <div className="shrink-0">Follow Us</div>
           </div>
         </div>

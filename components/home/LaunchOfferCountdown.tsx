@@ -72,16 +72,16 @@ export function LaunchOfferCountdown({
           {index > 0 ? (
             <span
               aria-hidden="true"
-              className="mr-0.5 text-[0.625rem] leading-none text-white/70 sm:mr-2 sm:text-[0.8125rem] md:mr-3 md:text-[1rem]"
+              className="mr-1 text-[13px] leading-none text-white/70 sm:mr-2 sm:text-[14px] md:mr-3 md:text-[16px]"
             >
               :
             </span>
           ) : null}
-          <div className="flex min-w-[1.85rem] flex-col items-center text-center sm:min-w-[2.75rem] md:min-w-[3.5rem]">
-            <span className="text-[0.5625rem] font-normal leading-none sm:text-[0.6875rem] md:text-[0.875rem]">
+          <div className="flex min-w-[2.25rem] flex-col items-center text-center sm:min-w-[2.75rem] md:min-w-[3.5rem]">
+            <span className="text-[14px] font-normal leading-[1.15] tracking-[0.02em] tabular-nums md:text-[16px]">
               {formatValue(item.value)}
             </span>
-            <span className="mt-0.5 text-[0.35rem] font-normal uppercase tracking-[0.1em] text-white/70 sm:text-[0.5rem] md:text-[0.625rem]">
+            <span className="mt-1 text-[11px] font-normal uppercase leading-none tracking-[0.04em] text-white/70">
               {item.label}
             </span>
           </div>

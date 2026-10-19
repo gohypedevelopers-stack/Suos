@@ -50,13 +50,19 @@ export type NavMenuCard = {
 }
 
 export type NavigationContent = {
-  /** "Collections" mega menu, left column. */
-  collections: NavMenuLink[]
-  /** "Men" mega menu, left column ("Featured"). */
-  menFeatured: NavMenuLink[]
-  /** Shared "Categories" column in both mega menus. */
+  /** "Collections" mega menu, middle "Edits" column. */
+  edits: NavMenuLink[]
+  /** "Men" mega menu, first column ("Collection"). */
+  menCollections: NavMenuLink[]
+  /** "Men" mega menu, second column ("Categories"). */
   categories: NavMenuLink[]
-  /** Landscape promo images on the right of both mega menus. */
+  /** "Men" mega menu, third column ("Featured"). */
+  menFeatured: NavMenuLink[]
+  /**
+   * Landscape promo images (up to 3, recommended 1200 × 800 px, 3:2).
+   * Collections menu: image 1 on the left, images 2–3 on the right.
+   * Men menu: images 2–3 on the right (falls back to whatever exists).
+   */
   cards: NavMenuCard[]
   /** "Bestsellers" is a plain link, no dropdown. */
   bestsellersHref: string
@@ -183,21 +189,27 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     ],
   },
   navigation: {
-    collections: [
-      { label: "All Collections", href: "/collections" },
+    edits: [
+      { label: "Shop All", href: "/collections" },
       { label: "Originals", href: "/collections/originals" },
       { label: "Freedom", href: "/collections/freedom" },
       { label: "Timeless", href: "/collections/timeless" },
     ],
-    menFeatured: [
-      { label: "New", href: "/collections" },
-      { label: "Bestsellers", href: "/#bestsellers" },
-      { label: "Sale", href: "/collections" },
+    menCollections: [
+      { label: "All Collection", href: "/collections" },
+      { label: "Originals", href: "/collections/originals" },
+      { label: "Freedom", href: "/collections/freedom" },
+      { label: "Timeless", href: "/collections/timeless" },
     ],
     categories: [
-      { label: "Bootcut Jeans", href: "/collections" },
-      { label: "Straight-Fit Jeans", href: "/collections" },
-      { label: "Regular-Fit Jeans", href: "/collections" },
+      { label: "Bootcut Jeans", href: "/shop?category=bootcut-jeans" },
+      { label: "Straight-Fit Jeans", href: "/shop?category=straight-fit-jeans" },
+      { label: "Regular-Fit Jeans", href: "/shop?category=regular-fit-jeans" },
+    ],
+    menFeatured: [
+      { label: "New Arrivals", href: "/shop?filter=new" },
+      { label: "Bestsellers", href: "/shop?filter=bestsellers" },
+      { label: "Sale", href: "/shop?filter=sale" },
     ],
     cards: [
       {
@@ -214,8 +226,15 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
         title: "Country Edit",
         href: "/collections",
       },
+      {
+        image: "/home-page-content/hero-1.png",
+        alt: "Editorial preview for the Timeless collection",
+        eyebrow: "Explore",
+        title: "Timeless",
+        href: "/collections/timeless",
+      },
     ],
-    bestsellersHref: "/#bestsellers",
+    bestsellersHref: "/shop?filter=bestsellers",
   },
   launchOffer: {
     // Hidden for now; switch on from Dashboard → Content → Launch offer.
@@ -241,7 +260,6 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     heading: "Edits",
     tabs: [
       { label: "ALL", active: false },
-      { label: "WOMEN", active: false },
       { label: "MEN", active: true },
     ],
     slides: [

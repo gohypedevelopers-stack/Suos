@@ -43,8 +43,8 @@ export function CartOfferProgress() {
   }
 
   return (
-    <section className="mx-auto w-full max-w-[360px] text-center">
-      <h2 className="whitespace-nowrap text-[14px] sm:text-[15px] font-normal uppercase leading-none tracking-[-0.02em] text-white">
+    <section className="mx-auto w-full max-w-[420px] text-center">
+      <h2 className="text-[13px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-white sm:text-[14px]">
         {headlineText}
       </h2>
 
@@ -71,7 +71,7 @@ export function CartOfferProgress() {
               />
               <span
                 className={cn(
-                  "absolute left-1/2 top-[1.45rem] -translate-x-1/2 whitespace-nowrap text-[10px] font-normal uppercase tracking-[0.03em] transition-colors sm:text-[11px]",
+                  "absolute left-1/2 top-[1.45rem] -translate-x-1/2 whitespace-nowrap text-[11px] font-normal uppercase leading-[1.4] tracking-[0.04em] transition-colors sm:text-[12px]",
                   isReached ? "text-white" : "text-white/60"
                 )}
               >

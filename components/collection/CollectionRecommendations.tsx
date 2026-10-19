@@ -32,14 +32,14 @@ export function CollectionRecommendations({ products = [] }: { products?: Produc
         <div className="flex items-center justify-between gap-6">
           <h2
             id="collection-recommendations-heading"
-            className="font-heading text-[24px] font-normal uppercase leading-none tracking-[-0.04em]"
+            className="font-heading text-[24px] sm:text-[26px] font-normal uppercase leading-[1.15] tracking-[0.01em]"
           >
             You May Also Like
           </h2>
 
           <Link
-            href="/collections"
-            className="group hidden flex-col items-start pb-0.5 text-[13px] font-normal uppercase leading-none tracking-normal transition-opacity hover:opacity-70 sm:inline-flex"
+            href="/shop"
+            className="group hidden flex-col items-start pb-0.5 text-[13px] md:text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em] transition-opacity hover:opacity-70 sm:inline-flex"
           >
             <span>View all</span>
             <span
@@ -86,8 +86,8 @@ export function CollectionRecommendations({ products = [] }: { products?: Produc
 
         <div className="mt-7 flex justify-center sm:hidden">
           <Link
-            href="/collections"
-            className="inline-flex h-9 min-w-[102px] items-center justify-center border border-black px-6 text-[13px] font-normal uppercase leading-none tracking-normal transition-colors hover:bg-black hover:text-white"
+            href="/shop"
+            className="inline-flex h-10 min-w-[102px] items-center justify-center border border-black px-6 text-[13px] font-normal uppercase leading-none tracking-[0.04em] transition-colors hover:bg-black hover:text-white"
           >
             View all
           </Link>

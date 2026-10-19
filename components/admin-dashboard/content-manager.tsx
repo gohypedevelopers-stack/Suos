@@ -147,7 +147,7 @@ function AnnouncementsEditor({ value, onChange }: SectionProps<"announcements">)
   )
 }
 
-type NavLinkList = SiteContent["navigation"]["collections"]
+type NavLinkList = SiteContent["navigation"]["edits"]
 
 function NavLinksEditor({ title, items, onChange }: { title: string; items: NavLinkList; onChange: (items: NavLinkList) => void }) {
   return (
@@ -173,19 +173,28 @@ function NavigationEditor({ value, onChange }: SectionProps<"navigation">) {
   return (
     <div className="space-y-4">
       <p className="text-xs text-black/55">
-        Controls the desktop mega menus in the header. &ldquo;Categories&rdquo; and the images are shared by the Collections and Men menus.
+        Controls the header mega menus (desktop) and the mobile menu. &ldquo;Collections&rdquo; links to /collections and opens the Edits menu; &ldquo;Men&rdquo; links to /shop and opens the three-column menu.
       </p>
-      <div className="grid gap-4 lg:grid-cols-3">
-        <NavLinksEditor title="Collections menu" items={value.collections} onChange={(collections) => onChange({ ...value, collections })} />
-        <NavLinksEditor title="Men menu · Featured" items={value.menFeatured} onChange={(menFeatured) => onChange({ ...value, menFeatured })} />
-        <NavLinksEditor title="Categories" items={value.categories} onChange={(categories) => onChange({ ...value, categories })} />
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-wide text-black/70">Collections menu</p>
+        <div className="grid gap-4 lg:grid-cols-3">
+          <NavLinksEditor title="Edits" items={value.edits} onChange={(edits) => onChange({ ...value, edits })} />
+        </div>
+      </div>
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-wide text-black/70">Men menu</p>
+        <div className="grid gap-4 lg:grid-cols-3">
+          <NavLinksEditor title="Collection" items={value.menCollections} onChange={(menCollections) => onChange({ ...value, menCollections })} />
+          <NavLinksEditor title="Categories" items={value.categories} onChange={(categories) => onChange({ ...value, categories })} />
+          <NavLinksEditor title="Featured" items={value.menFeatured} onChange={(menFeatured) => onChange({ ...value, menFeatured })} />
+        </div>
       </div>
       <Field label="Bestsellers button link" hint="Bestsellers is a plain button (no dropdown).">
         <Input value={value.bestsellersHref} onChange={(e) => onChange({ ...value, bestsellersHref: e.target.value })} />
       </Field>
       <div className="space-y-3">
-        <p className="text-xs font-semibold uppercase tracking-wide text-black/70">Menu images (landscape, up to 2)</p>
-        <p className="text-[11px] text-black/50">Recommended size: 1200 × 800 px (3:2, landscape). Text is centred on the image.</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-black/70">Menu images (landscape, up to 3)</p>
+        <p className="text-[11px] text-black/50">Recommended size: 1200 × 800 px (3:2, landscape). Text is centred on the image. Collections menu: image 1 on the left, images 2–3 on the right. Men menu: images 2–3 on the right.</p>
         {cards.map((card, index) => (
           <div key={index} className="rounded-lg border border-black/10 p-3">
             <div className="flex items-center justify-between gap-2">
@@ -201,7 +210,7 @@ function NavigationEditor({ value, onChange }: SectionProps<"navigation">) {
             </div>
           </div>
         ))}
-        {cards.length < 2 ? (
+        {cards.length < 3 ? (
           <Button type="button" variant="outline" onClick={() => setCards([...cards, { image: "", alt: "", eyebrow: "", title: "", href: "/collections" }])}>
             <Plus className="size-3.5" /> Add image
           </Button>

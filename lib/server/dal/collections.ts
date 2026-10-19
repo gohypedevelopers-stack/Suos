@@ -274,7 +274,7 @@ export async function getPublishedCollectionBySlug(slug: string) {
       const sizes = Array.from(new Set(
         product.variants.flatMap(v => {
           const opts = (v.optionValues && typeof v.optionValues === "object" && !Array.isArray(v.optionValues))
-            ? (v.optionValues as Record<string, any>)
+            ? (v.optionValues as Record<string, unknown>)
             : {}
           const size = opts["Size"] || opts["size"]
           return typeof size === "string" && size.trim() ? [size.trim().toUpperCase()] : []
@@ -284,11 +284,11 @@ export async function getPublishedCollectionBySlug(slug: string) {
       const swatches = Array.from(new Set(
         product.variants.flatMap(v => {
           const opts = (v.optionValues && typeof v.optionValues === "object" && !Array.isArray(v.optionValues))
-            ? (v.optionValues as Record<string, any>)
+            ? (v.optionValues as Record<string, unknown>)
             : {}
           const colorOpt = opts["Color"] || opts["color"]
           if (!colorOpt) return []
-          if (typeof colorOpt === "object" && "value" in colorOpt) {
+          if (typeof colorOpt === "object" && colorOpt !== null && "value" in colorOpt) {
             return [String(colorOpt.value)]
           }
           if (typeof colorOpt === "string") {
@@ -331,4 +331,94 @@ export async function getPublishedCollectionBySlug(slug: string) {
     alt: collection.imageAltText || collection.title,
     products: activeProducts,
   }
+}
+
+export type PublishedCollectionWithImages = {
+  id: string
+  title: string
+  slug: string
+  description: string | null
+  productCount: number
+  image: string
+  alt: string
+  images: { src: string; alt: string }[]
+}
+
+/**
+ * Published collections with up to `maxImages` image URLs each: the collection
+ * image first, then the first image of each active product (falling back to
+ * secondary product images when there are too few products).
+ */
+export async function listPublishedCollectionsWithImages(
+  maxImages = 5,
+): Promise<PublishedCollectionWithImages[]> {
+  const prisma = getPrisma()
+  const collections = await prisma.collection.findMany({
+    where: { isPublished: true },
+    orderBy: { updatedAt: "desc" },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      description: true,
+      imageObjectKey: true,
+      imageAltText: true,
+      _count: {
+        select: { products: { where: { product: { status: "ACTIVE" } } } },
+      },
+      products: {
+        where: { product: { status: "ACTIVE" } },
+        orderBy: { position: "asc" },
+        take: 12,
+        select: {
+          product: {
+            select: {
+              title: true,
+              images: {
+                orderBy: { position: "asc" },
+                take: 2,
+                select: { objectKey: true, altText: true },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+
+  return collections.map((collection) => {
+    const image = collection.imageObjectKey
+      ? (imageUrl(collection.imageObjectKey) ?? "")
+      : ""
+    const alt = collection.imageAltText || collection.title
+    const images: { src: string; alt: string }[] = []
+    const seen = new Set<string>()
+    const add = (src: string | null, imageAlt: string) => {
+      if (!src || seen.has(src) || images.length >= maxImages) return
+      seen.add(src)
+      images.push({ src, alt: imageAlt })
+    }
+
+    add(image || null, alt)
+    const products = collection.products.map(({ product }) => product)
+    for (const product of products) {
+      const first = product.images[0]
+      if (first) add(imageUrl(first.objectKey), first.altText || product.title)
+    }
+    for (const product of products) {
+      const second = product.images[1]
+      if (second) add(imageUrl(second.objectKey), second.altText || product.title)
+    }
+
+    return {
+      id: collection.id,
+      title: collection.title,
+      slug: collection.slug,
+      description: collection.description,
+      productCount: collection._count.products,
+      image: image || images[0]?.src || "",
+      alt,
+      images,
+    }
+  })
 }

@@ -83,13 +83,13 @@ export function RecommendedSection({
   return (
     <section className="w-full bg-white px-3 sm:px-6 lg:px-8 py-10 md:py-16 text-black">
       <div className="flex w-full items-end justify-between">
-        <h2 className="font-heading text-[22px] sm:text-[24px] font-normal uppercase leading-none tracking-[-0.04em]">
+        <h2 className="font-heading text-[24px] sm:text-[26px] font-normal uppercase leading-[1.15] tracking-[0.01em]">
           Recommended
         </h2>
 
         <Link
-          href="/collections"
-          className="text-[12px] sm:text-[13px] font-normal uppercase tracking-wider text-black/60 transition-colors hover:text-black"
+          href="/shop"
+          className="text-[12px] sm:text-[13px] md:text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black/60 transition-colors hover:text-black"
         >
           View All
         </Link>

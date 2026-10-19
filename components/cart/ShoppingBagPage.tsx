@@ -95,7 +95,7 @@ function CartItemRow({ item }: { item: CartItem }) {
             />
           </Link>
           {item.badge && (
-            <span className="absolute bottom-1.5 left-1.5 rounded-[2px] bg-slate-100/95 px-1.5 py-0.5 text-[9px] font-normal tracking-tight text-blue-900 shadow-xs">
+            <span className="absolute bottom-1.5 left-1.5 rounded-[2px] bg-slate-100/95 px-1.5 py-0.5 text-[11px] font-normal tracking-[0.02em] text-blue-900 shadow-xs">
               {item.badge}
             </span>
           )}
@@ -107,7 +107,7 @@ function CartItemRow({ item }: { item: CartItem }) {
           <div className="flex items-start justify-between gap-3">
             <Link
               href={item.slug ? `/products/${item.slug}` : "#"}
-              className="min-w-0 text-[13px] sm:text-[14px] font-normal leading-snug text-black transition-opacity hover:opacity-60"
+              className="min-w-0 text-[13px] sm:text-[14px] font-normal leading-[1.4] text-black transition-opacity hover:opacity-60"
             >
               {item.title || "SIGNATURE ITEM"}
             </Link>
@@ -230,7 +230,7 @@ function PromoCodeAccordion() {
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className="flex w-full items-center justify-between text-[13px] uppercase tracking-[0.06em] text-black transition-colors hover:opacity-70"
+        className="flex w-full items-center justify-between text-[13px] uppercase tracking-[0.04em] text-black transition-colors hover:opacity-70"
       >
         <span className="flex items-center gap-2">
           <Tag className="size-3.5 text-black/60" />
@@ -254,17 +254,17 @@ function PromoCodeAccordion() {
                 setApplied(false)
               }}
               placeholder="e.g. SUOS10"
-              className="flex-1 border border-black/25 bg-white px-3 py-2 text-[12px] uppercase tracking-[0.06em] placeholder:normal-case placeholder:tracking-normal placeholder:text-black/35 focus:border-black focus:outline-none"
+              className="flex-1 border border-black/25 bg-white px-3 py-2 text-[12px] uppercase tracking-[0.04em] placeholder:normal-case placeholder:tracking-normal placeholder:text-black/35 focus:border-black focus:outline-none"
             />
             <button
               type="submit"
-              className="border border-black bg-black px-4 text-[12px] uppercase tracking-[0.08em] text-white transition-colors hover:bg-black/80"
+              className="border border-black bg-black px-4 text-[12px] uppercase tracking-[0.04em] text-white transition-colors hover:bg-black/80"
             >
               Apply
             </button>
           </div>
           {applied && (
-            <p className="mt-2 text-[11px] uppercase tracking-[0.04em] text-black font-medium">
+            <p className="mt-2 text-[11px] uppercase tracking-[0.04em] text-black font-normal">
               ✓ Promo code applied: 10% off
             </p>
           )}
@@ -282,15 +282,15 @@ function SuosRewardsCard({ subtotal }: { subtotal: number }) {
 
   return (
     <div className="border border-black bg-black p-5 text-center sm:text-left text-white">
-      <h3 className="text-[14px] font-normal uppercase tracking-[0.1em] text-white">
-        SUOS <span className="font-light text-white/70">Rewards</span>
+      <h3 className="text-[14px] font-normal uppercase tracking-[0.04em] text-white">
+        SUOS <span className="font-normal text-white/70">Rewards</span>
       </h3>
-      <p className="mt-1 text-[12px] leading-relaxed text-white/75">
-        You could earn <strong className="font-semibold text-white">{points} points</strong> on this order.
+      <p className="mt-1 text-[12px] leading-[1.5] text-white/75">
+        You could earn <strong className="font-normal text-white">{points} points</strong> on this order.
       </p>
       <Link
         href="/contact"
-        className="mt-2.5 inline-block text-[11px] font-medium uppercase tracking-[0.08em] text-white underline underline-offset-4 transition-opacity hover:opacity-75"
+        className="mt-2.5 inline-block text-[11px] font-normal uppercase tracking-[0.04em] text-white underline underline-offset-4 transition-opacity hover:opacity-75"
       >
         Sign in or Join SUOS Rewards now
       </Link>
@@ -319,7 +319,7 @@ function ShoppingBagSummary({
 
       {/* Main Order Summary Box */}
       <aside className="border border-black/15 bg-white p-6 text-black sm:p-7">
-        <h2 className="text-[15px] font-normal uppercase tracking-[0.08em] text-black">
+        <h2 className="text-[15px] font-normal uppercase tracking-[0.04em] text-black">
           Order Summary ({itemCount} {itemCount === 1 ? "item" : "items"})
         </h2>
 
@@ -331,7 +331,7 @@ function ShoppingBagSummary({
           </div>
 
           {discount > 0 && (
-            <div className="flex items-center justify-between text-black font-medium">
+            <div className="flex items-center justify-between text-black font-normal">
               <span className="uppercase tracking-[0.04em]">Special 10% Privilege</span>
               <span>-{formatPrice(discount)}</span>
             </div>
@@ -344,7 +344,7 @@ function ShoppingBagSummary({
 
           <div className="flex items-center justify-between text-black/80">
             <span className="uppercase tracking-[0.04em]">Standard Shipping</span>
-            <span className="font-medium text-black uppercase tracking-[0.04em]">FREE</span>
+            <span className="font-normal text-black uppercase tracking-[0.04em]">FREE</span>
           </div>
         </div>
 
@@ -358,16 +358,16 @@ function ShoppingBagSummary({
 
         {/* Estimated Total */}
         <div className="flex items-baseline justify-between">
-          <span className="text-[14px] font-normal uppercase tracking-[0.08em] text-black">
+          <span className="text-[14px] font-normal uppercase tracking-[0.04em] text-black">
             Estimated Total
           </span>
-          <span className="text-[20px] font-semibold tracking-[-0.02em] text-black">
+          <span className="text-[20px] font-normal tracking-[0.02em] text-black">
             {formatPrice(finalTotal)}
           </span>
         </div>
 
         {/* Installment note */}
-        <p className="mt-2 text-[11px] leading-relaxed tracking-[0.02em] text-black/65">
+        <p className="mt-2 text-[11px] leading-[1.5] tracking-[0.02em] text-black/65">
           4 interest-free payments of <strong className="text-black">{formatPrice(installment)}</strong> with UPI or Netbanking ⓘ
         </p>
 
@@ -375,7 +375,7 @@ function ShoppingBagSummary({
         <div className="mt-6">
           <Link
             href="/checkout"
-            className="flex h-12 w-full items-center justify-center bg-black text-[13px] font-medium uppercase tracking-[0.12em] text-white transition-opacity hover:opacity-90 active:scale-[0.99]"
+            className="flex h-12 w-full items-center justify-center bg-black text-[14px] font-normal uppercase tracking-[0.04em] text-white transition-opacity hover:opacity-90 active:scale-[0.99]"
           >
             Start Checkout
           </Link>
@@ -386,7 +386,7 @@ function ShoppingBagSummary({
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-black/15" />
           </div>
-          <span className="relative bg-white px-3 text-[11px] uppercase tracking-[0.08em] text-black/50">
+          <span className="relative bg-white px-3 text-[11px] uppercase tracking-[0.04em] text-black/50">
             or checkout with
           </span>
         </div>
@@ -395,21 +395,21 @@ function ShoppingBagSummary({
         <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
           <Link
             href="/checkout"
-            className="flex h-10 items-center justify-center border border-black bg-white px-1 sm:px-2 text-center text-[10.5px] min-[360px]:text-[11px] sm:text-[12px] font-medium uppercase tracking-[0.02em] sm:tracking-[0.06em] text-black transition-colors hover:bg-black hover:text-white"
+            className="flex h-10 items-center justify-center border border-black bg-white px-1 sm:px-2 text-center text-[11px] min-[360px]:text-[11px] sm:text-[12px] font-normal uppercase tracking-[0.02em] sm:tracking-[0.04em] text-black transition-colors hover:bg-black hover:text-white"
           >
             UPI / GPay
           </Link>
           <Link
             href="/checkout"
-            className="flex h-10 items-center justify-center border border-black bg-white px-1 sm:px-2 text-center text-[10.5px] min-[360px]:text-[11px] sm:text-[12px] font-medium uppercase tracking-[0.02em] sm:tracking-[0.06em] text-black transition-colors hover:bg-black hover:text-white"
+            className="flex h-10 items-center justify-center border border-black bg-white px-1 sm:px-2 text-center text-[11px] min-[360px]:text-[11px] sm:text-[12px] font-normal uppercase tracking-[0.02em] sm:tracking-[0.04em] text-black transition-colors hover:bg-black hover:text-white"
           >
             Cards / Netbanking
           </Link>
         </div>
 
         {/* Trust & Policy Details */}
-        <div className="mt-8 space-y-2 border-t border-black/15 pt-6 text-center text-[11px] uppercase tracking-[0.06em] text-black/55">
-          <p className="font-medium text-black/80">SUOS members enjoy complimentary returns</p>
+        <div className="mt-8 space-y-2 border-t border-black/15 pt-6 text-center text-[11px] uppercase tracking-[0.04em] text-black/55">
+          <p className="font-normal text-black/80">SUOS members enjoy complimentary returns</p>
           <p>100% Authentic SUOS Atelier Guarantee</p>
           <p className="pt-1">
             Need Help?{" "}
@@ -417,7 +417,7 @@ function ShoppingBagSummary({
               info@suos.in
             </a>
           </p>
-          <div className="flex justify-center gap-3 pt-1 text-[10px]">
+          <div className="flex justify-center gap-3 pt-1 text-[11px]">
             <Link href="/returns-policy" className="underline hover:text-black">
               Shipping Info
             </Link>
@@ -439,7 +439,7 @@ function EmptyBagState() {
   return (
     <div className="flex min-h-[50vh] flex-col items-center justify-center py-20 text-center">
       <ShoppingBag className="mb-6 size-12 text-black/20" strokeWidth={1} />
-      <h2 className="text-[20px] font-normal uppercase tracking-[0.08em] text-black sm:text-[24px]">
+      <h2 className="text-[20px] font-normal uppercase tracking-[0.04em] text-black sm:text-[24px]">
         Your Bag is Empty
       </h2>
       <p className="mt-2 max-w-sm text-[13px] uppercase tracking-[0.04em] text-black/50">
@@ -447,7 +447,7 @@ function EmptyBagState() {
       </p>
       <Link
         href="/collections"
-        className="mt-8 inline-flex h-12 items-center bg-black px-8 text-[13px] uppercase tracking-[0.12em] text-white transition-opacity hover:opacity-90"
+        className="mt-8 inline-flex h-12 items-center bg-black px-8 text-[14px] uppercase tracking-[0.04em] text-white transition-opacity hover:opacity-90"
       >
         Shop New Collections
       </Link>
@@ -465,16 +465,16 @@ function BeforeYouGoSection() {
     <section className="mt-20 border-t border-black/15 pt-12">
       <div className="flex items-start sm:items-baseline justify-between gap-4">
         <div className="min-w-0">
-          <h2 className="text-[18px] sm:text-[22px] font-normal uppercase tracking-[0.06em] text-black">
+          <h2 className="text-[18px] sm:text-[22px] font-normal uppercase tracking-[0.04em] text-black">
             Before You Go
           </h2>
-          <p className="mt-1 text-[11px] sm:text-[12px] uppercase tracking-[0.06em] text-black/45">
+          <p className="mt-1 text-[11px] sm:text-[12px] uppercase tracking-[0.04em] text-black/45">
             Curated pieces to complete your wardrobe
           </p>
         </div>
         <Link
           href="/collections"
-          className="flex shrink-0 items-center gap-1.5 whitespace-nowrap text-[11px] sm:text-[12px] uppercase tracking-[0.08em] text-black transition-opacity hover:opacity-60 pt-0.5 sm:pt-0"
+          className="flex shrink-0 items-center gap-1.5 whitespace-nowrap text-[11px] sm:text-[12px] uppercase tracking-[0.04em] text-black transition-opacity hover:opacity-60 pt-0.5 sm:pt-0"
         >
           <span>View All</span>
           <ArrowRight className="size-3.5 shrink-0" />
@@ -497,16 +497,16 @@ function BeforeYouGoSection() {
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
               />
               {prod.badge && (
-                <span className="absolute left-2.5 top-2.5 bg-black px-2 py-0.5 text-[9px] uppercase tracking-[0.1em] text-white">
+                <span className="absolute left-2.5 top-2.5 bg-black px-2 py-0.5 text-[11px] uppercase tracking-[0.04em] text-white">
                   {prod.badge}
                 </span>
               )}
             </div>
             <div className="mt-3 space-y-1">
-              <h3 className="truncate text-[12px] font-normal uppercase tracking-[0.06em] text-black group-hover:opacity-70 sm:text-[13px]">
+              <h3 className="truncate text-[12px] font-normal uppercase tracking-[0.04em] text-black group-hover:opacity-70 sm:text-[13px]">
                 {prod.title || "SIGNATURE ATELIER PIECE"}
               </h3>
-              <p className="text-[12px] font-medium tracking-[0.02em] text-black sm:text-[13px]">
+              <p className="text-[12px] font-normal tracking-[0.02em] text-black sm:text-[13px]">
                 {prod.price && prod.price !== "N/A" ? formatPrice(prod.price) : "₹4,990"}
               </p>
             </div>
@@ -543,9 +543,9 @@ export function ShoppingBagPage() {
             {/* Top Page Title & Total */}
             <div className="border-b border-black/15 pb-5">
               <div className="flex items-baseline justify-between gap-3">
-                <h1 className="flex flex-wrap items-baseline gap-1.5 sm:gap-2 text-[18px] sm:text-[22px] font-normal uppercase tracking-[0.06em] text-black">
+                <h1 className="flex flex-wrap items-baseline gap-1.5 sm:gap-2 text-[18px] sm:text-[22px] font-normal uppercase tracking-[0.04em] text-black">
                   <span>Shopping Bag</span>
-                  <span className="text-[13px] sm:text-[15px] font-light text-black/50 tracking-[0.04em]">
+                  <span className="text-[13px] sm:text-[15px] font-normal text-black/50 tracking-[0.04em]">
                     ({totalItems} {totalItems === 1 ? "item" : "items"})
                   </span>
                 </h1>
@@ -555,7 +555,7 @@ export function ShoppingBagPage() {
               </div>
 
               {/* Alert notice */}
-              <div className="mt-2.5 flex items-center gap-1.5 text-[11px] sm:text-[12px] font-normal uppercase tracking-[0.05em] text-black/65">
+              <div className="mt-2.5 flex items-center gap-1.5 text-[11px] sm:text-[12px] font-normal uppercase tracking-[0.04em] text-black/65">
                 <svg className="size-3.5 shrink-0" viewBox="0 0 16 16" fill="currentColor">
                   <circle cx="8" cy="8" r="8" fill="black" />
                   <path d="M8 3.75a.75.75 0 0 1 .75.75v4.5a.75.75 0 0 1-1.5 0v-4.5A.75.75 0 0 1 8 3.75zm0 8a.875.875 0 1 1 0-1.75.875.875 0 0 1 0 1.75z" fill="white" />
@@ -575,7 +575,7 @@ export function ShoppingBagPage() {
                 </div>
 
                 {/* Gift Option Box */}
-                <div className="mt-8 border border-black/15 bg-neutral-50 px-5 py-4 text-center text-[12px] uppercase tracking-[0.06em] text-black/75">
+                <div className="mt-8 border border-black/15 bg-neutral-50 px-5 py-4 text-center text-[12px] uppercase tracking-[0.04em] text-black/75">
                   Gift options available in checkout
                 </div>
               </section>

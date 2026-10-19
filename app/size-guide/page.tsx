@@ -15,10 +15,10 @@ export default async function SizeGuidePage() {
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col items-center bg-white py-10 md:py-20">
       <div className="mb-12 space-y-4 px-5 text-center">
-        <h1 className="font-heading text-4xl font-normal uppercase tracking-tight sm:text-5xl">
+        <h1 className="font-heading text-[24px] font-normal uppercase leading-[1.15] tracking-[-0.01em] sm:text-[28px]">
           {sizeGuide.title}
         </h1>
-        <p className="font-sans text-sm font-normal uppercase tracking-wide text-black/60">
+        <p className="font-sans text-[13px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black/60 sm:text-[14px]">
           {sizeGuide.subtitle}
         </p>
       </div>

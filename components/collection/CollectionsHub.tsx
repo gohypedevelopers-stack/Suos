@@ -1,107 +1,204 @@
 import Image from "next/image"
 import Link from "next/link"
 
-import { listPublishedCollections } from "@/lib/server/dal/collections"
+import { CollectionHero } from "@/components/collection/CollectionHero"
+import {
+  listPublishedCollectionsWithImages,
+  type PublishedCollectionWithImages,
+} from "@/lib/server/dal/collections"
+
+const FALLBACK_HERO = "/home-page-content/hero-1.png"
+const FALLBACK_DESCRIPTION =
+  "This denim is washed and finished using closed-loop processes that cut water use and keep harsh chemicals out of the system — made to be worn hard and kept for years."
 
 export async function CollectionsHub() {
-  const collections = await listPublishedCollections()
+  const collections = await listPublishedCollectionsWithImages(5)
+  const hero = collections.find((collection) => collection.image)
 
   return (
-    <section className="w-full bg-white">
-      {/* Page Header */}
-      <div className="border-b border-black/10 px-4 pb-6 pt-8 sm:px-6 md:pt-10 lg:px-8">
-        <h1 className="font-heading text-[24px] font-[400] uppercase leading-none tracking-[-0.05em] text-black">
-          Collections
-        </h1>
-        <p className="mt-2 text-[13px] font-normal uppercase tracking-[0.04em] text-black/50">
-          {collections.length} {collections.length === 1 ? "Collection" : "Collections"}
-        </p>
-      </div>
+    <div className="w-full bg-white text-black">
+      <h1 className="sr-only">Collections</h1>
 
-      {/* Collections Grid */}
+      <CollectionHero
+        image={hero?.image || FALLBACK_HERO}
+        alt={hero?.alt || "SUOS collections"}
+        heightClassName="h-[60vh] min-h-[360px] sm:h-[72vh]"
+      />
+
       {collections.length > 0 ? (
-        <div className="px-4 py-8 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {collections.map((collection) => (
-              <CollectionCard key={collection.id} collection={collection} />
-            ))}
-          </div>
-        </div>
+        collections.map((collection) => (
+          <CollectionSection key={collection.id} collection={collection} />
+        ))
       ) : (
         <EmptyCollections />
       )}
+    </div>
+  )
+}
+
+function CollectionSection({
+  collection,
+}: {
+  collection: PublishedCollectionWithImages
+}) {
+  const headingId = `collection-${collection.slug}`
+  const href = `/collections/${collection.slug}`
+
+  return (
+    <section aria-labelledby={headingId} className="w-full">
+      <h2
+        id={headingId}
+        className="px-4 pb-4 pt-10 text-[14px] font-normal uppercase leading-[1.15] tracking-[0.04em] sm:px-6 sm:pb-5 sm:pt-14 sm:text-[16px] lg:px-8"
+      >
+        {collection.title}
+      </h2>
+
+      <CollectionMosaic
+        images={collection.images}
+        href={href}
+        title={collection.title}
+      />
+
+      <div className="flex flex-col items-center bg-[#fbf3f1] px-4 py-12 text-center sm:px-6 sm:py-16">
+        <p className="font-heading text-[20px] font-normal uppercase leading-[1.15] tracking-[0.01em] sm:text-[24px]">
+          Shop {collection.title} Collection
+        </p>
+        <p className="mt-3 max-w-[520px] text-[13px] font-normal leading-[1.4] text-black/70 sm:text-[14px]">
+          {collection.description || FALLBACK_DESCRIPTION}
+        </p>
+        <Link
+          href={href}
+          className="mt-6 inline-flex h-9 min-w-[128px] items-center justify-center border border-black px-6 text-[12px] font-normal uppercase leading-none tracking-[0.04em] transition-colors hover:bg-black hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black sm:h-10 sm:text-[13px]"
+          aria-label={`Shop the ${collection.title} collection`}
+        >
+          Shop now
+        </Link>
+      </div>
     </section>
   )
 }
 
-type CollectionItem = Awaited<ReturnType<typeof listPublishedCollections>>[number]
+type Tile = { className: string; sizes: string }
 
-function CollectionCard({ collection }: { collection: CollectionItem }) {
+/**
+ * Tile classes for a mosaic of `count` images. Desktop uses a 6-column grid:
+ *   5 images: [wide 2/3 | 1/3] then [1/3 | 1/3 | 1/3]
+ *   4 images: [wide 2/3 | 1/3] then [1/2 | 1/2]
+ *   3 images: three equal columns
+ *   2 images: two halves
+ *   1 image : one wide banner
+ * Mobile uses 2 columns: the first image full width, the rest in pairs.
+ */
+function mosaicTiles(count: number): Tile[] {
+  const big: Tile = {
+    className: "col-span-2 aspect-[4/5] lg:col-span-4 lg:aspect-[16/11]",
+    sizes: "(max-width: 1024px) 100vw, 67vw",
+  }
+  const side: Tile = {
+    className: "col-span-1 aspect-[3/4] lg:col-span-2 lg:aspect-auto",
+    sizes: "(max-width: 1024px) 50vw, 33vw",
+  }
+  const third: Tile = {
+    className: "col-span-1 aspect-[3/4] lg:col-span-2",
+    sizes: "(max-width: 1024px) 50vw, 33vw",
+  }
+  const half: Tile = {
+    className: "col-span-1 aspect-[3/4] lg:col-span-3 lg:aspect-[4/3]",
+    sizes: "50vw",
+  }
+  const lastFull: Tile = {
+    className: "col-span-2 aspect-[4/3] lg:col-span-3",
+    sizes: "(max-width: 1024px) 100vw, 50vw",
+  }
+
+  switch (count) {
+    case 0:
+      return []
+    case 1:
+      return [{ className: "col-span-2 aspect-[4/5] sm:aspect-[16/9] lg:col-span-6 lg:aspect-[21/9]", sizes: "100vw" }]
+    case 2:
+      return [
+        { className: "col-span-1 aspect-[3/4] lg:col-span-3 lg:aspect-[4/5]", sizes: "50vw" },
+        { className: "col-span-1 aspect-[3/4] lg:col-span-3 lg:aspect-[4/5]", sizes: "50vw" },
+      ]
+    case 3:
+      return [
+        { className: "col-span-2 aspect-[4/5] lg:col-span-2 lg:aspect-[3/4]", sizes: "(max-width: 1024px) 100vw, 33vw" },
+        third,
+        third,
+      ]
+    case 4:
+      return [big, side, half, lastFull]
+    default:
+      return [big, side, third, third, third]
+  }
+}
+
+function CollectionMosaic({
+  images,
+  href,
+  title,
+}: {
+  images: PublishedCollectionWithImages["images"]
+  href: string
+  title: string
+}) {
+  const shown = images.slice(0, 5)
+  const tiles = mosaicTiles(shown.length)
+
+  if (!tiles.length) {
+    return (
+      <Link
+        href={href}
+        className="flex aspect-[16/9] w-full items-center justify-center bg-[#e7e7e4] lg:aspect-[21/9]"
+        aria-label={`Shop the ${title} collection`}
+      >
+        <span className="font-heading text-[32px] font-normal uppercase leading-[1.15] tracking-[0.01em] text-black/20">
+          {title}
+        </span>
+      </Link>
+    )
+  }
+
   return (
-    <Link
-      href={`/collections/${collection.slug}`}
-      className="group relative block overflow-hidden bg-[#f0ede8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
-      aria-label={`Browse the ${collection.title} collection — ${collection.productCount} ${collection.productCount === 1 ? "item" : "items"}`}
-    >
-      {/* Image */}
-      <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#e8e4de]">
-        {collection.image.length > 0 ? (
+    <div className="grid grid-cols-2 gap-0.5 lg:grid-cols-6">
+      {shown.map((image, index) => (
+        <Link
+          key={image.src}
+          href={href}
+          tabIndex={index === 0 ? undefined : -1}
+          aria-label={index === 0 ? `Shop the ${title} collection` : undefined}
+          aria-hidden={index === 0 ? undefined : true}
+          className={`group relative block overflow-hidden bg-[#e7e7e4] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-black ${tiles[index].className}`}
+        >
           <Image
-            src={collection.image}
-            alt={collection.alt}
+            src={image.src}
+            alt={image.alt}
             fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover transition-transform duration-700 will-change-transform group-hover:scale-[1.03]"
+            sizes={tiles[index].sizes}
+            className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
           />
-        ) : (
-          /* Placeholder when no image is set */
-          <div className="flex h-full w-full items-center justify-center bg-[#e8e4de]">
-            <span className="font-heading text-[64px] font-[400] uppercase leading-none tracking-[-0.05em] text-black/10">
-              {collection.title.slice(0, 1)}
-            </span>
-          </div>
-        )}
-
-        {/* Dark gradient overlay at bottom */}
-        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-
-        {/* Text overlay */}
-        <div className="absolute inset-x-0 bottom-0 p-5 text-white">
-          <p className="font-heading text-[22px] font-[400] uppercase leading-none tracking-[-0.04em]">
-            {collection.title}
-          </p>
-          <p className="mt-1.5 text-[12px] font-normal uppercase tracking-[0.08em] text-white/75">
-            {collection.productCount} {collection.productCount === 1 ? "item" : "items"}
-          </p>
-          {collection.description ? (
-            <p className="mt-2 line-clamp-2 max-w-xs text-[12px] leading-relaxed text-white/60">
-              {collection.description}
-            </p>
-          ) : null}
-
-          {/* CTA */}
-          <span className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-normal uppercase tracking-[0.1em] text-white/80 transition-all duration-200 group-hover:text-white">
-            Shop now
-            <span
-              aria-hidden="true"
-              className="block h-px w-0 origin-left bg-white transition-all duration-300 group-hover:w-10"
-            />
-          </span>
-        </div>
-      </div>
-    </Link>
+        </Link>
+      ))}
+    </div>
   )
 }
 
 function EmptyCollections() {
   return (
-    <div className="flex min-h-[50vh] flex-col items-center justify-center px-4 py-20 text-center">
-      <p className="font-heading text-[20px] font-[400] uppercase leading-none tracking-[-0.04em] text-black">
-        No Collections Yet
+    <div className="flex min-h-[40vh] flex-col items-center justify-center px-4 py-20 text-center">
+      <p className="font-heading text-[24px] font-normal uppercase leading-[1.15] tracking-[0.01em]">
+        No collections yet
       </p>
-      <p className="mt-3 max-w-sm text-[13px] uppercase tracking-[0.04em] text-black/50">
-        Collections are being curated. Check back soon.
+      <p className="mt-3 max-w-sm text-[14px] leading-[1.4] text-black/60">
+        Collections are being curated. In the meantime, browse everything we make.
       </p>
+      <Link
+        href="/shop"
+        className="mt-6 inline-flex h-10 min-w-[140px] items-center justify-center border border-black px-6 text-[13px] uppercase leading-none tracking-[0.04em] transition-colors hover:bg-black hover:text-white"
+      >
+        Shop all
+      </Link>
     </div>
   )
 }

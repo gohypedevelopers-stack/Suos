@@ -226,6 +226,7 @@ export async function getHomeBanners(): Promise<HomeBanners> {
         overlayOpacity: 15,
       },
     ],
+    // Hidden until a FEATURE banner (image or video) is uploaded in admin.
     feature: null,
     middle: {
       id: "default-middle",
