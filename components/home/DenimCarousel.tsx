@@ -45,14 +45,14 @@ export function DenimCarousel({ slides }: { slides?: HomeCarouselSlide[] }) {
   const tiles = slides && slides.length > 0 ? slides.slice(0, TILE_COUNT).map(toTile) : DEFAULT_TILES
 
   return (
-    <section className="grid w-full grid-cols-1 bg-white sm:grid-cols-3">
+    <section className="flex w-full snap-x snap-mandatory gap-1 overflow-x-auto bg-white [scrollbar-width:none] sm:grid sm:grid-cols-3 sm:gap-0 sm:overflow-visible [&::-webkit-scrollbar]:hidden">
       <h2 className="sr-only">Shop by collection</h2>
       {tiles.map((tile) => (
         <Link
           key={tile.id}
           href={tile.href}
           aria-label={`Shop ${tile.label}`}
-          className="group relative block aspect-[4/5] overflow-hidden bg-[#efefef] sm:aspect-[480/834]"
+          className="group relative block aspect-[480/834] w-[78vw] shrink-0 snap-start overflow-hidden bg-[#efefef] sm:w-auto"
         >
           <Image
             src={tile.image}

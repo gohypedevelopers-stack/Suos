@@ -8,12 +8,16 @@ import {
   Copy,
   CreditCard,
   Heart,
+  Plus,
   RefreshCcw,
   ShieldCheck,
   Truck,
+  Undo2,
+  X,
 } from "lucide-react"
 import type { ButtonHTMLAttributes, ReactNode } from "react"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useSyncExternalStore } from "react"
+import { createPortal } from "react-dom"
 
 import {
   Accordion,
@@ -26,6 +30,7 @@ import type { ProductDetail } from "@/components/product/productData"
 import type { ProductCard as HomeProductCard } from "@/components/home/TrendingSection"
 import { SizeChartModal } from "@/components/product/SizeChartModal"
 import { useCart } from "@/lib/cart-context"
+import { useSiteContent } from "@/lib/site-content-context"
 import { useWishlist } from "@/lib/wishlist-context"
 import type { ProductCard } from "@/components/product/productData"
 
@@ -34,10 +39,18 @@ const deliveryIcons = {
   exchange: RefreshCcw,
   shield: ShieldCheck,
   card: CreditCard,
+  returns: Undo2,
 } as const
 
+/** Stored labels are uppercase; spec names read "Article Code", "Fit" in Figma. */
+function toDisplayCase(label: string) {
+  if (label !== label.toUpperCase()) return label
+  return label.toLowerCase().replace(/(^|[\s(/-])(\p{L})/gu, (_, sep, char) => sep + char.toUpperCase())
+}
+
+// The built-in chevrons are hidden; Figma uses "+" closed and "x" open.
 const accordionTriggerClass =
-  "h-[60px] items-center rounded-none py-0 text-h4 uppercase tracking-normal text-ink-800 hover:no-underline"
+  "h-[60px] items-center rounded-none py-0 text-h4 uppercase tracking-normal text-ink-800 hover:no-underline [&_[data-slot=accordion-trigger-icon]]:!hidden"
 const accordionBodyClass =
   "w-full min-w-0 max-w-full pb-6 text-body font-normal text-ink-700 break-words"
 
@@ -56,8 +69,8 @@ function OptionButton({
       className={cn(
         "inline-flex cursor-pointer items-center justify-center border text-h3 transition-[background-color,border-color,color] duration-200 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45",
         active
-          ? "border-black bg-black text-white"
-          : "border-black/15 bg-white text-ink-900 hover:border-black",
+          ? "border-black bg-[#ececec] text-ink-900"
+          : "border-black/20 bg-white text-ink-900 hover:border-black",
         className
       )}
       {...props}
@@ -67,9 +80,11 @@ function OptionButton({
   )
 }
 
-/** Bolds the first mention of the product name inside the description (Figma). */
-function DescriptionText({ text, productName }: { text: string; productName: string }) {
-  const index = productName ? text.toLowerCase().indexOf(productName.toLowerCase()) : -1
+/** Bolds the first mention of the product (line) name inside the description (Figma). */
+function DescriptionText({ text, names }: { text: string; names: string[] }) {
+  const lower = text.toLowerCase()
+  const productName = names.find((name) => name && lower.includes(name.toLowerCase())) ?? ""
+  const index = productName ? lower.indexOf(productName.toLowerCase()) : -1
   if (index < 0) return <p className="whitespace-pre-line">{text}</p>
 
   return (
@@ -136,7 +151,12 @@ function MiniProductCard({ product }: { product: HomeProductCard }) {
         </p>
       ) : null}
       <p className="mt-1.5 truncate text-[13px] uppercase leading-none text-ink-800">{product.title}</p>
-      <p className="mt-1.5 text-caption font-medium text-ink-900">{product.price}</p>
+      <p className="mt-1.5 flex items-baseline gap-2 text-caption">
+        {product.compareAtPrice ? (
+          <span className="text-ink-600 line-through">{product.compareAtPrice}</span>
+        ) : null}
+        <span className="font-medium text-ink-900">{product.price}</span>
+      </p>
     </Link>
   )
 }
@@ -144,7 +164,11 @@ function MiniProductCard({ product }: { product: HomeProductCard }) {
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <AccordionItem value={title} className="border-b border-black/15">
-      <AccordionTrigger className={accordionTriggerClass}>{title}</AccordionTrigger>
+      <AccordionTrigger className={accordionTriggerClass}>
+        <span>{title}</span>
+        <Plus aria-hidden="true" className="size-5 shrink-0 stroke-[1.5] group-aria-expanded/accordion-trigger:hidden" />
+        <X aria-hidden="true" className="hidden size-5 shrink-0 stroke-[1.5] group-aria-expanded/accordion-trigger:block" />
+      </AccordionTrigger>
       <AccordionContent className={accordionBodyClass}>{children}</AccordionContent>
     </AccordionItem>
   )
@@ -162,18 +186,41 @@ export function ProductSummary({
   )
   const { addToCart, setIsCartOpen } = useCart()
   const { toggleWishlist, isInWishlist } = useWishlist()
+  const { footer } = useSiteContent()
+
+  // True only in the browser; the sticky bar is portalled to <body> there so the
+  // sticky summary column (its own stacking context) can't paint it behind
+  // later sections.
+  const isClient = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  )
 
   // Sticky add-to-cart bar: shown once the main button has scrolled off the top.
   const addToCartRef = useRef<HTMLButtonElement>(null)
   const [showStickyBar, setShowStickyBar] = useState(false)
+  // Checked on every scroll frame rather than with an IntersectionObserver:
+  // a fast fling can jump past the button without ever "crossing" it.
   useEffect(() => {
     const target = addToCartRef.current
     if (!target) return
-    const observer = new IntersectionObserver(([entry]) => {
-      setShowStickyBar(!entry.isIntersecting && entry.boundingClientRect.top < 0)
-    })
-    observer.observe(target)
-    return () => observer.disconnect()
+    let frame = 0
+    const update = () => {
+      frame = 0
+      setShowStickyBar(target.getBoundingClientRect().bottom < 0)
+    }
+    const schedule = () => {
+      if (!frame) frame = window.requestAnimationFrame(update)
+    }
+    schedule()
+    window.addEventListener("scroll", schedule, { passive: true })
+    window.addEventListener("resize", schedule)
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame)
+      window.removeEventListener("scroll", schedule)
+      window.removeEventListener("resize", schedule)
+    }
   }, [])
 
   const productCard: ProductCard = {
@@ -205,6 +252,8 @@ export function ProductSummary({
   const details = product.details ?? []
   const sectionDetails = details.filter((detail) => detail.name.includes("&"))
   const specDetails = details.filter((detail) => !detail.name.includes("&"))
+  const hasSection = (pattern: RegExp) => sectionDetails.some((detail) => pattern.test(detail.name))
+  const origin = specDetails.find((detail) => /origin/i.test(detail.name))?.value
 
   return (
     <aside className="self-start w-full min-w-0 max-w-full [overflow-anchor:none] xl:sticky xl:top-[calc(var(--header-stack-height)+24px)]">
@@ -241,6 +290,7 @@ export function ProductSummary({
             Colour: <span className="text-ink-900">{selectedColor}</span>
           </p>
 
+          {product.colors.length > 1 ? (
           <div className="flex flex-wrap items-center gap-2">
             {product.colors.map((color) => {
               const isSelected = color.name === selectedColor
@@ -267,6 +317,7 @@ export function ProductSummary({
               )
             })}
           </div>
+          ) : null}
         </section>
 
         <section className="space-y-3">
@@ -284,13 +335,13 @@ export function ProductSummary({
             </SizeChartModal>
           </div>
 
-          <div id="size-guide" className="grid grid-cols-4 gap-1.5 sm:grid-cols-6 sm:gap-2">
+          <div id="size-guide" className="flex flex-wrap gap-2">
             {product.sizes.map((size) => (
               <OptionButton
                 key={size}
                 active={selectedSize === size}
                 onClick={() => setSelectedSize(size)}
-                className="h-12 min-w-0 px-2"
+                className="h-11 min-w-[64px] px-3"
               >
                 {size}
               </OptionButton>
@@ -312,7 +363,7 @@ export function ProductSummary({
               ref={addToCartRef}
               type="button"
               onClick={handleAddToCart}
-              className="flex h-14 flex-1 cursor-pointer items-center justify-center border border-black bg-white text-h3 uppercase tracking-[0.01em] text-black transition-[background-color,color] duration-200 ease-out hover:bg-black hover:text-white active:scale-[0.99]"
+              className="flex h-12 flex-1 cursor-pointer items-center justify-center border border-black bg-white text-[18px] font-medium uppercase sm:h-14 sm:text-h3 tracking-[0.01em] text-black transition-[background-color,color] duration-200 ease-out hover:bg-black hover:text-white active:scale-[0.99]"
             >
               Add To Cart
             </button>
@@ -322,7 +373,7 @@ export function ProductSummary({
               aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
               title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
               className={cn(
-                "flex size-14 shrink-0 cursor-pointer items-center justify-center border border-black transition-all duration-200 ease-out active:scale-[0.95]",
+                "flex size-12 shrink-0 cursor-pointer items-center justify-center border border-black transition-all sm:size-14 duration-200 ease-out active:scale-[0.95]",
                 isWishlisted
                   ? "bg-black text-white hover:bg-black/90"
                   : "bg-white text-black hover:bg-black hover:text-white"
@@ -339,7 +390,7 @@ export function ProductSummary({
           <button
             type="button"
             onClick={handleBuyNow}
-            className="flex h-14 w-full cursor-pointer items-center justify-center bg-black text-h3 uppercase tracking-[0.01em] text-white transition-opacity duration-200 ease-out hover:opacity-90 active:scale-[0.99]"
+            className="flex h-12 w-full cursor-pointer items-center justify-center bg-black text-[18px] font-medium uppercase sm:h-14 sm:text-h3 tracking-[0.01em] text-white transition-opacity duration-200 ease-out hover:opacity-90 active:scale-[0.99]"
           >
             Buy Now
           </button>
@@ -363,8 +414,9 @@ export function ProductSummary({
                 className="flex min-w-0 items-center gap-3 border border-black/15 px-3 py-3 text-[#080808]"
               >
                 <Icon className="size-5 shrink-0 stroke-[1.5]" aria-hidden="true" />
-                <p className="min-w-0 text-body-lg">
-                  {perk.label} <span className="text-ink-600">· {perk.detail}</span>
+                <p className="min-w-0 text-[15px] leading-tight sm:text-body-lg">
+                  {perk.label}
+                  {perk.detail ? <span className="text-ink-600"> · {perk.detail}</span> : null}
                 </p>
               </div>
             )
@@ -401,80 +453,106 @@ export function ProductSummary({
           <Section title="Features & Care">
             <div className="space-y-4">
               {product.description ? (
-                <DescriptionText text={product.description} productName={product.title} />
+                <DescriptionText text={product.description} names={[toDisplayCase(product.editLabel), product.title]} />
               ) : !specDetails.length ? (
                 <p>{product.detailsBody || "No details provided."}</p>
               ) : null}
               {specDetails.length > 0 ? (
-                <ul className="list-disc space-y-1.5 pl-5">
-                  {specDetails.map((detail, idx) => (
-                    <li key={idx}>
-                      <span className="text-ink-800">{detail.name}:</span> {detail.value}
-                    </li>
-                  ))}
-                </ul>
+                <div>
+                  <p className="uppercase text-ink-800">Features</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5">
+                    {specDetails.map((detail, idx) => (
+                      <li key={idx}>
+                        {toDisplayCase(detail.name)}: {detail.value}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               ) : null}
             </div>
           </Section>
 
-          {sectionDetails.length > 0 ? (
-            sectionDetails.map((detail, idx) => (
-              <Section key={`${detail.name}-${idx}`} title={detail.name}>
-                <p className="whitespace-pre-line">{detail.value}</p>
-              </Section>
-            ))
-          ) : (
-            <>
-              <Section title="Details & Care">
-                <ul className="space-y-2">
-                  {product.careNotes.map((note) => (
-                    <li key={note}>{note}</li>
-                  ))}
-                </ul>
-              </Section>
-              <Section title="Shipping & Payment">
-                <ul className="space-y-2">
-                  {product.shippingNotes.map((note) => (
-                    <li key={note}>{note}</li>
-                  ))}
-                </ul>
-              </Section>
-            </>
-          )}
+          {!hasSection(/fit|care/i) ? (
+            <Section title="The Fit & Care">
+              <ul className="space-y-2">
+                {product.modelInfo ? <li>{product.modelInfo}</li> : null}
+                {product.fitNote ? <li>Fit Note: {product.fitNote}</li> : null}
+                {product.careNotes.map((note) => (
+                  <li key={note}>{note}</li>
+                ))}
+              </ul>
+            </Section>
+          ) : null}
+          {!hasSection(/shipping|return|exchange/i) ? (
+            <Section title="Shipping, Returns & Exchanges">
+              <ul className="space-y-2">
+                {product.shippingNotes.map((note) => (
+                  <li key={note}>{note}</li>
+                ))}
+                <li>
+                  <Link href="/returns-policy" className="underline underline-offset-4">
+                    Read the full shipping, returns &amp; exchange policy
+                  </Link>
+                </li>
+              </ul>
+            </Section>
+          ) : null}
+          {sectionDetails.map((detail, idx) => (
+            <Section key={`${detail.name}-${idx}`} title={toDisplayCase(detail.name)}>
+              <p className="whitespace-pre-line">{detail.value}</p>
+            </Section>
+          ))}
+          {!hasSection(/origin|contact/i) ? (
+            <Section title="Origin & Contact">
+              <ul className="space-y-2">
+                {origin ? <li>Country of Origin: {origin}</li> : null}
+                <li>Customer care: {footer.careEmail}</li>
+                <li>Online orders: {footer.ordersPhone}</li>
+                <li>{footer.timings}</li>
+              </ul>
+            </Section>
+          ) : null}
         </Accordion>
       </div>
 
-      {/* Figma: "Should be sticky" — compact add-to-cart bar while scrolling. */}
-      <div
-        aria-hidden={!showStickyBar}
-        className={cn(
-          "fixed inset-x-0 bottom-0 z-40 bg-black text-white transition-transform duration-300 ease-out",
-          showStickyBar ? "translate-y-0" : "pointer-events-none translate-y-full"
-        )}
-      >
-        <div className="flex items-center gap-3 px-3 py-2.5 sm:px-6 lg:px-8">
-          {product.gallery[0]?.src ? (
-            <div className="relative h-14 w-11 shrink-0 overflow-hidden bg-white/10">
-              <Image src={product.gallery[0].src} alt="" fill sizes="44px" className="object-cover" />
-            </div>
-          ) : null}
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-body-lg uppercase">{product.title}</p>
-            <p className="mt-1 text-body text-white/70">
-              {selectedSize ? `Size ${selectedSize} · ` : null}
-              {product.price}
-            </p>
-          </div>
-          <button
-            type="button"
-            tabIndex={showStickyBar ? 0 : -1}
-            onClick={handleAddToCart}
-            className="h-11 shrink-0 cursor-pointer border border-white px-4 text-button font-medium uppercase transition-colors hover:bg-white hover:text-black sm:px-8"
-          >
-            Add To Cart
-          </button>
-        </div>
-      </div>
+      {/* Figma: "Should be sticky" — compact add-to-cart card once the main button scrolls away. */}
+      {isClient
+        ? createPortal(
+              <div
+                aria-hidden={!showStickyBar}
+                className={cn(
+                  "fixed inset-x-0 bottom-0 z-40 border-t border-black/15 bg-white text-black shadow-[0_-4px_16px_rgba(0,0,0,0.08)] transition-transform duration-300 ease-out xl:inset-x-auto xl:bottom-6 xl:right-8 xl:w-[573px] xl:border",
+                  showStickyBar ? "translate-y-0" : "pointer-events-none translate-y-[calc(100%+24px)]"
+                )}
+              >
+                <div className="flex items-center gap-3 p-3">
+                  {product.gallery[0]?.src ? (
+                    <div className="relative h-[72px] w-14 shrink-0 overflow-hidden bg-[#efefef]">
+                      <Image src={product.gallery[0].src} alt="" fill sizes="56px" className="object-cover" />
+                    </div>
+                  ) : null}
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[12px] uppercase leading-none text-ink-400">{product.editLabel}</p>
+                    <p className="mt-1.5 truncate text-[15px] uppercase leading-none text-ink-800 sm:text-body-lg">{product.title}</p>
+                    <p className="mt-1.5 flex flex-wrap items-baseline gap-x-2 text-caption text-ink-600">
+                      {selectedSize ? <span>Size: {selectedSize}</span> : null}
+                      {product.originalPrice ? <span className="line-through">{product.originalPrice}</span> : null}
+                      <span className="font-medium text-ink-900">{product.price}</span>
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    tabIndex={showStickyBar ? 0 : -1}
+                    onClick={handleAddToCart}
+                    className="h-11 shrink-0 cursor-pointer bg-black px-4 text-button font-medium uppercase text-white transition-opacity hover:opacity-90 sm:px-6"
+                  >
+                    Add To Cart
+                  </button>
+                </div>
+              </div>,
+            document.body,
+          )
+        : null}
     </aside>
   )
 }

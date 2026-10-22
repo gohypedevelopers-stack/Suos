@@ -91,11 +91,11 @@ export function ProductGallery({
       </div>
 
       {/* Desktop 2-Column Grid (>= md) */}
-      <div className="hidden md:grid md:grid-cols-2 gap-1.5">
+      <div className="hidden md:grid md:grid-cols-2 gap-1">
         {images.map((image, index) => (
           <figure
             key={`desktop-${image.src}-${index}`}
-            className="relative aspect-[13/16] overflow-hidden bg-[#efefef]"
+            className="relative aspect-[13/18] overflow-hidden bg-[#efefef]"
           >
             <Image
               src={image.src}

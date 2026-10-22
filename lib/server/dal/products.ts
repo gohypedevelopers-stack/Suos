@@ -588,11 +588,12 @@ export async function getProductBySlug(slug: string) {
     colors,
     sizes: sizes.length > 0 ? sizes : ["28", "32", "36", "42"],
     gallery: gallery.length > 0 ? gallery : [{ src: "/home-page-content/product-urban.png", alt: product.title }],
+    // Figma: "Easy 7 Days Returns" + "Easy 30 Days Exchanges". The returns
+    // policy states 7 days; no exchange window is published yet, so that
+    // badge carries no day count until the client confirms it.
     deliveryPerks: [
-      { label: "Fast delivery", detail: "2-4 days", icon: "truck" as const },
-      { label: "Easy exchange", detail: "14 days", icon: "exchange" as const },
-      { label: "Secure checkout", detail: "COD available", icon: "shield" as const },
-      { label: "Tracked shipping", detail: "Live updates", icon: "card" as const },
+      { label: "Easy 7 Days Returns", detail: "", icon: "returns" as const },
+      { label: "Easy Exchanges", detail: "", icon: "exchange" as const },
     ],
     completeLook: gallery.slice(0, 3),
     sizeGuideImages: [

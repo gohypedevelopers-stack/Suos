@@ -12,7 +12,7 @@ export type ProductSwatch = {
 export type DeliveryPerk = {
   label: string
   detail: string
-  icon: "truck" | "exchange" | "shield" | "card"
+  icon: "truck" | "exchange" | "shield" | "card" | "returns"
 }
 
 export type ProductCard = {
