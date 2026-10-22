@@ -2,12 +2,10 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import {
   Check,
   Copy,
   CreditCard,
-  Heart,
   Plus,
   RefreshCcw,
   ShieldCheck,
@@ -31,7 +29,6 @@ import type { ProductCard as HomeProductCard } from "@/components/home/TrendingS
 import { SizeChartModal } from "@/components/product/SizeChartModal"
 import { useCart } from "@/lib/cart-context"
 import { useSiteContent } from "@/lib/site-content-context"
-import { useWishlist } from "@/lib/wishlist-context"
 import type { ProductCard } from "@/components/product/productData"
 
 const deliveryIcons = {
@@ -67,10 +64,10 @@ function OptionButton({
       type="button"
       aria-pressed={active}
       className={cn(
-        "inline-flex cursor-pointer items-center justify-center border text-h3 transition-[background-color,border-color,color] duration-200 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45",
+        "inline-flex cursor-pointer items-center justify-center border text-[18px] font-medium leading-[25px] transition-[background-color,border-color,color] duration-200 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45 sm:text-h4",
         active
-          ? "border-black bg-[#ececec] text-ink-900"
-          : "border-black/20 bg-white text-ink-900 hover:border-black",
+          ? "border-[#333333] bg-[#ebebeb] text-ink-900"
+          : "border-[#e6e6e6] bg-white text-ink-650 hover:border-[#333333]",
         className
       )}
       {...props}
@@ -112,10 +109,10 @@ function OfferCard({ code, headline, detail }: { code: string; headline: string;
   return (
     <div className="flex items-center justify-between gap-3 border border-dashed border-black/30 px-4 py-3">
       <div className="min-w-0">
-        <p className="text-body-lg text-ink-900">{headline}</p>
+        <p className="text-body-lg text-ink-900">{code}</p>
         <p className="mt-1.5 text-body text-ink-600">
-          Use code <span className="font-medium text-ink-900">{code}</span>
-          {detail ? ` · ${detail}` : null}
+          {headline}
+          {detail ? ` ${detail}` : null}
         </p>
       </div>
       <button
@@ -133,14 +130,14 @@ function OfferCard({ code, headline, detail }: { code: string; headline: string;
 
 function MiniProductCard({ product }: { product: HomeProductCard }) {
   return (
-    <Link href={`/products/${product.slug}`} className="group block w-[180px] shrink-0 snap-start sm:w-[200px]">
-      <div className="relative aspect-[3/4] overflow-hidden bg-[#efefef]">
+    <Link href={`/products/${product.slug}`} className="group block w-[180px] shrink-0 snap-start sm:w-[230px]">
+      <div className="relative aspect-[230/304] overflow-hidden bg-[#efefef]">
         {product.image ? (
           <Image
             src={product.image}
             alt={product.alt || product.title}
             fill
-            sizes="200px"
+            sizes="230px"
             className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
           />
         ) : null}
@@ -166,8 +163,8 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
     <AccordionItem value={title} className="border-b border-black/15">
       <AccordionTrigger className={accordionTriggerClass}>
         <span>{title}</span>
-        <Plus aria-hidden="true" className="size-5 shrink-0 stroke-[1.5] group-aria-expanded/accordion-trigger:hidden" />
-        <X aria-hidden="true" className="hidden size-5 shrink-0 stroke-[1.5] group-aria-expanded/accordion-trigger:block" />
+        <Plus aria-hidden="true" className="size-[22px] shrink-0 stroke-[1.5] group-aria-expanded/accordion-trigger:hidden" />
+        <X aria-hidden="true" className="hidden size-[22px] shrink-0 stroke-[1.5] group-aria-expanded/accordion-trigger:block" />
       </AccordionTrigger>
       <AccordionContent className={accordionBodyClass}>{children}</AccordionContent>
     </AccordionItem>
@@ -179,13 +176,11 @@ export function ProductSummary({
 }: {
   product: ProductDetail
 }) {
-  const router = useRouter()
   const [selectedColor, setSelectedColor] = useState(product.colorName)
   const [selectedSize, setSelectedSize] = useState(
     product.sizes[1] ?? product.sizes[0]
   )
   const { addToCart, setIsCartOpen } = useCart()
-  const { toggleWishlist, isInWishlist } = useWishlist()
   const { footer } = useSiteContent()
 
   // True only in the browser; the sticky bar is portalled to <body> there so the
@@ -235,16 +230,9 @@ export function ProductSummary({
     price: product.price,
   }
 
-  const isWishlisted = isInWishlist(productCard.id)
-
   const handleAddToCart = () => {
     addToCart(productCard, selectedSize || product.sizes[0] || "M")
     setIsCartOpen(true)
-  }
-
-  const handleBuyNow = () => {
-    addToCart(productCard, selectedSize || product.sizes[0] || "M")
-    router.push("/checkout")
   }
 
   // Details named like "The Fit & Care" become their own accordion section;
@@ -257,7 +245,7 @@ export function ProductSummary({
 
   return (
     <aside className="self-start w-full min-w-0 max-w-full [overflow-anchor:none] xl:sticky xl:top-[calc(var(--header-stack-height)+24px)]">
-      <div className="w-full min-w-0 max-w-full space-y-6 text-black xl:w-[573px] xl:max-w-[573px] xl:justify-self-end">
+      <div className="w-full min-w-0 max-w-full space-y-6 text-black xl:pt-[18px] xl:w-[573px] xl:max-w-[573px] xl:justify-self-end">
         <div>
           <p className="text-caption uppercase text-ink-400">{product.editLabel}</p>
           <h1 className="mt-2 font-heading text-[20px] font-normal uppercase leading-none tracking-normal text-ink-800 sm:text-[24px]">
@@ -341,7 +329,7 @@ export function ProductSummary({
                 key={size}
                 active={selectedSize === size}
                 onClick={() => setSelectedSize(size)}
-                className="h-11 min-w-[64px] px-3"
+                className="h-10 min-w-[75px] px-3"
               >
                 {size}
               </OptionButton>
@@ -356,45 +344,15 @@ export function ProductSummary({
           ) : null}
         </section>
 
-        {/* Figma has a single outlined Add to Cart; Buy Now and wishlist are kept until the client confirms. */}
-        <div className="flex flex-col gap-2.5">
-          <div className="flex items-center gap-2.5">
-            <button
-              ref={addToCartRef}
-              type="button"
-              onClick={handleAddToCart}
-              className="flex h-12 flex-1 cursor-pointer items-center justify-center border border-black bg-white text-[18px] font-medium uppercase sm:h-14 sm:text-h3 tracking-[0.01em] text-black transition-[background-color,color] duration-200 ease-out hover:bg-black hover:text-white active:scale-[0.99]"
-            >
-              Add To Cart
-            </button>
-            <button
-              type="button"
-              onClick={() => toggleWishlist(productCard)}
-              aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-              title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-              className={cn(
-                "flex size-12 shrink-0 cursor-pointer items-center justify-center border border-black transition-all sm:size-14 duration-200 ease-out active:scale-[0.95]",
-                isWishlisted
-                  ? "bg-black text-white hover:bg-black/90"
-                  : "bg-white text-black hover:bg-black hover:text-white"
-              )}
-            >
-              <Heart
-                className={cn(
-                  "size-5 transition-transform duration-200",
-                  isWishlisted ? "fill-white text-white scale-110" : "stroke-[1.7]"
-                )}
-              />
-            </button>
-          </div>
-          <button
-            type="button"
-            onClick={handleBuyNow}
-            className="flex h-12 w-full cursor-pointer items-center justify-center bg-black text-[18px] font-medium uppercase sm:h-14 sm:text-h3 tracking-[0.01em] text-white transition-opacity duration-200 ease-out hover:opacity-90 active:scale-[0.99]"
-          >
-            Buy Now
-          </button>
-        </div>
+        {/* Figma: a single full-width outlined Add to Cart (571 x 53). */}
+        <button
+          ref={addToCartRef}
+          type="button"
+          onClick={handleAddToCart}
+          className="flex h-12 w-full cursor-pointer items-center justify-center border border-black bg-white text-[18px] font-medium uppercase tracking-[0.01em] text-black transition-[background-color,color] duration-200 ease-out hover:bg-black hover:text-white active:scale-[0.99] sm:h-[53px] sm:text-h3"
+        >
+          Add To Cart
+        </button>
 
         {product.offers && product.offers.length > 0 ? (
           <section aria-label="Offers" className="space-y-2">
@@ -404,14 +362,14 @@ export function ProductSummary({
           </section>
         ) : null}
 
-        <section aria-label="Delivery and returns" className="grid grid-cols-2 gap-2">
+        <section aria-label="Delivery and returns" className="grid grid-cols-2 gap-2 bg-[#f9f9f9] p-2 sm:gap-3 sm:px-4 sm:py-4">
           {product.deliveryPerks.map((perk) => {
             const Icon = deliveryIcons[perk.icon]
 
             return (
               <div
                 key={perk.label}
-                className="flex min-w-0 items-center gap-3 border border-black/15 px-3 py-3 text-[#080808]"
+                className="flex min-h-[41px] min-w-0 items-center gap-2.5 bg-white px-3 py-2 text-[#080808]"
               >
                 <Icon className="size-5 shrink-0 stroke-[1.5]" aria-hidden="true" />
                 <p className="min-w-0 text-[15px] leading-tight sm:text-body-lg">

@@ -99,8 +99,8 @@ export function ProductHighlightsSection({
           />
         </div>
         <div className="grid gap-1">
-          <HighlightImage highlight={first} number={1} sizes="(max-width: 767px) 100vw, 54vw" className="aspect-[4/3]" />
-          <HighlightImage highlight={third} number={3} sizes="(max-width: 767px) 100vw, 54vw" className="aspect-[4/3]" />
+          <HighlightImage highlight={first} number={1} sizes="(max-width: 767px) 100vw, 54vw" className="aspect-[760/560]" />
+          <HighlightImage highlight={third} number={3} sizes="(max-width: 767px) 100vw, 54vw" className="aspect-[760/560]" />
         </div>
       </div>
     </section>

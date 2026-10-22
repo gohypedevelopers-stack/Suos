@@ -207,16 +207,16 @@ export async function listStorefrontOffers(limit = 3): Promise<StorefrontOffer[]
         const value = discount.value ? Number(discount.value) : 0
         const headline =
           discount.type === "FREE_SHIPPING"
-            ? "Free shipping"
+            ? "Enjoy free shipping"
             : discount.valueType === "PERCENTAGE"
-              ? `Get ${value}% off`
-              : `Get ${formatRupees(value)} off`
+              ? `Enjoy ${value}% off`
+              : `Enjoy ${formatRupees(value)} off`
         const detail =
           discount.minimumType === "AMOUNT" && discount.minimumAmount
-            ? `On orders above ${formatRupees(Number(discount.minimumAmount))}`
+            ? `on orders above ${formatRupees(Number(discount.minimumAmount))}`
             : discount.minimumType === "QUANTITY" && discount.minimumQuantity
-              ? `On ${discount.minimumQuantity} or more items`
-              : null
+              ? `on ${discount.minimumQuantity} or more items`
+              : "on your order"
 
         return { code: discount.code as string, headline, detail }
       })

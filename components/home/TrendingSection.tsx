@@ -259,7 +259,10 @@ export function ProductCardView({
       )}
     >
       <div
-        className="relative aspect-[2/3] sm:aspect-[330/440] w-full overflow-hidden bg-neutral-900 touch-pan-y select-none"
+        className={cn(
+          "relative aspect-[2/3] w-full overflow-hidden bg-neutral-900 touch-pan-y select-none",
+          isCompact ? "sm:aspect-[234/342]" : "sm:aspect-[330/440]"
+        )}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         onTouchStart={handleTouchStart}

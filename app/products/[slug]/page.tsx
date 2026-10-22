@@ -52,7 +52,7 @@ export default async function Page({
 
   return (
     <main className="flex-1 bg-white text-black w-full min-w-0 overflow-x-hidden">
-      <section className="relative w-full min-w-0 overflow-x-hidden px-3 pb-10 pt-3 sm:px-6 sm:pb-16 sm:pt-5 lg:px-8 lg:pt-6">
+      <section className="relative w-full min-w-0 overflow-x-hidden px-3 pb-10 pt-3 sm:px-6 sm:pb-16 sm:pt-5 lg:px-[18px] lg:pt-6">
         <div className="w-full min-w-0">
           <nav aria-label="Breadcrumb" className="overflow-x-auto scrollbar-none py-1 text-body text-ink-400">
             <ol className="flex flex-wrap items-center gap-1 sm:gap-1.5">
