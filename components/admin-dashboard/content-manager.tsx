@@ -207,7 +207,7 @@ function NavigationEditor({ value, onChange }: SectionProps<"navigation">) {
           <NavLinksEditor title="Featured" items={value.menFeatured} onChange={(menFeatured) => onChange({ ...value, menFeatured })} />
         </div>
       </div>
-      <Field label="First menu name" hint='Name of the first top-level menu item (the one with the Edits dropdown), e.g. "Women".'>
+      <Field label="First menu name" hint='Name of the first top-level menu item (the one with the Edits dropdown), e.g. "Collections".'>
         <Input value={value.collectionsLabel} onChange={(e) => onChange({ ...value, collectionsLabel: e.target.value })} />
       </Field>
       <Field label="Bestsellers button link" hint="Bestsellers is a plain button (no dropdown).">

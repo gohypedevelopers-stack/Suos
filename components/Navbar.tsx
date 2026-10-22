@@ -314,7 +314,7 @@ export function Navbar({
   const pathname = usePathname()
   const { navigation } = useSiteContent()
   const primaryNav: PrimaryNavItem[] = [
-    { key: "collections", label: navigation.collectionsLabel || "Women", href: "/collections", hasMenu: true },
+    { key: "collections", label: navigation.collectionsLabel || "Collections", href: "/collections", hasMenu: true },
     { key: "men", label: "Men", href: "/shop", hasMenu: true },
     { key: "bestsellers", label: "Bestsellers", href: navigation.bestsellersHref || "/shop?filter=bestsellers", hasMenu: false },
   ]
@@ -590,38 +590,15 @@ export function Navbar({
             className="flex items-center justify-self-end gap-2 xl:gap-3"
             onMouseEnter={scheduleMenuClose}
           >
-            {/* Figma: inline search field. It opens the search panel; below xl it collapses to the icon. */}
-            <button
-              type="button"
+            <IconButton
+              label="Search products"
+              tone={tone}
               onClick={() => setSearchOpen(true)}
-              aria-haspopup="dialog"
-              aria-expanded={searchOpen}
-              className={cn(
-                "hidden h-9 w-[250px] cursor-pointer items-center gap-2 border border-current/35 px-3 text-left text-body font-[400] tracking-normal text-current transition-[color,border-color] duration-300 ease-out hover:border-current hover:text-current focus-visible:outline-none focus-visible:ring-2 xl:inline-flex",
-                tone === "light"
-                  ? "focus-visible:ring-white/30"
-                  : "focus-visible:ring-black/25"
-              )}
+              ariaHaspopup="dialog"
+              ariaExpanded={searchOpen}
             >
-              <Search className="size-4 shrink-0 stroke-[1.7]" aria-hidden="true" />
-              <span className="truncate">What are you looking for?</span>
-            </button>
-
-            <span className="xl:hidden">
-              <IconButton
-                label="Search products"
-                tone={tone}
-                onClick={() => setSearchOpen(true)}
-                ariaHaspopup="dialog"
-                ariaExpanded={searchOpen}
-              >
-                <Search className="size-[18px] stroke-[1.7]" />
-              </IconButton>
-            </span>
-
-            <span className="mx-1 xl:mx-2">
-              <NavLink href="/contact">Contact Us</NavLink>
-            </span>
+              <Search className="size-[18px] stroke-[1.7]" />
+            </IconButton>
 
             <Link
               href="/login"

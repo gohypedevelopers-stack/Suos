@@ -237,7 +237,7 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
       },
     ],
     bestsellersHref: "/shop?filter=bestsellers",
-    collectionsLabel: "Women",
+    collectionsLabel: "Collections",
   },
   launchOffer: {
     // Hidden for now; switch on from Dashboard → Content → Launch offer.
