@@ -26,6 +26,13 @@ import { toast } from "sonner"
 import { BannerMediaLibraryDialog } from "@/components/admin-dashboard/banner-media-library-dialog"
 import { BannerMediaPreview } from "@/components/admin-dashboard/banner-media-preview"
 import {
+  BANNER_IMAGE_CONTENT_TYPES,
+  BANNER_VIDEO_CONTENT_TYPES,
+  isBannerVideoContentType,
+  MAX_BANNER_IMAGE_BYTES,
+  MAX_BANNER_VIDEO_BYTES,
+} from "@/lib/banner-media"
+import {
   addCarouselSlideAction,
   addHeroSlideAction,
   deleteBannersAction,
@@ -218,13 +225,15 @@ export function BannerManager({
     let addedCount = 0
 
     for (const file of files) {
-      const allowed = new Set(["image/avif", "image/jpeg", "image/png", "image/webp"])
-      if (!allowed.has(file.type)) {
-        toast.error(`"${file.name}" is not a supported image (JPG, PNG, WebP, AVIF).`)
+      // Hero slides can be an image or a short looping video.
+      const isVideo = isBannerVideoContentType(file.type)
+      const isImage = (BANNER_IMAGE_CONTENT_TYPES as readonly string[]).includes(file.type)
+      if (!isImage && !isVideo) {
+        toast.error(`"${file.name}" is not supported. Use JPG, PNG, WebP, AVIF, MP4 or WebM.`)
         continue
       }
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error(`"${file.name}" is too large (max 10MB).`)
+      if (file.size > (isVideo ? MAX_BANNER_VIDEO_BYTES : MAX_BANNER_IMAGE_BYTES)) {
+        toast.error(`"${file.name}" is too large (max ${isVideo ? "50" : "10"} MB).`)
         continue
       }
 
@@ -527,12 +536,10 @@ export function BannerManager({
                   {/* Thumbnail Stack */}
                   <div className="relative aspect-[16/9] w-24 shrink-0 overflow-hidden rounded-lg border border-neutral-200 bg-neutral-900 shadow-2xs">
                     {heroBanners[0]?.desktopImageUrl ? (
-                      <Image
+                      <BannerMediaPreview
                         src={heroBanners[0].desktopImageUrl}
                         alt="Hero Carousel"
-                        fill
                         sizes="96px"
-                        className="object-cover"
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center text-[10px] text-white/50">
@@ -605,7 +612,7 @@ export function BannerManager({
                 type="file"
                 ref={heroUploadRef}
                 multiple
-                accept="image/png,image/jpeg,image/webp,image/avif"
+                accept={[...BANNER_IMAGE_CONTENT_TYPES, ...BANNER_VIDEO_CONTENT_TYPES].join(",")}
                 className="hidden"
                 onChange={(e) => {
                   if (e.target.files?.length) {
@@ -718,12 +725,11 @@ export function BannerManager({
                                 href={`/dashboard/banners/${slide.id}`}
                                 className="group relative block aspect-[16/9] w-24 shrink-0 overflow-hidden rounded-md border border-neutral-200 bg-neutral-900 shadow-2xs"
                               >
-                                <Image
+                                <BannerMediaPreview
                                   src={slide.desktopImageUrl}
                                   alt={slide.title || `Slide ${idx + 1}`}
-                                  fill
                                   sizes="96px"
-                                  className="object-cover transition-transform group-hover:scale-105"
+                                  className="transition-transform group-hover:scale-105"
                                 />
                                 {slide.mobileImageUrl && (
                                   <span

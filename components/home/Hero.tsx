@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
+import { isVideoMedia } from "@/lib/banner-media"
 import { cn } from "@/lib/utils"
 import type { HomeHeroBanner } from "@/lib/server/dal/banners"
 
@@ -18,6 +19,43 @@ const defaultFallbackBanner: HomeHeroBanner = {
   ctaLink: "/collections",
   textAlignment: "CENTER",
   overlayOpacity: 15,
+}
+
+/** Full-bleed hero media: a muted looping video for .mp4/.webm, otherwise an image. */
+function HeroMedia({
+  src,
+  alt,
+  priority,
+}: {
+  src: string
+  alt: string
+  priority: boolean
+}) {
+  if (isVideoMedia(src)) {
+    return (
+      <video
+        src={src}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload={priority ? "auto" : "metadata"}
+        aria-label={alt}
+        className="absolute inset-0 h-full w-full object-cover object-center"
+      />
+    )
+  }
+
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      fill
+      priority={priority}
+      sizes="100vw"
+      className="object-cover object-center w-full h-full"
+    />
+  )
 }
 
 export function Hero({ banners }: { banners?: HomeHeroBanner[] }) {
@@ -54,35 +92,14 @@ export function Hero({ banners }: { banners?: HomeHeroBanner[] }) {
               {slide.mobileImageUrl ? (
                 <>
                   <div className="relative block sm:hidden w-full h-full">
-                    <Image
-                      src={slide.mobileImageUrl}
-                      alt={slide.title || "Hero Banner"}
-                      fill
-                      priority={index === 0}
-                      sizes="100vw"
-                      className="object-cover object-center w-full h-full"
-                    />
+                    <HeroMedia src={slide.mobileImageUrl} alt={slide.title || "Hero Banner"} priority={index === 0} />
                   </div>
                   <div className="relative hidden sm:block w-full h-full">
-                    <Image
-                      src={slide.desktopImageUrl}
-                      alt={slide.title || "Hero Banner"}
-                      fill
-                      priority={index === 0}
-                      sizes="100vw"
-                      className="object-cover object-center w-full h-full"
-                    />
+                    <HeroMedia src={slide.desktopImageUrl} alt={slide.title || "Hero Banner"} priority={index === 0} />
                   </div>
                 </>
               ) : (
-                <Image
-                  src={slide.desktopImageUrl}
-                  alt={slide.title || "Hero Banner"}
-                  fill
-                  priority={index === 0}
-                  sizes="100vw"
-                  className="object-cover object-center w-full h-full"
-                />
+                <HeroMedia src={slide.desktopImageUrl} alt={slide.title || "Hero Banner"} priority={index === 0} />
               )}
 
               {/* Gradient Dark Overlay */}

@@ -1,6 +1,5 @@
 "use client"
 
-import Image from "next/image"
 import Link from "next/link"
 import { useEffect, useRef, useState, useTransition } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -59,7 +58,7 @@ const BANNER_PLACEMENTS: BannerPlacement[] = [
 ]
 
 // Full-width banners render through FullWidthBanner, which can play video.
-const VIDEO_PLACEMENTS = new Set<BannerPlacement>(["FEATURE", "MIDDLE", "BOTTOM"])
+const VIDEO_PLACEMENTS = new Set<BannerPlacement>(["HERO", "FEATURE", "MIDDLE", "BOTTOM"])
 
 type UploadInstruction = {
   objectKey?: string
@@ -246,13 +245,15 @@ export function BannerEditor({
     let addedCount = 0
 
     for (const file of files) {
-      const allowed = new Set(["image/avif", "image/jpeg", "image/png", "image/webp"])
-      if (!allowed.has(file.type)) {
-        toast.error(`"${file.name}" is not an image (JPG, PNG, WebP, AVIF).`)
+      // Hero slides can be an image or a short looping video.
+      const isVideo = isBannerVideoContentType(file.type)
+      const isImage = (BANNER_IMAGE_CONTENT_TYPES as readonly string[]).includes(file.type)
+      if (!isImage && !isVideo) {
+        toast.error(`"${file.name}" is not supported. Use JPG, PNG, WebP, AVIF, MP4 or WebM.`)
         continue
       }
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error(`"${file.name}" is too large (max 10MB).`)
+      if (file.size > (isVideo ? MAX_BANNER_VIDEO_BYTES : MAX_BANNER_IMAGE_BYTES)) {
+        toast.error(`"${file.name}" is too large (max ${isVideo ? "50" : "10"} MB).`)
         continue
       }
 
@@ -554,7 +555,7 @@ export function BannerEditor({
                     type="file"
                     ref={newSlideInputRef}
                     multiple
-                    accept="image/png,image/jpeg,image/webp,image/avif"
+                    accept={[...BANNER_IMAGE_CONTENT_TYPES, ...BANNER_VIDEO_CONTENT_TYPES].join(",")}
                     className="hidden"
                     onChange={(e) => {
                       if (e.target.files?.length) {
@@ -646,11 +647,10 @@ export function BannerEditor({
                           }}
                         >
                           <div className="relative aspect-[16/9] w-12 rounded overflow-hidden bg-neutral-800 shrink-0">
-                            <Image
+                            <BannerMediaPreview
                               src={slide.desktopImageUrl}
                               alt={`Slide ${idx + 1}`}
-                              fill
-                              className="object-cover"
+                              sizes="48px"
                             />
                           </div>
                           <div className="min-w-0">
@@ -689,7 +689,9 @@ export function BannerEditor({
                     {allowsVideo ? "Banner Image or Video" : "Slide Image"}
                   </h2>
                   <p className="text-xs text-neutral-500">
-                    {placement === "FEATURE"
+                    {placement === "HERO"
+                      ? "Full screen. Desktop 1920 × 1080 px (16:9), mobile 1080 × 1920 px (9:16). Image or a short muted MP4/WebM loop up to 50 MB."
+                      : placement === "FEATURE"
                       ? "Desktop 1920 × 840 px (16:7), mobile 1080 × 1350 px (4:5). Image or MP4/WebM video up to 50 MB."
                       : placement === "SPLIT"
                         ? "Left slot about 1760 × 1554 px, right slot about 1120 × 1554 px. Mobile 1080 × 1350 px (4:5)."
