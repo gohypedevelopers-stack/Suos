@@ -2,6 +2,11 @@ import "server-only"
 
 import { getPrisma } from "@/lib/server/db"
 import { requirePermission } from "@/lib/server/dal/auth"
+import { listStorefrontOffers } from "@/lib/server/dal/discounts"
+import {
+  parseProductPageContent,
+  type ProductPageContent,
+} from "@/lib/product-page-content"
 
 function imageUrl(objectKey: string) {
   if (objectKey.startsWith("/")) {
@@ -51,6 +56,7 @@ export type AdminProductDetail = {
   tags: string[]
   vendor: string
   details: { name: string; value: string }[]
+  pageContent: ProductPageContent
   taxRate: number
   hsnCode: string
   isTaxExempt: boolean
@@ -123,11 +129,20 @@ export function resolveColorHex(colorInput: string): string {
   return COLOR_SWATCH_MAP[normalized] ?? "#171717"
 }
 
-export async function listPublishedProducts() {
+export async function listPublishedProducts(
+  options: { collectionId?: string; excludeProductId?: string; take?: number } = {},
+) {
   const prisma = getPrisma()
   const products = await prisma.product.findMany({
-    where: { status: "ACTIVE" },
+    where: {
+      status: "ACTIVE",
+      ...(options.collectionId
+        ? { collections: { some: { collectionId: options.collectionId } } }
+        : {}),
+      ...(options.excludeProductId ? { id: { not: options.excludeProductId } } : {}),
+    },
     orderBy: { createdAt: "desc" },
+    take: options.take,
     select: {
       id: true,
       title: true,
@@ -343,6 +358,7 @@ export async function getProductForAdmin(
       vendor: true,
       tags: true,
       details: true,
+      pageContent: true,
       taxRate: true,
       hsnCode: true,
       isTaxExempt: true,
@@ -389,6 +405,7 @@ export async function getProductForAdmin(
     tags: product.tags,
     vendor: product.vendor,
     details: productDetails(product.details),
+    pageContent: parseProductPageContent(product.pageContent),
     taxRate: product.taxRate ? Number(product.taxRate) : 12,
     hsnCode: product.hsnCode ?? "6203",
     isTaxExempt: product.isTaxExempt ?? false,
@@ -422,9 +439,13 @@ export async function getProductBySlug(slug: string) {
       slug: true,
       description: true,
       details: true,
+      pageContent: true,
       tags: true,
       category: { select: { name: true } },
-      collections: { select: { collection: { select: { title: true } } } },
+      collections: {
+        orderBy: { position: "asc" },
+        select: { collection: { select: { id: true, title: true, slug: true, isPublished: true } } },
+      },
       images: {
         orderBy: { position: "asc" },
         select: { objectKey: true, altText: true },
@@ -443,6 +464,19 @@ export async function getProductBySlug(slug: string) {
   })
 
   if (!product) return null
+
+  const pageContent = parseProductPageContent(product.pageContent)
+  const primaryCollection = product.collections[0]?.collection ?? null
+  const [moreFromProducts, offers] = await Promise.all([
+    primaryCollection
+      ? listPublishedProducts({
+          collectionId: primaryCollection.id,
+          excludeProductId: product.id,
+          take: 8,
+        })
+      : Promise.resolve([]),
+    listStorefrontOffers(),
+  ])
 
   const detailsList = productDetails(product.details)
   const detailsBody = detailsList.find(d => d.name.toUpperCase() === "BODY")?.value || product.description || ""
@@ -525,9 +559,27 @@ export async function getProductBySlug(slug: string) {
     ],
     originalPrice: variant?.compareAtPrice ? `₹${variant.compareAtPrice.toString()}` : null,
     price: variant ? `₹${variant.price.toString()}` : "N/A",
-    sold: "1,238 Sold",
-    rating: "4.5",
+    // Sold count and rating stay hidden until they come from real orders/reviews.
     description: product.description || "",
+    subtitle: pageContent.subtitle,
+    modelInfo: pageContent.modelInfo,
+    fitNote: pageContent.fitNote,
+    highlightsIntro: pageContent.highlightsIntro,
+    highlights: pageContent.highlights.flatMap((highlight) => {
+      const src = highlight.imageKey ? imageUrl(highlight.imageKey) : null
+      return src ? [{ src, title: highlight.title, text: highlight.text }] : []
+    }),
+    lifestyleImage: pageContent.lifestyleImageKey
+      ? imageUrl(pageContent.lifestyleImageKey)
+      : null,
+    moreFrom: primaryCollection && moreFromProducts.length > 0
+      ? {
+          title: primaryCollection.title,
+          href: primaryCollection.isPublished ? `/collections/${primaryCollection.slug}` : null,
+          products: moreFromProducts,
+        }
+      : null,
+    offers,
     details: detailsList,
     detailsBody: detailsBody,
     careNotes,

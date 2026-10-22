@@ -368,6 +368,8 @@ export function BannerMediaLibraryDialog({
                   const placementLabel = bannerUsage
                     ? bannerUsage.placement === "HERO"
                       ? "Hero Carousel"
+                      : bannerUsage.placement === "SPLIT"
+                        ? "Split Pair"
                       : bannerUsage.placement === "FEATURE"
                         ? "Feature Banner"
                         : bannerUsage.placement === "MIDDLE"

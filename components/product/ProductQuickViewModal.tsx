@@ -248,24 +248,28 @@ export function ProductQuickViewModal({
 
               <div className="mt-4 sm:mt-5 flex flex-wrap items-end justify-between gap-3">
                 <div className="flex items-end gap-3">
-                  <span className="text-[15px] sm:text-[17px] font-normal leading-[20px] text-black/45 line-through">
-                    {product.originalPrice}
-                  </span>
+                  {product.originalPrice ? (
+                    <span className="text-[15px] sm:text-[17px] font-normal leading-[20px] text-black/45 line-through">
+                      {product.originalPrice}
+                    </span>
+                  ) : null}
                   <span className="font-sans text-[15px] sm:text-[17px] font-[500] leading-[20px] tracking-normal">
                     {product.price}
                   </span>
                 </div>
 
-                <div className="flex items-end gap-2 text-black">
-                  <span className="text-[13px] sm:text-[17px] font-normal uppercase leading-[20px] text-black/45">
-                    {product.sold}
-                  </span>
-                  <span className="text-[13px] sm:text-[17px] font-normal leading-[20px] text-black/25">•</span>
-                  <span className="inline-flex items-end gap-1 text-[13px] sm:text-[17px] font-[500] leading-[20px] text-black">
-                    <Star className="size-4 sm:size-5 fill-[#f2a33c] text-[#f2a33c]" />
-                    {product.rating}
-                  </span>
-                </div>
+                {product.sold && product.rating ? (
+                  <div className="flex items-end gap-2 text-black">
+                    <span className="text-[13px] sm:text-[17px] font-normal uppercase leading-[20px] text-black/45">
+                      {product.sold}
+                    </span>
+                    <span className="text-[13px] sm:text-[17px] font-normal leading-[20px] text-black/25">•</span>
+                    <span className="inline-flex items-end gap-1 text-[13px] sm:text-[17px] font-[500] leading-[20px] text-black">
+                      <Star className="size-4 sm:size-5 fill-[#f2a33c] text-[#f2a33c]" />
+                      {product.rating}
+                    </span>
+                  </div>
+                ) : null}
               </div>
 
               <p className="mt-3 sm:mt-5 max-w-none text-left font-sans text-[13px] sm:text-[14px] font-normal uppercase leading-[1.5] tracking-[0.02em] text-black/65">

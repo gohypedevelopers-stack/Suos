@@ -1,5 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
+import { Heart } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import type { HomeEditorialBanner } from "@/lib/server/dal/banners"
@@ -12,6 +13,8 @@ type DenimPanelProps = {
   className?: string
   imageClassName?: string
   sizes?: string
+  /** Figma marks the two jacket shots as shoppable with a heart in the corner. */
+  showHeart?: boolean
 }
 
 function DenimPanel({
@@ -22,6 +25,7 @@ function DenimPanel({
   className,
   imageClassName,
   sizes = "(max-width: 767px) 100vw, 50vw",
+  showHeart = false,
 }: DenimPanelProps) {
   const content = (
     <div className={cn("relative overflow-hidden bg-[#f3f0ea]", className)}>
@@ -55,6 +59,13 @@ function DenimPanel({
           className={cn("object-cover object-center", imageClassName)}
         />
       )}
+      {showHeart ? (
+        <Heart
+          aria-hidden="true"
+          className="pointer-events-none absolute right-3 top-3 z-10 size-[18px] fill-transparent stroke-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)] sm:right-4 sm:top-4 sm:size-5"
+          strokeWidth={1.6}
+        />
+      ) : null}
     </div>
   )
 
@@ -138,6 +149,7 @@ export function DenimEditorialSection({
           href={p0Link}
           className="aspect-square w-full"
           imageClassName="object-[center_22%]"
+          showHeart
         />
         <DenimPanel
           src={p1Src}
@@ -146,6 +158,7 @@ export function DenimEditorialSection({
           href={p1Link}
           className="aspect-square w-full"
           imageClassName="object-[center_32%]"
+          showHeart
         />
       </div>
 

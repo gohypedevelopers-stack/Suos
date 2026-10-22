@@ -143,6 +143,9 @@ export async function createProduct(input: ProductInput) {
       details: product.details.length > 0
         ? (product.details as Prisma.InputJsonValue)
         : Prisma.JsonNull,
+      pageContent: product.pageContent
+        ? (product.pageContent as Prisma.InputJsonValue)
+        : undefined,
       collections: product.collectionIds.length > 0
         ? {
             create: product.collectionIds.map((collectionId, position) => ({
@@ -267,6 +270,9 @@ export async function updateProduct(productId: string, input: ProductInput) {
         details: product.details.length > 0
           ? (product.details as Prisma.InputJsonValue)
           : Prisma.JsonNull,
+        pageContent: product.pageContent
+          ? (product.pageContent as Prisma.InputJsonValue)
+          : undefined,
         collections: {
           deleteMany: {},
           create: product.collectionIds.map((collectionId, position) => ({

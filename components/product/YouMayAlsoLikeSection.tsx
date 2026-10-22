@@ -1,48 +1,14 @@
-import Link from "next/link"
-
-import {
-  ProductCardView,
-} from "@/components/home/TrendingSection"
+import { RecommendedSection } from "@/components/home/RecommendedSection"
 import { listPublishedProducts } from "@/lib/server/dal/products"
 
-export async function YouMayAlsoLikeSection() {
-  const products = await listPublishedProducts()
-  
-  return (
-    <section className="w-full bg-white px-3 pb-14 pt-10 text-black sm:px-6 lg:px-8">
-      <div className="w-full">
-        <div className="flex items-center justify-between gap-6">
-          <h2 className="font-heading text-[24px] sm:text-[26px] font-normal uppercase leading-[1.15] tracking-[0.01em]">
-            You May Also Like
-          </h2>
+/** Product page "You May Also Like": same 6-card carousel as the homepage, real products only. */
+export async function YouMayAlsoLikeSection({
+  excludeProductId,
+}: {
+  excludeProductId?: string
+}) {
+  const products = await listPublishedProducts({ excludeProductId, take: 6 })
+  if (products.length === 0) return null
 
-          <Link
-            href="/shop"
-            className="group hidden flex-col items-start pb-0.5 text-[13px] md:text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em] transition-opacity hover:opacity-70 sm:inline-flex"
-          >
-            <span>View all</span>
-            <span
-              aria-hidden="true"
-              className="mt-[2px] h-px w-full origin-left scale-x-0 bg-black transition-transform duration-200 group-hover:scale-x-100"
-            />
-          </Link>
-        </div>
-
-        <div className="mt-6 grid grid-cols-2 gap-0.5 sm:gap-1 md:grid-cols-2 lg:grid-cols-4 items-start">
-          {products.slice(0, 4).map((product) => (
-            <ProductCardView key={product.id} product={product} />
-          ))}
-        </div>
-
-        <div className="mt-10 flex justify-center sm:hidden">
-          <Link
-            href="/shop"
-            className="inline-flex h-10 min-w-[102px] items-center justify-center border border-black px-6 text-[13px] font-normal uppercase leading-none tracking-[0.04em] transition-colors hover:bg-black hover:text-white"
-          >
-            View All
-          </Link>
-        </div>
-      </div>
-    </section>
-  )
+  return <RecommendedSection products={products} usePlaceholders={false} />
 }

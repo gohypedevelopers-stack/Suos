@@ -27,7 +27,7 @@ export function ProductAdditionalDetailsSection({
     (value ?? []).map((detail, index) => ({
       id: `detail-${index}`,
       name: toAdminUppercase(detail.name),
-      value: toAdminUppercase(detail.value),
+      value: detail.value,
     })),
   )
   const nextDetailId = useRef(1)
@@ -44,7 +44,9 @@ export function ProductAdditionalDetailsSection({
   }
 
   function updateDetail(id: string, field: "name" | "value", value: string) {
-    commit(details.map((detail) => detail.id === id ? { ...detail, [field]: toAdminUppercase(value) } : detail))
+    // Names are headings (uppercase); the information keeps the case it was typed in.
+    const next = field === "name" ? toAdminUppercase(value) : value
+    commit(details.map((detail) => detail.id === id ? { ...detail, [field]: next } : detail))
   }
 
   function removeDetail(id: string) {
@@ -56,7 +58,7 @@ export function ProductAdditionalDetailsSection({
       <div className="flex items-start justify-between gap-4 px-4 py-4">
         <div>
           <h2 className="text-sm font-semibold text-black/75">Additional details</h2>
-          <p className="mt-1 text-xs leading-5 text-black/50">Add any product-specific information, such as material, fit, care, or origin.</p>
+          <p className="mt-1 text-xs leading-5 text-black/50">Short names (Fabric, Rise, Fit) are listed under Features &amp; Care. Names with “&amp;” (e.g. The Fit &amp; Care, Origin &amp; Contact) get their own section on the product page.</p>
         </div>
         <Button type="button" variant="outline" size="sm" onClick={addDetail} className="shrink-0 cursor-pointer border-black/15 bg-white text-black/70 shadow-none hover:bg-black/[0.03]">
           <Plus className="size-3.5" /> Add detail

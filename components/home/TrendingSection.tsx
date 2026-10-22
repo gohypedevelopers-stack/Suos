@@ -47,8 +47,6 @@ function cardToProductDetail(card: ProductCard): ProductDetail {
     ],
     originalPrice: card.compareAtPrice || null,
     price: card.price || "N/A",
-    sold: "1,238 Sold",
-    rating: "4.5",
     description: card.description || "",
     detailsBody: card.description || "",
     careNotes: [
@@ -80,18 +78,20 @@ function cardToProductDetail(card: ProductCard): ProductDetail {
   }
 }
 
-const tabs = [
-  { label: "ALL", active: false },
-  { label: "MEN", active: true },
-] as const
-
 export function ProductCardView({
   product,
   expanded = false,
+  variant = "default",
 }: {
   product: ProductCard
   expanded?: boolean
+  /**
+   * "compact" is the You May Also Like card in Figma: line name (12px grey)
+   * above a 13px name, and a 14px Medium price.
+   */
+  variant?: "default" | "compact"
 }) {
+  const isCompact = variant === "compact"
   const gallery = product.gallery?.length ? product.gallery : [product.image]
   const [activeImageIndex, setActiveImageIndex] = useState(0)
   const [prevImageIndex, setPrevImageIndex] = useState(0)
@@ -231,16 +231,16 @@ export function ProductCardView({
   const displayPrice = product.price && product.price !== "N/A" ? product.price : "₹2,200"
   const numPrice = parseInt(displayPrice.replace(/[^\d]/g, "") || "2200", 10)
   
-  // Calculate compare price if not provided
-  const comparePriceStr = product.compareAtPrice
-    ? product.compareAtPrice
-    : `₹${(Math.round((numPrice * 1.35) / 100) * 100).toLocaleString("en-IN")}`
-  const numCompare = parseInt(comparePriceStr.replace(/[^\d]/g, "") || "3200", 10)
-  
-  const discountPercent =
-    numCompare > numPrice
-      ? Math.round(((numCompare - numPrice) / numCompare) * 100)
-      : 10
+  // Sale styling (struck-through price + SAVE %) only when a real compare-at
+  // price above the selling price is set, as in the Figma cards.
+  const numCompare = product.compareAtPrice
+    ? parseInt(product.compareAtPrice.replace(/[^\d]/g, "") || "0", 10)
+    : 0
+  const isOnSale = numCompare > numPrice
+  const comparePriceStr = isOnSale ? product.compareAtPrice : null
+  const discountPercent = isOnSale
+    ? Math.round(((numCompare - numPrice) / numCompare) * 100)
+    : 0
 
   const subtitle = product.category?.name
     ? `ORIGINALS 001 - ${product.category.name.toUpperCase()}`
@@ -305,7 +305,7 @@ export function ProductCardView({
 
         {/* Badge at Top-Left (Smaller and corner-aligned on mobile) */}
         <div className="pointer-events-none absolute left-1.5 top-1.5 sm:left-2.5 sm:top-2.5 z-20">
-          <span className="inline-block bg-black px-1.5 py-1 sm:px-2 sm:py-[5px] text-[11px] font-normal uppercase tracking-[0.08em] text-white leading-none shadow-xs">
+          <span className="inline-block bg-black px-1.5 py-1 sm:px-2 sm:py-[5px] text-[11px] sm:text-[12px] font-normal uppercase tracking-normal text-white leading-none shadow-xs">
             {product.badge || "NEW ARRIVAL"}
           </span>
         </div>
@@ -374,7 +374,7 @@ export function ProductCardView({
           <button
             type="button"
             onClick={handleQuickView}
-            className="bg-black px-4 py-2 text-[12px] font-normal uppercase leading-none tracking-[0.06em] text-white hover:bg-neutral-900 transition-colors cursor-pointer whitespace-nowrap shadow-md"
+            className="bg-black px-4 py-2 text-[12px] font-normal uppercase leading-none tracking-[0.01em] text-white hover:bg-neutral-900 transition-colors cursor-pointer whitespace-nowrap shadow-md"
           >
             QUICK VIEW
           </button>
@@ -386,7 +386,7 @@ export function ProductCardView({
             <button
               type="button"
               onClick={handleQuickView}
-              className="bg-black px-4 py-2 text-[11px] font-normal uppercase leading-none tracking-[0.06em] text-white hover:bg-neutral-900 transition-colors cursor-pointer whitespace-nowrap shadow-md"
+              className="bg-black px-4 py-2 text-[11px] font-normal uppercase leading-none tracking-[0.01em] text-white hover:bg-neutral-900 transition-colors cursor-pointer whitespace-nowrap shadow-md"
             >
               QUICK VIEW
             </button>
@@ -467,12 +467,21 @@ export function ProductCardView({
       </div>
 
       {/* Info Area Below Image */}
-      <div className="mt-2.5 md:mt-3 flex flex-col">
+      <div className="mt-2.5 md:mt-3 flex flex-col gap-1.5">
+        {isCompact && product.category?.name ? (
+          <p className="truncate text-[11px] md:text-[12px] uppercase tracking-normal leading-none text-ink-400">
+            {product.category.name}
+          </p>
+        ) : null}
+
         {/* Title row with icon */}
         <div className="flex items-center justify-between gap-1.5 md:gap-2">
           <Link
             href={`/products/${product.slug}`}
-            className="truncate text-[12px] md:text-[14px] font-normal uppercase tracking-[0.02em] leading-[1.4] text-black transition-opacity hover:opacity-70"
+            className={cn(
+              "truncate py-px font-normal uppercase tracking-normal leading-none transition-opacity hover:opacity-70",
+              isCompact ? "text-[12px] md:text-[13px] text-ink-800" : "text-[12px] md:text-[14px] text-black"
+            )}
           >
             {product.title || "WASHED BLACK STRAIGHT FIT DENIM"}
           </Link>
@@ -490,22 +499,24 @@ export function ProductCardView({
         </div>
 
         {/* Subtitle row */}
-        <p className="mt-0.5 truncate text-[11px] md:text-[13px] uppercase tracking-[0.04em] leading-[1.4] text-neutral-500 font-normal">
-          {subtitle}
-        </p>
+        {!isCompact ? (
+          <p className="truncate text-[11px] md:text-[14px] uppercase tracking-normal leading-none text-[#7d7d7d] font-normal">
+            {subtitle}
+          </p>
+        ) : null}
 
         {/* Pricing row */}
-        <div className="mt-1 flex items-baseline gap-x-1.5 md:gap-x-2 gap-y-0.5 flex-wrap text-[12px] md:text-[14px] leading-[1.4] tracking-[0.02em]">
+        <div className="flex items-baseline gap-x-1.5 md:gap-x-2 gap-y-0.5 flex-wrap text-[12px] md:text-[14px] leading-none tracking-normal">
           {comparePriceStr ? (
-            <span className="font-normal text-neutral-500 line-through text-[11px] md:text-[13px]">
+            <span className="font-normal text-[#7d7d7d] line-through">
               {comparePriceStr}
             </span>
           ) : null}
-          <span className="font-normal text-black">
+          <span className={isCompact ? "font-medium text-ink-900" : "font-normal text-black"}>
             {displayPrice}
           </span>
-          {discountPercent && discountPercent > 0 ? (
-            <span className="text-[11px] md:text-[12px] font-normal uppercase tracking-[0.04em] text-red-600">
+          {discountPercent > 0 ? (
+            <span className="text-[10px] font-normal uppercase tracking-normal text-[#ed0000]">
               SAVE {discountPercent}%
             </span>
           ) : null}
@@ -521,7 +532,7 @@ export function ProductCardView({
           )}
         >
           <div className="overflow-hidden">
-            <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 pt-1.5 md:pt-2.5">
+            <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 pt-0.5 md:pt-1">
               {sizesList.map((size) => {
                 const isSelected = selectedSize === size
                 return (
@@ -530,10 +541,10 @@ export function ProductCardView({
                     type="button"
                     onClick={(e) => handleSelectSize(size, e)}
                     className={cn(
-                      "flex min-w-[24px] h-[22px] px-1 items-center justify-center text-[11px] font-normal uppercase leading-none tracking-[0.02em] transition-colors cursor-pointer select-none md:min-w-[30px] md:h-7 md:px-1.5 md:text-[12px]",
+                      "flex min-w-[24px] h-[22px] px-1 items-center justify-center text-[11px] font-normal uppercase leading-none tracking-normal transition-colors cursor-pointer select-none md:min-w-[32px] md:h-8 md:px-1.5 md:text-[14px]",
                       isSelected
                         ? "border border-black bg-neutral-100 text-black md:bg-white"
-                        : "border border-neutral-200 bg-white text-neutral-600 hover:border-black"
+                        : "border border-neutral-200 bg-white text-ink-900 hover:border-black"
                     )}
                     title={`Select size ${size} and add to cart`}
                   >
@@ -564,31 +575,9 @@ export function TrendingSection({ products = [] }: { products?: ProductCard[] })
       id="bestsellers"
       className="w-full scroll-mt-[var(--main-navbar-height)] bg-white px-3 sm:px-6 lg:px-8 py-10 md:py-16 text-black"
     >
-      <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <h2 className="font-heading text-[24px] sm:text-[26px] font-normal uppercase leading-[1.15] tracking-[0.01em]">
-          Our Favourite
-        </h2>
-
-        <div className="flex items-center gap-5 sm:gap-8">
-          {tabs.map((tab) => (
-            <button
-              key={tab.label}
-              type="button"
-              aria-pressed={tab.active}
-              className={cn(
-                "group inline-flex flex-col items-start pb-0.5 text-[12px] sm:text-[13px] font-normal uppercase leading-[1.4] tracking-[0.04em] transition-opacity hover:opacity-70"
-              )}
-            >
-              <span>{tab.label}</span>
-              <span
-                aria-hidden="true"
-                className="mt-[2px] h-px w-full origin-left scale-x-0 bg-black transition-transform duration-200 group-hover:scale-x-100"
-              />
-            </button>
-          ))}
-        </div>
-
-      </div>
+      <h2 className="font-heading text-[28px] sm:text-[32px] lg:text-h2 font-normal uppercase leading-none tracking-normal">
+        Our Favourite
+      </h2>
 
       <div className="mt-6 sm:mt-8 grid grid-cols-2 gap-0.5 sm:gap-1 md:grid-cols-2 lg:grid-cols-4 items-start">
         {products.map((product) => (
@@ -599,7 +588,7 @@ export function TrendingSection({ products = [] }: { products?: ProductCard[] })
       <div className="mt-8 flex justify-center">
         <Link
           href="/shop"
-          className="inline-flex h-10 items-center justify-center border border-black px-6 text-[13px] md:text-[14px] font-normal uppercase leading-none tracking-[0.04em] transition-colors hover:bg-black hover:text-white"
+          className="inline-flex h-11 items-center justify-center border border-black px-7 text-[14px] md:text-button font-normal uppercase transition-colors hover:bg-black hover:text-white"
         >
           View All
         </Link>

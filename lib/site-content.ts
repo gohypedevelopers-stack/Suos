@@ -50,6 +50,8 @@ export type NavMenuCard = {
 }
 
 export type NavigationContent = {
+  /** Name of the first top-level menu item (Figma: "Women"). */
+  collectionsLabel: string
   /** "Collections" mega menu, middle "Edits" column. */
   edits: NavMenuLink[]
   /** "Men" mega menu, first column ("Collection"). */
@@ -235,6 +237,7 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
       },
     ],
     bestsellersHref: "/shop?filter=bestsellers",
+    collectionsLabel: "Women",
   },
   launchOffer: {
     // Hidden for now; switch on from Dashboard → Content → Launch offer.

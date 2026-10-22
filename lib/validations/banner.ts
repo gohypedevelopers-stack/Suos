@@ -7,6 +7,7 @@ export const bannerPlacementSchema = z.enum([
   "EDITORIAL",
   "DENIM_CAROUSEL",
   "FEATURE",
+  "SPLIT",
 ])
 export type BannerPlacement = z.infer<typeof bannerPlacementSchema>
 

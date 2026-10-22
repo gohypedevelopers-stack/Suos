@@ -95,6 +95,7 @@ export const siteContentSchemas = {
         .max(3)
         .default(() => structuredClone(DEFAULT_SITE_CONTENT.navigation.cards)),
       bestsellersHref: navHref.default(DEFAULT_SITE_CONTENT.navigation.bestsellersHref),
+      collectionsLabel: shortText.min(1).default(DEFAULT_SITE_CONTENT.navigation.collectionsLabel),
     }),
   ),
   launchOffer: z.object({

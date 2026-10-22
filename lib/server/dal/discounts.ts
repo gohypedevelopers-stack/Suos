@@ -151,3 +151,77 @@ export async function listDiscountEditorOptionsForAdmin(): Promise<{
   ])
   return { products, collections }
 }
+
+export type StorefrontOffer = {
+  code: string
+  headline: string
+  detail: string | null
+}
+
+function formatRupees(value: number) {
+  return `₹${Math.round(value).toLocaleString("en-IN")}`
+}
+
+/**
+ * Coupon codes to advertise on product pages. Mirrors what checkout will
+ * actually accept (see resolvePromoCode): active CODE discounts inside their
+ * date window, under their usage limit, and order-wide. Never throws, so a
+ * discounts problem can't take the product page down.
+ */
+export async function listStorefrontOffers(limit = 3): Promise<StorefrontOffer[]> {
+  try {
+    const now = new Date()
+    const discounts = await getPrisma().discount.findMany({
+      where: {
+        method: "CODE",
+        status: "ACTIVE",
+        code: { not: null },
+        type: { in: ["ORDER", "PRODUCT", "FREE_SHIPPING"] },
+        startsAt: { lte: now },
+        OR: [{ endsAt: null }, { endsAt: { gt: now } }],
+      },
+      orderBy: { createdAt: "desc" },
+      take: 20,
+      select: {
+        code: true,
+        type: true,
+        valueType: true,
+        value: true,
+        appliesTo: true,
+        minimumType: true,
+        minimumAmount: true,
+        minimumQuantity: true,
+        usageLimit: true,
+        usageCount: true,
+      },
+    })
+
+    return discounts
+      .filter((discount) =>
+        discount.code &&
+        (discount.usageLimit === null || discount.usageCount < discount.usageLimit) &&
+        (discount.type === "FREE_SHIPPING" || discount.appliesTo === "ALL"),
+      )
+      .slice(0, limit)
+      .map((discount) => {
+        const value = discount.value ? Number(discount.value) : 0
+        const headline =
+          discount.type === "FREE_SHIPPING"
+            ? "Free shipping"
+            : discount.valueType === "PERCENTAGE"
+              ? `Get ${value}% off`
+              : `Get ${formatRupees(value)} off`
+        const detail =
+          discount.minimumType === "AMOUNT" && discount.minimumAmount
+            ? `On orders above ${formatRupees(Number(discount.minimumAmount))}`
+            : discount.minimumType === "QUANTITY" && discount.minimumQuantity
+              ? `On ${discount.minimumQuantity} or more items`
+              : null
+
+        return { code: discount.code as string, headline, detail }
+      })
+  } catch (error) {
+    console.error("Error loading storefront offers:", error)
+    return []
+  }
+}

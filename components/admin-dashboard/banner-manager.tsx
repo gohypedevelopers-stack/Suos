@@ -93,6 +93,7 @@ export function BannerManager({
   const heroBanners = banners
     .filter((b) => b.placement === "HERO")
     .sort((a, b) => a.position - b.position)
+  const splitBanners = banners.filter((b) => b.placement === "SPLIT")
   const featureBanner = banners.find((b) => b.placement === "FEATURE")
   const middleBanner = banners.find((b) => b.placement === "MIDDLE")
   const denimCarouselBanners = banners
@@ -390,7 +391,8 @@ export function BannerManager({
         const addRes = await addCarouselSlideAction({
           desktopImageKey: instruction.objectKey,
           title: formattedTitle,
-          subtitle: "Denim Cut",
+          // The subtitle is the tile label on the site, so name files e.g. "Originals.jpg".
+          subtitle: formattedTitle,
           ctaText: null,
           ctaLink: "/collections",
         })
@@ -508,7 +510,7 @@ export function BannerManager({
           </div>
         </div>
 
-        {/* The 6 Homepage Sections in visual order */}
+        {/* The 7 Homepage Sections in visual order */}
         <div className="space-y-4">
           {/* ================================================================ */}
           {/* SECTION 1: HERO TOP CAROUSEL                                     */}
@@ -803,6 +805,131 @@ export function BannerManager({
           </section>
 
           {/* ================================================================ */}
+          {/* SECTION 1B: SPLIT PAIR (2 IMAGES DIRECTLY BELOW HERO)            */}
+          {/* ================================================================ */}
+          <section className="overflow-hidden rounded-xl border border-neutral-200/90 bg-white shadow-xs transition hover:border-neutral-300">
+            <div className="p-4 sm:p-5">
+              <div className="flex items-start sm:items-center gap-3.5 min-w-0">
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-neutral-200 font-mono text-xs font-bold text-neutral-800 shadow-2xs">
+                  01B
+                </div>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-sm font-bold text-neutral-900">Split Pair</h2>
+                    <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-semibold text-neutral-700">
+                      2 Slots (Wide + Narrow)
+                    </span>
+                  </div>
+                  <p className="mt-0.5 text-xs text-neutral-500">
+                    Two images side by side directly below the hero. Hidden on the site until both slots have an active image.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t border-neutral-200/80 bg-neutral-50/70 p-4 sm:p-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                  { slotNum: 0, title: "Slot 1: Left (Wide)", ratio: "about 1760 × 1554" },
+                  { slotNum: 1, title: "Slot 2: Right (Narrow)", ratio: "about 1120 × 1554" },
+                ].map((slot) => {
+                  const activeBanner = splitBanners.find((b) => b.position === slot.slotNum)
+
+                  return (
+                    <div
+                      key={slot.slotNum}
+                      className="flex flex-col justify-between rounded-xl border border-neutral-200 bg-white p-4 shadow-xs"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between pb-2 border-b border-neutral-100">
+                          <div>
+                            <h3 className="text-xs font-bold text-neutral-900">{slot.title}</h3>
+                            <span className="text-[10px] font-mono text-neutral-400">{slot.ratio}</span>
+                          </div>
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-[9px] font-semibold ${
+                              activeBanner?.isActive
+                                ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60"
+                                : "bg-neutral-100 text-neutral-500"
+                            }`}
+                          >
+                            {activeBanner ? (activeBanner.isActive ? "Active" : "Hidden") : "Not set"}
+                          </span>
+                        </div>
+
+                        <div className="mt-3 relative w-full aspect-video rounded-lg overflow-hidden border border-neutral-200 bg-neutral-100">
+                          {activeBanner?.desktopImageUrl ? (
+                            <Image
+                              src={activeBanner.desktopImageUrl}
+                              alt={activeBanner.title || slot.title}
+                              fill
+                              sizes="320px"
+                              className="object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center text-[10px] text-neutral-400">
+                              No image yet
+                            </div>
+                          )}
+                        </div>
+
+                        {activeBanner ? (
+                          <p className="mt-2.5 font-mono text-[10px] text-neutral-400 truncate">
+                            Link: {activeBanner.ctaLink || "none"}
+                          </p>
+                        ) : null}
+                      </div>
+
+                      <div className="mt-4 pt-3 border-t border-neutral-100 flex items-center justify-between gap-2">
+                        {activeBanner ? (
+                          <>
+                            <button
+                              type="button"
+                              disabled={isPending}
+                              onClick={() => handleToggleActive(activeBanner.id, activeBanner.isActive)}
+                              className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold transition cursor-pointer ${
+                                activeBanner.isActive
+                                  ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/60"
+                                  : "bg-neutral-100 text-neutral-500 hover:bg-neutral-200 border border-neutral-200"
+                              }`}
+                            >
+                              {activeBanner.isActive ? "Active" : "Hidden"}
+                            </button>
+
+                            <div className="flex items-center gap-1.5">
+                              <Link
+                                href={`/dashboard/banners/${activeBanner.id}`}
+                                className="inline-flex h-7 items-center gap-1 rounded border border-neutral-200 bg-white px-2.5 text-[11px] font-semibold text-neutral-700 hover:bg-neutral-50 transition shadow-2xs"
+                              >
+                                <Pencil className="size-3" /> Edit Photo
+                              </Link>
+                              <button
+                                type="button"
+                                onClick={() => setBannersToDelete([activeBanner.id])}
+                                title="Remove image"
+                                className="inline-flex size-7 items-center justify-center rounded border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 transition cursor-pointer"
+                              >
+                                <Trash2 className="size-3" />
+                              </button>
+                            </div>
+                          </>
+                        ) : (
+                          <Link
+                            href={`/dashboard/banners/new?placement=SPLIT&position=${slot.slotNum}`}
+                            className="w-full inline-flex h-7 items-center justify-center gap-1 rounded bg-black px-3 text-[11px] font-semibold text-white hover:bg-neutral-800 transition shadow-xs"
+                          >
+                            <Plus className="size-3" /> Upload Photo for Slot {slot.slotNum + 1}
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </section>
+
+          {/* ================================================================ */}
           {/* SECTION 2: FEATURE BANNER (BELOW LAUNCH OFFER, IMAGE OR VIDEO)   */}
           {/* ================================================================ */}
           <section className="overflow-hidden rounded-xl border border-neutral-200/90 bg-white shadow-xs transition hover:border-neutral-300">
@@ -1005,11 +1132,11 @@ export function BannerManager({
                         {denimCarouselBanners.length} {denimCarouselBanners.length === 1 ? "Slide" : "Slides"}
                       </span>
                       <span className="rounded-md bg-neutral-100 px-2 py-0.5 text-[10px] font-medium text-neutral-700">
-                        Interactive Cutout Strip
+                        3 Collection Tiles
                       </span>
                     </div>
                     <p className="mt-0.5 text-xs text-neutral-500">
-                      Draggable model cutout cards (Skinny, Bootcut, Straight, etc.) with custom links.
+                      The first 3 slides show as tall tiles (about 960 × 1668 px). Each slide&apos;s subtitle is the label (e.g. Originals); without a link it opens /collections/&lt;label&gt;.
                     </p>
                   </div>
                 </div>

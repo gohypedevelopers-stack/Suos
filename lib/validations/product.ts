@@ -1,5 +1,7 @@
 import { z } from "zod"
 
+import { productPageContentSchema } from "@/lib/product-page-content"
+
 export const productImageObjectKeySchema = z
   .string()
   .trim()
@@ -100,7 +102,7 @@ export const productInputSchema = z
       .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
       .max(180)
       .optional(),
-    description: z.string().trim().toUpperCase().max(10_000).optional(),
+    description: z.string().trim().max(10_000).optional(),
     status: z.enum(["DRAFT", "ACTIVE"]).default("DRAFT"),
     categoryId: z.string().trim().min(1).nullable().optional(),
     sku: optionalSkuSchema,
@@ -123,11 +125,13 @@ export const productInputSchema = z
       .array(
         z.object({
           name: z.string().trim().toUpperCase().min(1).max(80),
-          value: z.string().trim().toUpperCase().min(1).max(2_000),
+          value: z.string().trim().min(1).max(2_000),
         }),
       )
       .max(30)
       .default([]),
+    // Optional so callers that don't send it (e.g. bulk import) leave it untouched.
+    pageContent: productPageContentSchema.optional(),
     taxRate: z.number().min(0).max(100).optional().default(12),
     hsnCode: z.string().trim().optional().default("6203"),
     isTaxExempt: z.boolean().optional().default(false),

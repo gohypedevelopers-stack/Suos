@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation"
 import { ArrowDown, ArrowUp, ImageIcon, LayoutTemplate, Loader2, Plus, RotateCcw, Trash2, Upload } from "lucide-react"
 import { toast } from "sonner"
 
+import { isVideoMedia } from "@/lib/banner-media"
+
 import { resetSiteContentAction, saveSiteContentAction } from "@/app/actions/site-content"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -84,7 +86,18 @@ async function uploadImage(file: File): Promise<string> {
   return publicUrl
 }
 
-function ImageField({ value, onChange, label = "Image" }: { value: string; onChange: (value: string) => void; label?: string }) {
+function ImageField({
+  value,
+  onChange,
+  label = "Image",
+  allowVideo = false,
+}: {
+  value: string
+  onChange: (value: string) => void
+  label?: string
+  /** Also accept MP4 / WebM (up to 50 MB). */
+  allowVideo?: boolean
+}) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
 
@@ -104,10 +117,15 @@ function ImageField({ value, onChange, label = "Image" }: { value: string; onCha
   }
 
   return (
-    <Field label={label} hint="Paste a path or URL, or upload a JPG, PNG, WebP or AVIF.">
+    <Field
+      label={label}
+      hint={allowVideo ? "Paste a path or URL, or upload a JPG, PNG, WebP, AVIF, MP4 or WebM (video up to 50 MB)." : "Paste a path or URL, or upload a JPG, PNG, WebP or AVIF."}
+    >
       <div className="flex items-center gap-2">
         <div className="size-12 shrink-0 overflow-hidden rounded-md border border-black/10 bg-black/[0.03]">
-          {value ? (
+          {value && isVideoMedia(value) ? (
+            <video src={value} muted playsInline preload="metadata" className="size-full object-cover" />
+          ) : value ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={value} alt="" className="size-full object-cover" />
           ) : (
@@ -115,7 +133,7 @@ function ImageField({ value, onChange, label = "Image" }: { value: string; onCha
           )}
         </div>
         <Input value={value} onChange={(event) => onChange(event.target.value)} placeholder="/images/products/product1.png" />
-        <input ref={inputRef} type="file" accept="image/png,image/jpeg,image/webp,image/avif" className="hidden" onChange={pick} />
+        <input ref={inputRef} type="file" accept={allowVideo ? "image/png,image/jpeg,image/webp,image/avif,video/mp4,video/webm" : "image/png,image/jpeg,image/webp,image/avif"} className="hidden" onChange={pick} />
         <Button type="button" variant="outline" className="h-9 shrink-0" onClick={() => inputRef.current?.click()} disabled={uploading}>
           {uploading ? <Loader2 className="size-3.5 animate-spin" /> : <Upload className="size-3.5" />}
           Upload
@@ -189,6 +207,9 @@ function NavigationEditor({ value, onChange }: SectionProps<"navigation">) {
           <NavLinksEditor title="Featured" items={value.menFeatured} onChange={(menFeatured) => onChange({ ...value, menFeatured })} />
         </div>
       </div>
+      <Field label="First menu name" hint='Name of the first top-level menu item (the one with the Edits dropdown), e.g. "Women".'>
+        <Input value={value.collectionsLabel} onChange={(e) => onChange({ ...value, collectionsLabel: e.target.value })} />
+      </Field>
       <Field label="Bestsellers button link" hint="Bestsellers is a plain button (no dropdown).">
         <Input value={value.bestsellersHref} onChange={(e) => onChange({ ...value, bestsellersHref: e.target.value })} />
       </Field>
@@ -253,7 +274,7 @@ function LookbookEditor({ value, onChange }: SectionProps<"lookbook">) {
             <ListControls index={index} count={slides.length} onMove={(from, to) => set(move(slides, from, to))} onRemove={(i) => set(slides.filter((_, j) => j !== i))} />
           </div>
           <div className="mt-3 grid gap-3 md:grid-cols-[1fr_1fr_160px]">
-            <ImageField value={slide.image} onChange={(image) => set(slides.map((s, j) => (j === index ? { ...s, image } : s)))} />
+            <ImageField label="Image or video" allowVideo value={slide.image} onChange={(image) => set(slides.map((s, j) => (j === index ? { ...s, image } : s)))} />
             <Field label="Alt text"><Input value={slide.alt} onChange={(e) => set(slides.map((s, j) => (j === index ? { ...s, alt: e.target.value } : s)))} /></Field>
             <Field label="Focus (object-position)" hint='e.g. "center 20%"'><Input value={slide.objectPosition} onChange={(e) => set(slides.map((s, j) => (j === index ? { ...s, objectPosition: e.target.value } : s)))} /></Field>
           </div>

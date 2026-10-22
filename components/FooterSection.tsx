@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils"
 
 const companyLinks = [
   { label: "About Us", href: "/#about" },
-  { label: "Contact Us", href: "/contact" },
   { label: "Help", href: "/#help" },
   { label: "Chat With Us", href: "/#chat" },
   { label: "Privacy Policy", href: "/privacy" },
@@ -25,14 +24,14 @@ const quickLinks = [
 const bottomLinks = [
   { label: "Privacy Policy", href: "/privacy" },
   { label: "Terms of Use", href: "/terms" },
-  { label: "Returns Policy", href: "/returns-policy" },
+  { label: "Returns", href: "/returns-policy" },
 ] as const
 
 const headingClass =
-  "text-[12px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black sm:text-[13px]"
+  "text-[18px] font-medium uppercase leading-[22px] tracking-normal text-black sm:text-h4"
 
 const bodyClass =
-  "text-[13px] font-normal uppercase leading-[1.6] tracking-[0.04em] text-black/80 sm:text-[14px]"
+  "text-[14px] font-normal uppercase leading-[18px] tracking-normal text-black sm:text-body"
 
 function FooterLink({
   href,
@@ -57,7 +56,7 @@ function FooterLinkList({
   links: ReadonlyArray<{ label: string; href: string }>
 }) {
   return (
-    <ul className="space-y-2">
+    <ul className="space-y-3">
       {links.map((link) => (
         <li key={link.label}>
           <FooterLink href={link.href}>{link.label}</FooterLink>
@@ -88,7 +87,7 @@ export function FooterSection() {
     <footer className="w-full bg-white text-black">
       <div className="px-4 pb-6 pt-8 sm:px-6 lg:px-8 lg:pt-10">
         <div className="border-b border-black/20 pb-3">
-          <h2 className="font-heading text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em]">
+          <h2 className="font-heading text-[18px] font-medium uppercase leading-[22px] tracking-normal sm:text-h4">
             More About SUOS
           </h2>
         </div>
@@ -107,21 +106,21 @@ export function FooterSection() {
               <div className="space-y-4">
                 <div>
                   <p>For customer care</p>
-                  <p className="break-all normal-case tracking-[0.01em] text-black">
+                  <p className="break-all normal-case tracking-normal text-black">
                     {footer.careEmail}
                   </p>
                 </div>
 
                 <div>
                   <p>For online orders</p>
-                  <p className="normal-case tracking-[0.01em] text-black">
+                  <p className="normal-case tracking-normal text-black">
                     {footer.ordersPhone}
                   </p>
                 </div>
 
                 <div>
                   <p>Timings</p>
-                  <p className="normal-case tracking-[0.01em] text-black">
+                  <p className="normal-case tracking-normal text-black">
                     {footer.timings}
                   </p>
                 </div>
@@ -130,7 +129,7 @@ export function FooterSection() {
           </div>
 
           <div className="col-span-2 lg:col-span-1">
-            <h3 className={headingClass}>Subscribe to our newsletter</h3>
+            <h3 className="text-[14px] font-normal uppercase leading-[18px] tracking-normal text-black sm:text-body">Subscribe to our newsletter</h3>
 
             <div className="mt-4">
               <div className="flex items-center gap-3 border-b border-black/40 pb-2">
@@ -139,7 +138,7 @@ export function FooterSection() {
                   aria-label="Email address"
                   placeholder="Enter your email address"
                   className={cn(
-                    "h-8 min-w-0 flex-1 bg-transparent text-[14px] font-normal leading-[1.4] tracking-[0.01em] text-black outline-none placeholder:text-black/55",
+                    "h-8 min-w-0 flex-1 bg-transparent text-body font-normal tracking-normal text-black outline-none placeholder:text-black/55",
                     "selection:bg-black selection:text-white"
                   )}
                 />
@@ -154,7 +153,7 @@ export function FooterSection() {
 
               <button
                 type="button"
-                className="mt-5 flex h-12 w-full cursor-pointer items-center justify-center bg-black text-[14px] font-normal uppercase leading-none tracking-[0.04em] text-white transition-opacity hover:opacity-90"
+                className="mt-5 flex h-12 w-full cursor-pointer items-center justify-center bg-black text-body-lg font-normal uppercase tracking-[0.01em] text-[#d9d9d9] transition-opacity hover:opacity-90"
               >
                 Subscribe
               </button>
@@ -163,7 +162,7 @@ export function FooterSection() {
         </div>
 
         <div className="border-t border-black/20 pt-5 pb-1">
-          <div className="flex w-full flex-wrap items-center justify-between gap-x-6 gap-y-3 text-[11px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black/80 sm:text-[12px] lg:text-[13px]">
+          <div className="flex w-full flex-wrap items-center justify-between gap-x-6 gap-y-3 text-[12px] font-normal uppercase leading-none tracking-normal text-black sm:text-caption">
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
               {bottomLinks.map((link) => (
                 <FooterLink key={link.label} href={link.href}>

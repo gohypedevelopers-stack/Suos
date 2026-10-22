@@ -1,13 +1,9 @@
-"use client"
-
 import Image from "next/image"
-
 import Link from "next/link"
 
-import { useContinuousDraggableCarousel } from "./useContinuousDraggableCarousel"
 import type { HomeCarouselSlide } from "@/lib/server/dal/banners"
 
-type DenimSlide = {
+type CategoryTile = {
   id: string
   image: string
   alt: string
@@ -15,120 +11,63 @@ type DenimSlide = {
   href: string
 }
 
-/** Collection tiles shown over the carousel slides, cycled by slide index. */
-const COLLECTION_TILES = [
-  { label: "Originals", href: "/collections/originals" },
-  { label: "Freedom", href: "/collections/freedom" },
-  { label: "Timeless", href: "/collections/timeless" },
-] as const
+const TILE_COUNT = 3
 
-function resolveTile(
-  index: number,
-  title?: string | null,
-  subtitle?: string | null,
-  ctaLink?: string | null
-) {
-  const named = COLLECTION_TILES.find((tile) =>
-    [title, subtitle].some(
-      (value) => value?.trim().toLowerCase() === tile.label.toLowerCase()
-    )
-  )
-  const tile = named ?? COLLECTION_TILES[index % COLLECTION_TILES.length]
-  const link = ctaLink?.trim()
-  // A bare "/collections" link is the generic seed default; prefer the collection page.
-  const href = link && link !== "/collections" ? link : tile.href
-  return { label: tile.label, href }
-}
-
-const defaultDenimSlides: DenimSlide[] = [
-  "Model wearing skinny denim",
-  "Model wearing bootcut denim",
-  "Model wearing low-rise denim",
-].map((alt, index) => ({
-  id: `default-${index}`,
+/** Shown until the Denim Carousel slides are set in Banners → 04. */
+const DEFAULT_TILES: CategoryTile[] = ["Originals", "Freedom", "Timeless"].map((label) => ({
+  id: `default-${label.toLowerCase()}`,
   image: "/images/products/product5-white.png",
-  alt,
-  ...resolveTile(index),
+  alt: `${label} collection`,
+  label,
+  href: `/collections/${label.toLowerCase()}`,
 }))
 
-function DenimSlideCard({ slide }: { slide: DenimSlide }) {
-  return (
-    <Link
-      href={slide.href}
-      aria-label={`Shop ${slide.label}`}
-      className="group block cursor-pointer"
-    >
-      <article className="relative h-[460px] w-[min(92vw,627px)] shrink-0 overflow-hidden bg-white sm:h-[530px] sm:w-[min(72vw,627px)] md:h-[590px] md:w-[min(58vw,627px)] lg:h-[640px] lg:w-[627px]">
-        <Image
-          src={slide.image}
-          alt={slide.alt}
-          fill
-          sizes="(max-width: 640px) 92vw, (max-width: 1024px) 64vw, 627px"
-          className="pointer-events-none object-contain object-center"
-        />
-        {/* mix-blend-difference keeps the label legible on both white cut-outs and dark photos */}
-        <span className="pointer-events-none absolute bottom-5 left-5 z-10 text-[14px] font-normal uppercase leading-[1.15] tracking-[0.04em] text-white mix-blend-difference sm:bottom-6 sm:left-6 sm:text-[16px]">
-          <span className="border-b border-transparent pb-0.5 transition-colors duration-200 group-hover:border-current">
-            {slide.label}
-          </span>
-        </span>
-      </article>
-    </Link>
-  )
+function slugify(value: string) {
+  return value.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")
 }
 
-export function DenimCarousel({
-  slides,
-}: {
-  slides?: HomeCarouselSlide[]
-}) {
-  const activeSlides: DenimSlide[] =
-    slides && slides.length > 0
-      ? slides.map((s, index) => ({
-          id: s.id,
-          image: s.desktopImageUrl,
-          alt: s.title || "Denim collection slide",
-          ...resolveTile(index, s.title, s.subtitle, s.ctaLink),
-        }))
-      : defaultDenimSlides
+function toTile(slide: HomeCarouselSlide): CategoryTile {
+  // The slide name (subtitle) is the label; the title is the image description.
+  const label = slide.subtitle?.trim() || slide.title?.trim() || "Shop"
+  const link = slide.ctaLink?.trim()
+  return {
+    id: slide.id,
+    image: slide.desktopImageUrl,
+    alt: slide.title || `${label} collection`,
+    label,
+    // A bare "/collections" link is the old seed default; prefer the collection page.
+    href: link && link !== "/collections" ? link : `/collections/${slugify(label)}`,
+  }
+}
 
-  const loopingDenimSlides = [...activeSlides, ...activeSlides, ...activeSlides]
-  const {
-    viewportRef,
-    trackRef,
-    onPointerEnter,
-    onPointerLeave,
-    onPointerDown,
-    onPointerMove,
-    onPointerUp,
-    onPointerCancel,
-  } = useContinuousDraggableCarousel({
-    slideCount: activeSlides.length,
-  })
+/** Figma: 3 tall photo tiles across the full width, white label bottom-left. */
+export function DenimCarousel({ slides }: { slides?: HomeCarouselSlide[] }) {
+  const tiles = slides && slides.length > 0 ? slides.slice(0, TILE_COUNT).map(toTile) : DEFAULT_TILES
 
   return (
-    <section className="w-full bg-white pb-12 pt-4 text-black md:pb-16">
-      <h2 className="sr-only">Denim collection carousel</h2>
-
-      <div
-        ref={viewportRef}
-        className="denim-carousel-viewport continuous-carousel-viewport"
-        aria-label="Denim collection carousel"
-        onPointerEnter={onPointerEnter}
-        onPointerLeave={onPointerLeave}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerCancel}
-      >
-        <div ref={trackRef} className="denim-carousel-track continuous-carousel-track">
-          {loopingDenimSlides.map((slide, index) => (
-            <div key={`${slide.id}-${index}`} aria-hidden={index >= activeSlides.length}>
-              <DenimSlideCard slide={slide} />
-            </div>
-          ))}
-        </div>
-      </div>
+    <section className="grid w-full grid-cols-1 bg-white sm:grid-cols-3">
+      <h2 className="sr-only">Shop by collection</h2>
+      {tiles.map((tile) => (
+        <Link
+          key={tile.id}
+          href={tile.href}
+          aria-label={`Shop ${tile.label}`}
+          className="group relative block aspect-[4/5] overflow-hidden bg-[#efefef] sm:aspect-[480/834]"
+        >
+          <Image
+            src={tile.image}
+            alt={tile.alt}
+            fill
+            sizes="(max-width: 639px) 100vw, 33vw"
+            className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.02]"
+          />
+          <span className="pointer-events-none absolute bottom-5 left-5 z-10 text-[18px] font-medium uppercase leading-none tracking-normal text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)] sm:bottom-6 sm:left-6 lg:text-h3">
+            <span className="border-b border-transparent pb-0.5 transition-colors duration-200 group-hover:border-current">
+              {tile.label}
+            </span>
+          </span>
+        </Link>
+      ))}
     </section>
   )
 }

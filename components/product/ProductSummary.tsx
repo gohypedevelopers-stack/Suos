@@ -4,15 +4,16 @@ import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
+  Check,
+  Copy,
   CreditCard,
   Heart,
   RefreshCcw,
   ShieldCheck,
-  Star,
   Truck,
 } from "lucide-react"
-import type { ButtonHTMLAttributes } from "react"
-import { useState } from "react"
+import type { ButtonHTMLAttributes, ReactNode } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import {
   Accordion,
@@ -20,15 +21,13 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel"
 import { cn } from "@/lib/utils"
-import { CartIcon } from "@/components/icons/CartIcon"
 import type { ProductDetail } from "@/components/product/productData"
+import type { ProductCard as HomeProductCard } from "@/components/home/TrendingSection"
 import { SizeChartModal } from "@/components/product/SizeChartModal"
+import { useCart } from "@/lib/cart-context"
+import { useWishlist } from "@/lib/wishlist-context"
+import type { ProductCard } from "@/components/product/productData"
 
 const deliveryIcons = {
   truck: Truck,
@@ -36,6 +35,11 @@ const deliveryIcons = {
   shield: ShieldCheck,
   card: CreditCard,
 } as const
+
+const accordionTriggerClass =
+  "h-[60px] items-center rounded-none py-0 text-h4 uppercase tracking-normal text-ink-800 hover:no-underline"
+const accordionBodyClass =
+  "w-full min-w-0 max-w-full pb-6 text-body font-normal text-ink-700 break-words"
 
 function OptionButton({
   active,
@@ -50,10 +54,10 @@ function OptionButton({
       type="button"
       aria-pressed={active}
       className={cn(
-        "inline-flex cursor-pointer items-center justify-center border text-[13px] font-normal leading-none transition-[background-color,border-color,color,transform,font-weight] duration-200 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45",
+        "inline-flex cursor-pointer items-center justify-center border text-h3 transition-[background-color,border-color,color] duration-200 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/45",
         active
-          ? "border-black bg-black font-[500] text-white"
-          : "border-black/15 bg-white text-black hover:border-black hover:bg-black/4",
+          ? "border-black bg-black text-white"
+          : "border-black/15 bg-white text-ink-900 hover:border-black",
         className
       )}
       {...props}
@@ -63,9 +67,88 @@ function OptionButton({
   )
 }
 
-import { useCart } from "@/lib/cart-context"
-import { useWishlist } from "@/lib/wishlist-context"
-import type { ProductCard } from "@/components/product/productData"
+/** Bolds the first mention of the product name inside the description (Figma). */
+function DescriptionText({ text, productName }: { text: string; productName: string }) {
+  const index = productName ? text.toLowerCase().indexOf(productName.toLowerCase()) : -1
+  if (index < 0) return <p className="whitespace-pre-line">{text}</p>
+
+  return (
+    <p className="whitespace-pre-line">
+      {text.slice(0, index)}
+      <strong className="font-bold">{text.slice(index, index + productName.length)}</strong>
+      {text.slice(index + productName.length)}
+    </p>
+  )
+}
+
+function OfferCard({ code, headline, detail }: { code: string; headline: string; detail: string | null }) {
+  const [copied, setCopied] = useState(false)
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(code)
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 1600)
+    } catch {
+      // Clipboard can be blocked; the code is still visible to copy by hand.
+    }
+  }
+
+  return (
+    <div className="flex items-center justify-between gap-3 border border-dashed border-black/30 px-4 py-3">
+      <div className="min-w-0">
+        <p className="text-body-lg text-ink-900">{headline}</p>
+        <p className="mt-1.5 text-body text-ink-600">
+          Use code <span className="font-medium text-ink-900">{code}</span>
+          {detail ? ` · ${detail}` : null}
+        </p>
+      </div>
+      <button
+        type="button"
+        onClick={copy}
+        aria-label={`Copy code ${code}`}
+        className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 text-body text-ink-650 underline underline-offset-4 hover:text-black"
+      >
+        {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
+        {copied ? "Copied" : "Copy"}
+      </button>
+    </div>
+  )
+}
+
+function MiniProductCard({ product }: { product: HomeProductCard }) {
+  return (
+    <Link href={`/products/${product.slug}`} className="group block w-[180px] shrink-0 snap-start sm:w-[200px]">
+      <div className="relative aspect-[3/4] overflow-hidden bg-[#efefef]">
+        {product.image ? (
+          <Image
+            src={product.image}
+            alt={product.alt || product.title}
+            fill
+            sizes="200px"
+            className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+          />
+        ) : null}
+      </div>
+      {product.category?.name ? (
+        <p className="mt-2.5 truncate text-[12px] uppercase leading-none text-ink-400">
+          {product.category.name}
+        </p>
+      ) : null}
+      <p className="mt-1.5 truncate text-[13px] uppercase leading-none text-ink-800">{product.title}</p>
+      <p className="mt-1.5 text-caption font-medium text-ink-900">{product.price}</p>
+    </Link>
+  )
+}
+
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <AccordionItem value={title} className="border-b border-black/15">
+      <AccordionTrigger className={accordionTriggerClass}>{title}</AccordionTrigger>
+      <AccordionContent className={accordionBodyClass}>{children}</AccordionContent>
+    </AccordionItem>
+  )
+}
 
 export function ProductSummary({
   product,
@@ -79,6 +162,19 @@ export function ProductSummary({
   )
   const { addToCart, setIsCartOpen } = useCart()
   const { toggleWishlist, isInWishlist } = useWishlist()
+
+  // Sticky add-to-cart bar: shown once the main button has scrolled off the top.
+  const addToCartRef = useRef<HTMLButtonElement>(null)
+  const [showStickyBar, setShowStickyBar] = useState(false)
+  useEffect(() => {
+    const target = addToCartRef.current
+    if (!target) return
+    const observer = new IntersectionObserver(([entry]) => {
+      setShowStickyBar(!entry.isIntersecting && entry.boundingClientRect.top < 0)
+    })
+    observer.observe(target)
+    return () => observer.disconnect()
+  }, [])
 
   const productCard: ProductCard = {
     id: product.id || product.slug,
@@ -104,51 +200,46 @@ export function ProductSummary({
     router.push("/checkout")
   }
 
+  // Details named like "The Fit & Care" become their own accordion section;
+  // short names ("Fabric", "Rise") are listed as specs under Features & Care.
+  const details = product.details ?? []
+  const sectionDetails = details.filter((detail) => detail.name.includes("&"))
+  const specDetails = details.filter((detail) => !detail.name.includes("&"))
+
   return (
     <aside className="self-start w-full min-w-0 max-w-full [overflow-anchor:none] xl:sticky xl:top-[calc(var(--header-stack-height)+24px)]">
-      <div className="space-y-5 text-black w-full min-w-0 max-w-full xl:w-[573px] xl:max-w-[573px] xl:justify-self-end">
-        <div className="space-y-1">
-          <p className="w-fit text-[12px] sm:text-[13px] font-normal uppercase leading-[17px] tracking-normal text-black/45">
-            {product.editLabel}
-          </p>
-          <h1 className="font-heading text-[20px] sm:text-[24px] font-normal uppercase leading-[1.05] tracking-[-0.04em]">
+      <div className="w-full min-w-0 max-w-full space-y-6 text-black xl:w-[573px] xl:max-w-[573px] xl:justify-self-end">
+        <div>
+          <p className="text-caption uppercase text-ink-400">{product.editLabel}</p>
+          <h1 className="mt-2 font-heading text-[20px] font-normal uppercase leading-none tracking-normal text-ink-800 sm:text-[24px]">
             {product.title}
           </h1>
+          {product.subtitle ? (
+            <p className="mt-3 text-body text-ink-600">{product.subtitle}</p>
+          ) : null}
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="space-y-1">
-            <div className="flex items-end gap-2.5">
-              {product.originalPrice ? (
-                <span className="text-[15px] sm:text-[17px] font-normal leading-[20px] text-black/45 line-through">
-                  {product.originalPrice}
-                </span>
-              ) : null}
-              <span className="font-sans text-[16px] sm:text-[17px] font-[500] leading-[20px] tracking-normal">
-                {product.price}
-              </span>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div className="flex items-baseline gap-3">
+            {product.originalPrice ? (
+              <span className="text-body-lg text-ink-600 line-through">{product.originalPrice}</span>
+            ) : null}
+            <span className="text-h3 text-ink-900">{product.price}</span>
+          </div>
+
+          {product.sold && product.rating ? (
+            <div className="flex items-center gap-2">
+              <span className="text-body text-ink-600">{product.sold}</span>
+              <span className="text-body text-black/25">|</span>
+              <span className="text-h4 text-ink-900">{product.rating}</span>
             </div>
-          </div>
-
-          <div className="flex items-center gap-2 text-black">
-            <span className="text-[13px] sm:text-[15px] font-normal uppercase leading-none text-black/45">
-              {product.sold}
-            </span>
-            <span className="text-[13px] sm:text-[15px] font-normal leading-none text-black/25">|</span>
-            <span className="inline-flex items-center gap-1 text-[13px] sm:text-[15px] font-[500] leading-none text-black">
-              <Star className="size-3.5 fill-[#d08b21] text-[#d08b21]" />
-              {product.rating}
-            </span>
-          </div>
+          ) : null}
         </div>
 
-        <section className="space-y-2.5">
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-[12px] sm:text-[13px] font-normal uppercase text-black/45">
-              Color{" "}
-              <span className="font-[500] text-black">{selectedColor}</span>
-            </p>
-          </div>
+        <section className="space-y-3">
+          <p className="text-body-lg text-ink-400">
+            Colour: <span className="text-ink-900">{selectedColor}</span>
+          </p>
 
           <div className="flex flex-wrap items-center gap-2">
             {product.colors.map((color) => {
@@ -178,21 +269,17 @@ export function ProductSummary({
           </div>
         </section>
 
-        <section className="space-y-2.5">
+        <section className="space-y-3">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-[12px] sm:text-[13px] font-normal uppercase text-black/45">
-              Size <span className="font-[500] text-black">{selectedSize}</span>
+            <p className="text-body-lg text-ink-400">
+              Size: <span className="text-ink-900">{selectedSize}</span>
             </p>
             <SizeChartModal images={product.sizeGuideImages} fitType={product.fitType}>
               <button
                 type="button"
-                className="group inline-flex flex-col items-start pb-0.5 text-[12px] sm:text-[13px] font-normal uppercase leading-none text-black/45 transition-colors duration-200 hover:text-black focus-visible:text-black cursor-pointer"
+                className="cursor-pointer text-body-lg text-ink-650 underline underline-offset-4 transition-colors hover:text-black"
               >
-                <span>View Size Chart</span>
-                <span
-                  aria-hidden="true"
-                  className="mt-[2px] h-px w-full origin-left scale-x-0 bg-black transition-transform duration-200 group-hover:scale-x-100 group-focus-visible:scale-x-100"
-                />
+                Discover your Size
               </button>
             </SizeChartModal>
           </div>
@@ -203,22 +290,30 @@ export function ProductSummary({
                 key={size}
                 active={selectedSize === size}
                 onClick={() => setSelectedSize(size)}
-                className="h-10 min-w-0 px-2 sm:px-3 text-[12px] sm:text-[13px]"
+                className="h-12 min-w-0 px-2"
               >
                 {size}
               </OptionButton>
             ))}
           </div>
+
+          {product.modelInfo || product.fitNote ? (
+            <div className="space-y-1 pt-1 text-body text-ink-600">
+              {product.modelInfo ? <p>{product.modelInfo}</p> : null}
+              {product.fitNote ? <p>Fit Note: {product.fitNote}</p> : null}
+            </div>
+          ) : null}
         </section>
 
-        <div className="flex flex-col gap-2.5 pt-1">
+        {/* Figma has a single outlined Add to Cart; Buy Now and wishlist are kept until the client confirms. */}
+        <div className="flex flex-col gap-2.5">
           <div className="flex items-center gap-2.5">
             <button
+              ref={addToCartRef}
               type="button"
               onClick={handleAddToCart}
-              className="flex h-12 flex-1 cursor-pointer items-center justify-center gap-2 border border-black bg-white text-[13px] font-[500] uppercase tracking-normal transition-[background-color,color] duration-200 ease-out hover:bg-black hover:text-white active:scale-[0.99]"
+              className="flex h-14 flex-1 cursor-pointer items-center justify-center border border-black bg-white text-h3 uppercase tracking-[0.01em] text-black transition-[background-color,color] duration-200 ease-out hover:bg-black hover:text-white active:scale-[0.99]"
             >
-              <CartIcon className="size-4" />
               Add To Cart
             </button>
             <button
@@ -227,7 +322,7 @@ export function ProductSummary({
               aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
               title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
               className={cn(
-                "flex size-12 shrink-0 cursor-pointer items-center justify-center border border-black transition-all duration-200 ease-out active:scale-[0.95]",
+                "flex size-14 shrink-0 cursor-pointer items-center justify-center border border-black transition-all duration-200 ease-out active:scale-[0.95]",
                 isWishlisted
                   ? "bg-black text-white hover:bg-black/90"
                   : "bg-white text-black hover:bg-black hover:text-white"
@@ -244,147 +339,141 @@ export function ProductSummary({
           <button
             type="button"
             onClick={handleBuyNow}
-            className="flex h-12 w-full cursor-pointer items-center justify-center bg-black text-white text-[13px] font-[500] uppercase tracking-normal transition-opacity duration-200 ease-out hover:opacity-90 active:scale-[0.99]"
+            className="flex h-14 w-full cursor-pointer items-center justify-center bg-black text-h3 uppercase tracking-[0.01em] text-white transition-opacity duration-200 ease-out hover:opacity-90 active:scale-[0.99]"
           >
             Buy Now
           </button>
         </div>
 
-        <section className="space-y-2.5 pt-1 w-full min-w-0">
-          <p className="text-[12px] sm:text-[13px] font-normal uppercase text-black/45">
-            Delivery T&C
-          </p>
+        {product.offers && product.offers.length > 0 ? (
+          <section aria-label="Offers" className="space-y-2">
+            {product.offers.map((offer) => (
+              <OfferCard key={offer.code} {...offer} />
+            ))}
+          </section>
+        ) : null}
 
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 w-full min-w-0">
-            {product.deliveryPerks.map((perk) => {
-              const Icon = deliveryIcons[perk.icon]
+        <section aria-label="Delivery and returns" className="grid grid-cols-2 gap-2">
+          {product.deliveryPerks.map((perk) => {
+            const Icon = deliveryIcons[perk.icon]
 
-              return (
-                <div
-                  key={perk.label}
-                  title={`${perk.label} · ${perk.detail}`}
-                  aria-label={`${perk.label}, ${perk.detail}`}
-                  className="flex min-h-[72px] sm:min-h-[85px] w-full min-w-0 flex-col items-center justify-center gap-1 border border-black/15 bg-white p-2 text-center text-black"
-                >
-                  <Icon className="size-4 sm:size-5 shrink-0 stroke-[1.7] text-black" />
-                  <div className="space-y-0.5 w-full min-w-0 overflow-hidden">
-                    <p className="truncate text-[11px] sm:text-[12px] font-medium uppercase leading-tight text-black">
-                      {perk.label}
-                    </p>
-                    <p className="truncate text-[9px] sm:text-[10px] font-normal uppercase leading-tight text-black/55">
-                      {perk.detail}
-                    </p>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
+            return (
+              <div
+                key={perk.label}
+                className="flex min-w-0 items-center gap-3 border border-black/15 px-3 py-3 text-[#080808]"
+              >
+                <Icon className="size-5 shrink-0 stroke-[1.5]" aria-hidden="true" />
+                <p className="min-w-0 text-body-lg">
+                  {perk.label} <span className="text-ink-600">· {perk.detail}</span>
+                </p>
+              </div>
+            )
+          })}
         </section>
+
+        {product.moreFrom ? (
+          <section className="space-y-4 pt-2">
+            <div className="flex items-end justify-between gap-3">
+              <h2 className="text-h4 font-normal uppercase text-black">
+                More from {product.moreFrom.title}
+              </h2>
+              {product.moreFrom.href ? (
+                <Link href={product.moreFrom.href} className="text-body text-ink-650 underline underline-offset-4 hover:text-black">
+                  View all
+                </Link>
+              ) : null}
+            </div>
+            <div className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {product.moreFrom.products.map((item) => (
+                <MiniProductCard key={item.id} product={item} />
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <Accordion
           id="details"
           type="single"
-          defaultValue="product-details"
+          defaultValue="Features & Care"
           collapsible
           className="border-t border-black/15"
         >
-          <AccordionItem
-            value="product-details"
-            className="border-b border-black/15"
-          >
-            <AccordionTrigger className="h-[52px] items-center rounded-none py-0 text-[15px] font-[500] uppercase leading-none tracking-normal hover:no-underline">
-              Product Details
-            </AccordionTrigger>
-            <AccordionContent className="w-full min-w-0 max-w-full pb-5 font-sans text-[12px] sm:text-[13px] font-normal uppercase leading-[1.55] text-black/68 break-words">
-              {product.details && product.details.length > 0 ? (
-                <div className="space-y-3 min-w-0">
-                  {product.description ? <p className="break-words">{product.description}</p> : null}
-                  <div className="grid grid-cols-1 gap-2 pt-2 sm:grid-cols-2 min-w-0">
-                    {product.details.map((detail, idx) => (
-                      <div key={idx} className="flex gap-2 min-w-0">
-                        <span className="font-[500] text-black shrink-0">{detail.name}:</span>
-                        <span className="break-words min-w-0">{detail.value}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <p className="break-words">{product.detailsBody || product.description || "No details provided."}</p>
-              )}
-            </AccordionContent>
-          </AccordionItem>
+          <Section title="Features & Care">
+            <div className="space-y-4">
+              {product.description ? (
+                <DescriptionText text={product.description} productName={product.title} />
+              ) : !specDetails.length ? (
+                <p>{product.detailsBody || "No details provided."}</p>
+              ) : null}
+              {specDetails.length > 0 ? (
+                <ul className="list-disc space-y-1.5 pl-5">
+                  {specDetails.map((detail, idx) => (
+                    <li key={idx}>
+                      <span className="text-ink-800">{detail.name}:</span> {detail.value}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
+          </Section>
 
-          <AccordionItem
-            value="details-and-care"
-            className="border-b border-black/15"
-          >
-            <AccordionTrigger className="h-[52px] items-center rounded-none py-0 text-[15px] font-[500] uppercase leading-none tracking-normal hover:no-underline">
-              Details &amp; Care
-            </AccordionTrigger>
-            <AccordionContent className="w-full min-w-0 max-w-full pb-5 font-sans text-[12px] sm:text-[13px] font-normal uppercase leading-[1.55] text-black/68 break-words">
-              <ul className="space-y-2 min-w-0">
-                {product.careNotes.map((note) => (
-                  <li key={note} className="break-words">{note}</li>
-                ))}
-              </ul>
-            </AccordionContent>
-          </AccordionItem>
-
-          <AccordionItem
-            value="shipping-and-payment"
-            className="border-b border-black/15"
-          >
-            <AccordionTrigger className="h-[52px] items-center rounded-none py-0 text-[15px] font-[500] uppercase leading-none tracking-normal hover:no-underline">
-              Shipping &amp; Payment
-            </AccordionTrigger>
-            <AccordionContent className="w-full min-w-0 max-w-full pb-5 font-sans text-[12px] sm:text-[13px] font-normal uppercase leading-[1.55] text-black/68 break-words">
-              <ul className="space-y-2 min-w-0">
-                {product.shippingNotes.map((note) => (
-                  <li key={note} className="break-words">{note}</li>
-                ))}
-              </ul>
-            </AccordionContent>
-          </AccordionItem>
+          {sectionDetails.length > 0 ? (
+            sectionDetails.map((detail, idx) => (
+              <Section key={`${detail.name}-${idx}`} title={detail.name}>
+                <p className="whitespace-pre-line">{detail.value}</p>
+              </Section>
+            ))
+          ) : (
+            <>
+              <Section title="Details & Care">
+                <ul className="space-y-2">
+                  {product.careNotes.map((note) => (
+                    <li key={note}>{note}</li>
+                  ))}
+                </ul>
+              </Section>
+              <Section title="Shipping & Payment">
+                <ul className="space-y-2">
+                  {product.shippingNotes.map((note) => (
+                    <li key={note}>{note}</li>
+                  ))}
+                </ul>
+              </Section>
+            </>
+          )}
         </Accordion>
+      </div>
 
-        <section className="space-y-4 pt-8">
-          <h2 className="text-[24px] font-normal uppercase">
-            Complete The Look
-          </h2>
-
-          <Carousel
-            opts={{
-              align: "start",
-              loop: false,
-            }}
-            className="w-full"
-            aria-label="Complete the look carousel"
+      {/* Figma: "Should be sticky" — compact add-to-cart bar while scrolling. */}
+      <div
+        aria-hidden={!showStickyBar}
+        className={cn(
+          "fixed inset-x-0 bottom-0 z-40 bg-black text-white transition-transform duration-300 ease-out",
+          showStickyBar ? "translate-y-0" : "pointer-events-none translate-y-full"
+        )}
+      >
+        <div className="flex items-center gap-3 px-3 py-2.5 sm:px-6 lg:px-8">
+          {product.gallery[0]?.src ? (
+            <div className="relative h-14 w-11 shrink-0 overflow-hidden bg-white/10">
+              <Image src={product.gallery[0].src} alt="" fill sizes="44px" className="object-cover" />
+            </div>
+          ) : null}
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-body-lg uppercase">{product.title}</p>
+            <p className="mt-1 text-body text-white/70">
+              {selectedSize ? `Size ${selectedSize} · ` : null}
+              {product.price}
+            </p>
+          </div>
+          <button
+            type="button"
+            tabIndex={showStickyBar ? 0 : -1}
+            onClick={handleAddToCart}
+            className="h-11 shrink-0 cursor-pointer border border-white px-4 text-button font-medium uppercase transition-colors hover:bg-white hover:text-black sm:px-8"
           >
-            <CarouselContent className="-ml-2">
-              {product.completeLook.map((image, index) => (
-                <CarouselItem
-                  key={`${image.src}-${index}`}
-                  className="basis-[250px] pl-2"
-                >
-                  <figure className="relative aspect-[3/4] overflow-hidden bg-[#efefef]">
-                    <Image
-                      src={image.src}
-                      alt={image.alt}
-                      fill
-                      sizes="250px"
-                      style={
-                        image.objectPosition
-                          ? { objectPosition: image.objectPosition }
-                          : undefined
-                      }
-                      className="object-cover"
-                    />
-                  </figure>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-          </Carousel>
-        </section>
+            Add To Cart
+          </button>
+        </div>
       </div>
     </aside>
   )

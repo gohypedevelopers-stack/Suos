@@ -41,9 +41,22 @@ export type ProductDetail = {
   }>
   originalPrice: string | null
   price: string
-  sold: string
-  rating: string
+  /** Only shown when backed by real orders / reviews. */
+  sold?: string
+  rating?: string
   description: string
+  subtitle?: string
+  modelInfo?: string
+  fitNote?: string
+  highlightsIntro?: string
+  highlights?: Array<{ src: string; title: string; text: string }>
+  lifestyleImage?: string | null
+  moreFrom?: {
+    title: string
+    href: string | null
+    products: import("@/components/home/TrendingSection").ProductCard[]
+  } | null
+  offers?: Array<{ code: string; headline: string; detail: string | null }>
   detailsBody: string
   details?: Array<{ name: string; value: string }>
   careNotes: string[]

@@ -117,12 +117,12 @@ export function Hero({ banners }: { banners?: HomeHeroBanner[] }) {
                 )}
               >
                 {slide.title && (
-                  <h2 className="text-white text-sm sm:text-2xl lg:text-3xl font-serif font-normal uppercase tracking-[0.14em] drop-shadow-md leading-tight">
+                  <h2 className="text-white text-sm sm:text-2xl lg:text-3xl font-serif font-normal uppercase tracking-normal drop-shadow-md leading-tight">
                     {slide.title}
                   </h2>
                 )}
                 {slide.subtitle && (
-                  <p className="mt-0.5 sm:mt-1 text-white/90 text-[9px] sm:text-xs uppercase tracking-[0.2em] font-light drop-shadow-sm">
+                  <p className="mt-0.5 sm:mt-1 text-white/90 text-[9px] sm:text-xs uppercase tracking-normal font-light drop-shadow-sm">
                     {slide.subtitle}
                   </p>
                 )}
@@ -131,7 +131,7 @@ export function Hero({ banners }: { banners?: HomeHeroBanner[] }) {
                   <div className={cn(slide.title || slide.subtitle ? "mt-2.5 sm:mt-4" : "")}>
                     <Link
                       href={slide.ctaLink || "/collections"}
-                      className="inline-flex cursor-pointer pointer-events-auto items-center justify-center border border-white/85 bg-black/30 backdrop-blur-sm px-4 py-2 sm:px-6 sm:py-3 text-[10px] sm:text-[13px] font-normal uppercase tracking-[0.12em] sm:tracking-normal transition-colors hover:bg-white/10 shadow-sm"
+                      className="inline-flex cursor-pointer pointer-events-auto items-center justify-center border border-white/85 bg-black/30 backdrop-blur-sm px-4 py-2.5 sm:px-6 sm:py-3.5 text-[13px] sm:text-button font-normal uppercase transition-colors hover:bg-white/10 shadow-sm"
                     >
                       {slide.ctaText}
                     </Link>
@@ -158,7 +158,7 @@ export function Hero({ banners }: { banners?: HomeHeroBanner[] }) {
               )}
             />
           ))}
-          <span className="ml-1 text-[10px] font-mono text-white/75">
+          <span className="ml-1 text-caption text-white">
             {activeSlide + 1}/{slides.length}
           </span>
         </div>

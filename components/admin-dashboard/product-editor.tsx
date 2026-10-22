@@ -26,6 +26,11 @@ import {
   type ProductDetailDraft,
 } from "@/components/admin-dashboard/product-additional-details-section"
 import { ProductOrganizationFields } from "@/components/admin-dashboard/product-organization-fields"
+import { ProductPageContentSection } from "@/components/admin-dashboard/product-page-content-section"
+import {
+  emptyProductPageContent,
+  type ProductPageContent,
+} from "@/lib/product-page-content"
 import {
   ProductVariantsSection,
   type ProductVariantDraft,
@@ -67,6 +72,7 @@ export type ProductEditorInitialProduct = {
   images: ProductEditorImage[]
   variants: ProductVariantDraft[]
   details: ProductDetailDraft[]
+  pageContent?: ProductPageContent
   taxRate?: string
   hsnCode?: string
   isTaxExempt?: boolean
@@ -144,7 +150,7 @@ export function ProductEditor({
   const router = useRouter()
   const imageInputRef = useRef<HTMLInputElement>(null)
   const [title, setTitle] = useState(toAdminUppercase(initialProduct?.title ?? ""))
-  const [description, setDescription] = useState(toAdminUppercase(initialProduct?.description ?? ""))
+  const [description, setDescription] = useState(initialProduct?.description ?? "")
   const [slug, setSlug] = useState(initialProduct?.slug ?? "")
   const [isCustomSlug, setIsCustomSlug] = useState(Boolean(initialProduct))
   const [seoExpanded, setSeoExpanded] = useState(false)
@@ -168,8 +174,11 @@ export function ProductEditor({
   const [details, setDetails] = useState<ProductDetailDraft[]>(() =>
     (initialProduct?.details ?? []).map((detail) => ({
       name: toAdminUppercase(detail.name),
-      value: toAdminUppercase(detail.value),
+      value: detail.value,
     })),
+  )
+  const [pageContent, setPageContent] = useState<ProductPageContent>(
+    initialProduct?.pageContent ?? emptyProductPageContent,
   )
   const [isUploading, setIsUploading] = useState(false)
   const [uploadMessage, setUploadMessage] = useState<string | null>(null)
@@ -353,6 +362,17 @@ export function ProductEditor({
         images: images.map((image) => image.objectKey),
         variants,
         details: completeDetails,
+        pageContent: {
+          ...pageContent,
+          // Drop picks of images that were removed from Media before saving.
+          highlights: pageContent.highlights.map((highlight) => ({
+            ...highlight,
+            imageKey: images.some((image) => image.objectKey === highlight.imageKey) ? highlight.imageKey : "",
+          })),
+          lifestyleImageKey: images.some((image) => image.objectKey === pageContent.lifestyleImageKey)
+            ? pageContent.lifestyleImageKey
+            : "",
+        },
         taxRate,
         hsnCode,
         isTaxExempt,
@@ -432,7 +452,7 @@ export function ProductEditor({
                   <textarea
                     id="product-description"
                     value={description}
-                    onChange={(event) => { setDescription(toAdminUppercase(event.target.value)); markChanged() }}
+                    onChange={(event) => { setDescription(event.target.value); markChanged() }}
                     placeholder="Write a product description"
                     rows={6}
                     className="w-full resize-y rounded-lg border border-black/25 bg-white px-3 py-2.5 text-sm leading-6 outline-none placeholder:text-black/40 focus:border-black focus:ring-2 focus:ring-black/10"
@@ -738,6 +758,11 @@ export function ProductEditor({
             />
             <ProductAdditionalDetailsSection value={details} onChange={handleDetailsChange} />
             {errorFor(fieldErrors, "details") ? <p className="mt-2 text-xs text-red-700">{errorFor(fieldErrors, "details")}</p> : null}
+            <ProductPageContentSection
+              value={pageContent}
+              media={images}
+              onChange={(next) => { setPageContent(next); markChanged() }}
+            />
 
             <Card
               title="Search engine listing"

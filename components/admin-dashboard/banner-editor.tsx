@@ -50,6 +50,7 @@ import type { BannerPlacement, BannerTextAlignment } from "@/lib/validations/ban
 
 const BANNER_PLACEMENTS: BannerPlacement[] = [
   "HERO",
+  "SPLIT",
   "FEATURE",
   "MIDDLE",
   "BOTTOM",
@@ -690,6 +691,8 @@ export function BannerEditor({
                   <p className="text-xs text-neutral-500">
                     {placement === "FEATURE"
                       ? "Desktop 1920 × 840 px (16:7), mobile 1080 × 1350 px (4:5). Image or MP4/WebM video up to 50 MB."
+                      : placement === "SPLIT"
+                        ? "Left slot about 1760 × 1554 px, right slot about 1120 × 1554 px. Mobile 1080 × 1350 px (4:5)."
                       : allowsVideo
                         ? "High-resolution widescreen visual. Image or MP4/WebM video up to 50 MB."
                         : "High-resolution widescreen visual (16:9 ratio recommended)."}
@@ -1187,6 +1190,7 @@ export function BannerEditor({
                     className="mt-1.5 w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-xs font-medium text-neutral-900 shadow-xs focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
                   >
                     <option value="HERO">Hero Banner (Top Carousel)</option>
+                    <option value="SPLIT">Split Pair (2 Images Below Hero)</option>
                     <option value="FEATURE">Feature Banner (Below Launch Offer · Image or Video)</option>
                     <option value="MIDDLE">Middle Banner (Motion Section)</option>
                     <option value="DENIM_CAROUSEL">Denim Carousel (Collection Slide)</option>
@@ -1194,6 +1198,22 @@ export function BannerEditor({
                     <option value="BOTTOM">Bottom Banner (Product Section)</option>
                   </select>
                 </div>
+
+                {placement === "SPLIT" && (
+                  <div>
+                    <label className="block text-xs font-semibold text-neutral-800">
+                      Split Slot
+                    </label>
+                    <select
+                      value={position}
+                      onChange={(e) => setPosition(parseInt(e.target.value, 10))}
+                      className="mt-1.5 w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-xs font-medium text-neutral-900 shadow-xs focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+                    >
+                      <option value={0}>Slot 1: Left, wide (about 880 × 777)</option>
+                      <option value={1}>Slot 2: Right, narrow (about 560 × 777)</option>
+                    </select>
+                  </div>
+                )}
 
                 {placement === "EDITORIAL" && (
                   <div>
@@ -1277,12 +1297,16 @@ export function BannerEditor({
               <div className="mt-4 flex justify-center">
                 <div
                   className={`overflow-hidden rounded-xl border border-neutral-800 bg-black shadow-2xl transition-all duration-300 relative ${
-                    placement === "EDITORIAL"
+                    placement === "SPLIT"
+                      ? position === 0
+                        ? "w-[300px] aspect-[880/777]"
+                        : "w-[200px] aspect-[560/777]"
+                      : placement === "EDITORIAL"
                       ? position === 2
                         ? "w-full aspect-[20/9]"
                         : "w-[280px] aspect-square"
                       : placement === "DENIM_CAROUSEL"
-                        ? "w-[260px] aspect-[627/640]"
+                        ? "w-[220px] aspect-[480/834]"
                         : previewDevice === "desktop"
                           ? placement === "HERO"
                             ? "w-full aspect-[16/9]"

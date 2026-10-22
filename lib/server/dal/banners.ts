@@ -101,6 +101,8 @@ export type HomeCarouselSlide = {
 
 export type HomeBanners = {
   hero: HomeHeroBanner[]
+  /** Two side-by-side images directly below the hero (slot 0 left, slot 1 right). */
+  split: HomeEditorialBanner[]
   /** Full-width image/video banner directly below the launch offer bar. */
   feature: HomeBannerSectionItem | null
   middle: HomeBannerSectionItem | null
@@ -226,6 +228,8 @@ export async function getHomeBanners(): Promise<HomeBanners> {
         overlayOpacity: 15,
       },
     ],
+    // Hidden until SPLIT images are uploaded in admin.
+    split: [],
     // Hidden until a FEATURE banner (image or video) is uploaded in admin.
     feature: null,
     middle: {
@@ -347,6 +351,7 @@ export async function getHomeBanners(): Promise<HomeBanners> {
     })
 
     const heroBanners = activeBanners.filter((b) => b.placement === "HERO")
+    const splitBanners = activeBanners.filter((b) => b.placement === "SPLIT")
     const featureBanners = activeBanners.filter((b) => b.placement === "FEATURE")
     const middleBanners = activeBanners.filter((b) => b.placement === "MIDDLE")
     const bottomBanners = activeBanners.filter((b) => b.placement === "BOTTOM")
@@ -367,6 +372,17 @@ export async function getHomeBanners(): Promise<HomeBanners> {
             overlayOpacity: b.overlayOpacity,
           }))
         : defaultFallback.hero
+
+    const split: HomeEditorialBanner[] = splitBanners.map((b) => ({
+      id: b.id,
+      title: b.title,
+      subtitle: b.subtitle,
+      desktopImageUrl: imageUrl(b.desktopImageKey) ?? b.desktopImageKey,
+      mobileImageUrl: imageUrl(b.mobileImageKey),
+      ctaText: b.ctaText,
+      ctaLink: b.ctaLink,
+      position: b.position,
+    }))
 
     const hasConfiguredBanners = activeBanners.length > 0
     const featureBanner = featureBanners[0]
@@ -438,7 +454,7 @@ export async function getHomeBanners(): Promise<HomeBanners> {
           }))
         : defaultFallback.denimCarousel
 
-    return { hero, feature, middle, bottom, editorial, denimCarousel }
+    return { hero, split, feature, middle, bottom, editorial, denimCarousel }
   } catch (error) {
     console.error("Error retrieving banners in getHomeBanners:", error)
     return defaultFallback

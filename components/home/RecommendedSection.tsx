@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import { ProductCardView, type ProductCard } from "@/components/home/TrendingSection"
 
 const defaultRecommendedProducts: ProductCard[] = [
@@ -66,38 +65,44 @@ const defaultRecommendedProducts: ProductCard[] = [
   },
 ]
 
+const CAROUSEL_SIZE = 6
+
+/** Homepage "You May Also Like": a horizontal, scroll-snapping row of 6 cards. */
 export function RecommendedSection({
   products = [],
+  usePlaceholders = true,
 }: {
   products?: ProductCard[]
+  /** Fill a short list with the sample cards (homepage only). */
+  usePlaceholders?: boolean
 }) {
-  // Use real products if at least 4 are provided, otherwise supplement with defaults
-  const displayProducts =
-    products.length >= 4
-      ? products.slice(0, 4)
-      : [
-          ...products,
-          ...defaultRecommendedProducts.slice(products.length, 4),
-        ]
+  // Real products first; optionally fill any gap with the placeholder cards.
+  const displayProducts = [
+    ...products.slice(0, CAROUSEL_SIZE),
+    ...(usePlaceholders
+      ? defaultRecommendedProducts.slice(0, Math.max(0, CAROUSEL_SIZE - products.length))
+      : []),
+  ]
 
   return (
-    <section className="w-full bg-white px-3 sm:px-6 lg:px-8 py-10 md:py-16 text-black">
-      <div className="flex w-full items-end justify-between">
-        <h2 className="font-heading text-[24px] sm:text-[26px] font-normal uppercase leading-[1.15] tracking-[0.01em]">
-          Recommended
+    <section className="w-full bg-white py-10 md:py-16 text-black">
+      <div className="w-full px-3 sm:px-6 lg:px-8">
+        <h2 className="font-heading text-[28px] sm:text-[32px] lg:text-h2 font-normal uppercase leading-none tracking-normal">
+          You May Also Like
         </h2>
-
-        <Link
-          href="/shop"
-          className="text-[12px] sm:text-[13px] md:text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black/60 transition-colors hover:text-black"
-        >
-          View All
-        </Link>
       </div>
 
-      <div className="mt-6 sm:mt-8 grid grid-cols-2 gap-0.5 sm:gap-1 md:grid-cols-2 lg:grid-cols-4 items-start">
+      <div
+        className="mt-6 sm:mt-8 flex snap-x snap-mandatory items-start gap-0.5 overflow-x-auto overscroll-x-contain px-3 [scrollbar-width:none] sm:gap-1 sm:px-6 lg:px-8 [&::-webkit-scrollbar]:hidden"
+        aria-label="You may also like"
+      >
         {displayProducts.map((product) => (
-          <ProductCardView key={product.id} product={product} />
+          <div
+            key={product.id}
+            className="w-[46vw] shrink-0 snap-start sm:w-[34vw] md:w-[26vw] lg:w-[calc((100%-5*0.25rem)/6)]"
+          >
+            <ProductCardView product={product} variant="compact" />
+          </div>
         ))}
       </div>
     </section>

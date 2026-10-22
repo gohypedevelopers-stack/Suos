@@ -128,8 +128,8 @@ function NavLink({
       className={cn(
         "group/link inline-flex flex-col items-start whitespace-nowrap pb-0.5 font-[400] uppercase text-current transition-[color,opacity] duration-300 ease-out",
         mobile
-          ? "flex-none text-[12px] tracking-[0.06em]"
-          : "text-[15px] tracking-[0.04em]",
+          ? "flex-none text-[12px] tracking-normal"
+          : "text-body tracking-normal",
         active ? "opacity-100" : "hover:opacity-60"
       )}
     >
@@ -194,7 +194,7 @@ function MenuSection({
 }) {
   return (
     <section className="min-w-0">
-      <p className="text-[13px] font-[400] uppercase leading-[1.4] tracking-[0.04em] text-black">
+      <p className="text-[13px] font-[400] uppercase leading-[1.4] tracking-normal text-black">
         {title}
       </p>
 
@@ -205,7 +205,7 @@ function MenuSection({
               href={item.href}
               tabIndex={open ? 0 : -1}
               onClick={onClose}
-              className="inline-flex cursor-pointer items-start text-left text-[14px] font-[400] uppercase leading-[1.4] tracking-[0.04em] text-black/55 transition-colors duration-200 hover:text-black focus-visible:text-black focus-visible:outline-none"
+              className="inline-flex cursor-pointer items-start text-left text-[14px] font-[400] uppercase leading-[1.4] tracking-normal text-black/55 transition-colors duration-200 hover:text-black focus-visible:text-black focus-visible:outline-none"
             >
               {item.label}
             </Link>
@@ -249,12 +249,12 @@ function MenuCard({
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.1)_0%,rgba(0,0,0,0.12)_58%,rgba(0,0,0,0.28)_100%)]" />
       <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center text-white drop-shadow-[0_2px_16px_rgba(0,0,0,0.45)]">
         {eyebrow ? (
-          <span className="text-[12px] font-[400] uppercase leading-[1.4] tracking-[0.08em]">
+          <span className="text-[12px] font-[400] uppercase leading-[1.4] tracking-normal">
             {eyebrow}
           </span>
         ) : null}
         {title ? (
-          <div className="mt-1.5 text-[clamp(1.25rem,1.8vw,2rem)] font-[400] uppercase leading-[1.15] tracking-[0.01em]">
+          <div className="mt-1.5 text-[clamp(1.25rem,1.8vw,2rem)] font-[400] uppercase leading-[1.15] tracking-normal">
             {title}
           </div>
         ) : null}
@@ -268,7 +268,7 @@ function WishlistPanel() {
     <div className="h-full w-full bg-white text-black">
       <div className="mx-auto flex h-full w-full max-w-[1160px] flex-col px-6 py-8 lg:px-8">
         <div className="flex items-start justify-between gap-4">
-          <h2 className="text-[0.78rem] font-medium uppercase tracking-[0.08em]">
+          <h2 className="text-[0.78rem] font-medium uppercase tracking-normal">
             My Wishlist
           </h2>
 
@@ -314,7 +314,7 @@ export function Navbar({
   const pathname = usePathname()
   const { navigation } = useSiteContent()
   const primaryNav: PrimaryNavItem[] = [
-    { key: "collections", label: "Collections", href: "/collections", hasMenu: true },
+    { key: "collections", label: navigation.collectionsLabel || "Women", href: "/collections", hasMenu: true },
     { key: "men", label: "Men", href: "/shop", hasMenu: true },
     { key: "bestsellers", label: "Bestsellers", href: navigation.bestsellersHref || "/shop?filter=bestsellers", hasMenu: false },
   ]
@@ -356,14 +356,6 @@ export function Navbar({
   const isLightSurface = !isHeroTransparent
   const tone: "dark" | "light" = isLightSurface ? "dark" : "light"
   const isWishlistOpen = activeMenu === "wishlist"
-  // Home page only: a large logo sits over the hero and docks into the header
-  // logo slot as the user scrolls (scroll-linked, transform only). Reduced
-  // motion users just get the normal header logo.
-  const heroLogoEnabled = isOverlay && !prefersReducedMotion
-  const heroLogoVisible = heroLogoEnabled && !isScrolled && !isInteractiveSurface
-  const heroLogoRef = useRef<HTMLDivElement | null>(null)
-  const desktopLogoRef = useRef<HTMLAnchorElement | null>(null)
-  const mobileLogoRef = useRef<HTMLAnchorElement | null>(null)
 
   const openMenu = (menu: MegaMenuKey) => {
     if (menuCloseTimeoutRef.current !== null) {
@@ -464,30 +456,9 @@ export function Navbar({
       const announcementHeight = announcementHeightRef.current
       const scrollY = Math.max(0, window.scrollY)
       const navbarScrollOffset = Math.min(announcementHeight, scrollY)
-      let nextIsScrolled = navbarScrollOffset >= announcementHeight
+      const nextIsScrolled = navbarScrollOffset >= announcementHeight
       const navbarTranslateY = -navbarScrollOffset
 
-      const heroLogo = heroLogoRef.current
-      if (heroLogoEnabled && heroLogo && headerRef.current) {
-        // Header-relative coordinates. The logo rests at the hero's centre
-        // and moves 1:1 with the page until its centre meets the header's
-        // (the header itself already absorbs the first navbarScrollOffset px).
-        const navbarHeight = headerRef.current.offsetHeight
-        const heroHeight = Math.max(window.innerHeight, 580)
-        const dockDistance = Math.max(1, heroHeight / 2 - navbarHeight / 2)
-        const travel = Math.min(scrollY, dockDistance) - navbarScrollOffset
-        const progress = Math.min(1, scrollY / dockDistance)
-        const bigWidth = heroLogo.offsetWidth || 1
-        const smallWidth =
-          desktopLogoRef.current?.offsetWidth ||
-          mobileLogoRef.current?.offsetWidth ||
-          bigWidth * 0.2
-        const scale = 1 + (smallWidth / bigWidth - 1) * progress
-
-        heroLogo.style.transform = `translate3d(0, ${-travel}px, 0) scale(${scale})`
-        // Keep the header transparent until the logo has docked.
-        nextIsScrolled = scrollY >= dockDistance
-      }
 
       if (headerRef.current) {
         headerRef.current.style.transform = `translate3d(0, ${navbarTranslateY}px, 0)`
@@ -529,7 +500,7 @@ export function Navbar({
       window.removeEventListener("pageshow", syncScrollState)
       window.removeEventListener("resize", syncScrollState)
     }
-  }, [isOverlay, heroLogoEnabled])
+  }, [isOverlay])
 
   const headerContent = (
     <header
@@ -549,30 +520,6 @@ export function Navbar({
       )}
     >
       <div className="relative h-full w-full px-4 sm:px-6 lg:px-8">
-        {heroLogoEnabled ? (
-          <div
-            ref={heroLogoRef}
-            aria-hidden="true"
-            style={{
-              top: "calc(max(100svh, 580px) / 2 - var(--announcement-height))",
-            }}
-            className={cn(
-              "pointer-events-none absolute left-1/2 z-0 w-[72vw] max-w-[880px] -translate-x-1/2 -translate-y-1/2 origin-center transition-opacity duration-300 ease-out [will-change:transform] motion-reduce:hidden sm:w-[60vw] lg:w-[56vw]",
-              heroLogoVisible ? "opacity-100" : "opacity-0"
-            )}
-          >
-            {/* logo.svg is black; invert renders it white over the hero. */}
-            <Image
-              src="/logo.svg"
-              alt=""
-              width={1185}
-              height={549}
-              priority
-              className="block h-auto w-full invert"
-            />
-          </div>
-        ) : null}
-
         <div className="relative z-[1] hidden h-full lg:grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-0">
           <nav
             aria-label="Primary"
@@ -622,7 +569,6 @@ export function Navbar({
           </nav>
 
           <Link
-            ref={desktopLogoRef}
             href="/"
             aria-label="SUOS home"
             className="justify-self-center transition-opacity hover:opacity-70"
@@ -635,8 +581,7 @@ export function Navbar({
               priority
               className={cn(
                 "block h-auto w-[8.5rem] max-w-none transition-[filter,opacity] duration-300 ease-out",
-                isOverlay && !isLightSurface && "invert",
-                heroLogoVisible && "opacity-0 motion-reduce:opacity-100"
+                isOverlay && !isLightSurface && "invert"
               )}
             />
           </Link>
@@ -645,15 +590,38 @@ export function Navbar({
             className="flex items-center justify-self-end gap-2 xl:gap-3"
             onMouseEnter={scheduleMenuClose}
           >
-            <IconButton
-              label="Search products"
-              tone={tone}
+            {/* Figma: inline search field. It opens the search panel; below xl it collapses to the icon. */}
+            <button
+              type="button"
               onClick={() => setSearchOpen(true)}
-              ariaHaspopup="dialog"
-              ariaExpanded={searchOpen}
+              aria-haspopup="dialog"
+              aria-expanded={searchOpen}
+              className={cn(
+                "hidden h-9 w-[250px] cursor-pointer items-center gap-2 border border-current/35 px-3 text-left text-body font-[400] tracking-normal text-current transition-[color,border-color] duration-300 ease-out hover:border-current hover:text-current focus-visible:outline-none focus-visible:ring-2 xl:inline-flex",
+                tone === "light"
+                  ? "focus-visible:ring-white/30"
+                  : "focus-visible:ring-black/25"
+              )}
             >
-              <Search className="size-[18px] stroke-[1.7]" />
-            </IconButton>
+              <Search className="size-4 shrink-0 stroke-[1.7]" aria-hidden="true" />
+              <span className="truncate">What are you looking for?</span>
+            </button>
+
+            <span className="xl:hidden">
+              <IconButton
+                label="Search products"
+                tone={tone}
+                onClick={() => setSearchOpen(true)}
+                ariaHaspopup="dialog"
+                ariaExpanded={searchOpen}
+              >
+                <Search className="size-[18px] stroke-[1.7]" />
+              </IconButton>
+            </span>
+
+            <span className="mx-1 xl:mx-2">
+              <NavLink href="/contact">Contact Us</NavLink>
+            </span>
 
             <Link
               href="/login"
@@ -742,7 +710,6 @@ export function Navbar({
           </div>
 
           <Link
-            ref={mobileLogoRef}
             href="/"
             aria-label="SUOS home"
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity hover:opacity-70"
@@ -755,8 +722,7 @@ export function Navbar({
               priority
               className={cn(
                 "block h-auto w-[6rem] max-w-none transition-[filter,opacity] duration-300 ease-out",
-                isOverlay && !isLightSurface && "invert",
-                heroLogoVisible && "opacity-0 motion-reduce:opacity-100"
+                isOverlay && !isLightSurface && "invert"
               )}
             />
           </Link>
@@ -975,7 +941,7 @@ export function Navbar({
           {/* Navigation Links */}
           <div className="flex-1 overflow-y-auto px-6 py-6">
             <div className="flex flex-col gap-6">
-              <p className="text-[11px] font-medium uppercase leading-[1.4] tracking-[0.08em] text-white/40">
+              <p className="text-[11px] font-medium uppercase leading-[1.4] tracking-normal text-white/40">
                 Menu
               </p>
               <nav className="flex flex-col gap-2">
@@ -994,7 +960,7 @@ export function Navbar({
                             setMobileMenuOpen(false)
                           }}
                           className={cn(
-                            "flex-1 py-2.5 text-[17px] font-normal uppercase leading-[1.2] tracking-[0.06em] transition-colors hover:text-white/70",
+                            "flex-1 py-2.5 text-[17px] font-normal uppercase leading-[1.2] tracking-normal transition-colors hover:text-white/70",
                             selectedNav === item.key ? "text-white" : "text-white/80"
                           )}
                         >
@@ -1028,7 +994,7 @@ export function Navbar({
                         <div className="space-y-5 pb-3 pl-1 pt-1">
                           {groups.map((group) => (
                             <div key={group.title}>
-                              <p className="text-[11px] uppercase leading-[1.4] tracking-[0.08em] text-white/40">
+                              <p className="text-[11px] uppercase leading-[1.4] tracking-normal text-white/40">
                                 {group.title}
                               </p>
                               <ul className="mt-2 space-y-1">
@@ -1037,7 +1003,7 @@ export function Navbar({
                                     <Link
                                       href={link.href}
                                       onClick={() => setMobileMenuOpen(false)}
-                                      className="block py-1.5 text-[14px] uppercase leading-[1.4] tracking-[0.04em] text-white/75 transition-colors hover:text-white"
+                                      className="block py-1.5 text-[14px] uppercase leading-[1.4] tracking-normal text-white/75 transition-colors hover:text-white"
                                     >
                                       {link.label}
                                     </Link>
@@ -1055,11 +1021,11 @@ export function Navbar({
 
               <div className="my-1 h-px w-full bg-white/10" />
 
-              <p className="text-[11px] font-medium uppercase leading-[1.4] tracking-[0.08em] text-white/40">
+              <p className="text-[11px] font-medium uppercase leading-[1.4] tracking-normal text-white/40">
                 Account & Utilities
               </p>
 
-              <div className="flex flex-col gap-2 text-[14px] uppercase leading-[1.4] tracking-[0.04em] text-white/75">
+              <div className="flex flex-col gap-2 text-[14px] uppercase leading-[1.4] tracking-normal text-white/75">
                 <button
                   type="button"
                   onClick={() => {
@@ -1124,7 +1090,7 @@ export function Navbar({
 
           {/* Footer in Drawer */}
           <div className="border-t border-white/10 p-5">
-            <p className="text-[11px] uppercase leading-[1.4] tracking-[0.06em] text-white/40">
+            <p className="text-[11px] uppercase leading-[1.4] tracking-normal text-white/40">
               SUOS ORIGINALS — FREE SHIPPING OVER ₹2,900
             </p>
           </div>

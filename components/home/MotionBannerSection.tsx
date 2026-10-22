@@ -13,7 +13,7 @@ export function MotionBannerSection({
       banner={banner}
       fallbackSrc="/home-page-content/hero-2.png"
       defaultAlt="Editorial fashion banner"
-      className="aspect-[16/7] sm:aspect-[2172/724] min-h-[150px] sm:min-h-0"
+      className="aspect-[4/3] sm:aspect-[2/1]"
     />
   )
 }
