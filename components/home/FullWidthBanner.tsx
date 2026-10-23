@@ -9,10 +9,13 @@ function BannerMedia({
   src,
   alt,
   className,
+  sizes = "100vw",
 }: {
   src: string
   alt: string
   className?: string
+  /** The phone/desktop variants are each hidden at the other size. */
+  sizes?: string
 }) {
   if (isVideoMedia(src)) {
     return (
@@ -34,7 +37,7 @@ function BannerMedia({
       src={src}
       alt={alt}
       fill
-      sizes="100vw"
+      sizes={sizes}
       className={cn("object-cover object-center", className)}
     />
   )
@@ -64,10 +67,10 @@ export function FullWidthBanner({
       {banner.mobileImageUrl ? (
         <>
           <div className="absolute inset-0 sm:hidden">
-            <BannerMedia src={banner.mobileImageUrl} alt={alt} />
+            <BannerMedia src={banner.mobileImageUrl} alt={alt} sizes="(max-width: 639px) 100vw, 1px" />
           </div>
           <div className="absolute inset-0 hidden sm:block">
-            <BannerMedia src={desktopSrc} alt={alt} />
+            <BannerMedia src={desktopSrc} alt={alt} sizes="(min-width: 640px) 100vw, 1px" />
           </div>
         </>
       ) : (

@@ -3,7 +3,8 @@ import Link from "next/link"
 
 import type { HomeEditorialBanner } from "@/lib/server/dal/banners"
 
-function SplitPanel({ banner, sizes }: { banner: HomeEditorialBanner; sizes: string }) {
+/** `width` is the panel's share of the viewport on desktop, e.g. "61vw". */
+function SplitPanel({ banner, width }: { banner: HomeEditorialBanner; width: string }) {
   const alt = banner.title || "SUOS editorial"
 
   const media = (
@@ -14,19 +15,19 @@ function SplitPanel({ banner, sizes }: { banner: HomeEditorialBanner; sizes: str
             src={banner.mobileImageUrl}
             alt={alt}
             fill
-            sizes="100vw"
+            sizes="(max-width: 767px) 100vw, 1px"
             className="object-cover object-center md:hidden"
           />
           <Image
             src={banner.desktopImageUrl}
             alt={alt}
             fill
-            sizes={sizes}
+            sizes={`(max-width: 767px) 1px, ${width}`}
             className="hidden object-cover object-center md:block"
           />
         </>
       ) : (
-        <Image src={banner.desktopImageUrl} alt={alt} fill sizes={sizes} className="object-cover object-center" />
+        <Image src={banner.desktopImageUrl} alt={alt} fill sizes={`(max-width: 767px) 100vw, ${width}`} className="object-cover object-center" />
       )}
     </div>
   )
@@ -54,8 +55,8 @@ export function SplitBannerSection({ banners }: { banners?: HomeEditorialBanner[
   return (
     <section className="grid w-full grid-cols-1 bg-white md:aspect-[1440/777] md:grid-cols-[61fr_39fr]">
       <h2 className="sr-only">Editorial</h2>
-      <SplitPanel banner={left} sizes="(max-width: 767px) 100vw, 61vw" />
-      <SplitPanel banner={right} sizes="(max-width: 767px) 100vw, 39vw" />
+      <SplitPanel banner={left} width="61vw" />
+      <SplitPanel banner={right} width="39vw" />
     </section>
   )
 }

@@ -26,7 +26,8 @@ function stripQuery(path: string) {
 export async function storeRecordingChunk(
   input: RecordingChunkInput,
   context: { userAgent: string | null; userId: string | null; country: string | null },
-) {
+  isRetry = false,
+): Promise<void> {
   const prisma = getPrisma()
   const device = deviceFromUserAgent(context.userAgent)
   if (device === "bot") return
@@ -74,32 +75,45 @@ export async function storeRecordingChunk(
     return
   }
 
-  await prisma.sessionRecording.create({
-    data: {
-      id: input.recordingId,
-      visitorId: input.visitorId,
-      userId: context.userId,
-      device,
-      userAgent: context.userAgent?.slice(0, 512),
-      country: context.country ?? undefined,
-      firstPath: path,
-      pagePaths: [path],
-      startedAt: new Date(firstTs),
-      lastEventAt: new Date(lastTs),
-      durationMs: Math.max(0, lastTs - firstTs),
-      eventCount: input.events.length,
-      chunkCount: 1,
-      byteSize: data.byteLength,
-      chunks: {
-        create: {
-          seq: input.seq,
-          data,
-          eventCount: input.events.length,
-          byteSize: data.byteLength,
+  try {
+    await createRecording()
+  } catch (error) {
+    // The first two batches of a session often arrive together: both see no
+    // recording and both try to create it. The loser appends to the winner's.
+    if (!isRetry && (error as { code?: string })?.code === "P2002") {
+      return storeRecordingChunk(input, context, true)
+    }
+    throw error
+  }
+
+  async function createRecording() {
+    await prisma.sessionRecording.create({
+      data: {
+        id: input.recordingId,
+        visitorId: input.visitorId,
+        userId: context.userId,
+        device,
+        userAgent: context.userAgent?.slice(0, 512),
+        country: context.country ?? undefined,
+        firstPath: path,
+        pagePaths: [path],
+        startedAt: new Date(firstTs),
+        lastEventAt: new Date(lastTs),
+        durationMs: Math.max(0, lastTs - firstTs),
+        eventCount: input.events.length,
+        chunkCount: 1,
+        byteSize: data.byteLength,
+        chunks: {
+          create: {
+            seq: input.seq,
+            data,
+            eventCount: input.events.length,
+            byteSize: data.byteLength,
+          },
         },
       },
-    },
-  })
+    })
+  }
 
   await prisma.analyticsSession
     .updateMany({ where: { id: input.recordingId }, data: { recorded: true } })

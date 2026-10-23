@@ -36,7 +36,7 @@ function DenimPanel({
               src={mobileSrc}
               alt={alt}
               fill
-              sizes="100vw"
+              sizes="(max-width: 639px) 100vw, 1px"
               className={cn("object-cover object-center", imageClassName)}
             />
           </div>
@@ -45,7 +45,7 @@ function DenimPanel({
               src={src}
               alt={alt}
               fill
-              sizes={sizes}
+              sizes="(max-width: 639px) 1px, 50vw"
               className={cn("object-cover object-center", imageClassName)}
             />
           </div>
@@ -111,7 +111,7 @@ export function DenimEditorialSection({
               src={p2MobileSrc}
               alt={p2Alt}
               fill
-              sizes="100vw"
+              sizes="(max-width: 639px) 100vw, 1px"
               className="object-cover object-[center_44%]"
             />
           </div>
@@ -120,7 +120,7 @@ export function DenimEditorialSection({
               src={p2Src}
               alt={p2Alt}
               fill
-              sizes="100vw"
+              sizes="(min-width: 640px) 100vw, 1px"
               className="object-cover object-[center_44%]"
             />
           </div>

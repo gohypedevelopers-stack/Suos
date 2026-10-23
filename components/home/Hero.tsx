@@ -26,10 +26,13 @@ function HeroMedia({
   src,
   alt,
   priority,
+  sizes = "100vw",
 }: {
   src: string
   alt: string
   priority: boolean
+  /** The phone/desktop variants are each hidden at the other size. */
+  sizes?: string
 }) {
   if (isVideoMedia(src)) {
     return (
@@ -52,7 +55,7 @@ function HeroMedia({
       alt={alt}
       fill
       priority={priority}
-      sizes="100vw"
+      sizes={sizes}
       className="object-cover object-center w-full h-full"
     />
   )
@@ -92,10 +95,10 @@ export function Hero({ banners }: { banners?: HomeHeroBanner[] }) {
               {slide.mobileImageUrl ? (
                 <>
                   <div className="relative block sm:hidden w-full h-full">
-                    <HeroMedia src={slide.mobileImageUrl} alt={slide.title || "Hero Banner"} priority={index === 0} />
+                    <HeroMedia src={slide.mobileImageUrl} alt={slide.title || "Hero Banner"} priority={index === 0} sizes="(max-width: 639px) 100vw, 1px" />
                   </div>
                   <div className="relative hidden sm:block w-full h-full">
-                    <HeroMedia src={slide.desktopImageUrl} alt={slide.title || "Hero Banner"} priority={index === 0} />
+                    <HeroMedia src={slide.desktopImageUrl} alt={slide.title || "Hero Banner"} priority={index === 0} sizes="(min-width: 640px) 100vw, 1px" />
                   </div>
                 </>
               ) : (
