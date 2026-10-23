@@ -4,9 +4,12 @@ import { getPrisma } from "@/lib/server/db"
 import { requirePermission } from "@/lib/server/dal/auth"
 import { listStorefrontOffers } from "@/lib/server/dal/discounts"
 import {
+  modelLine,
   parseProductPageContent,
+  SPEC_FIELDS,
   type ProductPageContent,
 } from "@/lib/product-page-content"
+import { getSiteContent } from "@/lib/server/dal/site-content"
 
 function imageUrl(objectKey: string) {
   if (objectKey.startsWith("/")) {
@@ -130,12 +133,13 @@ export function resolveColorHex(colorInput: string): string {
 }
 
 export async function listPublishedProducts(
-  options: { collectionId?: string; excludeProductId?: string; take?: number } = {},
+  options: { collectionId?: string; excludeProductId?: string; take?: number; ids?: string[] } = {},
 ) {
   const prisma = getPrisma()
-  const products = await prisma.product.findMany({
+  const found = await prisma.product.findMany({
     where: {
       status: "ACTIVE",
+      ...(options.ids ? { id: { in: options.ids } } : {}),
       ...(options.collectionId
         ? { collections: { some: { collectionId: options.collectionId } } }
         : {}),
@@ -149,6 +153,7 @@ export async function listPublishedProducts(
       slug: true,
       description: true,
       tags: true,
+      pageContent: true,
       category: {
         select: {
           name: true,
@@ -167,7 +172,7 @@ export async function listPublishedProducts(
       },
       images: {
         orderBy: { position: "asc" },
-        take: 5,
+        take: 12,
         select: {
           objectKey: true,
           altText: true,
@@ -176,7 +181,13 @@ export async function listPublishedProducts(
     },
   })
 
+  // Hand-picked lists keep the order they were picked in.
+  const products = options.ids
+    ? options.ids.flatMap((id) => found.filter((product) => product.id === id))
+    : found
+
   return products.map((product) => {
+    const content = parseProductPageContent(product.pageContent)
     const variant = product.variants[0]
     
     const sizes = Array.from(new Set(
@@ -205,10 +216,17 @@ export async function listPublishedProducts(
       })
     ))
     
-    const image = product.images[0]
-    const gallery = product.images.map(img => imageUrl(img.objectKey)).filter((url): url is string => url !== null)
+    // Card gallery: lifestyle shots are left out; a chosen hover image comes second.
+    const cardImages = product.images.filter(
+      (img) => content.imageRoles[img.objectKey] !== "lifestyle" && img.objectKey !== content.hoverImageKey,
+    )
+    const hover = product.images.find((img) => img.objectKey === content.hoverImageKey)
+    const ordered = (cardImages.length > 0 ? cardImages : product.images).slice(0, 5)
+    if (hover) ordered.splice(1, 0, hover)
+    const image = ordered[0]
+    const gallery = ordered.map(img => imageUrl(img.objectKey)).filter((url): url is string => url !== null)
 
-    const badge = product.tags.find(t => 
+    const badge = content.badge || product.tags.find(t => 
       ["NEW ARRIVAL", "BESTSELLER", "SALE", "HOT", "TRENDING", "LIMITED"].includes(t.toUpperCase())
     )?.toUpperCase() || (product.tags.length > 0 ? product.tags[0].toUpperCase() : undefined)
 
@@ -218,6 +236,8 @@ export async function listPublishedProducts(
       slug: product.slug,
       description: product.description,
       category: product.category,
+      /** Line / short name for card labels (falls back to the category). */
+      lineName: content.shortName || null,
       price: variant ? `₹${variant.price.toString()}` : "N/A",
       compareAtPrice: variant?.compareAtPrice ? `₹${variant.compareAtPrice.toString()}` : null,
       isInStock: product.variants.some(v => v.inventoryQuantity > 0),
@@ -429,14 +449,34 @@ export async function getProductForAdmin(
   }
 }
 
-export async function getProductBySlug(slug: string) {
+/** Units sold across orders that weren't cancelled. */
+async function soldCount(productId: string) {
+  try {
+    const result = await getPrisma().orderItem.aggregate({
+      _sum: { quantity: true },
+      where: { variant: { productId }, order: { status: { not: "CANCELLED" } } },
+    })
+    return result._sum.quantity ?? 0
+  } catch {
+    return 0
+  }
+}
+
+const textLines = (text: string) => text.split("\n").map((line) => line.trim()).filter(Boolean)
+
+/**
+ * Storefront product page data. `preview` (staff only, checked by the page)
+ * also returns Draft products.
+ */
+export async function getProductBySlug(slug: string, options: { preview?: boolean } = {}) {
   const prisma = getPrisma()
   const product = await prisma.product.findUnique({
-    where: { slug, status: "ACTIVE" },
+    where: options.preview ? { slug } : { slug, status: "ACTIVE" },
     select: {
       id: true,
       title: true,
       slug: true,
+      status: true,
       description: true,
       details: true,
       pageContent: true,
@@ -467,7 +507,7 @@ export async function getProductBySlug(slug: string) {
 
   const pageContent = parseProductPageContent(product.pageContent)
   const primaryCollection = product.collections[0]?.collection ?? null
-  const [moreFromProducts, offers] = await Promise.all([
+  const [moreFromProducts, offers, siteContent, sold, completeLookProducts] = await Promise.all([
     primaryCollection
       ? listPublishedProducts({
           collectionId: primaryCollection.id,
@@ -475,8 +515,14 @@ export async function getProductBySlug(slug: string) {
           take: 8,
         })
       : Promise.resolve([]),
-    listStorefrontOffers(),
+    listStorefrontOffers(3, pageContent.offerCodes),
+    getSiteContent(),
+    pageContent.showSoldCount ? soldCount(product.id) : Promise.resolve(0),
+    pageContent.completeLookIds.length > 0
+      ? listPublishedProducts({ ids: pageContent.completeLookIds })
+      : Promise.resolve([]),
   ])
+  const shared = siteContent.productPage
 
   const detailsList = productDetails(product.details)
   const detailsBody = detailsList.find(d => d.name.toUpperCase() === "BODY")?.value || product.description || ""
@@ -491,7 +537,7 @@ export async function getProductBySlug(slug: string) {
       return []
     })
   ))
-  
+
   const colorMap = new Map<string, string>()
   product.variants.forEach(v => {
     const opts = variantOptionValues(v.optionValues)
@@ -513,12 +559,17 @@ export async function getProductBySlug(slug: string) {
     }
   })
   const colors = Array.from(colorMap.entries()).map(([name, value]) => ({ name, value }))
-  
+
   if (colors.length === 0) {
-    colors.push({ name: "Default", value: "#171717" })
+    colors.push({ name: pageContent.colourName || "Default", value: "#171717" })
   }
 
-  const gallery = product.images.map(img => ({
+  // Main gallery: hover-only and lifestyle shots are left out (they have their own places).
+  const roleOf = (key: string) => pageContent.imageRoles[key] ?? "gallery"
+  const galleryImages = product.images.filter(
+    (img) => roleOf(img.objectKey) !== "hover" && roleOf(img.objectKey) !== "lifestyle",
+  )
+  const gallery = (galleryImages.length > 0 ? galleryImages : product.images).map(img => ({
     src: imageUrl(img.objectKey) ?? "",
     alt: img.altText ?? product.title,
     objectPosition: "center 36%"
@@ -526,44 +577,84 @@ export async function getProductBySlug(slug: string) {
 
   const variant = product.variants[0]
 
+  // Care: the admin checklist first; older products fall back to a "Care" detail.
   const careDetail = detailsList.find(d => /care|wash/i.test(d.name))
-  const shippingDetail = detailsList.find(d => /shipping|delivery/i.test(d.name))
+  const careNotes = pageContent.care.length > 0
+    ? pageContent.care
+    : careDetail
+      ? careDetail.value.split(/\n|;/).map(s => s.trim()).filter(Boolean)
+      : []
 
-  const careNotes = careDetail
-    ? careDetail.value.split(/\n|;/).map(s => s.trim()).filter(Boolean)
-    : [
-        "Machine wash cold, inside out.",
-        "Do not bleach or tumble dry.",
-        "Hang dry to preserve the drape.",
-        "Steam lightly to refresh the finish.",
-      ]
+  // "Shipping, Returns & Exchanges": shared text unless this product overrides it.
+  const shippingSections = pageContent.shippingOverride
+    ? [{ title: "", lines: textLines(pageContent.shippingOverride) }]
+    : ([
+        ["Shipping", shared.shipping],
+        ["Returns", shared.returns],
+        ["Exchanges", shared.exchanges],
+        ["Refunds", shared.refunds],
+      ] as const)
+        .map(([title, text]) => ({ title, lines: textLines(text) }))
+        .filter((section) => section.lines.length > 0)
 
-  const shippingNotes = shippingDetail
-    ? shippingDetail.value.split(/\n|;/).map(s => s.trim()).filter(Boolean)
+  // FEATURES list, in the Figma order.
+  const specValue = (key: (typeof SPEC_FIELDS)[number]["key"]) => pageContent.specs[key]?.trim() || ""
+  const features = [
+    { label: "Product", value: pageContent.shortName },
+    { label: "Article Code", value: pageContent.articleCode },
+    { label: "Edit", value: pageContent.edit },
+    { label: "Category", value: product.category?.name ?? "" },
+    ...SPEC_FIELDS.filter((f) => f.key !== "countryOfOrigin").map((f) => ({ label: f.label, value: specValue(f.key) })),
+    { label: "Colour", value: pageContent.colourName },
+    { label: "Country of Origin", value: specValue("countryOfOrigin") },
+  ].filter((feature) => feature.value)
+  // Only identity fields filled in isn't a feature list yet.
+  const hasSpecs = SPEC_FIELDS.some((f) => specValue(f.key))
+
+  const genderLabel = pageContent.gender === "MEN" ? "Men" : pageContent.gender === "WOMEN" ? "Women" : null
+  const fitSpec = specValue("fit").toLowerCase()
+  const fitType =
+    pageContent.sizeChart ||
+    (fitSpec.includes("bootcut") ? "bootcut" : fitSpec.includes("straight") ? "straight" : "regular")
+
+  const badges = pageContent.hideReturnBadges
+    ? []
     : [
-        "Standard delivery in 2-4 business days.",
-        "Free exchange within 14 days.",
-        "Cash on delivery available on select pin codes.",
-      ]
+        { label: shared.returnsBadge, detail: "", icon: "returns" as const },
+        { label: shared.exchangesBadge, detail: "", icon: "exchange" as const },
+      ].filter((badge) => badge.label.trim())
 
   return {
     id: product.id,
     slug: product.slug,
-    editLabel: product.category?.name?.toUpperCase() || "SUOS",
+    isDraft: product.status !== "ACTIVE",
+    editLabel: (pageContent.shortName || product.category?.name || "SUOS").toUpperCase(),
     title: product.title,
+    seoTitle: pageContent.seoTitle,
+    seoDescription: pageContent.seoDescription,
     breadcrumb: [
       { label: "Homepage", href: "/" },
-      { label: "Collections", href: "/collections" },
-      { label: product.category?.name || "Products" },
+      ...(genderLabel ? [{ label: genderLabel, href: pageContent.gender === "MEN" ? "/shop" : undefined }] : [
+        { label: "Collections", href: "/collections" },
+      ]),
+      ...(product.category?.name ? [{ label: product.category.name }] : []),
       { label: product.title },
     ],
     originalPrice: variant?.compareAtPrice ? `₹${variant.compareAtPrice.toString()}` : null,
     price: variant ? `₹${variant.price.toString()}` : "N/A",
-    // Sold count and rating stay hidden until they come from real orders/reviews.
+    // Real units sold, only when switched on for the product. Ratings need a reviews system first.
+    sold: pageContent.showSoldCount && sold > 0 ? `${sold.toLocaleString("en-IN")} Sold` : undefined,
     description: product.description || "",
     subtitle: pageContent.subtitle,
-    modelInfo: pageContent.modelInfo,
+    modelInfo: modelLine(pageContent),
     fitNote: pageContent.fitNote,
+    fitHeadline: pageContent.fitHeadline,
+    fitText: pageContent.fitText,
+    features: hasSpecs ? features : [],
+    highlightStrip: pageContent.highlightStrip.filter((tile) => tile.title || tile.text),
+    bundleLine: pageContent.bundleLine,
+    origin: pageContent.originOverride || shared.origin,
+    shippingSections,
     highlightsIntro: pageContent.highlightsIntro,
     highlights: pageContent.highlights.flatMap((highlight) => {
       const src = highlight.imageKey ? imageUrl(highlight.imageKey) : null
@@ -579,27 +670,34 @@ export async function getProductBySlug(slug: string) {
           products: moreFromProducts,
         }
       : null,
+    completeLookProducts,
+    alsoLikeIds: pageContent.alsoLikeIds,
     offers,
     details: detailsList,
     detailsBody: detailsBody,
     careNotes,
-    shippingNotes,
-    colorName: colors[0]?.name || "Default",
+    shippingNotes: shippingSections.flatMap((section) => section.lines),
+    colorName: pageContent.colourName || colors[0]?.name || "Default",
     colors,
     sizes: sizes.length > 0 ? sizes : ["28", "32", "36", "42"],
     gallery: gallery.length > 0 ? gallery : [{ src: "/home-page-content/product-urban.png", alt: product.title }],
-    // Figma: "Easy 7 Days Returns" + "Easy 30 Days Exchanges". The returns
-    // policy states 7 days; no exchange window is published yet, so that
-    // badge carries no day count until the client confirms it.
-    deliveryPerks: [
-      { label: "Easy 7 Days Returns", detail: "", icon: "returns" as const },
-      { label: "Easy Exchanges", detail: "", icon: "exchange" as const },
-    ],
+    deliveryPerks: badges,
     completeLook: gallery.slice(0, 3),
     sizeGuideImages: [
       "/size-charts/SU022026-27_TECHPACK_page_1.png",
       "/size-charts/SU022026-27_TECHPACK_page_2.png",
     ],
-    fitType: "regular" as const,
+    fitType: fitType as "regular" | "straight" | "bootcut",
   }
+}
+
+export type AdminProductOption = { id: string; title: string; status: string }
+
+/** Every product (any status) for the related-product pickers. */
+export async function listProductOptionsForAdmin(): Promise<AdminProductOption[]> {
+  await requirePermission("products.view")
+  return getPrisma().product.findMany({
+    orderBy: { title: "asc" },
+    select: { id: true, title: true, status: true },
+  })
 }

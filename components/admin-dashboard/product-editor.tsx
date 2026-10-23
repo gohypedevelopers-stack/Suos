@@ -19,14 +19,18 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 
-import { createProductAction, updateProductAction } from "@/app/actions/products"
+import { createProductAction, duplicateProductAction, updateProductAction } from "@/app/actions/products"
 import { toAdminUppercase } from "@/lib/content-case"
 import {
   ProductAdditionalDetailsSection,
   type ProductDetailDraft,
 } from "@/components/admin-dashboard/product-additional-details-section"
 import { ProductOrganizationFields } from "@/components/admin-dashboard/product-organization-fields"
-import { ProductPageContentSection } from "@/components/admin-dashboard/product-page-content-section"
+import {
+  ProductPageContentSection,
+  type DiscountCodeOption,
+  type ProductOption,
+} from "@/components/admin-dashboard/product-page-content-section"
 import {
   emptyProductPageContent,
   type ProductPageContent,
@@ -54,6 +58,7 @@ export type ProductEditorImage = {
   objectKey: string
   url: string | null
   name: string
+  altText?: string
 }
 
 export type ProductEditorInitialProduct = {
@@ -141,10 +146,14 @@ function errorFor(errors: FieldErrors, key: string) {
 export function ProductEditor({
   categories,
   collections,
+  productOptions = [],
+  discountCodes = [],
   initialProduct,
 }: {
   categories: AdminCategoryOption[]
   collections: AdminCollectionOption[]
+  productOptions?: ProductOption[]
+  discountCodes?: DiscountCodeOption[]
   initialProduct?: ProductEditorInitialProduct
 }) {
   const router = useRouter()
@@ -180,6 +189,10 @@ export function ProductEditor({
   const [pageContent, setPageContent] = useState<ProductPageContent>(
     initialProduct?.pageContent ?? emptyProductPageContent,
   )
+  const [imageAlts, setImageAlts] = useState<Record<string, string>>(() =>
+    Object.fromEntries((initialProduct?.images ?? []).map((image) => [image.objectKey, image.altText ?? ""])),
+  )
+  const [isDuplicating, startDuplicating] = useTransition()
   const [isUploading, setIsUploading] = useState(false)
   const [uploadMessage, setUploadMessage] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
@@ -372,7 +385,17 @@ export function ProductEditor({
           lifestyleImageKey: images.some((image) => image.objectKey === pageContent.lifestyleImageKey)
             ? pageContent.lifestyleImageKey
             : "",
+          hoverImageKey: images.some((image) => image.objectKey === pageContent.hoverImageKey)
+            ? pageContent.hoverImageKey
+            : "",
+          imageRoles: Object.fromEntries(
+            Object.entries(pageContent.imageRoles).filter(([key]) => images.some((image) => image.objectKey === key)),
+          ),
+          highlightStrip: pageContent.highlightStrip.filter((tile) => tile.title.trim() || tile.text.trim()),
         },
+        imageAltTexts: Object.fromEntries(
+          images.map((image) => [image.objectKey, (imageAlts[image.objectKey] ?? "").trim()]),
+        ),
         taxRate,
         hsnCode,
         isTaxExempt,
@@ -406,7 +429,39 @@ export function ProductEditor({
             <ChevronRight className="size-4 text-black/45" />
             {initialProduct ? "Edit product" : "Add product"}
           </h1>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {initialProduct ? (
+              <>
+                <a
+                  href={`/products/${initialProduct.slug}?preview=1`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Opens the saved version (save first to see new changes)"
+                  className="inline-flex h-9 items-center rounded-lg border border-black/15 bg-white px-3 text-sm font-medium text-black/75 transition hover:bg-black/[0.03]"
+                >
+                  Preview
+                </a>
+                <button
+                  type="button"
+                  disabled={isDuplicating || isSaving}
+                  onClick={() =>
+                    startDuplicating(async () => {
+                      const result = await duplicateProductAction(initialProduct.id)
+                      if (!result.success) {
+                        toast.error(result.message)
+                        return
+                      }
+                      toast.success("Duplicated as a Draft. Add its photos, then set it to Active.")
+                      router.push(`/dashboard/products/${result.productId}`)
+                    })
+                  }
+                  className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-black/15 bg-white px-3 text-sm font-medium text-black/75 transition hover:bg-black/[0.03] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isDuplicating ? <LoaderCircle className="size-4 animate-spin" /> : null}
+                  Duplicate
+                </button>
+              </>
+            ) : null}
             <Link
               href="/dashboard/products"
               className="inline-flex h-9 items-center rounded-lg bg-black/[0.06] px-3 text-sm font-medium text-black/75 transition hover:bg-black/10"
@@ -761,6 +816,10 @@ export function ProductEditor({
             <ProductPageContentSection
               value={pageContent}
               media={images}
+              imageAlts={imageAlts}
+              onImageAltChange={(key, alt) => { setImageAlts((current) => ({ ...current, [key]: alt })); markChanged() }}
+              productOptions={productOptions}
+              discountCodes={discountCodes}
               onChange={(next) => { setPageContent(next); markChanged() }}
             />
 
@@ -775,16 +834,26 @@ export function ProductEditor({
             >
               <div className="border-t border-black/10 px-4 py-4">
                 {seoExpanded ? (
-                  <label className="grid gap-1.5 text-sm text-black/75" htmlFor="product-slug">
-                    <span>URL handle</span>
-                    <input id="product-slug" value={slug} onChange={(event) => { setSlug(slugify(event.target.value)); setIsCustomSlug(true); markChanged() }} placeholder="generated-from-title" className={inputClass} />
-                    <span className="text-xs text-black/55">suos.store/products/{effectiveSlug || "product-handle"}</span>
-                  </label>
+                  <div className="grid gap-4">
+                    <label className="grid gap-1.5 text-sm text-black/75" htmlFor="product-seo-title">
+                      <span>Page title <span className="font-normal text-black/45">({pageContent.seoTitle.length}/70)</span></span>
+                      <input id="product-seo-title" maxLength={70} value={pageContent.seoTitle} onChange={(event) => { setPageContent((c) => ({ ...c, seoTitle: event.target.value })); markChanged() }} placeholder={`${title || "Product title"} | SUOS`} className={inputClass} />
+                    </label>
+                    <label className="grid gap-1.5 text-sm text-black/75" htmlFor="product-seo-description">
+                      <span>Meta description <span className="font-normal text-black/45">({pageContent.seoDescription.length}/320)</span></span>
+                      <textarea id="product-seo-description" maxLength={320} rows={3} value={pageContent.seoDescription} onChange={(event) => { setPageContent((c) => ({ ...c, seoDescription: event.target.value })); markChanged() }} placeholder="Shown under the title in Google results. Defaults to the start of the description." className={`${inputClass} h-auto py-2`} />
+                    </label>
+                    <label className="grid gap-1.5 text-sm text-black/75" htmlFor="product-slug">
+                      <span>URL handle</span>
+                      <input id="product-slug" value={slug} onChange={(event) => { setSlug(slugify(event.target.value)); setIsCustomSlug(true); markChanged() }} placeholder="generated-from-title" className={inputClass} />
+                      <span className="text-xs text-black/55">suos.store/products/{effectiveSlug || "product-handle"}</span>
+                    </label>
+                  </div>
                 ) : (
                   <div>
-                    <p className="text-sm font-medium text-black/75">{title || "Your product title"}</p>
+                    <p className="text-sm font-medium text-black/75">{pageContent.seoTitle || title || "Your product title"}</p>
                     <p className="mt-1 text-sm text-black/55">suos.store/products/{effectiveSlug || "product-handle"}</p>
-                    <p className="mt-2 line-clamp-2 text-sm leading-6 text-black/60">{description || "Add a product title and description to preview its search listing."}</p>
+                    <p className="mt-2 line-clamp-2 text-sm leading-6 text-black/60">{pageContent.seoDescription || description || "Add a product title and description to preview its search listing."}</p>
                   </div>
                 )}
               </div>

@@ -129,6 +129,20 @@ export type SizeGuideContent = {
   images: string[]
 }
 
+/** Shared product-page text, edited once and used on every product. */
+export type ProductPageSharedContent = {
+  /** Trust badges under Add to Cart (empty = hidden). */
+  returnsBadge: string
+  exchangesBadge: string
+  /** Accordion "Shipping, Returns & Exchanges" (one paragraph per line). */
+  shipping: string
+  returns: string
+  exchanges: string
+  refunds: string
+  /** Accordion "Origin & Contact" text, above the footer contact details. */
+  origin: string
+}
+
 export type SiteContent = {
   announcements: AnnouncementsContent
   navigation: NavigationContent
@@ -137,6 +151,7 @@ export type SiteContent = {
   edits: EditsContent
   contact: ContactContent
   footer: FooterContent
+  productPage: ProductPageSharedContent
   returnsPage: ReturnsPageContent
   sizeGuide: SizeGuideContent
   privacyPolicy: PolicyContent
@@ -154,6 +169,7 @@ export const SITE_CONTENT_KEYS: SiteContentKey[] = [
   "edits",
   "contact",
   "footer",
+  "productPage",
   "returnsPage",
   "sizeGuide",
   "privacyPolicy",
@@ -169,6 +185,7 @@ export const SITE_CONTENT_LABELS: Record<SiteContentKey, string> = {
   edits: "Edits carousel",
   contact: "Contact page & FAQs",
   footer: "Footer contact",
+  productPage: "Product page",
   returnsPage: "Returns page",
   sizeGuide: "Size guide",
   privacyPolicy: "Privacy policy",
@@ -317,6 +334,25 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
       { heading: "For online orders", lines: [{ type: "phone", label: "", value: "+91 000000000" }] },
       { heading: "Timings", lines: [{ type: "text", label: "", value: "Mon-Sat : 9AM - 8PM" }] },
     ],
+  },
+  productPage: {
+    returnsBadge: "Easy 7 Days Returns",
+    exchangesBadge: "Easy Exchanges",
+    shipping: [
+      "Products are shipped from the warehouse within 4 working days from order confirmation.",
+      "Orders are typically delivered within 10 working days from the date of shipment.",
+    ].join("\n"),
+    returns: [
+      "SUOS offers a 7-day return window from the date of delivery, applicable only to returnable products.",
+      "Returned products must be unused, unworn, unwashed, and returned with original tags and packaging intact.",
+    ].join("\n"),
+    exchanges: [
+      "Exchanges are free of charge.",
+      "Size exchanges are subject to availability.",
+      "Only one exchange per order is permitted.",
+    ].join("\n"),
+    refunds: "Once the product is picked up, refunds are initiated within 3 working days.",
+    origin: "Designed and made in India.",
   },
   returnsPage: {
     title: "Place a refund/ exchange request",

@@ -168,7 +168,7 @@ function formatRupees(value: number) {
  * date window, under their usage limit, and order-wide. Never throws, so a
  * discounts problem can't take the product page down.
  */
-export async function listStorefrontOffers(limit = 3): Promise<StorefrontOffer[]> {
+export async function listStorefrontOffers(limit = 3, codes: string[] = []): Promise<StorefrontOffer[]> {
   try {
     const now = new Date()
     const discounts = await getPrisma().discount.findMany({
@@ -177,6 +177,8 @@ export async function listStorefrontOffers(limit = 3): Promise<StorefrontOffer[]
         status: "ACTIVE",
         code: { not: null },
         type: { in: ["ORDER", "PRODUCT", "FREE_SHIPPING"] },
+        // A product can pick specific codes; otherwise every eligible code is shown.
+        ...(codes.length > 0 ? { code: { in: codes } } : {}),
         startsAt: { lte: now },
         OR: [{ endsAt: null }, { endsAt: { gt: now } }],
       },
@@ -224,4 +226,22 @@ export async function listStorefrontOffers(limit = 3): Promise<StorefrontOffer[]
     console.error("Error loading storefront offers:", error)
     return []
   }
+}
+
+export type AdminDiscountCodeOption = { code: string; title: string; isActive: boolean }
+
+/** Coupon codes for the product page's offer picker. */
+export async function listDiscountCodeOptionsForAdmin(): Promise<AdminDiscountCodeOption[]> {
+  await requirePermission("products.view")
+  const rows = await getPrisma().discount.findMany({
+    where: { method: "CODE", code: { not: null } },
+    orderBy: { createdAt: "desc" },
+    select: { code: true, title: true, status: true, endsAt: true },
+  })
+  const now = Date.now()
+  return rows.map((row) => ({
+    code: row.code as string,
+    title: row.title,
+    isActive: row.status === "ACTIVE" && (!row.endsAt || row.endsAt.getTime() > now),
+  }))
 }

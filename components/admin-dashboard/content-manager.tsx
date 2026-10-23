@@ -474,6 +474,34 @@ function FooterEditor({ value, onChange }: SectionProps<"footer">) {
   )
 }
 
+function ProductPageSharedEditor({ value, onChange }: SectionProps<"productPage">) {
+  const text = (key: keyof typeof value, label: string, hint: string) => (
+    <Field label={label} hint={hint}>
+      <Textarea rows={4} value={value[key]} onChange={(e) => onChange({ ...value, [key]: e.target.value })} />
+    </Field>
+  )
+  return (
+    <div className="space-y-4">
+      <p className="text-xs text-black/55">
+        Shown on every product page. A single product can replace the shipping or origin text in its own edit screen.
+      </p>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Field label="Returns badge" hint="Leave empty to hide. A product can also hide both badges.">
+          <Input value={value.returnsBadge} onChange={(e) => onChange({ ...value, returnsBadge: e.target.value })} />
+        </Field>
+        <Field label="Exchanges badge" hint='e.g. "Easy 30 Days Exchanges" once the policy is confirmed.'>
+          <Input value={value.exchangesBadge} onChange={(e) => onChange({ ...value, exchangesBadge: e.target.value })} />
+        </Field>
+      </div>
+      {text("shipping", "Shipping", "One point per line. Shown under “Shipping, Returns & Exchanges”.")}
+      {text("returns", "Returns", "One point per line.")}
+      {text("exchanges", "Exchanges", "One point per line.")}
+      {text("refunds", "Refunds", "One point per line.")}
+      {text("origin", "Origin & Contact", "Shown above the footer contact details in “Origin & Contact”.")}
+    </div>
+  )
+}
+
 function ReturnsPageEditor({ value, onChange }: SectionProps<"returnsPage">) {
   return (
     <div className="space-y-4">
@@ -578,6 +606,7 @@ const TAB_GROUPS: Array<{ key: SiteContentKey; title: string }> = [
   { key: "edits", title: SITE_CONTENT_LABELS.edits },
   { key: "contact", title: SITE_CONTENT_LABELS.contact },
   { key: "footer", title: SITE_CONTENT_LABELS.footer },
+  { key: "productPage", title: SITE_CONTENT_LABELS.productPage },
   { key: "returnsPage", title: SITE_CONTENT_LABELS.returnsPage },
   { key: "sizeGuide", title: SITE_CONTENT_LABELS.sizeGuide },
   { key: "privacyPolicy", title: SITE_CONTENT_LABELS.privacyPolicy },
@@ -648,6 +677,8 @@ export function ContentManager({ initial }: { initial: SiteContentAdminView }) {
         return <ContactEditor value={content.contact} onChange={(v) => update("contact", v)} />
       case "footer":
         return <FooterEditor value={content.footer} onChange={(v) => update("footer", v)} />
+      case "productPage":
+        return <ProductPageSharedEditor value={content.productPage} onChange={(v) => update("productPage", v)} />
       case "returnsPage":
         return <ReturnsPageEditor value={content.returnsPage} onChange={(v) => update("returnsPage", v)} />
       case "sizeGuide":

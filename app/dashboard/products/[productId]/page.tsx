@@ -6,9 +6,11 @@ import { ProductEditor } from "@/components/admin-dashboard/product-editor"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { listCategoryOptionsForAdmin } from "@/lib/server/dal/categories"
+import { listDiscountCodeOptionsForAdmin } from "@/lib/server/dal/discounts"
 import {
   getProductForAdmin,
   listCollectionOptionsForAdmin,
+  listProductOptionsForAdmin,
 } from "@/lib/server/dal/products"
 
 export const metadata: Metadata = {
@@ -22,10 +24,12 @@ export default async function EditProductPage({
   params: Promise<{ productId: string }>
 }) {
   const { productId } = await params
-  const [product, categories, collections] = await Promise.all([
+  const [product, categories, collections, productOptions, discountCodes] = await Promise.all([
     getProductForAdmin(productId),
     listCategoryOptionsForAdmin(),
     listCollectionOptionsForAdmin(),
+    listProductOptionsForAdmin(),
+    listDiscountCodeOptionsForAdmin(),
   ])
 
   if (!product) {
@@ -43,6 +47,8 @@ export default async function EditProductPage({
             key={product.id}
             categories={categories}
             collections={collections}
+            productOptions={productOptions.filter((option) => option.id !== product.id)}
+            discountCodes={discountCodes}
             initialProduct={{
               id: product.id,
               title: product.title,
@@ -60,6 +66,7 @@ export default async function EditProductPage({
                 objectKey: image.objectKey,
                 url: image.url,
                 name: image.altText || product.title,
+                altText: image.altText ?? "",
               })),
               variants: product.variants.map((variant) => ({
                 title: variant.title,

@@ -6,6 +6,7 @@ import { z } from "zod"
 import {
   attachProductImage,
   createProduct,
+  duplicateProduct,
   deleteProducts,
   updateProduct,
   updateProductsStatus,
@@ -204,5 +205,23 @@ export async function attachProductImageAction(input: unknown) {
   return {
     success: true,
     imageId: image.id,
+  }
+}
+
+export async function duplicateProductAction(productId: string) {
+  const id = z.string().trim().min(1).safeParse(productId)
+  if (!id.success) return { success: false as const, message: "Choose a product to duplicate." }
+  try {
+    const product = await duplicateProduct(id.data)
+    revalidatePath("/dashboard/products")
+    return { success: true as const, productId: product.id }
+  } catch (error) {
+    if (error instanceof Error && error.message === "Unauthorized") {
+      return { success: false as const, message: "Sign in to continue." }
+    }
+    if (error instanceof Error && (error.message === "Forbidden" || error.message.startsWith("PermissionDenied:"))) {
+      return { success: false as const, message: "You don't have permission to add products." }
+    }
+    return { success: false as const, message: "The product could not be duplicated." }
   }
 }

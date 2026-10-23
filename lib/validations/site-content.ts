@@ -178,6 +178,15 @@ export const siteContentSchemas = {
         .max(8),
     }),
   ),
+  productPage: z.object({
+    returnsBadge: shortText,
+    exchangesBadge: shortText,
+    shipping: longText,
+    returns: longText,
+    exchanges: longText,
+    refunds: longText,
+    origin: longText,
+  }),
   returnsPage: z.object({
     title: shortText.min(1),
     image: imagePath,
@@ -203,6 +212,7 @@ export const siteContentKeySchema = z.enum([
   "edits",
   "contact",
   "footer",
+  "productPage",
   "returnsPage",
   "sizeGuide",
   "privacyPolicy",

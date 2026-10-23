@@ -26,6 +26,8 @@ export type ProductCard = {
   compareAtPrice?: string | null
   description?: string | null
   category?: { name: string; slug: string } | null
+  /** Short name set in the admin (e.g. "Faded Years"); preferred over the category for labels. */
+  lineName?: string | null
 }
 
 function cardToProductDetail(card: ProductCard): ProductDetail {
@@ -472,9 +474,9 @@ export function ProductCardView({
 
       {/* Info Area Below Image */}
       <div className="mt-2.5 md:mt-3 flex flex-col gap-1.5">
-        {isCompact && product.category?.name ? (
+        {isCompact && (product.lineName || product.category?.name) ? (
           <p className="truncate text-[11px] md:text-[12px] uppercase tracking-normal leading-none text-ink-400">
-            {product.category.name}
+            {product.lineName || product.category?.name}
           </p>
         ) : null}
 

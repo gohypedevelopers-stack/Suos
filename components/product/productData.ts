@@ -57,6 +57,19 @@ export type ProductDetail = {
     products: import("@/components/home/TrendingSection").ProductCard[]
   } | null
   offers?: Array<{ code: string; headline: string; detail: string | null }>
+  /** FEATURES list ("Fit: Bootcut Fit"); empty = fall back to Additional details. */
+  features?: Array<{ label: string; value: string }>
+  /** Up to 4 tiles: STRAIGHT FIT / 100% COTTON … */
+  highlightStrip?: Array<{ title: string; text: string }>
+  fitHeadline?: string
+  fitText?: string
+  bundleLine?: string
+  /** "Shipping, Returns & Exchanges" accordion, from Website content or a product override. */
+  shippingSections?: Array<{ title: string; lines: string[] }>
+  /** "Origin & Contact" text above the footer contact details. */
+  origin?: string
+  completeLookProducts?: import("@/components/home/TrendingSection").ProductCard[]
+  isDraft?: boolean
   detailsBody: string
   details?: Array<{ name: string; value: string }>
   careNotes: string[]

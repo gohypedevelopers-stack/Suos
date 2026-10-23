@@ -111,6 +111,8 @@ export const productInputSchema = z
     inventoryQuantity: requiredQuantitySchema,
     variants: z.array(productVariantSchema).max(100).default([]),
     images: z.array(productImageObjectKeySchema).max(20).default([]),
+    /** Alt text per image object key (optional; missing keys keep their current text). */
+    imageAltTexts: z.record(z.string().max(512), z.string().trim().max(200)).optional(),
     collectionIds: z
       .array(z.string().trim().min(1))
       .max(100)

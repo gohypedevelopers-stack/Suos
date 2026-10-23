@@ -143,9 +143,9 @@ function MiniProductCard({ product }: { product: HomeProductCard }) {
           />
         ) : null}
       </div>
-      {product.category?.name ? (
+      {product.lineName || product.category?.name ? (
         <p className="mt-2.5 truncate text-[12px] uppercase leading-none text-ink-400">
-          {product.category.name}
+          {product.lineName || product.category?.name}
         </p>
       ) : null}
       <p className="mt-1.5 truncate text-[13px] uppercase leading-none text-ink-800">{product.title}</p>
@@ -242,7 +242,13 @@ export function ProductSummary({
   const sectionDetails = details.filter((detail) => detail.name.includes("&"))
   const specDetails = details.filter((detail) => !detail.name.includes("&"))
   const hasSection = (pattern: RegExp) => sectionDetails.some((detail) => pattern.test(detail.name))
-  const origin = specDetails.find((detail) => /origin/i.test(detail.name))?.value
+  // Structured specs from the admin win; older products list their short-named details.
+  const features: Array<{ label: string; value: string }> =
+    product.features && product.features.length > 0
+      ? product.features
+      : specDetails.map((detail) => ({ label: toDisplayCase(detail.name), value: detail.value }))
+  const hasCountryInFeatures = features.some((feature) => /origin/i.test(feature.label))
+  const origin = hasCountryInFeatures ? undefined : specDetails.find((detail) => /origin/i.test(detail.name))?.value
 
   return (
     <aside className="self-start w-full min-w-0 max-w-full [overflow-anchor:none] xl:sticky xl:top-[calc(var(--header-stack-height)+24px)]">
@@ -265,11 +271,15 @@ export function ProductSummary({
             <span className="text-h3 text-ink-900">{product.price}</span>
           </div>
 
-          {product.sold && product.rating ? (
+          {product.sold ? (
             <div className="flex items-center gap-2">
               <span className="text-body text-ink-600">{product.sold}</span>
-              <span className="text-body text-black/25">|</span>
-              <span className="text-h4 text-ink-900">{product.rating}</span>
+              {product.rating ? (
+                <>
+                  <span className="text-body text-black/25">|</span>
+                  <span className="text-h4 text-ink-900">{product.rating}</span>
+                </>
+              ) : null}
             </div>
           ) : null}
         </div>
@@ -363,6 +373,11 @@ export function ProductSummary({
           </section>
         ) : null}
 
+        {product.bundleLine ? (
+          <p className="border border-black/15 px-4 py-3 text-body text-ink-900">{product.bundleLine}</p>
+        ) : null}
+
+        {product.deliveryPerks.length > 0 ? (
         <section aria-label="Delivery and returns" className="grid grid-cols-2 gap-2 bg-[#f9f9f9] p-2 sm:gap-3 sm:px-4 sm:py-4">
           {product.deliveryPerks.map((perk) => {
             const Icon = deliveryIcons[perk.icon]
@@ -381,6 +396,18 @@ export function ProductSummary({
             )
           })}
         </section>
+        ) : null}
+
+        {product.highlightStrip && product.highlightStrip.length > 0 ? (
+          <section aria-label="Highlights" className="grid grid-cols-2 gap-px bg-black/10 sm:grid-cols-4">
+            {product.highlightStrip.map((tile, index) => (
+              <div key={index} className="bg-white px-3 py-3 text-center">
+                <p className="text-caption font-medium uppercase text-ink-900">{tile.title}</p>
+                {tile.text ? <p className="mt-1.5 text-[13px] leading-[17px] text-ink-600">{tile.text}</p> : null}
+              </div>
+            ))}
+          </section>
+        ) : null}
 
         {product.moreFrom ? (
           <section className="space-y-4 pt-2">
@@ -402,6 +429,17 @@ export function ProductSummary({
           </section>
         ) : null}
 
+        {product.completeLookProducts && product.completeLookProducts.length > 0 ? (
+          <section className="space-y-4 pt-2">
+            <h2 className="text-h4 font-normal uppercase text-black">Complete the Look</h2>
+            <div className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {product.completeLookProducts.map((item) => (
+                <MiniProductCard key={item.id} product={item} />
+              ))}
+            </div>
+          </section>
+        ) : null}
+
         <Accordion
           id="details"
           type="single"
@@ -413,16 +451,16 @@ export function ProductSummary({
             <div className="space-y-4">
               {product.description ? (
                 <DescriptionText text={product.description} names={[toDisplayCase(product.editLabel), product.title]} />
-              ) : !specDetails.length ? (
+              ) : !features.length ? (
                 <p>{product.detailsBody || "No details provided."}</p>
               ) : null}
-              {specDetails.length > 0 ? (
+              {features.length > 0 ? (
                 <div>
                   <p className="uppercase text-ink-800">Features</p>
                   <ul className="mt-2 list-disc space-y-1 pl-5">
-                    {specDetails.map((detail, idx) => (
+                    {features.map((feature, idx) => (
                       <li key={idx}>
-                        {toDisplayCase(detail.name)}: {detail.value}
+                        {feature.label}: {feature.value}
                       </li>
                     ))}
                   </ul>
@@ -433,27 +471,45 @@ export function ProductSummary({
 
           {!hasSection(/fit|care/i) ? (
             <Section title="The Fit & Care">
-              <ul className="space-y-2">
-                {product.modelInfo ? <li>{product.modelInfo}</li> : null}
-                {product.fitNote ? <li>Fit Note: {product.fitNote}</li> : null}
-                {product.careNotes.map((note) => (
-                  <li key={note}>{note}</li>
-                ))}
-              </ul>
+              <div className="space-y-4">
+                {product.fitHeadline ? <p className="uppercase text-ink-800">{product.fitHeadline}</p> : null}
+                {product.fitText ? <p className="whitespace-pre-line">{product.fitText}</p> : null}
+                {product.modelInfo || product.fitNote ? (
+                  <div className="space-y-1">
+                    {product.modelInfo ? <p>{product.modelInfo}</p> : null}
+                    {product.fitNote ? <p>Fit Note: {product.fitNote}</p> : null}
+                  </div>
+                ) : null}
+                {product.careNotes.length > 0 ? (
+                  <div>
+                    <p className="uppercase text-ink-800">Care</p>
+                    <ul className="mt-2 list-disc space-y-1 pl-5">
+                      {product.careNotes.map((note) => (
+                        <li key={note}>{note}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+              </div>
             </Section>
           ) : null}
           {!hasSection(/shipping|return|exchange/i) ? (
             <Section title="Shipping, Returns & Exchanges">
-              <ul className="space-y-2">
-                {product.shippingNotes.map((note) => (
-                  <li key={note}>{note}</li>
+              <div className="space-y-4">
+                {(product.shippingSections ?? [{ title: "", lines: product.shippingNotes }]).map((section, index) => (
+                  <div key={index}>
+                    {section.title ? <p className="uppercase text-ink-800">{section.title}</p> : null}
+                    <ul className={cn("space-y-1", section.title && "mt-2 list-disc pl-5")}>
+                      {section.lines.map((line) => (
+                        <li key={line}>{line}</li>
+                      ))}
+                    </ul>
+                  </div>
                 ))}
-                <li>
-                  <Link href="/returns-policy" className="underline underline-offset-4">
-                    Read the full shipping, returns &amp; exchange policy
-                  </Link>
-                </li>
-              </ul>
+                <Link href="/returns-policy" className="inline-block underline underline-offset-4">
+                  Read the full shipping, returns &amp; exchange policy
+                </Link>
+              </div>
             </Section>
           ) : null}
           {sectionDetails.map((detail, idx) => (
@@ -464,6 +520,7 @@ export function ProductSummary({
           {!hasSection(/origin|contact/i) ? (
             <Section title="Origin & Contact">
               <ul className="space-y-2">
+                {product.origin ? <li className="whitespace-pre-line">{product.origin}</li> : null}
                 {origin ? <li>Country of Origin: {origin}</li> : null}
                 {footer.contactGroups.map((group, index) => (
                   <li key={`${group.heading}-${index}`}>

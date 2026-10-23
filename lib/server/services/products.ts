@@ -159,6 +159,7 @@ export async function createProduct(input: ProductInput) {
             create: product.images.map((objectKey, position) => ({
               objectKey,
               position,
+              altText: product.imageAltTexts?.[objectKey] || null,
             })),
           }
         : undefined,
@@ -296,10 +297,15 @@ export async function updateProduct(productId: string, input: ProductInput) {
         existingImageKeys.has(objectKey)
           ? transaction.productImage.update({
               where: { objectKey },
-              data: { position },
+              data: {
+                position,
+                ...(product.imageAltTexts && objectKey in product.imageAltTexts
+                  ? { altText: product.imageAltTexts[objectKey] || null }
+                  : {}),
+              },
             })
           : transaction.productImage.create({
-              data: { productId, objectKey, position },
+              data: { productId, objectKey, position, altText: product.imageAltTexts?.[objectKey] || null },
             }),
       ),
     )
@@ -386,5 +392,68 @@ export async function attachProductImage(input: unknown) {
       objectKey: true,
       position: true,
     },
+  })
+}
+
+/**
+ * Copies a product into a new Draft: details, page content, variants (new
+ * SKUs), category and collections. Photos are not copied: each image row is
+ * tied to one product, and a duplicate is usually a new colour anyway.
+ */
+export async function duplicateProduct(productId: string) {
+  await assertPermission("products.manage")
+  const prisma = getPrisma()
+  const source = await prisma.product.findUnique({
+    where: { id: productId },
+    include: {
+      variants: { orderBy: { createdAt: "asc" } },
+      collections: { orderBy: { position: "asc" } },
+    },
+  })
+  if (!source) throw new Error("Product not found")
+
+  const title = `${source.title} (COPY)`.slice(0, 160)
+  const slug = await createAvailableSlug(`${source.slug}-copy`)
+  const variants = []
+  for (const [index, variant] of source.variants.entries()) {
+    variants.push({
+      title: variant.title,
+      sku: await createAvailableSku(`${variant.sku}-COPY`, index + 1),
+      price: variant.price,
+      compareAtPrice: variant.compareAtPrice,
+      inventoryQuantity: 0,
+      optionValues: variant.optionValues ?? Prisma.JsonNull,
+    })
+  }
+
+  return prisma.product.create({
+    data: {
+      title,
+      slug,
+      description: source.description,
+      vendor: source.vendor,
+      status: "DRAFT",
+      categoryId: source.categoryId,
+      tags: source.tags,
+      details: source.details ?? Prisma.JsonNull,
+      // Image picks point at the source's photos, so clear them.
+      pageContent: source.pageContent
+        ? ({
+            ...(source.pageContent as Record<string, unknown>),
+            highlights: [],
+            lifestyleImageKey: "",
+            hoverImageKey: "",
+            imageRoles: {},
+          } as Prisma.InputJsonValue)
+        : Prisma.JsonNull,
+      taxRate: source.taxRate,
+      hsnCode: source.hsnCode,
+      isTaxExempt: source.isTaxExempt,
+      collections: {
+        create: source.collections.map(({ collectionId }, position) => ({ collectionId, position })),
+      },
+      variants: { create: variants },
+    },
+    select: { id: true, slug: true },
   })
 }

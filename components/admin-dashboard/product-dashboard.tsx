@@ -22,6 +22,9 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 
+import { PRODUCT_CSV_COLUMNS, pageContentFromCsvRow } from "@/lib/product-csv"
+import type { ProductPageContent } from "@/lib/product-page-content"
+
 import {
   deleteProductsAction,
   importProductsAction,
@@ -64,6 +67,8 @@ type ImportedProductPayload = {
   images: string[]
   variants: []
   details: []
+  description?: string
+  pageContent?: Partial<ProductPageContent>
 }
 
 const pageSize = 50
@@ -291,6 +296,36 @@ export function ProductDashboard({
     setShowSelectedOnly(false)
   }
 
+  function downloadTemplate() {
+    const example = PRODUCT_CSV_COLUMNS.map((column) =>
+      ({
+        Title: "VINTAGE WASH BOOTCUT FIT DENIM",
+        Price: "2800",
+        "Compare at price": "3000",
+        Status: "DRAFT",
+        Collections: "Originals",
+        "Short name": "Faded Years",
+        Edit: "Originals",
+        Gender: "MEN",
+        Colour: "Grey Cirrus",
+        Fit: "Bootcut Fit",
+        Rise: "Mid",
+        Stretch: "No",
+        "Highlight strip": "BOOTCUT FIT: Opens from the knee | 100% COTTON: No stretch",
+        Care: "Machine wash cold | Wash inside out | Dry in shade",
+        "Model height": "5'9\"",
+        "Model size": "32",
+      } as Record<string, string>)[column] ?? "",
+    )
+    const csv = [PRODUCT_CSV_COLUMNS.map(quoteCsv).join(","), example.map(quoteCsv).join(",")].join("\n")
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }))
+    const link = document.createElement("a")
+    link.href = url
+    link.download = "suos-product-import-template.csv"
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
   async function importCsv(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
     event.target.value = ""
@@ -353,6 +388,8 @@ export function ProductDashboard({
         images: [],
         variants: [],
         details: [],
+        description: row.description || undefined,
+        pageContent: pageContentFromCsvRow(row),
       })
     }
 
@@ -375,6 +412,7 @@ export function ProductDashboard({
         <div className="flex flex-wrap items-center gap-2">
           <button type="button" onClick={exportProducts} className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg bg-black/[0.06] px-3 text-xs font-medium transition hover:bg-black/10"><Download className="size-3.5" /> Export</button>
           <button type="button" disabled={isMutating} onClick={() => importInputRef.current?.click()} className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg bg-black/[0.06] px-3 text-xs font-medium transition hover:bg-black/10 disabled:cursor-not-allowed disabled:opacity-50"><Upload className="size-3.5" /> Import</button>
+          <button type="button" onClick={downloadTemplate} title="CSV with every column the import understands" className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg bg-black/[0.06] px-3 text-xs font-medium transition hover:bg-black/10">Template</button>
           <input ref={importInputRef} onChange={importCsv} type="file" accept=".csv,text/csv" className="sr-only" />
           <Link href="/dashboard/products/new" className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-black px-3 text-xs font-medium text-white transition hover:bg-black/80"><Plus className="size-3.5" /> Add product</Link>
         </div>

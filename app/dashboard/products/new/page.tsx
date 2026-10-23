@@ -5,7 +5,8 @@ import { ProductEditor } from "@/components/admin-dashboard/product-editor"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { listCategoryOptionsForAdmin } from "@/lib/server/dal/categories"
-import { listCollectionOptionsForAdmin } from "@/lib/server/dal/products"
+import { listDiscountCodeOptionsForAdmin } from "@/lib/server/dal/discounts"
+import { listCollectionOptionsForAdmin, listProductOptionsForAdmin } from "@/lib/server/dal/products"
 
 export const metadata: Metadata = {
   title: "Add product | SUOS Admin",
@@ -13,9 +14,11 @@ export const metadata: Metadata = {
 }
 
 export default async function AddProductPage() {
-  const [categories, collections] = await Promise.all([
+  const [categories, collections, productOptions, discountCodes] = await Promise.all([
     listCategoryOptionsForAdmin(),
     listCollectionOptionsForAdmin(),
+    listProductOptionsForAdmin(),
+    listDiscountCodeOptionsForAdmin(),
   ])
 
   return (
@@ -23,7 +26,12 @@ export default async function AddProductPage() {
       <SidebarProvider className="min-h-svh">
         <AppSidebar />
         <SidebarInset>
-          <ProductEditor categories={categories} collections={collections} />
+          <ProductEditor
+            categories={categories}
+            collections={collections}
+            productOptions={productOptions}
+            discountCodes={discountCodes}
+          />
         </SidebarInset>
       </SidebarProvider>
     </TooltipProvider>

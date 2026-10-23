@@ -6,19 +6,29 @@ import { ChevronRight } from "lucide-react"
 
 import { ProductGallery } from "@/components/product/ProductGallery"
 import { ProductHighlightsSection } from "@/components/product/ProductHighlightsSection"
+import { RecentlyViewed } from "@/components/product/RecentlyViewed"
 import { ProductSummary } from "@/components/product/ProductSummary"
 import { YouMayAlsoLikeSection } from "@/components/product/YouMayAlsoLikeSection"
+import { getCurrentUser } from "@/lib/server/dal/auth"
 import { getProductBySlug } from "@/lib/server/dal/products"
+import { isStaffRole } from "@/lib/roles"
 
 export const dynamic = "force-dynamic"
 
-export async function generateMetadata({
-  params,
-}: {
+type PageProps = {
   params: Promise<{ slug: string }>
-}): Promise<Metadata> {
-  const { slug } = await params
-  const product = await getProductBySlug(slug)
+  searchParams: Promise<{ preview?: string }>
+}
+
+/** Staff can open Draft products with ?preview=1 (the admin's Preview button). */
+async function loadProduct({ params, searchParams }: PageProps) {
+  const [{ slug }, { preview }] = await Promise.all([params, searchParams])
+  const wantsPreview = preview === "1" && isStaffRole((await getCurrentUser().catch(() => null))?.role)
+  return getProductBySlug(slug, { preview: wantsPreview })
+}
+
+export async function generateMetadata(props: PageProps): Promise<Metadata> {
+  const product = await loadProduct(props)
 
   if (!product) {
     return {
@@ -27,8 +37,10 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${product.title} | SUOS`,
-    description: product.description || `Buy ${product.title} at SUOS`,
+    title: product.seoTitle || `${product.title} | SUOS`,
+    description: product.seoDescription || product.description?.slice(0, 160) || `Buy ${product.title} at SUOS`,
+    // Draft previews must never be indexed.
+    ...(product.isDraft ? { robots: { index: false, follow: false } } : {}),
   }
 }
 
@@ -38,13 +50,8 @@ function toDisplayCase(label: string) {
   return label.toLowerCase().replace(/(^|[\s(/-])(\p{L})/gu, (_, sep, char) => sep + char.toUpperCase())
 }
 
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ slug: string }>
-}) {
-  const { slug } = await params
-  const product = await getProductBySlug(slug)
+export default async function Page(props: PageProps) {
+  const product = await loadProduct(props)
 
   if (!product) {
     notFound()
@@ -52,6 +59,11 @@ export default async function Page({
 
   return (
     <main className="flex-1 bg-white text-black w-full min-w-0 overflow-x-hidden">
+      {product.isDraft ? (
+        <p className="bg-amber-100 px-4 py-2 text-center text-caption text-amber-900">
+          Preview of a Draft product: only staff can see this page until it is set to Active.
+        </p>
+      ) : null}
       <section className="relative w-full min-w-0 overflow-x-hidden px-3 pb-10 pt-3 sm:px-6 sm:pb-16 sm:pt-5 lg:px-[18px] lg:pt-6">
         <div className="w-full min-w-0">
           <nav aria-label="Breadcrumb" className="overflow-x-auto scrollbar-none py-1 text-body text-ink-400">
@@ -89,7 +101,7 @@ export default async function Page({
       </section>
       {/* Figma order: details → You May Also Like → lifestyle image; marquee + footer come from SiteFooter. */}
       <ProductHighlightsSection intro={product.highlightsIntro} highlights={product.highlights} />
-      <YouMayAlsoLikeSection excludeProductId={product.id} />
+      <YouMayAlsoLikeSection excludeProductId={product.id} pickedIds={product.alsoLikeIds} />
       {product.lifestyleImage ? (
         <section className="relative aspect-[4/5] w-full overflow-hidden bg-[#efefef] sm:aspect-[1440/720]">
           <Image
@@ -101,6 +113,18 @@ export default async function Page({
           />
         </section>
       ) : null}
+      {product.isDraft ? null : (
+        <RecentlyViewed
+          current={{
+            id: product.id,
+            slug: product.slug,
+            title: product.title,
+            image: product.gallery[0]?.src ?? "",
+            price: product.price,
+            line: product.editLabel,
+          }}
+        />
+      )}
     </main>
   )
 }
