@@ -4,6 +4,8 @@ import Image from "next/image"
 import Link from "next/link"
 import { useEffect, useSyncExternalStore } from "react"
 
+import { ScrollRow } from "@/components/ScrollRow"
+
 type ViewedProduct = {
   id: string
   slug: string
@@ -70,7 +72,7 @@ export function RecentlyViewed({ current }: { current: ViewedProduct }) {
   return (
     <section className="w-full bg-white px-3 py-10 text-black sm:px-6 lg:px-8">
       <h2 className="text-h4 font-normal uppercase">Recently Viewed</h2>
-      <div className="mt-5 flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <ScrollRow className="mt-5 gap-2 pb-1" label="Recently viewed">
         {others.map((item) => (
           <Link key={item.id} href={`/products/${item.slug}`} className="group block w-[160px] shrink-0 snap-start sm:w-[200px]">
             <div className="relative aspect-[3/4] overflow-hidden bg-[#efefef]">
@@ -83,7 +85,7 @@ export function RecentlyViewed({ current }: { current: ViewedProduct }) {
             <p className="mt-1.5 text-caption font-medium text-ink-900">{item.price}</p>
           </Link>
         ))}
-      </div>
+      </ScrollRow>
     </section>
   )
 }

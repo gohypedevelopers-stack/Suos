@@ -1,6 +1,7 @@
 "use client"
 
 import { ProductCardView, type ProductCard } from "@/components/home/TrendingSection"
+import { ScrollRow } from "@/components/ScrollRow"
 
 const defaultRecommendedProducts: ProductCard[] = [
   {
@@ -92,9 +93,9 @@ export function RecommendedSection({
         </h2>
       </div>
 
-      <div
-        className="mt-6 sm:mt-8 flex snap-x snap-mandatory items-start gap-0.5 overflow-x-auto overscroll-x-contain px-3 [scrollbar-width:none] sm:gap-1 sm:px-6 lg:px-8 [&::-webkit-scrollbar]:hidden"
-        aria-label="You may also like"
+      <ScrollRow
+        className="mt-6 sm:mt-8 items-start gap-0.5 overscroll-x-contain px-3 sm:gap-1 sm:px-6 lg:px-8"
+        label="You may also like"
       >
         {displayProducts.map((product) => (
           <div
@@ -104,7 +105,7 @@ export function RecommendedSection({
             <ProductCardView product={product} variant="compact" />
           </div>
         ))}
-      </div>
+      </ScrollRow>
     </section>
   )
 }

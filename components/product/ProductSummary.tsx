@@ -27,6 +27,7 @@ import { cn } from "@/lib/utils"
 import type { ProductDetail } from "@/components/product/productData"
 import type { ProductCard as HomeProductCard } from "@/components/home/TrendingSection"
 import { SizeChartModal } from "@/components/product/SizeChartModal"
+import { ScrollRow } from "@/components/ScrollRow"
 import { useCart } from "@/lib/cart-context"
 import { useSiteContent } from "@/lib/site-content-context"
 import { ContactLineItem } from "@/components/ContactLines"
@@ -421,22 +422,22 @@ export function ProductSummary({
                 </Link>
               ) : null}
             </div>
-            <div className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <ScrollRow className="gap-2 pb-1" label="More from this collection">
               {product.moreFrom.products.map((item) => (
                 <MiniProductCard key={item.id} product={item} />
               ))}
-            </div>
+            </ScrollRow>
           </section>
         ) : null}
 
         {product.completeLookProducts && product.completeLookProducts.length > 0 ? (
           <section className="space-y-4 pt-2">
             <h2 className="text-h4 font-normal uppercase text-black">Complete the Look</h2>
-            <div className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <ScrollRow className="gap-2 pb-1" label="Complete the look">
               {product.completeLookProducts.map((item) => (
                 <MiniProductCard key={item.id} product={item} />
               ))}
-            </div>
+            </ScrollRow>
           </section>
         ) : null}
 
