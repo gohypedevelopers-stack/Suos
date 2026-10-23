@@ -205,7 +205,11 @@ export function ProductSummary({
     let frame = 0
     const update = () => {
       frame = 0
-      setShowStickyBar(target.getBoundingClientRect().bottom < 0)
+      // Only alongside the product details: hidden again once the main product
+      // area has scrolled away, so it never covers "It's in the Details".
+      const area = target.closest("section")
+      const areaEnded = area ? area.getBoundingClientRect().bottom < window.innerHeight * 0.6 : false
+      setShowStickyBar(target.getBoundingClientRect().bottom < 0 && !areaEnded)
     }
     const schedule = () => {
       if (!frame) frame = window.requestAnimationFrame(update)

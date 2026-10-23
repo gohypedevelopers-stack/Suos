@@ -423,7 +423,7 @@ export function ProductCardView({
 
         {/* Gallery indicator bars, one per image (max 6), styled like the client reference */}
         {indicatorCount > 1 && (
-          <div className="pointer-events-auto absolute inset-x-0 bottom-2 sm:bottom-3 z-20 flex items-center justify-center gap-1 sm:gap-1.5 px-2 drop-shadow-[0_0_3px_rgba(0,0,0,0.55)]">
+          <div className="pointer-events-auto absolute inset-x-0 bottom-2 sm:bottom-3 z-20 flex items-center justify-center gap-0 px-2 drop-shadow-[0_0_3px_rgba(0,0,0,0.55)]">
             {Array.from({ length: indicatorCount }).map((_, dashIdx) => {
               const targetImageIndex = Math.round(
                 (dashIdx / (indicatorCount - 1)) * (gallery.length - 1)
@@ -448,7 +448,7 @@ export function ProductCardView({
                 >
                   <span
                     className={cn(
-                      "block h-[2px] w-3 sm:w-5 md:w-7 transition-colors duration-200",
+                      "block h-[2px] w-4 sm:w-5 md:w-6 transition-colors duration-200",
                       dashIdx === activeIndicatorIndex
                         ? "bg-white"
                         : "bg-white/45 group-hover/ind:bg-white/80"

@@ -18,12 +18,12 @@ export function CarouselArrow({
     <button
       type="button"
       className={cn(
-        "z-20 flex size-7 cursor-pointer items-center justify-center rounded-full bg-white/90 text-black shadow-sm ring-1 ring-black/10 transition-[background-color,opacity] duration-200 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black",
+        "z-20 flex size-8 cursor-pointer items-center justify-center rounded-full bg-white/90 text-black shadow-sm ring-1 ring-black/10 transition-[background-color,opacity] duration-200 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black",
         className,
       )}
       {...props}
     >
-      <Icon aria-hidden="true" className="size-4" strokeWidth={1.5} />
+      <Icon aria-hidden="true" className="size-3.5" strokeWidth={1.5} />
     </button>
   )
 }
