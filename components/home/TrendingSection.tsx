@@ -254,8 +254,9 @@ export function ProductCardView({
   return (
     <article
       className={cn(
-        "group relative flex flex-col bg-white text-black p-0.5 sm:p-1 pb-2 sm:pb-2.5 transition-all duration-200 border hover:z-10",
-        isExpanded ? "border-black z-10" : "border-transparent hover:border-black"
+        // No outline on hover/expand (client + updated Figma); no inner padding, so cards sit closer.
+        "group relative flex flex-col bg-white text-black pb-2 sm:pb-2.5 hover:z-10",
+        isExpanded && "z-10"
       )}
     >
       <div
