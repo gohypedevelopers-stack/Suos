@@ -490,3 +490,20 @@
     --main-navbar-height: 98px;
   }
 }
+
+/* Banner crop focus set in the admin (lib/banner-media.ts bannerFocusProps).
+   Unlayered, so it wins over Tailwind's object-* utilities. */
+.banner-focus,
+.banner-focus-md {
+  object-position: var(--focus-mobile);
+}
+@media (min-width: 640px) {
+  .banner-focus {
+    object-position: var(--focus-desktop);
+  }
+}
+@media (min-width: 768px) {
+  .banner-focus-md {
+    object-position: var(--focus-desktop);
+  }
+}

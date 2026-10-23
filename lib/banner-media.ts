@@ -14,3 +14,26 @@ export function isVideoMedia(urlOrKey: string | null | undefined): boolean {
 export function isBannerVideoContentType(contentType: string): boolean {
   return (BANNER_VIDEO_CONTENT_TYPES as readonly string[]).includes(contentType)
 }
+
+export const BANNER_FOCUS_CENTER = "50% 50%"
+
+/**
+ * Class + CSS variables that crop a banner image/video around the focus
+ * points set in the admin (see .banner-focus in globals.css). Returns nothing
+ * when no focus is set, so components keep their own default positioning.
+ * `breakpoint` is where that component switches from its phone to desktop layout.
+ */
+export function bannerFocusProps(
+  desktopFocus?: string | null,
+  mobileFocus?: string | null,
+  breakpoint: "sm" | "md" = "sm",
+): { className?: string; style?: Record<string, string> } {
+  if (!desktopFocus && !mobileFocus) return {}
+  return {
+    className: breakpoint === "md" ? "banner-focus-md" : "banner-focus",
+    style: {
+      "--focus-desktop": desktopFocus || BANNER_FOCUS_CENTER,
+      "--focus-mobile": mobileFocus || BANNER_FOCUS_CENTER,
+    },
+  }
+}

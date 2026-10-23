@@ -30,6 +30,18 @@ export const bannerImageObjectKeySchema = z
     "Invalid banner image key",
   )
 
+/** "x% y%" with each value 0–100, e.g. "50% 30%". */
+const bannerFocusSchema = z.preprocess(
+  (val) => (typeof val === "string" && val.trim() === "" ? null : val),
+  z
+    .string()
+    .trim()
+    .regex(/^\d{1,3}(?:\.\d+)?% \d{1,3}(?:\.\d+)?%$/, "Invalid focus point")
+    .refine((v) => v.split(" ").every((part) => parseFloat(part) <= 100), "Invalid focus point")
+    .nullable()
+    .optional(),
+)
+
 export const bannerInputSchema = z.object({
   title: z.preprocess(
     (val) => (typeof val === "string" && val.trim() === "" ? null : val),
@@ -55,6 +67,8 @@ export const bannerInputSchema = z.object({
   placement: bannerPlacementSchema.default("HERO"),
   textAlignment: bannerTextAlignmentSchema.default("CENTER"),
   overlayOpacity: z.coerce.number().int().min(0).max(100).default(20),
+  desktopFocus: bannerFocusSchema,
+  mobileFocus: bannerFocusSchema,
   isActive: z.boolean().default(true),
   position: z.coerce.number().int().min(0).default(0),
 })

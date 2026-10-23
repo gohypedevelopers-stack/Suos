@@ -9,12 +9,16 @@ export function BannerMediaPreview({
   alt,
   sizes,
   className,
+  objectPosition,
 }: {
   src: string
   alt: string
   sizes?: string
   className?: string
+  /** CSS object-position, e.g. a banner's crop focus "50% 30%". */
+  objectPosition?: string | null
 }) {
+  const style = objectPosition ? { objectPosition } : undefined
   if (isVideoMedia(src)) {
     return (
       <video
@@ -25,9 +29,10 @@ export function BannerMediaPreview({
         playsInline
         aria-label={alt}
         className={cn("absolute inset-0 h-full w-full object-cover", className)}
+        style={style}
       />
     )
   }
 
-  return <Image src={src} alt={alt} fill sizes={sizes} className={cn("object-cover", className)} />
+  return <Image src={src} alt={alt} fill sizes={sizes} className={cn("object-cover", className)} style={style} />
 }

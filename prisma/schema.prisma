@@ -449,6 +449,9 @@ model Banner {
   placement       BannerPlacement @default(HERO)
   textAlignment   String          @default("CENTER")
   overlayOpacity  Int             @default(20)
+  /// Focus point for cropping, e.g. "50% 30%" (CSS object-position). Null = centre.
+  desktopFocus    String?
+  mobileFocus     String?
   isActive        Boolean         @default(true)
   position        Int             @default(0)
   createdAt       DateTime        @default(now())

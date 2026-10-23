@@ -5,7 +5,7 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
-import { isVideoMedia } from "@/lib/banner-media"
+import { bannerFocusProps, isVideoMedia } from "@/lib/banner-media"
 import { cn } from "@/lib/utils"
 import type { HomeHeroBanner } from "@/lib/server/dal/banners"
 
@@ -27,12 +27,15 @@ function HeroMedia({
   alt,
   priority,
   sizes = "100vw",
+  focus = {},
 }: {
   src: string
   alt: string
   priority: boolean
   /** The phone/desktop variants are each hidden at the other size. */
   sizes?: string
+  /** Crop focus chosen in the admin. */
+  focus?: ReturnType<typeof bannerFocusProps>
 }) {
   if (isVideoMedia(src)) {
     return (
@@ -44,7 +47,8 @@ function HeroMedia({
         playsInline
         preload={priority ? "auto" : "metadata"}
         aria-label={alt}
-        className="absolute inset-0 h-full w-full object-cover object-center"
+        className={cn("absolute inset-0 h-full w-full object-cover object-center", focus.className)}
+        style={focus.style}
       />
     )
   }
@@ -56,7 +60,8 @@ function HeroMedia({
       fill
       priority={priority}
       sizes={sizes}
-      className="object-cover object-center w-full h-full"
+      className={cn("object-cover object-center w-full h-full", focus.className)}
+      style={focus.style}
     />
   )
 }
@@ -95,14 +100,14 @@ export function Hero({ banners }: { banners?: HomeHeroBanner[] }) {
               {slide.mobileImageUrl ? (
                 <>
                   <div className="relative block sm:hidden w-full h-full">
-                    <HeroMedia src={slide.mobileImageUrl} alt={slide.title || "Hero Banner"} priority={index === 0} sizes="(max-width: 639px) 100vw, 1px" />
+                    <HeroMedia src={slide.mobileImageUrl} alt={slide.title || "Hero Banner"} priority={index === 0} sizes="(max-width: 639px) 100vw, 1px" focus={bannerFocusProps(slide.desktopFocus, slide.mobileFocus)} />
                   </div>
                   <div className="relative hidden sm:block w-full h-full">
-                    <HeroMedia src={slide.desktopImageUrl} alt={slide.title || "Hero Banner"} priority={index === 0} sizes="(min-width: 640px) 100vw, 1px" />
+                    <HeroMedia src={slide.desktopImageUrl} alt={slide.title || "Hero Banner"} priority={index === 0} sizes="(min-width: 640px) 100vw, 1px" focus={bannerFocusProps(slide.desktopFocus, slide.mobileFocus)} />
                   </div>
                 </>
               ) : (
-                <HeroMedia src={slide.desktopImageUrl} alt={slide.title || "Hero Banner"} priority={index === 0} />
+                <HeroMedia src={slide.desktopImageUrl} alt={slide.title || "Hero Banner"} priority={index === 0} focus={bannerFocusProps(slide.desktopFocus, slide.mobileFocus)} />
               )}
 
               {/* Gradient Dark Overlay */}

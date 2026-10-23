@@ -1,11 +1,14 @@
 import Image from "next/image"
 import Link from "next/link"
 
+import { bannerFocusProps } from "@/lib/banner-media"
 import type { HomeEditorialBanner } from "@/lib/server/dal/banners"
+import { cn } from "@/lib/utils"
 
 /** `width` is the panel's share of the viewport on desktop, e.g. "61vw". */
 function SplitPanel({ banner, width }: { banner: HomeEditorialBanner; width: string }) {
   const alt = banner.title || "SUOS editorial"
+  const focus = bannerFocusProps(banner.desktopFocus, banner.mobileFocus, "md")
 
   const media = (
     <div className="relative aspect-[4/5] h-full w-full overflow-hidden bg-[#f3f0ea] md:aspect-auto">
@@ -16,18 +19,20 @@ function SplitPanel({ banner, width }: { banner: HomeEditorialBanner; width: str
             alt={alt}
             fill
             sizes="(max-width: 767px) 100vw, 1px"
-            className="object-cover object-center md:hidden"
+            className={cn("object-cover object-center md:hidden", focus.className)}
+            style={focus.style}
           />
           <Image
             src={banner.desktopImageUrl}
             alt={alt}
             fill
             sizes={`(max-width: 767px) 1px, ${width}`}
-            className="hidden object-cover object-center md:block"
+            className={cn("hidden object-cover object-center md:block", focus.className)}
+            style={focus.style}
           />
         </>
       ) : (
-        <Image src={banner.desktopImageUrl} alt={alt} fill sizes={`(max-width: 767px) 100vw, ${width}`} className="object-cover object-center" />
+        <Image src={banner.desktopImageUrl} alt={alt} fill sizes={`(max-width: 767px) 100vw, ${width}`} className={cn("object-cover object-center", focus.className)} style={focus.style} />
       )}
     </div>
   )

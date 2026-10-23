@@ -106,6 +106,9 @@ export function BannerEditor({
   const [textAlignment, setTextAlignment] = useState<BannerTextAlignment>(
     banner?.textAlignment ?? "CENTER",
   )
+  // Crop focus per device ("x% y%"); null = centre. Set by dragging in the preview.
+  const [desktopFocus, setDesktopFocus] = useState<string | null>(banner?.desktopFocus ?? null)
+  const [mobileFocus, setMobileFocus] = useState<string | null>(banner?.mobileFocus ?? null)
   const [overlayOpacity, setOverlayOpacity] = useState<number>(
     banner?.overlayOpacity ?? 20,
   )
@@ -440,6 +443,8 @@ export function BannerEditor({
         placement,
         textAlignment,
         overlayOpacity,
+        desktopFocus,
+        mobileFocus,
         isActive,
         position,
       }
@@ -1270,6 +1275,10 @@ export function BannerEditor({
                 subtitle={subtitle}
                 ctaText={ctaText}
                 textAlignment={textAlignment}
+                desktopFocus={desktopFocus}
+                mobileFocus={mobileFocus}
+                onDesktopFocusChange={setDesktopFocus}
+                onMobileFocusChange={setMobileFocus}
               />
             </div>
           </div>

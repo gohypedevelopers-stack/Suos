@@ -26,6 +26,9 @@ export type AdminBannerListItem = {
   desktopImageUrl: string
   desktopImageKey: string
   mobileImageUrl: string | null
+  /** Crop focus (CSS object-position); null = centre. */
+  desktopFocus?: string | null
+  mobileFocus?: string | null
   mobileImageKey: string | null
   ctaText: string | null
   ctaLink: string | null
@@ -45,6 +48,9 @@ export type AdminBannerDetail = {
   desktopImageUrl: string
   mobileImageKey: string | null
   mobileImageUrl: string | null
+  /** Crop focus (CSS object-position); null = centre. */
+  desktopFocus?: string | null
+  mobileFocus?: string | null
   ctaText: string | null
   ctaLink: string | null
   placement: BannerPlacement
@@ -60,6 +66,9 @@ export type HomeHeroBanner = {
   subtitle: string | null
   desktopImageUrl: string
   mobileImageUrl: string | null
+  /** Crop focus (CSS object-position); null = centre. */
+  desktopFocus?: string | null
+  mobileFocus?: string | null
   ctaText: string | null
   ctaLink: string | null
   textAlignment: BannerTextAlignment
@@ -72,6 +81,9 @@ export type HomeBannerSectionItem = {
   subtitle: string | null
   desktopImageUrl: string
   mobileImageUrl: string | null
+  /** Crop focus (CSS object-position); null = centre. */
+  desktopFocus?: string | null
+  mobileFocus?: string | null
   ctaText: string | null
   ctaLink: string | null
   overlayOpacity: number
@@ -83,6 +95,9 @@ export type HomeEditorialBanner = {
   subtitle: string | null
   desktopImageUrl: string
   mobileImageUrl: string | null
+  /** Crop focus (CSS object-position); null = centre. */
+  desktopFocus?: string | null
+  mobileFocus?: string | null
   ctaText: string | null
   ctaLink: string | null
   position: number
@@ -94,6 +109,9 @@ export type HomeCarouselSlide = {
   subtitle: string | null
   desktopImageUrl: string
   mobileImageUrl: string | null
+  /** Crop focus (CSS object-position); null = centre. */
+  desktopFocus?: string | null
+  mobileFocus?: string | null
   ctaText: string | null
   ctaLink: string | null
   position: number
@@ -134,6 +152,8 @@ export async function listBannersForAdmin(): Promise<AdminBannerListItem[]> {
     desktopImageUrl: imageUrl(banner.desktopImageKey) ?? banner.desktopImageKey,
     desktopImageKey: banner.desktopImageKey,
     mobileImageUrl: imageUrl(banner.mobileImageKey),
+    desktopFocus: banner.desktopFocus,
+    mobileFocus: banner.mobileFocus,
     mobileImageKey: banner.mobileImageKey,
     ctaText: banner.ctaText,
     ctaLink: banner.ctaLink,
@@ -169,6 +189,8 @@ export async function listHeroSlidesForAdmin(): Promise<AdminBannerListItem[]> {
     desktopImageUrl: imageUrl(banner.desktopImageKey) ?? banner.desktopImageKey,
     desktopImageKey: banner.desktopImageKey,
     mobileImageUrl: imageUrl(banner.mobileImageKey),
+    desktopFocus: banner.desktopFocus,
+    mobileFocus: banner.mobileFocus,
     mobileImageKey: banner.mobileImageKey,
     ctaText: banner.ctaText,
     ctaLink: banner.ctaLink,
@@ -203,6 +225,8 @@ export async function getBannerForAdmin(id: string): Promise<AdminBannerDetail |
     desktopImageUrl: imageUrl(banner.desktopImageKey) ?? banner.desktopImageKey,
     mobileImageKey: banner.mobileImageKey,
     mobileImageUrl: imageUrl(banner.mobileImageKey),
+    desktopFocus: banner.desktopFocus,
+    mobileFocus: banner.mobileFocus,
     ctaText: banner.ctaText,
     ctaLink: banner.ctaLink,
     placement: banner.placement as BannerPlacement,
@@ -366,6 +390,8 @@ export async function getHomeBanners(): Promise<HomeBanners> {
             subtitle: b.subtitle,
             desktopImageUrl: imageUrl(b.desktopImageKey) ?? b.desktopImageKey,
             mobileImageUrl: imageUrl(b.mobileImageKey),
+            desktopFocus: b.desktopFocus,
+            mobileFocus: b.mobileFocus,
             ctaText: b.ctaText,
             ctaLink: b.ctaLink,
             textAlignment: (b.textAlignment as BannerTextAlignment) || "CENTER",
@@ -379,6 +405,8 @@ export async function getHomeBanners(): Promise<HomeBanners> {
       subtitle: b.subtitle,
       desktopImageUrl: imageUrl(b.desktopImageKey) ?? b.desktopImageKey,
       mobileImageUrl: imageUrl(b.mobileImageKey),
+      desktopFocus: b.desktopFocus,
+      mobileFocus: b.mobileFocus,
       ctaText: b.ctaText,
       ctaLink: b.ctaLink,
       position: b.position,
@@ -393,6 +421,8 @@ export async function getHomeBanners(): Promise<HomeBanners> {
           subtitle: featureBanner.subtitle,
           desktopImageUrl: imageUrl(featureBanner.desktopImageKey) ?? featureBanner.desktopImageKey,
           mobileImageUrl: imageUrl(featureBanner.mobileImageKey),
+          desktopFocus: featureBanner.desktopFocus,
+          mobileFocus: featureBanner.mobileFocus,
           ctaText: featureBanner.ctaText,
           ctaLink: featureBanner.ctaLink,
           overlayOpacity: featureBanner.overlayOpacity,
@@ -406,6 +436,8 @@ export async function getHomeBanners(): Promise<HomeBanners> {
           subtitle: middleBanner.subtitle,
           desktopImageUrl: imageUrl(middleBanner.desktopImageKey) ?? middleBanner.desktopImageKey,
           mobileImageUrl: imageUrl(middleBanner.mobileImageKey),
+          desktopFocus: middleBanner.desktopFocus,
+          mobileFocus: middleBanner.mobileFocus,
           ctaText: middleBanner.ctaText,
           ctaLink: middleBanner.ctaLink,
           overlayOpacity: middleBanner.overlayOpacity,
@@ -420,6 +452,8 @@ export async function getHomeBanners(): Promise<HomeBanners> {
           subtitle: bottomBanner.subtitle,
           desktopImageUrl: imageUrl(bottomBanner.desktopImageKey) ?? bottomBanner.desktopImageKey,
           mobileImageUrl: imageUrl(bottomBanner.mobileImageKey),
+          desktopFocus: bottomBanner.desktopFocus,
+          mobileFocus: bottomBanner.mobileFocus,
           ctaText: bottomBanner.ctaText,
           ctaLink: bottomBanner.ctaLink,
           overlayOpacity: bottomBanner.overlayOpacity,
@@ -434,6 +468,8 @@ export async function getHomeBanners(): Promise<HomeBanners> {
             subtitle: b.subtitle,
             desktopImageUrl: imageUrl(b.desktopImageKey) ?? b.desktopImageKey,
             mobileImageUrl: imageUrl(b.mobileImageKey),
+            desktopFocus: b.desktopFocus,
+            mobileFocus: b.mobileFocus,
             ctaText: b.ctaText,
             ctaLink: b.ctaLink,
             position: b.position,
@@ -448,6 +484,8 @@ export async function getHomeBanners(): Promise<HomeBanners> {
             subtitle: b.subtitle,
             desktopImageUrl: imageUrl(b.desktopImageKey) ?? b.desktopImageKey,
             mobileImageUrl: imageUrl(b.mobileImageKey),
+            desktopFocus: b.desktopFocus,
+            mobileFocus: b.mobileFocus,
             ctaText: b.ctaText,
             ctaLink: b.ctaLink,
             position: b.position,

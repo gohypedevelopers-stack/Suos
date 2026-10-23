@@ -4,7 +4,9 @@ import Image from "next/image"
 import Link from "next/link"
 
 import { useContinuousDraggableCarousel } from "./useContinuousDraggableCarousel"
+import { bannerFocusProps } from "@/lib/banner-media"
 import type { HomeCarouselSlide } from "@/lib/server/dal/banners"
+import { cn } from "@/lib/utils"
 
 type CategoryTile = {
   id: string
@@ -12,6 +14,8 @@ type CategoryTile = {
   alt: string
   label: string
   href: string
+  desktopFocus?: string | null
+  mobileFocus?: string | null
 }
 
 /** Shown until the Denim Carousel slides are set in Banners → 04. */
@@ -36,12 +40,15 @@ function toTile(slide: HomeCarouselSlide): CategoryTile {
     image: slide.desktopImageUrl,
     alt: slide.title || `${label} collection`,
     label,
+    desktopFocus: slide.desktopFocus,
+    mobileFocus: slide.mobileFocus,
     // A bare "/collections" link is the old seed default; prefer the collection page.
     href: link && link !== "/collections" ? link : `/collections/${slugify(label)}`,
   }
 }
 
 function TileCard({ tile, hidden }: { tile: CategoryTile; hidden: boolean }) {
+  const focus = bannerFocusProps(tile.desktopFocus, tile.mobileFocus)
   return (
     <Link
       href={tile.href}
@@ -58,7 +65,8 @@ function TileCard({ tile, hidden }: { tile: CategoryTile; hidden: boolean }) {
         fill
         draggable={false}
         sizes="(max-width: 639px) 80vw, (max-width: 1023px) 55vw, 40vw"
-        className="pointer-events-none object-cover object-center"
+        className={cn("pointer-events-none object-cover object-center", focus.className)}
+        style={focus.style}
       />
       <span className="pointer-events-none absolute bottom-5 left-5 z-10 text-[18px] font-medium uppercase leading-none tracking-normal text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)] sm:bottom-6 sm:left-6 lg:text-h3">
         <span className="border-b border-transparent pb-0.5 transition-colors duration-200 group-hover:border-current">

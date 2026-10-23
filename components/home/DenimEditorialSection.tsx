@@ -3,6 +3,7 @@ import Link from "next/link"
 import { Heart } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { bannerFocusProps } from "@/lib/banner-media"
 import type { HomeEditorialBanner } from "@/lib/server/dal/banners"
 
 type DenimPanelProps = {
@@ -12,6 +13,8 @@ type DenimPanelProps = {
   href?: string | null
   className?: string
   imageClassName?: string
+  /** Crop focus chosen in the admin. */
+  focus?: ReturnType<typeof bannerFocusProps>
   sizes?: string
   /** Figma marks the two jacket shots as shoppable with a heart in the corner. */
   showHeart?: boolean
@@ -24,6 +27,7 @@ function DenimPanel({
   href,
   className,
   imageClassName,
+  focus = {},
   sizes = "(max-width: 767px) 100vw, 50vw",
   showHeart = false,
 }: DenimPanelProps) {
@@ -37,7 +41,8 @@ function DenimPanel({
               alt={alt}
               fill
               sizes="(max-width: 639px) 100vw, 1px"
-              className={cn("object-cover object-center", imageClassName)}
+              className={cn("object-cover object-center", imageClassName, focus.className)}
+              style={focus.style}
             />
           </div>
           <div className="relative hidden sm:block w-full h-full">
@@ -46,7 +51,8 @@ function DenimPanel({
               alt={alt}
               fill
               sizes="(max-width: 639px) 1px, 50vw"
-              className={cn("object-cover object-center", imageClassName)}
+              className={cn("object-cover object-center", imageClassName, focus.className)}
+              style={focus.style}
             />
           </div>
         </>
@@ -56,7 +62,8 @@ function DenimPanel({
           alt={alt}
           fill
           sizes={sizes}
-          className={cn("object-cover object-center", imageClassName)}
+          className={cn("object-cover object-center", imageClassName, focus.className)}
+              style={focus.style}
         />
       )}
       {showHeart ? (
@@ -98,6 +105,7 @@ export function DenimEditorialSection({
   const p1Link = banner1?.ctaLink
 
   const p2Src = banner2?.desktopImageUrl || "/images/products/product8.png"
+  const bottomFocus = bannerFocusProps(banner2?.desktopFocus, banner2?.mobileFocus)
   const p2MobileSrc = banner2?.mobileImageUrl
   const p2Alt = banner2?.title || "Model reclining in a denim look across stacked screens"
   const p2Link = banner2?.ctaLink
@@ -112,7 +120,8 @@ export function DenimEditorialSection({
               alt={p2Alt}
               fill
               sizes="(max-width: 639px) 100vw, 1px"
-              className="object-cover object-[center_44%]"
+              className={cn("object-cover object-[center_44%]", bottomFocus.className)}
+              style={bottomFocus.style}
             />
           </div>
           <div className="relative hidden sm:block w-full h-full">
@@ -121,7 +130,8 @@ export function DenimEditorialSection({
               alt={p2Alt}
               fill
               sizes="(min-width: 640px) 100vw, 1px"
-              className="object-cover object-[center_44%]"
+              className={cn("object-cover object-[center_44%]", bottomFocus.className)}
+              style={bottomFocus.style}
             />
           </div>
         </>
@@ -131,7 +141,8 @@ export function DenimEditorialSection({
           alt={p2Alt}
           fill
           sizes="100vw"
-          className="object-cover object-[center_44%]"
+          className={cn("object-cover object-[center_44%]", bottomFocus.className)}
+              style={bottomFocus.style}
         />
       )}
     </div>
@@ -149,6 +160,7 @@ export function DenimEditorialSection({
           href={p0Link}
           className="aspect-square w-full"
           imageClassName="object-[center_22%]"
+          focus={bannerFocusProps(banner0?.desktopFocus, banner0?.mobileFocus)}
           showHeart
         />
         <DenimPanel
@@ -158,6 +170,7 @@ export function DenimEditorialSection({
           href={p1Link}
           className="aspect-square w-full"
           imageClassName="object-[center_32%]"
+          focus={bannerFocusProps(banner1?.desktopFocus, banner1?.mobileFocus)}
           showHeart
         />
       </div>

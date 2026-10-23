@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 
-import { isVideoMedia } from "@/lib/banner-media"
+import { bannerFocusProps, isVideoMedia } from "@/lib/banner-media"
 import type { HomeBannerSectionItem } from "@/lib/server/dal/banners"
 import { cn } from "@/lib/utils"
 
@@ -10,12 +10,15 @@ function BannerMedia({
   alt,
   className,
   sizes = "100vw",
+  focus = {},
 }: {
   src: string
   alt: string
   className?: string
   /** The phone/desktop variants are each hidden at the other size. */
   sizes?: string
+  /** Crop focus chosen in the admin. */
+  focus?: ReturnType<typeof bannerFocusProps>
 }) {
   if (isVideoMedia(src)) {
     return (
@@ -27,7 +30,8 @@ function BannerMedia({
         playsInline
         preload="auto"
         aria-label={alt}
-        className={cn("absolute inset-0 h-full w-full object-cover object-center", className)}
+        className={cn("absolute inset-0 h-full w-full object-cover object-center", className, focus.className)}
+        style={focus.style}
       />
     )
   }
@@ -38,7 +42,8 @@ function BannerMedia({
       alt={alt}
       fill
       sizes={sizes}
-      className={cn("object-cover object-center", className)}
+      className={cn("object-cover object-center", className, focus.className)}
+      style={focus.style}
     />
   )
 }
@@ -61,20 +66,21 @@ export function FullWidthBanner({
   const desktopSrc = banner.desktopImageUrl || fallbackSrc
   const alt = banner.title || defaultAlt
   const link = banner.ctaLink?.trim()
+  const focus = bannerFocusProps(banner.desktopFocus, banner.mobileFocus)
 
   const content = (
     <section className={cn("group/banner relative w-full overflow-hidden bg-black", className)}>
       {banner.mobileImageUrl ? (
         <>
           <div className="absolute inset-0 sm:hidden">
-            <BannerMedia src={banner.mobileImageUrl} alt={alt} sizes="(max-width: 639px) 100vw, 1px" />
+            <BannerMedia src={banner.mobileImageUrl} alt={alt} sizes="(max-width: 639px) 100vw, 1px" focus={focus} />
           </div>
           <div className="absolute inset-0 hidden sm:block">
-            <BannerMedia src={desktopSrc} alt={alt} sizes="(min-width: 640px) 100vw, 1px" />
+            <BannerMedia src={desktopSrc} alt={alt} sizes="(min-width: 640px) 100vw, 1px" focus={focus} />
           </div>
         </>
       ) : (
-        <BannerMedia src={desktopSrc} alt={alt} />
+        <BannerMedia src={desktopSrc} alt={alt} focus={focus} />
       )}
 
       {banner.overlayOpacity ? (
