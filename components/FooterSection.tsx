@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 
+import { ContactLineItem } from "@/components/ContactLines"
 import { useSiteContent } from "@/lib/site-content-context"
 import { cn } from "@/lib/utils"
 
@@ -104,26 +105,18 @@ export function FooterSection() {
 
             <FooterGroup title="Contact">
               <div className="space-y-4">
-                <div>
-                  <p>For customer care</p>
-                  <p className="break-all normal-case tracking-normal text-black">
-                    {footer.careEmail}
-                  </p>
-                </div>
-
-                <div>
-                  <p>For online orders</p>
-                  <p className="normal-case tracking-normal text-black">
-                    {footer.ordersPhone}
-                  </p>
-                </div>
-
-                <div>
-                  <p>Timings</p>
-                  <p className="normal-case tracking-normal text-black">
-                    {footer.timings}
-                  </p>
-                </div>
+                {footer.contactGroups.map((group, index) => (
+                  <div key={`${group.heading}-${index}`}>
+                    <p>{group.heading}</p>
+                    {group.lines.map((line, lineIndex) => (
+                      <ContactLineItem
+                        key={lineIndex}
+                        line={line}
+                        className="normal-case tracking-normal text-black"
+                      />
+                    ))}
+                  </div>
+                ))}
               </div>
             </FooterGroup>
           </div>

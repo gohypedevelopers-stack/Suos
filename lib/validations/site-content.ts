@@ -1,5 +1,6 @@
 import { z } from "zod"
 
+import { contactGroupsFromLegacy, isValidContactLine } from "@/lib/contact-lines"
 import { DEFAULT_SITE_CONTENT } from "@/lib/site-content"
 
 const shortText = z.string().trim().max(200)
@@ -146,11 +147,37 @@ export const siteContentSchemas = {
     chatHours: shortText,
     faqs: z.array(z.object({ question: mediumText.min(1), answer: longText.min(1) })).max(30),
   }),
-  footer: z.object({
-    careEmail: shortText,
-    ordersPhone: shortText,
-    timings: shortText,
-  }),
+  // Older rows stored three fixed fields; they are converted to groups on read.
+  footer: z.preprocess(
+    (raw) => {
+      if (!raw || typeof raw !== "object" || Array.isArray(raw)) return raw
+      const value = raw as Record<string, unknown>
+      return Array.isArray(value.contactGroups) ? value : { contactGroups: contactGroupsFromLegacy(value) }
+    },
+    z.object({
+      contactGroups: z
+        .array(
+          z.object({
+            heading: shortText.min(1, "Give each contact group a heading."),
+            lines: z
+              .array(
+                z
+                  .object({
+                    type: z.enum(["email", "phone", "whatsapp", "text"]),
+                    label: shortText,
+                    value: shortText.min(1, "Fill in or remove empty contact lines."),
+                  })
+                  .refine(isValidContactLine, {
+                    message: "Check the contact lines: emails need an @, phone and WhatsApp numbers need at least 7 digits.",
+                  }),
+              )
+              .min(1, "Each contact group needs at least one line.")
+              .max(10),
+          }),
+        )
+        .max(8),
+    }),
+  ),
   returnsPage: z.object({
     title: shortText.min(1),
     image: imagePath,

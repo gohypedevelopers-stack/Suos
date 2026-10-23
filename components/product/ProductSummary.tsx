@@ -29,6 +29,7 @@ import type { ProductCard as HomeProductCard } from "@/components/home/TrendingS
 import { SizeChartModal } from "@/components/product/SizeChartModal"
 import { useCart } from "@/lib/cart-context"
 import { useSiteContent } from "@/lib/site-content-context"
+import { ContactLineItem } from "@/components/ContactLines"
 import type { ProductCard } from "@/components/product/productData"
 
 const deliveryIcons = {
@@ -464,9 +465,14 @@ export function ProductSummary({
             <Section title="Origin & Contact">
               <ul className="space-y-2">
                 {origin ? <li>Country of Origin: {origin}</li> : null}
-                <li>Customer care: {footer.careEmail}</li>
-                <li>Online orders: {footer.ordersPhone}</li>
-                <li>{footer.timings}</li>
+                {footer.contactGroups.map((group, index) => (
+                  <li key={`${group.heading}-${index}`}>
+                    <span className="text-ink-800">{group.heading}</span>
+                    {group.lines.map((line, lineIndex) => (
+                      <ContactLineItem key={lineIndex} line={line} />
+                    ))}
+                  </li>
+                ))}
               </ul>
             </Section>
           ) : null}

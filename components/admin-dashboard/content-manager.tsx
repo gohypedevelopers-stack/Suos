@@ -6,6 +6,7 @@ import { ArrowDown, ArrowUp, ImageIcon, LayoutTemplate, Loader2, Plus, RotateCcw
 import { toast } from "sonner"
 
 import { isVideoMedia } from "@/lib/banner-media"
+import { CONTACT_LINE_TYPES, isValidContactLine } from "@/lib/contact-lines"
 
 import { resetSiteContentAction, saveSiteContentAction } from "@/app/actions/site-content"
 import { Button } from "@/components/ui/button"
@@ -374,11 +375,101 @@ function ContactEditor({ value, onChange }: SectionProps<"contact">) {
 }
 
 function FooterEditor({ value, onChange }: SectionProps<"footer">) {
+  const groups = value.contactGroups
+  const setGroups = (next: typeof groups) => onChange({ ...value, contactGroups: next })
+  const setGroup = (index: number, patch: Partial<(typeof groups)[number]>) =>
+    setGroups(groups.map((g, i) => (i === index ? { ...g, ...patch } : g)))
+  const selectClass =
+    "h-9 rounded-md border border-input bg-transparent px-2 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+
   return (
-    <div className="grid gap-4 md:grid-cols-3">
-      <Field label="Customer care email"><Input value={value.careEmail} onChange={(e) => onChange({ ...value, careEmail: e.target.value })} /></Field>
-      <Field label="Orders phone"><Input value={value.ordersPhone} onChange={(e) => onChange({ ...value, ordersPhone: e.target.value })} /></Field>
-      <Field label="Timings"><Input value={value.timings} onChange={(e) => onChange({ ...value, timings: e.target.value })} /></Field>
+    <div className="space-y-4">
+      <p className="text-xs text-black/55">
+        The Contact column of the footer (also used in the product page&apos;s &ldquo;Origin &amp; Contact&rdquo;). Add as many
+        groups and lines as you need. Emails, phone and WhatsApp numbers become clickable; the label is optional
+        (e.g. &ldquo;Customer Care&rdquo; shows as &ldquo;Customer Care: +91…&rdquo;).
+      </p>
+      {groups.map((group, index) => (
+        <div key={index} className="rounded-lg border border-black/10 p-3">
+          <div className="flex items-end justify-between gap-2">
+            <Field label="Group heading">
+              <Input
+                value={group.heading}
+                placeholder="For customer care"
+                onChange={(e) => setGroup(index, { heading: e.target.value })}
+              />
+            </Field>
+            <ListControls
+              index={index}
+              count={groups.length}
+              onMove={(from, to) => setGroups(move(groups, from, to))}
+              onRemove={(i) => setGroups(groups.filter((_, j) => j !== i))}
+            />
+          </div>
+
+          <div className="mt-3 space-y-2">
+            {group.lines.map((line, lineIndex) => {
+              const setLine = (patch: Partial<typeof line>) =>
+                setGroup(index, { lines: group.lines.map((l, k) => (k === lineIndex ? { ...l, ...patch } : l)) })
+              return (
+                <div key={lineIndex} className="grid items-center gap-2 sm:grid-cols-[120px_minmax(0,0.8fr)_minmax(0,1.4fr)_auto]">
+                  <select
+                    aria-label="Line type"
+                    className={selectClass}
+                    value={line.type}
+                    onChange={(e) => setLine({ type: e.target.value as typeof line.type })}
+                  >
+                    {CONTACT_LINE_TYPES.map((t) => (
+                      <option key={t.value} value={t.value}>{t.label}</option>
+                    ))}
+                  </select>
+                  <Input
+                    aria-label="Label (optional)"
+                    placeholder="Label (optional)"
+                    value={line.label}
+                    onChange={(e) => setLine({ label: e.target.value })}
+                  />
+                  <Input
+                    aria-label="Value"
+                    placeholder={
+                      line.type === "email" ? "care@suosindia.com" : line.type === "text" ? "Mon-Sat : 9AM - 8PM" : "+91 72680 18889"
+                    }
+                    value={line.value}
+                    aria-invalid={line.value.trim() !== "" && !isValidContactLine(line)}
+                    onChange={(e) => setLine({ value: e.target.value })}
+                  />
+                  <ListControls
+                    index={lineIndex}
+                    count={group.lines.length}
+                    onMove={(from, to) => setGroup(index, { lines: move(group.lines, from, to) })}
+                    onRemove={(k) => setGroup(index, { lines: group.lines.filter((_, m) => m !== k) })}
+                  />
+                </div>
+              )
+            })}
+            <div className="flex flex-wrap gap-2 pt-1">
+              {CONTACT_LINE_TYPES.map((t) => (
+                <Button
+                  key={t.value}
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setGroup(index, { lines: [...group.lines, { type: t.value, label: "", value: "" }] })}
+                >
+                  <Plus className="size-3.5" /> {t.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </div>
+      ))}
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => setGroups([...groups, { heading: "", lines: [{ type: "text", label: "", value: "" }] }])}
+      >
+        <Plus className="size-3.5" /> Add group
+      </Button>
     </div>
   )
 }

@@ -1,3 +1,5 @@
+import type { ContactGroup } from "@/lib/contact-lines"
+
 /**
  * Editable storefront content. The defaults below are exactly what the
  * storefront rendered before the content manager existed, so an empty
@@ -111,9 +113,8 @@ export type ContactContent = {
 }
 
 export type FooterContent = {
-  careEmail: string
-  ordersPhone: string
-  timings: string
+  /** Contact column: any number of groups, each with emails / phones / text. */
+  contactGroups: ContactGroup[]
 }
 
 export type ReturnsPageContent = {
@@ -311,9 +312,11 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     ],
   },
   footer: {
-    careEmail: "info@suos.in",
-    ordersPhone: "+91 000000000",
-    timings: "Mon-Sat : 9AM - 8PM",
+    contactGroups: [
+      { heading: "For customer care", lines: [{ type: "email", label: "", value: "info@suos.in" }] },
+      { heading: "For online orders", lines: [{ type: "phone", label: "", value: "+91 000000000" }] },
+      { heading: "Timings", lines: [{ type: "text", label: "", value: "Mon-Sat : 9AM - 8PM" }] },
+    ],
   },
   returnsPage: {
     title: "Place a refund/ exchange request",
