@@ -24,6 +24,7 @@ import { toast } from "sonner"
 
 import { placeOrderAction } from "@/app/actions/checkout"
 import { getSessionId, track } from "@/lib/analytics-client"
+import { usePageContent } from "@/lib/site-content-context"
 
 /* ─────────────────────────────────────────────
    Helpers & Options
@@ -261,6 +262,7 @@ function PaymentSection({
   setSelectedMethod: (m: string) => void
   total: number
 }) {
+  const page = usePageContent("checkoutPage")
   const [upiId, setUpiId] = useState("")
   const [cardNumber, setCardNumber] = useState("")
   const [cardExpiry, setCardExpiry] = useState("")
@@ -272,10 +274,10 @@ function PaymentSection({
     <div className="space-y-6 pt-4">
       <div className="space-y-3">
         <h2 className="text-[20px] font-normal uppercase tracking-[0.04em] text-black sm:text-[22px]">
-          Payment
+          {page.text("payment", "heading")}
         </h2>
         <p className="text-[12px] uppercase tracking-[0.04em] text-black/50">
-          All transactions are encrypted and secure.
+          {page.text("payment", "text")}
         </p>
       </div>
 
@@ -481,6 +483,7 @@ function CheckoutRightSummary({
   subtotal: number
   shippingCost: number
 }) {
+  const page = usePageContent("checkoutPage")
   const { cart } = useCart()
   const [bagOpen, setBagOpen] = useState(true)
   const [promoOpen, setPromoOpen] = useState(false)
@@ -578,6 +581,7 @@ function CheckoutRightSummary({
       </div>
 
       {/* Promo Code Accordion */}
+      {page.show("promo") ? (
       <div className="mt-5 border-t border-black/15 pt-4">
         <button
           type="button"
@@ -586,7 +590,7 @@ function CheckoutRightSummary({
         >
           <span className="flex items-center gap-2">
             <Tag className="size-3.5" />
-            Have a promo code?
+            {page.text("promo", "label")}
           </span>
           <ChevronDown
             className={`size-4 transition-transform duration-200 ${
@@ -619,6 +623,7 @@ function CheckoutRightSummary({
           </p>
         )}
       </div>
+      ) : null}
 
       {/* Total */}
       <div className="mt-5 border-t border-black pt-4">
@@ -631,20 +636,28 @@ function CheckoutRightSummary({
           </span>
         </div>
 
-        <p className="mt-2 text-[11px] leading-[1.5] tracking-[0.02em] text-black/65">
-          4 payments of <strong className="text-black">{formatPrice(installment)}</strong> with UPI or Netbanking ⓘ
-        </p>
+        {page.show("installments") ? (
+          <p className="mt-2 text-[11px] leading-[1.5] tracking-[0.02em] text-black/65">
+            4 payments of <strong className="text-black">{formatPrice(installment)}</strong> with UPI or Netbanking ⓘ
+          </p>
+        ) : null}
       </div>
 
       {/* Authenticity & Perks */}
-      <div className="mt-8 space-y-2 border-t border-black/15 pt-5 text-center text-[11px] uppercase tracking-[0.04em] text-black/55">
-        <div className="flex items-center justify-center gap-1.5 text-black/80 font-normal">
-          <Lock className="size-3.5" />
-          <span>Encrypted 256-bit Secure Checkout</span>
+      {page.show("trust") && page.lines("trust", "lines").length > 0 ? (
+        <div className="mt-8 space-y-2 border-t border-black/15 pt-5 text-center text-[11px] uppercase tracking-[0.04em] text-black/55">
+          {page.lines("trust", "lines").map((line, index) =>
+            index === 0 ? (
+              <div key={line} className="flex items-center justify-center gap-1.5 text-black/80 font-normal">
+                <Lock className="size-3.5" />
+                <span>{line}</span>
+              </div>
+            ) : (
+              <p key={line}>{line}</p>
+            ),
+          )}
         </div>
-        <p>100% Authentic SUOS Atelier Guarantee</p>
-        <p>Complimentary 30-Day Returns</p>
-      </div>
+      ) : null}
     </aside>
   )
 }
@@ -653,6 +666,7 @@ function CheckoutRightSummary({
    Main Checkout & Payment Page
 ───────────────────────────────────────────── */
 export function CheckoutPage() {
+  const page = usePageContent("checkoutPage")
   const { cart, totalItems, clearCart } = useCart()
 
   // Form State
@@ -771,13 +785,13 @@ export function CheckoutPage() {
             <CheckCircle2 className="size-10" />
           </div>
           <h1 className="mt-6 text-[24px] font-normal uppercase leading-[1.15] tracking-[0.02em] text-black sm:text-[28px]">
-            Thank You For Your Order
+            {page.text("thankYou", "heading")}
           </h1>
           <p className="mt-2 text-[14px] uppercase tracking-[0.04em] text-black/60">
             Order Reference: <strong className="text-black">{orderId}</strong>
           </p>
           <p className="mx-auto mt-4 max-w-md text-[13px] leading-[1.5] text-black/60">
-            A confirmation receipt and tracking updates have been dispatched to{" "}
+            {page.text("thankYou", "text")}{" "}
             <strong className="text-black">{email || "your email"}</strong>.
           </p>
 
@@ -840,12 +854,14 @@ export function CheckoutPage() {
 
           {/* Help & Bag Icon with Item Count */}
           <div className="flex items-center gap-5 text-[12px] tracking-[0.04em] text-black/60">
-            <div className="hidden items-center gap-2 sm:flex">
-              <span>Need help?</span>
-              <a href="mailto:info@suos.in" className="text-black underline underline-offset-2 hover:opacity-75">
-                Email us
-              </a>
-            </div>
+            {page.show("help") ? (
+              <div className="hidden items-center gap-2 sm:flex">
+                <span>{page.text("help", "text")}</span>
+                <a href={`mailto:${page.text("help", "email")}`} className="text-black underline underline-offset-2 hover:opacity-75">
+                  {page.text("help", "link")}
+                </a>
+              </div>
+            ) : null}
 
             {/* Shopping Bag Icon with Count Badge */}
             <Link
@@ -872,10 +888,10 @@ export function CheckoutPage() {
           <div className="space-y-10">
 
             {/* Express Checkout Section */}
-            {step === "details" && (
+            {step === "details" && page.show("express") && (
               <div>
                 <p className="text-center text-[12px] uppercase tracking-[0.04em] text-black/60">
-                  Express Checkout
+                  {page.text("express", "heading")}
                 </p>
                 <div className="mt-3 grid grid-cols-2 gap-2 sm:gap-3">
                   <button
@@ -921,7 +937,7 @@ export function CheckoutPage() {
                 {/* 1. Email Address */}
                 <section className="space-y-4">
                   <h2 className="text-[20px] font-normal uppercase tracking-[0.04em] text-black sm:text-[22px]">
-                    Email Address
+                    {page.text("contact", "heading")}
                   </h2>
                   <FloatingField
                     id="email"
@@ -939,7 +955,7 @@ export function CheckoutPage() {
                       className="mt-0.5 size-4 accent-black"
                     />
                     <span className="text-[12px] leading-[1.5] text-black/60">
-                      I would like to receive updates on the latest products and promotions
+                      {page.text("contact", "newsletter")}
                       via email or other channels. See{" "}
                       <Link href="/privacy" className="underline hover:text-black">
                         Privacy Policy
@@ -957,11 +973,13 @@ export function CheckoutPage() {
                 <section className="space-y-4">
                   <div>
                     <h2 className="text-[20px] font-normal uppercase tracking-[0.04em] text-black sm:text-[22px]">
-                      Shipping To
+                      {page.text("shipping", "heading")}
                     </h2>
-                    <p className="mt-1 text-[12px] uppercase tracking-[0.04em] text-black/50">
-                      Sorry we cannot ship to P.O. Boxes.
-                    </p>
+                    {page.text("shipping", "note") ? (
+                      <p className="mt-1 text-[12px] uppercase tracking-[0.04em] text-black/50">
+                        {page.text("shipping", "note")}
+                      </p>
+                    ) : null}
                   </div>
 
                   <div className="space-y-3.5">
@@ -1037,6 +1055,7 @@ export function CheckoutPage() {
                     />
 
                     {/* Free Gift Note Checkbox */}
+                    {page.show("gift") ? (
                     <div className="pt-2">
                       <label className="flex cursor-pointer items-center gap-3 text-[13px] uppercase tracking-[0.04em] text-black/75 transition-colors hover:text-black">
                         <input
@@ -1045,7 +1064,7 @@ export function CheckoutPage() {
                           onChange={(e) => setGiftNote(e.target.checked)}
                           className="size-4 accent-black"
                         />
-                        Add a free gift note
+                        {page.text("gift", "label")}
                       </label>
                       {giftNote && (
                         <textarea
@@ -1058,6 +1077,7 @@ export function CheckoutPage() {
                         />
                       )}
                     </div>
+                    ) : null}
                   </div>
                 </section>
 
@@ -1065,11 +1085,13 @@ export function CheckoutPage() {
                 <section className="space-y-4">
                   <div>
                     <h2 className="text-[20px] font-normal uppercase tracking-[0.04em] text-black sm:text-[22px]">
-                      Shipping Method
+                      {page.text("method", "heading")}
                     </h2>
-                    <p className="mt-1 text-[12px] uppercase tracking-[0.04em] text-black/50">
-                      Shipping options may update once an address is entered.
-                    </p>
+                    {page.text("method", "note") ? (
+                      <p className="mt-1 text-[12px] uppercase tracking-[0.04em] text-black/50">
+                        {page.text("method", "note")}
+                      </p>
+                    ) : null}
                   </div>
 
                   <ShippingMethodCards
@@ -1077,10 +1099,11 @@ export function CheckoutPage() {
                     onChange={setShippingMethodId}
                   />
 
-                  <p className="text-[11px] leading-[1.5] tracking-[0.02em] text-black/55">
-                    Orders placed by 12:00 pm IST Monday-Friday usually process the same day.
-                    Shipping price may update once the address is entered.
-                  </p>
+                  {page.lines("method", "info").length > 0 ? (
+                    <p className="text-[11px] leading-[1.5] tracking-[0.02em] text-black/55">
+                      {page.lines("method", "info").join(" ")}
+                    </p>
+                  ) : null}
                 </section>
 
                 {/* Continue to Payment CTA */}
@@ -1089,7 +1112,7 @@ export function CheckoutPage() {
                     type="submit"
                     className="flex h-12 w-full items-center justify-center bg-black text-[14px] font-normal uppercase tracking-[0.04em] text-white transition-opacity hover:opacity-90 active:scale-[0.99]"
                   >
-                    Continue to Payment
+                    {page.text("method", "continue")}
                   </button>
                 </div>
               </form>
@@ -1121,9 +1144,10 @@ export function CheckoutPage() {
             )}
 
             {/* Footer Trust and Legal */}
+            {page.show("footerLinks") ? (
             <div className="border-t border-black/15 pt-8 space-y-3 text-[12px] uppercase tracking-[0.04em] text-black/55">
               <p>
-                30 day returns ·{" "}
+                {page.text("footerLinks", "returns")} ·{" "}
                 <Link href="/returns-policy" className="underline hover:text-black">
                   Return Policy
                 </Link>
@@ -1150,6 +1174,7 @@ export function CheckoutPage() {
                 .
               </p>
             </div>
+            ) : null}
           </div>
 
           {/* ─── RIGHT COLUMN: Order Summary ─── */}

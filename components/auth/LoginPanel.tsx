@@ -7,8 +7,10 @@ import { type FormEvent, useState } from "react"
 import { toast } from "sonner"
 
 import { authClient } from "@/lib/auth-client"
+import { usePageContent } from "@/lib/site-content-context"
 
 export function LoginPanel() {
+  const page = usePageContent("loginPage")
   const [mobileNumber, setMobileNumber] = useState("")
   const [password, setPassword] = useState("")
   const [isPending, setIsPending] = useState(false)
@@ -75,17 +77,18 @@ export function LoginPanel() {
     <div className="w-full text-black">
       <div>
         <h1 className="font-heading text-[24px] font-normal uppercase leading-none tracking-normal">
-          Log in
+          {page.text("intro", "heading")}
         </h1>
         <p className="mt-3 max-w-sm text-justify text-[12px] uppercase leading-[1.6] tracking-normal text-black">
-          Access your favourites, follow your orders, and stay connected to the latest edits.
+          {page.text("intro", "text")}
         </p>
       </div>
 
+      {page.show("mobile") ? (
       <form className="mt-6" onSubmit={handleMobileLogin}>
         <fieldset disabled={isPending}>
           <legend className="text-[13px] font-normal uppercase leading-none">
-            Log in or register
+            {page.text("mobile", "legend")}
           </legend>
 
           <div className="mt-3 flex h-12 border border-black bg-white focus-within:ring-1 focus-within:ring-black">
@@ -114,7 +117,7 @@ export function LoginPanel() {
               onChange={(event) => {
                 setMobileNumber(event.target.value.replace(/\D/g, "").slice(0, 10))
               }}
-              placeholder="10-DIGIT MOBILE NUMBER"
+              placeholder={page.text("mobile", "placeholder").toUpperCase()}
               className="auth-form-input min-w-0 flex-1 bg-transparent px-3 text-[13px] uppercase outline-none placeholder:text-black/45"
             />
 
@@ -122,7 +125,7 @@ export function LoginPanel() {
               type="submit"
               className="shrink-0 cursor-pointer bg-black px-5 text-[13px] font-normal uppercase text-white transition-colors hover:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
             >
-              Login
+              {page.text("mobile", "button")}
             </button>
           </div>
 
@@ -138,18 +141,22 @@ export function LoginPanel() {
             >
               <Check className="size-3 stroke-[3]" />
             </span>
-            <span>Notify me for updates and offers</span>
+            <span>{page.text("mobile", "newsletter")}</span>
           </label>
         </fieldset>
       </form>
+      ) : null}
 
+      {page.show("mobile") && page.show("email") ? (
       <div className="my-5 flex items-center gap-3 text-[12px] uppercase text-black/50">
         <span aria-hidden="true" className="h-px flex-1 bg-black/15" />
         <span>OR</span>
         <span aria-hidden="true" className="h-px flex-1 bg-black/15" />
       </div>
+      ) : null}
 
-      <form onSubmit={handleEmailLogin}>
+      {page.show("email") ? (
+      <form onSubmit={handleEmailLogin} className={page.show("mobile") ? undefined : "mt-6"}>
         <fieldset disabled={isPending}>
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="block">
@@ -208,15 +215,17 @@ export function LoginPanel() {
             type="submit"
             className="mt-3 h-12 w-full cursor-pointer bg-black px-5 text-[13px] font-normal uppercase text-white transition-colors hover:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:cursor-wait disabled:bg-black/60"
           >
-            {isPending ? "Logging in…" : "Login with email"}
+            {isPending ? "Logging in…" : page.text("email", "button")}
           </button>
         </fieldset>
       </form>
+      ) : null}
 
+      {page.show("terms") ? (
       <div className="mt-3 flex items-start gap-2 text-justify text-[12px] uppercase leading-[1.5] tracking-normal text-black/50">
         <Info aria-hidden="true" className="mt-0.5 size-3.5 shrink-0 fill-black/20 stroke-white" />
         <p>
-          By proceeding, you agree to our{" "}
+          {page.text("terms", "text")}{" "}
           <Link href="/terms" className="font-medium underline underline-offset-2 hover:text-black">
             T&amp;C
           </Link>{" "}
@@ -227,20 +236,27 @@ export function LoginPanel() {
           .
         </p>
       </div>
+      ) : null}
 
+      {page.show("social") || page.show("qr") ? (
       <section className="mt-5" aria-labelledby="access-heading">
+        {page.show("social") ? (
+        <>
         <h2 id="access-heading" className="text-[13px] font-normal uppercase leading-none">
-          Access with
+          {page.text("social", "heading")}
         </h2>
         <p className="mt-2 max-w-md text-justify text-[12px] uppercase leading-[1.5] tracking-normal">
-          By logging in with my social login, I agree to link my account in accordance with the{" "}
+          {page.text("social", "text")}{" "}
           <Link href="/privacy" className="underline underline-offset-2 hover:text-black/60">
             Privacy Policy
           </Link>
           .
         </p>
+        </>
+        ) : null}
 
         <div className="mt-4 space-y-2">
+          {page.show("social") ? (
           <button
             type="button"
             onClick={handleGoogleLogin}
@@ -254,26 +270,32 @@ export function LoginPanel() {
               height={18}
               className="size-[18px]"
             />
-            <span>{isPending ? "Connecting…" : "Continue with Google"}</span>
+            <span>{isPending ? "Connecting…" : page.text("social", "google")}</span>
           </button>
+          ) : null}
 
+          {page.show("qr") ? (
           <button
             type="button"
             onClick={() => toast.info("QR login is not configured yet.")}
             className="flex h-12 w-full cursor-pointer items-center justify-center gap-3 border border-black bg-white px-4 text-[13px] font-normal uppercase transition-colors hover:bg-black hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
           >
             <QrCode aria-hidden="true" className="size-[18px] stroke-[1.6]" />
-            <span>Continue with QR</span>
+            <span>{page.text("qr", "button")}</span>
           </button>
+          ) : null}
         </div>
       </section>
+      ) : null}
 
+      {page.show("signup") ? (
       <p className="mt-5 text-center text-[13px] font-normal uppercase">
-        New to SUOS?{" "}
+        {page.text("signup", "text")}{" "}
         <Link href="/signin" className="font-[500] underline underline-offset-2 hover:text-black/60">
-          Create account
+          {page.text("signup", "link")}
         </Link>
       </p>
+      ) : null}
     </div>
   )
 }

@@ -15,8 +15,8 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { useCart, type CartItem } from "@/lib/cart-context"
+import { usePageContent } from "@/lib/site-content-context"
 
-const promoStripText = "Additional Discount on Pre-paid | Free Return and Exchange"
 
 const recommendations = [
   {
@@ -112,7 +112,7 @@ function CartItemRow({ item }: { item: CartItem }) {
   )
 }
 
-function PromoMarqueeRow() {
+function PromoMarqueeRow({ text: promoStripText }: { text: string }) {
   return (
     <div className="flex shrink-0 items-center gap-10 whitespace-nowrap pr-10 text-[12px] font-normal uppercase leading-[1.4] tracking-[0.04em]">
       {Array.from({ length: 4 }).map((_, index) => (
@@ -130,6 +130,7 @@ type CartSidebarProps = {
 }
 
 export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
+  const page = usePageContent("cartPage")
   const { cart, totalItems } = useCart()
 
   const subtotal = cart.reduce((acc, item) => {
@@ -181,9 +182,11 @@ export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
           {/* Scrollable Container with Offer, Cart Items, Marquee & Recommendations */}
           <div className="cart-item-scrollbar min-h-0 flex-1 overflow-y-auto">
             {/* Cart Offer Progress */}
-            <div className="border-b border-white/10 px-6 py-5">
-              <CartOfferProgress />
-            </div>
+            {page.show("offerProgress") ? (
+              <div className="border-b border-white/10 px-6 py-5">
+                <CartOfferProgress />
+              </div>
+            ) : null}
 
             {/* Cart Items List */}
             <div className="px-6 py-6">
@@ -196,7 +199,7 @@ export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
               ) : (
                 <div className="py-12 text-center">
                   <p className="text-[14px] uppercase tracking-[0.04em] text-white/60">
-                    Your cart is empty
+                    {page.text("sidebar", "empty")}
                   </p>
                   <button
                     type="button"
@@ -210,17 +213,21 @@ export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
             </div>
 
             {/* Promo Marquee Strip */}
-            <div className="overflow-hidden bg-white py-2 text-black">
-              <div className="flex w-max transform-gpu items-center animate-[marquee_30s_linear_infinite] motion-reduce:animate-none [will-change:transform]">
-                <PromoMarqueeRow />
-                <PromoMarqueeRow />
+            {page.show("marquee") ? (
+              <div className="overflow-hidden bg-white py-2 text-black">
+                <div className="flex w-max transform-gpu items-center animate-[marquee_30s_linear_infinite] motion-reduce:animate-none [will-change:transform]">
+                  <PromoMarqueeRow text={page.text("marquee", "text")} />
+                  <PromoMarqueeRow text={page.text("marquee", "text")} />
+                </div>
               </div>
-            </div>
+            ) : null}
 
             {/* Recommendations (You May Also Like) in scroll body */}
-            <div className="border-t border-white/10 px-6 py-6">
-              <CartRecommendationsCarousel items={recommendations} />
-            </div>
+            {page.show("sideRecommendations") ? (
+              <div className="border-t border-white/10 px-6 py-6">
+                <CartRecommendationsCarousel items={recommendations} />
+              </div>
+            ) : null}
           </div>
 
           {/* Fixed Bottom Checkout Footer */}
@@ -236,7 +243,7 @@ export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
                 onClick={() => onOpenChange(false)}
                 className="flex h-12 w-full items-center justify-center bg-white text-[14px] font-normal uppercase tracking-[0.04em] text-black transition-opacity hover:opacity-90"
               >
-                Checkout
+                {page.text("sidebar", "checkout")}
               </Link>
             ) : (
               <button
@@ -244,7 +251,7 @@ export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
                 disabled
                 className="flex h-12 w-full items-center justify-center border border-white/10 bg-white/10 text-[14px] font-normal uppercase tracking-[0.04em] text-white/40 cursor-not-allowed"
               >
-                Checkout
+                {page.text("sidebar", "checkout")}
               </button>
             )}
 
@@ -253,7 +260,7 @@ export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
               onClick={() => onOpenChange(false)}
               className="mt-3.5 block text-center text-[13px] font-normal uppercase tracking-[0.04em] text-white/80 underline underline-offset-4 transition-opacity hover:text-white"
             >
-              View Shopping Cart
+              {page.text("sidebar", "viewCart")}
             </Link>
           </div>
         </div>

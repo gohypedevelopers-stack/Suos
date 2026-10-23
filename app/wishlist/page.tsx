@@ -8,8 +8,10 @@ import { CartIcon } from "@/components/icons/CartIcon"
 import { useWishlist } from "@/lib/wishlist-context"
 import { useCart } from "@/lib/cart-context"
 import { Button } from "@/components/ui/button"
+import { usePageContent } from "@/lib/site-content-context"
 
 export default function WishlistPage() {
+  const page = usePageContent("wishlistPage")
   const { wishlist, removeFromWishlist, clearWishlist, isLoaded } = useWishlist()
   const { addToCart, setIsCartOpen } = useCart()
 
@@ -20,15 +22,17 @@ export default function WishlistPage() {
       {/* Header */}
       <div className="mb-10 flex flex-col items-start justify-between gap-4 border-b pb-6 sm:flex-row sm:items-center">
         <h1 className="font-heading text-[20px] font-normal uppercase leading-[1.15] tracking-[0.02em] text-black sm:text-[24px]">
-          My Wishlist
+          {page.text("header", "heading")}
         </h1>
         <div className="flex w-full items-center justify-end gap-3 sm:w-auto">
-          <Button 
-            variant="default" 
-            className="h-10 w-full rounded-none px-6 text-[13px] font-normal uppercase tracking-[0.04em] sm:w-auto"
-          >
-            Share Wishlist
-          </Button>
+          {page.show("share") ? (
+            <Button
+              variant="default"
+              className="h-10 w-full rounded-none px-6 text-[13px] font-normal uppercase tracking-[0.04em] sm:w-auto"
+            >
+              {page.text("share", "label")}
+            </Button>
+          ) : null}
           <Button
             variant="default"
             className="h-10 w-full rounded-none px-6 text-[13px] font-normal uppercase tracking-[0.04em] sm:w-auto"
@@ -105,10 +109,10 @@ export default function WishlistPage() {
       ) : (
         <div className="flex min-h-[40vh] flex-col items-center justify-center text-center">
           <p className="mb-5 text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black/55">
-            Your wishlist is empty
+            {page.text("empty", "text")}
           </p>
           <Button asChild variant="outline" className="h-11 rounded-none px-6 text-[14px] font-normal uppercase tracking-[0.04em]">
-            <Link href="/">Continue Shopping</Link>
+            <Link href="/">{page.text("empty", "button")}</Link>
           </Button>
         </div>
       )}

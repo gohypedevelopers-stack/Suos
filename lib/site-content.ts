@@ -1,4 +1,5 @@
 import type { ContactGroup } from "@/lib/contact-lines"
+import { EMPTY_PAGE_CONTENT, PAGE_DEFS, PAGE_KEYS, type PageKey, type StoredPageContent } from "@/lib/page-content"
 
 /**
  * Editable storefront content. The defaults below are exactly what the
@@ -143,7 +144,7 @@ export type ProductPageSharedContent = {
   origin: string
 }
 
-export type SiteContent = {
+export type SiteContent = Record<PageKey, StoredPageContent> & {
   announcements: AnnouncementsContent
   navigation: NavigationContent
   launchOffer: LaunchOfferContent
@@ -175,6 +176,7 @@ export const SITE_CONTENT_KEYS: SiteContentKey[] = [
   "privacyPolicy",
   "termsPolicy",
   "shippingPolicy",
+  ...PAGE_KEYS,
 ]
 
 export const SITE_CONTENT_LABELS: Record<SiteContentKey, string> = {
@@ -191,12 +193,14 @@ export const SITE_CONTENT_LABELS: Record<SiteContentKey, string> = {
   privacyPolicy: "Privacy policy",
   termsPolicy: "Terms & conditions",
   shippingPolicy: "Shipping & returns policy",
+  ...(Object.fromEntries(PAGE_KEYS.map((key) => [key, PAGE_DEFS[key].label])) as Record<PageKey, string>),
 }
 
 const p = (text: string): PolicyBlock => ({ type: "paragraph", text })
 const list = (...items: string[]): PolicyBlock => ({ type: "list", items })
 
 export const DEFAULT_SITE_CONTENT: SiteContent = {
+  ...(Object.fromEntries(PAGE_KEYS.map((key) => [key, EMPTY_PAGE_CONTENT])) as Record<PageKey, StoredPageContent>),
   announcements: {
     left: "International Shipping Available",
     center: "Free Shipping on Orders above Rs 2,900 | Launch Offer 30% off",

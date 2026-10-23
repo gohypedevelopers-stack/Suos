@@ -1,7 +1,9 @@
 import Link from "next/link"
 
 import { trackOrderAction } from "@/app/actions/track-order"
+import { resolvePage } from "@/lib/page-content"
 import { findOrderForTracking } from "@/lib/server/dal/order-tracking"
+import { getSiteContent } from "@/lib/server/dal/site-content"
 import { trackOrderLookupSchema } from "@/lib/validations/contact"
 
 export const metadata = {
@@ -54,17 +56,19 @@ export default async function TrackOrderPage({
   searchParams: Promise<TrackOrderSearchParams>
 }) {
   const params = await searchParams
-  const lookup = await resolveLookup(params)
+  const [lookup, siteContent] = await Promise.all([resolveLookup(params), getSiteContent()])
+  const page = resolvePage("trackOrderPage", siteContent.trackOrderPage)
+  const showSignIn = page.show("signIn")
 
   return (
     <main className="flex min-h-[calc(100svh-var(--header-stack-height))] bg-white text-black">
-      <div className="mx-auto grid w-full max-w-[1600px] px-5 py-16 sm:px-8 lg:grid-cols-2 lg:px-20 lg:py-[6.25rem]">
-        <section className="lg:border-r lg:border-black/55 lg:pr-[6rem]">
+      <div className={`mx-auto grid w-full px-5 py-16 sm:px-8 lg:px-20 lg:py-[6.25rem] ${showSignIn ? "max-w-[1600px] lg:grid-cols-2" : "max-w-[720px]"}`}>
+        <section className={showSignIn ? "lg:border-r lg:border-black/55 lg:pr-[6rem]" : undefined}>
           <h1 className="font-heading text-[20px] font-normal uppercase leading-[1.15] tracking-[0.02em] sm:text-[24px]">
-            Track your order
+            {page.text("intro", "heading")}
           </h1>
           <p className="mt-3 text-[14px] font-normal leading-[1.4] text-black/60">
-            Enter your details below to view your order status
+            {page.text("intro", "text")}
           </p>
 
           {lookup.message ? (
@@ -145,7 +149,7 @@ export default async function TrackOrderPage({
             />
 
             <button type="submit" className={`${actionClassName} mt-6`}>
-              Check order status
+              {page.text("intro", "button")}
             </button>
           </form>
 
@@ -157,12 +161,13 @@ export default async function TrackOrderPage({
           </Link>
         </section>
 
+        {showSignIn ? (
         <section className="mt-16 lg:mt-0 lg:pl-[6rem]">
           <h2 className="font-heading text-[20px] font-normal uppercase leading-[1.15] tracking-[0.02em] sm:text-[24px]">
-            Have an account
+            {page.text("signIn", "heading")}
           </h2>
           <p className="mt-3 text-[14px] font-normal leading-[1.4] text-black/60">
-            Sign in below to view your order history
+            {page.text("signIn", "text")}
           </p>
 
           <form className="mt-7 space-y-3" noValidate>
@@ -227,6 +232,7 @@ export default async function TrackOrderPage({
             </Link>
           </p>
         </section>
+        ) : null}
       </div>
     </main>
   )

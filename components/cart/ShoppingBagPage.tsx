@@ -7,6 +7,7 @@ import { useState } from "react"
 
 import { useCart, type CartItem } from "@/lib/cart-context"
 import { trendingProducts } from "@/components/product/productData"
+import { usePageContent } from "@/lib/site-content-context"
 
 /* ─────────────────────────────────────────────
    Price & number formatting
@@ -214,6 +215,7 @@ function CartItemRow({ item }: { item: CartItem }) {
    Promo code row
 ───────────────────────────────────────────── */
 function PromoCodeAccordion() {
+  const page = usePageContent("cartPage")
   const [open, setOpen] = useState(false)
   const [code, setCode] = useState("")
   const [applied, setApplied] = useState(false)
@@ -234,7 +236,7 @@ function PromoCodeAccordion() {
       >
         <span className="flex items-center gap-2">
           <Tag className="size-3.5 text-black/60" />
-          Have a promo code?
+          {page.text("promo", "label")}
         </span>
         <ChevronDown
           className={`size-4 text-black/60 transition-transform duration-200 ${
@@ -278,12 +280,13 @@ function PromoCodeAccordion() {
    Rewards Banner (SUOS Monochrome Luxury Card)
 ───────────────────────────────────────────── */
 function SuosRewardsCard({ subtotal }: { subtotal: number }) {
+  const page = usePageContent("cartPage")
   const points = Math.max(100, Math.round(subtotal * 0.1))
 
   return (
     <div className="border border-black bg-black p-5 text-center sm:text-left text-white">
       <h3 className="text-[14px] font-normal uppercase tracking-[0.04em] text-white">
-        SUOS <span className="font-normal text-white/70">Rewards</span>
+        SUOS <span className="font-normal text-white/70">{page.text("rewards", "heading")}</span>
       </h3>
       <p className="mt-1 text-[12px] leading-[1.5] text-white/75">
         You could earn <strong className="font-normal text-white">{points} points</strong> on this order.
@@ -292,7 +295,7 @@ function SuosRewardsCard({ subtotal }: { subtotal: number }) {
         href="/contact"
         className="mt-2.5 inline-block text-[11px] font-normal uppercase tracking-[0.04em] text-white underline underline-offset-4 transition-opacity hover:opacity-75"
       >
-        Sign in or Join SUOS Rewards now
+        {page.text("rewards", "text")}
       </Link>
     </div>
   )
@@ -308,6 +311,7 @@ function ShoppingBagSummary({
   subtotal: number
   itemCount: number
 }) {
+  const page = usePageContent("cartPage")
   const discount = subtotal >= 2999 ? Math.round(subtotal * 0.1) : 0
   const finalTotal = subtotal - discount
   const installment = Math.round(finalTotal / 4)
@@ -315,7 +319,7 @@ function ShoppingBagSummary({
   return (
     <div className="space-y-4 lg:sticky lg:top-8">
       {/* Rewards Header Card */}
-      <SuosRewardsCard subtotal={subtotal} />
+      {page.show("rewards") ? <SuosRewardsCard subtotal={subtotal} /> : null}
 
       {/* Main Order Summary Box */}
       <aside className="border border-black/15 bg-white p-6 text-black sm:p-7">
@@ -349,9 +353,11 @@ function ShoppingBagSummary({
         </div>
 
         {/* Promo Code Accordion */}
-        <div className="mt-5">
-          <PromoCodeAccordion />
-        </div>
+        {page.show("promo") ? (
+          <div className="mt-5">
+            <PromoCodeAccordion />
+          </div>
+        ) : null}
 
         {/* Divider */}
         <div className="my-5 border-t border-black/15" />
@@ -367,9 +373,11 @@ function ShoppingBagSummary({
         </div>
 
         {/* Installment note */}
-        <p className="mt-2 text-[11px] leading-[1.5] tracking-[0.02em] text-black/65">
-          4 interest-free payments of <strong className="text-black">{formatPrice(installment)}</strong> with UPI or Netbanking ⓘ
-        </p>
+        {page.show("installments") ? (
+          <p className="mt-2 text-[11px] leading-[1.5] tracking-[0.02em] text-black/65">
+            4 interest-free payments of <strong className="text-black">{formatPrice(installment)}</strong> with UPI or Netbanking ⓘ
+          </p>
+        ) : null}
 
         {/* Primary CTA */}
         <div className="mt-6">
@@ -377,10 +385,12 @@ function ShoppingBagSummary({
             href="/checkout"
             className="flex h-12 w-full items-center justify-center bg-black text-[14px] font-normal uppercase tracking-[0.04em] text-white transition-opacity hover:opacity-90 active:scale-[0.99]"
           >
-            Start Checkout
+            {page.text("summary", "checkout")}
           </Link>
         </div>
 
+        {page.show("express") ? (
+        <>
         {/* Express Checkout Divider */}
         <div className="relative my-6 text-center">
           <div className="absolute inset-0 flex items-center">
@@ -406,11 +416,16 @@ function ShoppingBagSummary({
             Cards / Netbanking
           </Link>
         </div>
+        </>
+        ) : null}
 
         {/* Trust & Policy Details */}
         <div className="mt-8 space-y-2 border-t border-black/15 pt-6 text-center text-[11px] uppercase tracking-[0.04em] text-black/55">
-          <p className="font-normal text-black/80">SUOS members enjoy complimentary returns</p>
-          <p>100% Authentic SUOS Atelier Guarantee</p>
+          {page.show("trust")
+            ? page.lines("trust", "lines").map((line, index) => (
+                <p key={line} className={index === 0 ? "font-normal text-black/80" : undefined}>{line}</p>
+              ))
+            : null}
           <p className="pt-1">
             Need Help?{" "}
             <a href="mailto:info@suos.in" className="underline hover:text-black">
@@ -436,20 +451,21 @@ function ShoppingBagSummary({
    Empty Bag State
 ───────────────────────────────────────────── */
 function EmptyBagState() {
+  const page = usePageContent("cartPage")
   return (
     <div className="flex min-h-[50vh] flex-col items-center justify-center py-20 text-center">
       <ShoppingBag className="mb-6 size-12 text-black/20" strokeWidth={1} />
       <h2 className="text-[20px] font-normal uppercase tracking-[0.04em] text-black sm:text-[24px]">
-        Your Bag is Empty
+        {page.text("empty", "heading")}
       </h2>
       <p className="mt-2 max-w-sm text-[13px] uppercase tracking-[0.04em] text-black/50">
-        Discover new arrivals and signature pieces crafted for timeless elegance.
+        {page.text("empty", "text")}
       </p>
       <Link
         href="/collections"
         className="mt-8 inline-flex h-12 items-center bg-black px-8 text-[14px] uppercase tracking-[0.04em] text-white transition-opacity hover:opacity-90"
       >
-        Shop New Collections
+        {page.text("empty", "button")}
       </Link>
     </div>
   )
@@ -459,17 +475,19 @@ function EmptyBagState() {
    "Before You Go" Recommendations Grid
 ───────────────────────────────────────────── */
 function BeforeYouGoSection() {
+  const page = usePageContent("cartPage")
   const recommendations = trendingProducts.slice(0, 4)
+  if (!page.show("recommendations")) return null
 
   return (
     <section className="mt-20 border-t border-black/15 pt-12">
       <div className="flex items-start sm:items-baseline justify-between gap-4">
         <div className="min-w-0">
           <h2 className="text-[18px] sm:text-[22px] font-normal uppercase tracking-[0.04em] text-black">
-            Before You Go
+            {page.text("recommendations", "heading")}
           </h2>
           <p className="mt-1 text-[11px] sm:text-[12px] uppercase tracking-[0.04em] text-black/45">
-            Curated pieces to complete your wardrobe
+            {page.text("recommendations", "text")}
           </p>
         </div>
         <Link
@@ -521,6 +539,7 @@ function BeforeYouGoSection() {
    Main Shopping Bag Page
 ───────────────────────────────────────────── */
 export function ShoppingBagPage() {
+  const page = usePageContent("cartPage")
   const { cart, totalItems } = useCart()
 
   const subtotal = cart.reduce(
@@ -544,7 +563,7 @@ export function ShoppingBagPage() {
             <div className="border-b border-black/15 pb-5">
               <div className="flex items-baseline justify-between gap-3">
                 <h1 className="flex flex-wrap items-baseline gap-1.5 sm:gap-2 text-[18px] sm:text-[22px] font-normal uppercase tracking-[0.04em] text-black">
-                  <span>Shopping Bag</span>
+                  <span>{page.text("header", "heading")}</span>
                   <span className="text-[13px] sm:text-[15px] font-normal text-black/50 tracking-[0.04em]">
                     ({totalItems} {totalItems === 1 ? "item" : "items"})
                   </span>
@@ -555,13 +574,15 @@ export function ShoppingBagPage() {
               </div>
 
               {/* Alert notice */}
+              {page.show("urgency") ? (
               <div className="mt-2.5 flex items-center gap-1.5 text-[11px] sm:text-[12px] font-normal uppercase tracking-[0.04em] text-black/65">
                 <svg className="size-3.5 shrink-0" viewBox="0 0 16 16" fill="currentColor">
                   <circle cx="8" cy="8" r="8" fill="black" />
                   <path d="M8 3.75a.75.75 0 0 1 .75.75v4.5a.75.75 0 0 1-1.5 0v-4.5A.75.75 0 0 1 8 3.75zm0 8a.875.875 0 1 1 0-1.75.875.875 0 0 1 0 1.75z" fill="white" />
                 </svg>
-                <span>Items in bag are not reserved and may sell out. Order now.</span>
+                <span>{page.text("urgency", "text")}</span>
               </div>
+              ) : null}
             </div>
 
             {/* Main 2-Column Content */}
@@ -575,9 +596,11 @@ export function ShoppingBagPage() {
                 </div>
 
                 {/* Gift Option Box */}
-                <div className="mt-8 border border-black/15 bg-neutral-50 px-5 py-4 text-center text-[12px] uppercase tracking-[0.04em] text-black/75">
-                  Gift options available in checkout
-                </div>
+                {page.show("gift") ? (
+                  <div className="mt-8 border border-black/15 bg-neutral-50 px-5 py-4 text-center text-[12px] uppercase tracking-[0.04em] text-black/75">
+                    {page.text("gift", "text")}
+                  </div>
+                ) : null}
               </section>
 
               {/* Right Column: Sticky Summary & Checkout */}

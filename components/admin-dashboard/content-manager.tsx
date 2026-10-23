@@ -7,6 +7,7 @@ import { toast } from "sonner"
 
 import { isVideoMedia } from "@/lib/banner-media"
 import { CONTACT_LINE_TYPES, isValidContactLine } from "@/lib/contact-lines"
+import { PAGE_DEFS, PAGE_KEYS, resolvePage, type PageDef, type PageKey, type StoredPageContent } from "@/lib/page-content"
 
 import { resetSiteContentAction, saveSiteContentAction } from "@/app/actions/site-content"
 import { Button } from "@/components/ui/button"
@@ -474,6 +475,85 @@ function FooterEditor({ value, onChange }: SectionProps<"footer">) {
   )
 }
 
+/** Generic editor for the pages described in lib/page-content.ts. */
+function PageSectionsEditor({
+  pageKey,
+  value,
+  onChange,
+}: {
+  pageKey: PageKey
+  value: StoredPageContent
+  onChange: (value: StoredPageContent) => void
+}) {
+  const def: PageDef = PAGE_DEFS[pageKey]
+  const page = resolvePage(pageKey, value)
+  const setSection = (sectionId: string, patch: { visible?: boolean; field?: [string, string] }) => {
+    const current = value.sections[sectionId] ?? {}
+    onChange({
+      sections: {
+        ...value.sections,
+        [sectionId]: {
+          ...current,
+          ...(patch.visible !== undefined ? { visible: patch.visible } : {}),
+          ...(patch.field ? { fields: { ...current.fields, [patch.field[0]]: patch.field[1] } } : {}),
+        },
+      },
+    })
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="text-xs text-black/55">{def.description} Sections switched off are hidden on the site; their text is kept for later.</p>
+      {def.sections.map((section) => {
+        const visible = page.show(section.id)
+        return (
+          <div key={section.id} className={`rounded-lg border p-3 ${visible ? "border-black/10" : "border-dashed border-black/15 bg-black/[0.02]"}`}>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-medium text-black/80">{section.label}</p>
+                {section.hint ? <p className="mt-0.5 text-[11px] text-black/50">{section.hint}</p> : null}
+              </div>
+              {section.hideable ? (
+                <label className="flex shrink-0 cursor-pointer items-center gap-2 text-xs text-black/60">
+                  <input
+                    type="checkbox"
+                    className="size-4 accent-black"
+                    checked={visible}
+                    onChange={(e) => setSection(section.id, { visible: e.target.checked })}
+                  />
+                  {visible ? "Shown" : "Hidden"}
+                </label>
+              ) : (
+                <span className="shrink-0 text-[11px] text-black/40">Always shown</span>
+              )}
+            </div>
+            {visible && section.fields.length > 0 ? (
+              <div className="mt-3 grid gap-3 md:grid-cols-2">
+                {section.fields.map((field) => {
+                  const current = page.text(section.id, field.id)
+                  const set = (next: string) => setSection(section.id, { field: [field.id, next] })
+                  if (field.kind === "image") {
+                    return <ImageField key={field.id} label={field.label} value={current} onChange={set} />
+                  }
+                  return (
+                    <Field key={field.id} label={field.label} hint={field.hint}>
+                      {field.kind === "textarea" ? (
+                        <Textarea rows={3} value={current} onChange={(e) => set(e.target.value)} />
+                      ) : (
+                        <Input value={current} onChange={(e) => set(e.target.value)} />
+                      )}
+                    </Field>
+                  )
+                })}
+              </div>
+            ) : null}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 function ProductPageSharedEditor({ value, onChange }: SectionProps<"productPage">) {
   const text = (key: keyof typeof value, label: string, hint: string) => (
     <Field label={label} hint={hint}>
@@ -612,6 +692,7 @@ const TAB_GROUPS: Array<{ key: SiteContentKey; title: string }> = [
   { key: "privacyPolicy", title: SITE_CONTENT_LABELS.privacyPolicy },
   { key: "termsPolicy", title: SITE_CONTENT_LABELS.termsPolicy },
   { key: "shippingPolicy", title: SITE_CONTENT_LABELS.shippingPolicy },
+  ...PAGE_KEYS.map((key) => ({ key, title: SITE_CONTENT_LABELS[key] })),
 ]
 
 export function ContentManager({ initial }: { initial: SiteContentAdminView }) {
@@ -662,6 +743,10 @@ export function ContentManager({ initial }: { initial: SiteContentAdminView }) {
   }
 
   function renderEditor(key: SiteContentKey) {
+    if ((PAGE_KEYS as string[]).includes(key)) {
+      const pageKey = key as PageKey
+      return <PageSectionsEditor pageKey={pageKey} value={content[pageKey]} onChange={(v) => update(pageKey, v)} />
+    }
     switch (key) {
       case "announcements":
         return <AnnouncementsEditor value={content.announcements} onChange={(v) => update("announcements", v)} />

@@ -1,6 +1,7 @@
 import { z } from "zod"
 
 import { contactGroupsFromLegacy, isValidContactLine } from "@/lib/contact-lines"
+import { PAGE_KEYS, storedPageContentSchema } from "@/lib/page-content"
 import { DEFAULT_SITE_CONTENT } from "@/lib/site-content"
 
 const shortText = z.string().trim().max(200)
@@ -45,6 +46,11 @@ const navHref = z.string().trim().min(1, "Enter a link.").max(500)
 const navMenuLinkSchema = z.object({ label: shortText.min(1, "Enter a label."), href: navHref })
 
 export const siteContentSchemas = {
+  // Pages built from lib/page-content.ts (login, cart, checkout…).
+  ...(Object.fromEntries(PAGE_KEYS.map((key) => [key, storedPageContentSchema])) as Record<
+    (typeof PAGE_KEYS)[number],
+    typeof storedPageContentSchema
+  >),
   announcements: z.object({
     left: shortText,
     center: shortText,
@@ -218,4 +224,12 @@ export const siteContentKeySchema = z.enum([
   "privacyPolicy",
   "termsPolicy",
   "shippingPolicy",
+  "loginPage",
+  "signupPage",
+  "cartPage",
+  "checkoutPage",
+  "wishlistPage",
+  "trackOrderPage",
+  "shopPage",
+  "collectionsPage",
 ])

@@ -7,8 +7,10 @@ import { type FormEvent, useState } from "react"
 import { toast } from "sonner"
 
 import { authClient } from "@/lib/auth-client"
+import { usePageContent } from "@/lib/site-content-context"
 
 export function SignUpPanel() {
+  const page = usePageContent("signupPage")
   const router = useRouter()
   const [isPending, setIsPending] = useState(false)
   const [passwordValue, setPasswordValue] = useState("")
@@ -68,10 +70,10 @@ export function SignUpPanel() {
     <div className="w-full">
       <div>
         <h1 className="font-heading text-[24px] font-normal uppercase leading-none tracking-normal">
-          Create your account
+          {page.text("intro", "heading")}
         </h1>
         <p className="mt-3 max-w-sm text-justify text-[12px] uppercase leading-[1.6] tracking-normal text-black">
-          Save your favourites, follow your orders, and receive access to our latest edits.
+          {page.text("intro", "text")}
         </p>
       </div>
 
@@ -180,11 +182,12 @@ export function SignUpPanel() {
           disabled={isPending}
           className="flex h-14 w-full items-center justify-center bg-black px-5 text-[13px] font-normal uppercase text-white transition-colors hover:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:cursor-wait disabled:bg-black/60"
         >
-          <span>{isPending ? "Creating account…" : "Create account"}</span>
+          <span>{isPending ? "Creating account…" : page.text("form", "button")}</span>
         </button>
 
+        {page.show("terms") ? (
         <p className="text-justify text-[12px] uppercase leading-[1.5] tracking-normal text-black/60">
-          By creating an account, you agree to our{" "}
+          {page.text("terms", "text")}{" "}
           <Link href="/terms" className="font-medium underline underline-offset-2 hover:text-black">
             Terms &amp; Conditions
           </Link>{" "}
@@ -192,16 +195,19 @@ export function SignUpPanel() {
           <Link href="/privacy" className="font-medium underline underline-offset-2 hover:text-black">
             Privacy Policy
           </Link>
-          . You also consent to receive marketing and promotional communications from SUOS. You may unsubscribe at any time.
+          . {page.text("terms", "after")}
         </p>
+        ) : null}
       </form>
 
+      {page.show("login") ? (
       <p className="mt-5 text-center text-[13px] font-normal uppercase">
-        Already have an account?{" "}
+        {page.text("login", "text")}{" "}
         <Link href="/login" className="font-[500] underline underline-offset-4 hover:text-black/60">
-          Log in
+          {page.text("login", "link")}
         </Link>
       </p>
+      ) : null}
     </div>
   )
 }

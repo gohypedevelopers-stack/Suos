@@ -2,6 +2,8 @@ import type { Metadata } from "next"
 import Link from "next/link"
 
 import { CollectionBenefitsBar } from "@/components/collection/CollectionBenefitsBar"
+import { resolvePage, type ResolvedPage } from "@/lib/page-content"
+import { getSiteContent } from "@/lib/server/dal/site-content"
 import { CollectionRecommendations } from "@/components/collection/CollectionRecommendations"
 import { ProductListing, buildEditorialImages } from "@/components/collection/ProductListing"
 import { parseSort, sortProducts } from "@/components/collection/productSort"
@@ -44,7 +46,8 @@ export default async function Page({
   searchParams: Promise<SearchParams>
 }) {
   const query = await searchParams
-  const allProducts = await listPublishedProducts()
+  const [allProducts, siteContent] = await Promise.all([listPublishedProducts(), getSiteContent()])
+  const page = resolvePage("shopPage", siteContent.shopPage)
 
   const categoryParam = first(query.category)
   const categorySlug = categoryParam ? slugify(categoryParam) : undefined
@@ -100,7 +103,7 @@ export default async function Page({
         products={sorted}
         sort={sort}
         editorialImages={buildEditorialImages(sorted)}
-        emptyState={<EmptyShop hasFilters={Boolean(categorySlug || filter)} />}
+        emptyState={<EmptyShop page={page} hasFilters={Boolean(categorySlug || filter)} />}
       />
 
       <div className="px-4 sm:px-6 lg:px-8">
@@ -112,23 +115,21 @@ export default async function Page({
   )
 }
 
-function EmptyShop({ hasFilters }: { hasFilters: boolean }) {
+function EmptyShop({ page, hasFilters }: { page: ResolvedPage; hasFilters: boolean }) {
   return (
     <div className="flex min-h-[40vh] flex-col items-center justify-center border-t border-black/10 px-4 py-16 text-center">
       <p className="font-heading text-[20px] font-normal uppercase leading-[1.15] tracking-[0.01em] text-black sm:text-[24px]">
-        Nothing here yet
+        {page.text("empty", "heading")}
       </p>
       <p className="mt-3 max-w-sm text-[14px] leading-[1.4] text-black/60">
-        {hasFilters
-          ? "We couldn't find pieces matching this selection. New styles land often — have a look at everything else."
-          : "New pieces are on their way. Check back soon."}
+        {hasFilters ? page.text("empty", "filteredText") : page.text("empty", "text")}
       </p>
       {hasFilters ? (
         <Link
           href="/shop"
           className="mt-6 inline-flex h-10 min-w-[140px] items-center justify-center border border-black px-6 text-[13px] uppercase leading-none tracking-[0.04em] text-black transition-colors hover:bg-black hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black sm:text-[14px]"
         >
-          Shop all
+          {page.text("empty", "button")}
         </Link>
       ) : null}
     </div>

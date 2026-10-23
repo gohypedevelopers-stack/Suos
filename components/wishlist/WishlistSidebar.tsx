@@ -15,8 +15,10 @@ import {
   SheetContent,
   SheetTitle,
 } from "@/components/ui/sheet"
+import { usePageContent } from "@/lib/site-content-context"
 
 export function WishlistSidebar() {
+  const page = usePageContent("wishlistPage")
   const { isSidebarOpen, setIsSidebarOpen, wishlist, removeFromWishlist } = useWishlist()
   const { addToCart } = useCart()
 
@@ -93,10 +95,10 @@ export function WishlistSidebar() {
           ) : (
             <div className="flex h-full flex-col items-center justify-center text-center">
               <p className="mb-5 text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black/55">
-                Your wishlist is empty
+                {page.text("empty", "text")}
               </p>
               <Button asChild variant="outline" className="h-11 rounded-none px-6 text-[14px] font-normal uppercase tracking-[0.04em]" onClick={() => setIsSidebarOpen(false)}>
-                <Link href="/">Continue Shopping</Link>
+                <Link href="/">{page.text("empty", "button")}</Link>
               </Button>
             </div>
           )}
@@ -110,7 +112,7 @@ export function WishlistSidebar() {
               className="h-12 w-full rounded-none text-[14px] font-normal uppercase tracking-[0.04em]"
               onClick={() => setIsSidebarOpen(false)}
             >
-              <Link href="/wishlist">View Full Wishlist</Link>
+              <Link href="/wishlist">{page.text("sidebar", "viewAll")}</Link>
             </Button>
           </div>
         )}

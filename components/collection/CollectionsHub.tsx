@@ -2,6 +2,8 @@ import Image from "next/image"
 import Link from "next/link"
 
 import { CollectionHero } from "@/components/collection/CollectionHero"
+import { resolvePage, type ResolvedPage } from "@/lib/page-content"
+import { getSiteContent } from "@/lib/server/dal/site-content"
 import {
   listPublishedCollectionsWithImages,
   type PublishedCollectionWithImages,
@@ -12,25 +14,29 @@ const FALLBACK_DESCRIPTION =
   "This denim is washed and finished using closed-loop processes that cut water use and keep harsh chemicals out of the system — made to be worn hard and kept for years."
 
 export async function CollectionsHub() {
-  const collections = await listPublishedCollectionsWithImages(5)
+  const [collections, siteContent] = await Promise.all([listPublishedCollectionsWithImages(5), getSiteContent()])
+  const page = resolvePage("collectionsPage", siteContent.collectionsPage)
   const hero = collections.find((collection) => collection.image)
+  const heroImage = page.text("hero", "src") || hero?.image || FALLBACK_HERO
 
   return (
     <div className="w-full bg-white text-black">
       <h1 className="sr-only">Collections</h1>
 
-      <CollectionHero
-        image={hero?.image || FALLBACK_HERO}
-        alt={hero?.alt || "SUOS collections"}
-        heightClassName="h-[60vh] min-h-[360px] sm:h-[72vh]"
-      />
+      {page.show("hero") ? (
+        <CollectionHero
+          image={heroImage}
+          alt={page.text("hero", "src") ? page.text("hero", "alt") : hero?.alt || page.text("hero", "alt")}
+          heightClassName="h-[60vh] min-h-[360px] sm:h-[72vh]"
+        />
+      ) : null}
 
       {collections.length > 0 ? (
         collections.map((collection) => (
           <CollectionSection key={collection.id} collection={collection} />
         ))
       ) : (
-        <EmptyCollections />
+        <EmptyCollections page={page} />
       )}
     </div>
   )
@@ -184,20 +190,20 @@ function CollectionMosaic({
   )
 }
 
-function EmptyCollections() {
+function EmptyCollections({ page }: { page: ResolvedPage }) {
   return (
     <div className="flex min-h-[40vh] flex-col items-center justify-center px-4 py-20 text-center">
       <p className="font-heading text-[24px] font-normal uppercase leading-[1.15] tracking-[0.01em]">
-        No collections yet
+        {page.text("empty", "heading")}
       </p>
       <p className="mt-3 max-w-sm text-[14px] leading-[1.4] text-black/60">
-        Collections are being curated. In the meantime, browse everything we make.
+        {page.text("empty", "text")}
       </p>
       <Link
         href="/shop"
         className="mt-6 inline-flex h-10 min-w-[140px] items-center justify-center border border-black px-6 text-[13px] uppercase leading-none tracking-[0.04em] transition-colors hover:bg-black hover:text-white"
       >
-        Shop all
+        {page.text("empty", "button")}
       </Link>
     </div>
   )

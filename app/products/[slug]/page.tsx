@@ -58,14 +58,14 @@ export default async function Page(props: PageProps) {
   }
 
   return (
-    <main className="flex-1 bg-white text-black w-full min-w-0 overflow-x-hidden">
+    <main className="flex-1 bg-white text-black w-full min-w-0 overflow-x-clip">
       {product.isDraft ? (
         <p className="bg-amber-100 px-4 py-2 text-center text-caption text-amber-900">
           Preview of a Draft product: only staff can see this page until it is set to Active.
         </p>
       ) : null}
-      <section className="relative w-full min-w-0 overflow-x-hidden px-3 pb-10 pt-3 sm:px-6 sm:pb-16 sm:pt-5 lg:px-[18px] lg:pt-6">
-        <div className="w-full min-w-0">
+      <section className="relative w-full min-w-0 overflow-x-clip px-3 pb-10 pt-3 sm:px-6 sm:pb-16 sm:pt-5 lg:px-8 lg:pt-6">
+        <div className="mx-auto w-full min-w-0 max-w-[1680px]">
           <nav aria-label="Breadcrumb" className="overflow-x-auto scrollbar-none py-1 text-body text-ink-400">
             <ol className="flex flex-wrap items-center gap-1 sm:gap-1.5">
               {product.breadcrumb.map((crumb, index) => {
@@ -93,7 +93,7 @@ export default async function Page(props: PageProps) {
             </ol>
           </nav>
 
-          <div className="mt-3 sm:mt-5 grid w-full min-w-0 gap-6 sm:gap-8 xl:grid-cols-[minmax(0,1fr)_573px] xl:items-start xl:gap-12">
+          <div className="mt-3 sm:mt-5 grid w-full min-w-0 gap-6 sm:gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-start lg:gap-10 xl:gap-14">
             <ProductGallery images={product.gallery} />
             <ProductSummary product={product} />
           </div>

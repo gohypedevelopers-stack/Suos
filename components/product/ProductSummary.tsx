@@ -252,8 +252,8 @@ export function ProductSummary({
   const origin = hasCountryInFeatures ? undefined : specDetails.find((detail) => /origin/i.test(detail.name))?.value
 
   return (
-    <aside className="self-start w-full min-w-0 max-w-full [overflow-anchor:none] xl:sticky xl:top-[calc(var(--header-stack-height)+24px)]">
-      <div className="w-full min-w-0 max-w-full space-y-6 text-black xl:pt-[18px] xl:w-[573px] xl:max-w-[573px] xl:justify-self-end">
+    <aside className="self-start w-full min-w-0 max-w-full [overflow-anchor:none] lg:sticky lg:top-[calc(var(--header-stack-height)+24px)]">
+      <div className="w-full min-w-0 max-w-full space-y-6 text-black">
         <div>
           <p className="text-caption uppercase text-ink-400">{product.editLabel}</p>
           <h1 className="mt-2 font-heading text-[20px] font-normal uppercase leading-none tracking-normal text-ink-800 sm:text-[24px]">
@@ -543,7 +543,7 @@ export function ProductSummary({
               <div
                 aria-hidden={!showStickyBar}
                 className={cn(
-                  "fixed inset-x-0 bottom-0 z-40 border-t border-black/15 bg-white text-black shadow-[0_-4px_16px_rgba(0,0,0,0.08)] transition-transform duration-300 ease-out xl:inset-x-auto xl:bottom-6 xl:right-8 xl:w-[573px] xl:border",
+                  "fixed inset-x-0 bottom-0 z-40 border-t border-black/15 bg-white text-black shadow-[0_-4px_16px_rgba(0,0,0,0.08)] transition-transform duration-300 ease-out lg:inset-x-auto lg:bottom-6 lg:right-8 lg:w-[min(573px,calc(40vw-3rem))] lg:border",
                   showStickyBar ? "translate-y-0" : "pointer-events-none translate-y-[calc(100%+24px)]"
                 )}
               >
