@@ -103,7 +103,7 @@ export type HomeBanners = {
   hero: HomeHeroBanner[]
   /** Two side-by-side images directly below the hero (slot 0 left, slot 1 right). */
   split: HomeEditorialBanner[]
-  /** Full-width image/video banner directly below the launch offer bar. */
+  /** Full-width image/video banner directly below Our Favourite. */
   feature: HomeBannerSectionItem | null
   middle: HomeBannerSectionItem | null
   bottom: HomeBannerSectionItem | null

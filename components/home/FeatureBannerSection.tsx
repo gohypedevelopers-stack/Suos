@@ -3,7 +3,7 @@ import type { HomeBannerSectionItem } from "@/lib/server/dal/banners"
 import { cn } from "@/lib/utils"
 
 /**
- * Banner directly below the launch offer bar. Accepts an image or a video.
+ * Banner directly below Our Favourite. Accepts an image or a video.
  * Recommended: desktop 1920 × 840 px (16:7), mobile 1080 × 1350 px (4:5).
  */
 export function FeatureBannerSection({

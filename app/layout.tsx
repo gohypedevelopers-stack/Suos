@@ -38,7 +38,9 @@ export default async function RootLayout({
         "font-sans"
       )}
     >
-      <body className="min-h-full flex flex-col bg-white text-black">
+      {/* Browser extensions (e.g. ColorZilla's cz-shortcut-listen) add attributes to
+          <body> before React loads; ignore those attribute mismatches on this tag only. */}
+      <body className="min-h-full flex flex-col bg-white text-black" suppressHydrationWarning>
         <Toaster position="bottom-right" />
         <AnalyticsBeacon />
         <SessionRecorder />

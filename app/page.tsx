@@ -31,8 +31,9 @@ export default async function Home() {
       <Hero banners={banners.hero} />
       <SplitBannerSection banners={banners.split} />
       <LaunchOfferBar />
-      <FeatureBannerSection banner={banners.feature} />
       <TrendingSection products={products.slice(0, 8)} />
+      {/* Client: the full-width chair image sits below Our Favourite. */}
+      <FeatureBannerSection banner={banners.feature} />
       <MotionBannerSection banner={banners.middle} />
       <DenimCarousel slides={banners.denimCarousel} />
       <DenimEditorialSection banners={banners.editorial} />

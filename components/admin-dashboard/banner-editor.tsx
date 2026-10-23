@@ -13,7 +13,6 @@ import {
   GripVertical,
   ImageIcon,
   LoaderCircle,
-  Monitor,
   Plus,
   RotateCcw,
   Search,
@@ -36,6 +35,7 @@ import {
 } from "@/app/actions/banners"
 import { BannerMediaLibraryDialog } from "@/components/admin-dashboard/banner-media-library-dialog"
 import { BannerMediaPreview } from "@/components/admin-dashboard/banner-media-preview"
+import { BannerPlacementPreview } from "@/components/admin-dashboard/banner-placement-preview"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import {
   BANNER_IMAGE_CONTENT_TYPES,
@@ -141,7 +141,6 @@ export function BannerEditor({
 
   const [isUploadingDesktop, setIsUploadingDesktop] = useState(false)
   const [isUploadingMobile, setIsUploadingMobile] = useState(false)
-  const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop")
   const [mediaLibraryOpen, setMediaLibraryOpen] = useState(false)
   const [mediaLibraryRole, setMediaLibraryRole] = useState<"desktop" | "mobile">("desktop")
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[] | undefined>>({})
@@ -466,11 +465,6 @@ export function BannerEditor({
     ...BANNER_IMAGE_CONTENT_TYPES,
     ...(allowsVideo ? BANNER_VIDEO_CONTENT_TYPES : []),
   ].join(",")
-
-  const currentPreviewImage =
-    previewDevice === "mobile" && mobileImage?.url
-      ? mobileImage.url
-      : desktopImage?.url || "/home-page-content/hero-1.png"
 
   return (
     <main className="min-h-full flex-1 bg-[#f7f7f8] p-4 text-black sm:p-6">
@@ -1193,7 +1187,7 @@ export function BannerEditor({
                   >
                     <option value="HERO">Hero Banner (Top Carousel)</option>
                     <option value="SPLIT">Split Pair (2 Images Below Hero)</option>
-                    <option value="FEATURE">Feature Banner (Below Launch Offer · Image or Video)</option>
+                    <option value="FEATURE">Feature Banner (Below Our Favourite · Image or Video)</option>
                     <option value="MIDDLE">Middle Banner (Motion Section)</option>
                     <option value="DENIM_CAROUSEL">Denim Carousel (Collection Slide)</option>
                     <option value="EDITORIAL">Denim Editorial Grid (3 Images)</option>
@@ -1259,130 +1253,24 @@ export function BannerEditor({
 
           {/* Live Storefront Preview (Right Column) */}
           <div className="lg:col-span-5">
-            <div className="sticky top-6 rounded-xl border border-black/10 bg-white p-5 shadow-sm">
-              <div className="flex items-center justify-between border-b border-black/10 pb-3">
-                <div className="flex items-center gap-1.5">
-                  <Eye className="size-4 text-neutral-600" />
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-800">
-                    Live Storefront Preview
-                  </h3>
-                </div>
-
-                {/* Device viewport switcher */}
-                <div className="flex items-center rounded-lg border border-black/10 bg-neutral-100 p-0.5">
-                  <button
-                    type="button"
-                    onClick={() => setPreviewDevice("desktop")}
-                    className={`flex items-center gap-1 rounded px-2 py-1 text-[11px] font-medium transition cursor-pointer ${
-                      previewDevice === "desktop"
-                        ? "bg-white text-black shadow-xs"
-                        : "text-neutral-500 hover:text-black"
-                    }`}
-                  >
-                    <Monitor className="size-3" /> Desktop
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPreviewDevice("mobile")}
-                    className={`flex items-center gap-1 rounded px-2 py-1 text-[11px] font-medium transition cursor-pointer ${
-                      previewDevice === "mobile"
-                        ? "bg-white text-black shadow-xs"
-                        : "text-neutral-500 hover:text-black"
-                    }`}
-                  >
-                    <Smartphone className="size-3" /> Mobile
-                  </button>
-                </div>
+            <div className="sticky top-6 max-h-[calc(100vh-3rem)] overflow-y-auto rounded-xl border border-black/10 bg-white p-5 shadow-sm">
+              <div className="mb-4 flex items-center gap-1.5 border-b border-black/10 pb-3">
+                <Eye className="size-4 text-neutral-600" />
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-800">
+                  Live Storefront Preview
+                </h3>
               </div>
-
-              {/* Mockup Frame */}
-              <div className="mt-4 flex justify-center">
-                <div
-                  className={`overflow-hidden rounded-xl border border-neutral-800 bg-black shadow-2xl transition-all duration-300 relative ${
-                    placement === "SPLIT"
-                      ? position === 0
-                        ? "w-[300px] aspect-[880/777]"
-                        : "w-[200px] aspect-[560/777]"
-                      : placement === "EDITORIAL"
-                      ? position === 2
-                        ? "w-full aspect-[20/9]"
-                        : "w-[280px] aspect-square"
-                      : placement === "DENIM_CAROUSEL"
-                        ? "w-[220px] aspect-[480/834]"
-                        : previewDevice === "desktop"
-                          ? placement === "HERO"
-                            ? "w-full aspect-[16/9]"
-                            : "w-full aspect-[16/7]"
-                          : "w-[240px] aspect-[9/16]"
-                  }`}
-                >
-                  {/* Banner Image / Video */}
-                  <BannerMediaPreview
-                    src={currentPreviewImage}
-                    alt="Banner preview"
-                    sizes="(max-width: 1024px) 100vw, 480px"
-                  />
-
-                  {/* Dynamic Dark Gradient Overlay */}
-                  <div
-                    className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent transition-opacity"
-                    style={{ opacity: overlayOpacity / 100 }}
-                  />
-
-                  {/* Dynamic Content Overlay */}
-                  <div
-                    className={`absolute inset-0 flex flex-col justify-end p-4 sm:p-5 z-10 ${
-                      textAlignment === "CENTER"
-                        ? "items-center text-center"
-                        : textAlignment === "RIGHT"
-                          ? "items-end text-right"
-                          : "items-start text-left"
-                    }`}
-                  >
-                    {title && (
-                      <h4
-                        className={`text-white font-serif uppercase tracking-widest leading-tight ${
-                          previewDevice === "desktop" ? "text-base" : "text-xs"
-                        }`}
-                      >
-                        {title}
-                      </h4>
-                    )}
-                    {subtitle && (
-                      <p
-                        className={`text-white/80 font-mono tracking-wider mt-0.5 ${
-                          previewDevice === "desktop" ? "text-[11px]" : "text-[9px]"
-                        }`}
-                      >
-                        {subtitle}
-                      </p>
-                    )}
-
-                    {ctaText && (
-                      <div className="mt-2.5">
-                        <span
-                          className={`inline-flex items-center justify-center border border-white/85 bg-black/40 text-white backdrop-blur-xs font-normal uppercase tracking-wider ${
-                            previewDevice === "desktop"
-                              ? "px-3.5 py-1.5 text-[11px]"
-                              : "px-2.5 py-1 text-[9px]"
-                          }`}
-                        >
-                          {ctaText}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-4 rounded-lg bg-neutral-50 p-3 text-[11px] text-neutral-500">
-                <p className="font-semibold text-neutral-700">Preview Info:</p>
-                <p className="mt-0.5">
-                  Displaying: <span className="font-medium text-neutral-900">{placement}</span> slot
-                  with <span className="font-medium text-neutral-900">{textAlignment}</span> text
-                  alignment.
-                </p>
-              </div>
+              <BannerPlacementPreview
+                placement={placement}
+                position={position}
+                desktopSrc={desktopImage?.url || "/home-page-content/hero-1.png"}
+                mobileSrc={mobileImage?.url ?? null}
+                overlayOpacity={overlayOpacity}
+                title={title}
+                subtitle={subtitle}
+                ctaText={ctaText}
+                textAlignment={textAlignment}
+              />
             </div>
           </div>
         </div>

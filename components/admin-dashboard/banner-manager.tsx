@@ -971,7 +971,7 @@ export function BannerManager({
                       </span>
                     </div>
                     <p className="mt-0.5 text-xs text-neutral-500">
-                      Full-width, fully clickable banner directly below the launch offer bar.
+                      Full-width, fully clickable banner directly below Our Favourite.
                     </p>
                     {featureBanner?.ctaLink && (
                       <p className="mt-0.5 font-mono text-[10px] text-neutral-400 truncate max-w-xs">
