@@ -651,7 +651,10 @@ export async function getProductBySlug(slug: string, options: { preview?: boolea
     fitHeadline: pageContent.fitHeadline,
     fitText: pageContent.fitText,
     features: hasSpecs ? features : [],
-    highlightStrip: pageContent.highlightStrip.filter((tile) => tile.title || tile.text),
+    highlightStrip:
+      shared.showHighlightStrip && !pageContent.hideHighlightStrip
+        ? pageContent.highlightStrip.filter((tile) => tile.title || tile.text)
+        : [],
     bundleLine: pageContent.bundleLine,
     origin: pageContent.originOverride || shared.origin,
     shippingSections,

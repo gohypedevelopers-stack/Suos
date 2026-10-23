@@ -75,7 +75,7 @@ export function RecentlyViewed({ current }: { current: ViewedProduct }) {
       <ScrollRow className="mt-5 gap-2 pb-1" label="Recently viewed">
         {others.map((item) => (
           <Link key={item.id} href={`/products/${item.slug}`} className="group block w-[160px] shrink-0 snap-start sm:w-[200px]">
-            <div className="relative aspect-[3/4] overflow-hidden bg-[#efefef]">
+            <div data-row-media className="relative aspect-[3/4] overflow-hidden bg-[#efefef]">
               {item.image ? (
                 <Image src={item.image} alt={item.title} fill sizes="200px" className="object-cover transition-transform duration-500 group-hover:scale-[1.02]" />
               ) : null}

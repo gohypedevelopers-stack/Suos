@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect, useRef, useState, type ReactNode } from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
 
+import { CarouselArrow } from "@/components/CarouselArrow"
 import { cn } from "@/lib/utils"
 
 /**
@@ -24,6 +24,8 @@ export function ScrollRow({
   const drag = useRef<{ x: number; left: number; moved: boolean } | null>(null)
   const [canLeft, setCanLeft] = useState(false)
   const [canRight, setCanRight] = useState(false)
+  // Centre of the item photos (marked data-row-media), so arrows sit mid-photo.
+  const [arrowTop, setArrowTop] = useState<number | null>(null)
 
   useEffect(() => {
     const el = ref.current
@@ -31,6 +33,11 @@ export function ScrollRow({
     const update = () => {
       setCanLeft(el.scrollLeft > 4)
       setCanRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4)
+      const media = el.querySelector<HTMLElement>("[data-row-media]")
+      if (media) {
+        const top = media.getBoundingClientRect().top - el.getBoundingClientRect().top
+        setArrowTop(top + media.offsetHeight / 2)
+      }
     }
     // ResizeObserver fires once on observe, which sets the initial state.
     const observer = new ResizeObserver(update)
@@ -47,7 +54,8 @@ export function ScrollRow({
     if (el) el.scrollBy({ left: direction * el.clientWidth * 0.8, behavior: "smooth" })
   }
 
-  const arrow = "absolute top-1/3 z-10 hidden size-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/90 text-black shadow-md ring-1 ring-black/10 transition hover:bg-white md:flex"
+  const arrowClass = "absolute hidden -translate-y-1/2 md:flex"
+  const arrowStyle = { top: arrowTop ?? "50%" }
 
   return (
     <div className="relative">
@@ -93,14 +101,10 @@ export function ScrollRow({
         {children}
       </div>
       {canLeft ? (
-        <button type="button" aria-label="Scroll left" onClick={() => step(-1)} className={cn(arrow, "left-2")}>
-          <ChevronLeft className="size-5" strokeWidth={1.6} />
-        </button>
+        <CarouselArrow direction="prev" aria-label="Scroll left" onClick={() => step(-1)} className={cn(arrowClass, "left-2")} style={arrowStyle} />
       ) : null}
       {canRight ? (
-        <button type="button" aria-label="Scroll right" onClick={() => step(1)} className={cn(arrow, "right-2")}>
-          <ChevronRight className="size-5" strokeWidth={1.6} />
-        </button>
+        <CarouselArrow direction="next" aria-label="Scroll right" onClick={() => step(1)} className={cn(arrowClass, "right-2")} style={arrowStyle} />
       ) : null}
     </div>
   )

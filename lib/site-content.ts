@@ -132,6 +132,8 @@ export type SizeGuideContent = {
 
 /** Shared product-page text, edited once and used on every product. */
 export type ProductPageSharedContent = {
+  /** Highlight strip (4 tiles under the badges) on all product pages. */
+  showHighlightStrip: boolean
   /** Trust badges under Add to Cart (empty = hidden). */
   returnsBadge: string
   exchangesBadge: string
@@ -340,6 +342,7 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     ],
   },
   productPage: {
+    showHighlightStrip: true,
     returnsBadge: "Easy 7 Days Returns",
     exchangesBadge: "Easy Exchanges",
     shipping: [

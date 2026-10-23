@@ -555,7 +555,7 @@ function PageSectionsEditor({
 }
 
 function ProductPageSharedEditor({ value, onChange }: SectionProps<"productPage">) {
-  const text = (key: keyof typeof value, label: string, hint: string) => (
+  const text = (key: "shipping" | "returns" | "exchanges" | "refunds" | "origin", label: string, hint: string) => (
     <Field label={label} hint={hint}>
       <Textarea rows={4} value={value[key]} onChange={(e) => onChange({ ...value, [key]: e.target.value })} />
     </Field>
@@ -565,6 +565,15 @@ function ProductPageSharedEditor({ value, onChange }: SectionProps<"productPage"
       <p className="text-xs text-black/55">
         Shown on every product page. A single product can replace the shipping or origin text in its own edit screen.
       </p>
+      <label className="flex cursor-pointer items-center gap-2 text-sm text-black/75">
+        <input
+          type="checkbox"
+          className="size-4 accent-black"
+          checked={value.showHighlightStrip}
+          onChange={(e) => onChange({ ...value, showHighlightStrip: e.target.checked })}
+        />
+        Show the highlight strip (4 tiles under the badges) on product pages
+      </label>
       <div className="grid gap-4 md:grid-cols-2">
         <Field label="Returns badge" hint="Leave empty to hide. A product can also hide both badges.">
           <Input value={value.returnsBadge} onChange={(e) => onChange({ ...value, returnsBadge: e.target.value })} />

@@ -185,6 +185,7 @@ export const siteContentSchemas = {
     }),
   ),
   productPage: z.object({
+    showHighlightStrip: z.boolean().default(true),
     returnsBadge: shortText,
     exchangesBadge: shortText,
     shipping: longText,

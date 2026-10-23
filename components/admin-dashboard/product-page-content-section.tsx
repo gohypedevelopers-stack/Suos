@@ -299,6 +299,12 @@ export function ProductPageContentSection({
       </Panel>
 
       <Panel title="Highlight strip" hint="Up to 4 tiles under the badges, e.g. STRAIGHT FIT / 100% COTTON / MID-RISE / SOFT WASHED. Empty tiles are hidden.">
+        <Toggle
+          checked={value.hideHighlightStrip}
+          onChange={(v) => set("hideHighlightStrip", v)}
+          label="Hide the highlight strip on this product"
+          hint="Your text is kept. It can also be switched off for every product in Website content → Product page."
+        />
         <div className="grid gap-3 sm:grid-cols-2">
           {strip.map((tile, index) => (
             <div key={index} className="grid gap-2 rounded-lg border border-black/10 p-3">

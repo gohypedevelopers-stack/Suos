@@ -3,10 +3,11 @@
 import { useState, useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ChevronLeft, ChevronRight, Heart } from "lucide-react"
+import { Heart } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { CartIcon } from "@/components/icons/CartIcon"
+import { CarouselArrow } from "@/components/CarouselArrow"
 import { ProductQuickViewModal } from "@/components/product/ProductQuickViewModal"
 import { useWishlist } from "@/lib/wishlist-context"
 import { useCart } from "@/lib/cart-context"
@@ -262,6 +263,7 @@ export function ProductCardView({
       )}
     >
       <div
+        data-row-media
         className={cn(
           "relative aspect-[2/3] w-full overflow-hidden bg-neutral-900 touch-pan-y select-none",
           isCompact ? "sm:aspect-[234/342]" : "sm:aspect-[330/440]"
@@ -402,32 +404,20 @@ export function ProductCardView({
         {/* Previous / next image arrows (always on touch, on hover for desktop) */}
         {gallery.length > 1 && (
           <>
-            <button
-              type="button"
+            <CarouselArrow
+              direction="prev"
               onClick={(e) => stepImage(-1, e)}
               onMouseMove={(e) => e.stopPropagation()}
               aria-label={`Previous image of ${product.title}`}
-              className="pointer-events-auto absolute left-1 sm:left-2 top-1/2 z-20 flex size-7 md:size-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/20 text-white transition-[opacity,background-color] duration-200 hover:bg-black/40 cursor-pointer md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-white"
-            >
-              <ChevronLeft
-                className="size-4 md:size-5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
-                strokeWidth={1.8}
-                aria-hidden="true"
-              />
-            </button>
-            <button
-              type="button"
+              className="pointer-events-auto absolute left-1.5 top-1/2 -translate-y-1/2 sm:left-2 md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100"
+            />
+            <CarouselArrow
+              direction="next"
               onClick={(e) => stepImage(1, e)}
               onMouseMove={(e) => e.stopPropagation()}
               aria-label={`Next image of ${product.title}`}
-              className="pointer-events-auto absolute right-1 sm:right-2 top-1/2 z-20 flex size-7 md:size-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/20 text-white transition-[opacity,background-color] duration-200 hover:bg-black/40 cursor-pointer md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-white"
-            >
-              <ChevronRight
-                className="size-4 md:size-5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
-                strokeWidth={1.8}
-                aria-hidden="true"
-              />
-            </button>
+              className="pointer-events-auto absolute right-1.5 top-1/2 -translate-y-1/2 sm:right-2 md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100"
+            />
           </>
         )}
 
@@ -458,7 +448,7 @@ export function ProductCardView({
                 >
                   <span
                     className={cn(
-                      "block h-[3px] w-5 sm:w-9 md:w-12 transition-colors duration-200",
+                      "block h-[2px] w-3 sm:w-5 md:w-7 transition-colors duration-200",
                       dashIdx === activeIndicatorIndex
                         ? "bg-white"
                         : "bg-white/45 group-hover/ind:bg-white/80"

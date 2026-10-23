@@ -109,6 +109,7 @@ export const productPageContentSchema = z.object({
   /* Specs + highlight strip */
   specs: specsSchema,
   highlightStrip: z.array(stripTileSchema).max(PRODUCT_STRIP_COUNT).default([]),
+  hideHighlightStrip: z.boolean().optional().default(false),
 
   /* Fit & Care */
   fitHeadline: optionalText(120),

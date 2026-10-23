@@ -78,7 +78,7 @@ export function ProductHighlightsSection({
               highlight={highlight}
               number={index + 1}
               sizes="(max-width: 639px) 100vw, 50vw"
-              className="aspect-[4/3]"
+              className="aspect-[4/3] sm:max-h-[calc(100svh-var(--main-navbar-height)-10rem)] sm:w-full"
             />
           ))}
         </div>
@@ -88,19 +88,19 @@ export function ProductHighlightsSection({
 
   return (
     <section className="w-full bg-white pb-10 text-black md:py-16">
-      <div className="grid grid-cols-1 gap-1 md:grid-cols-[46fr_54fr]">
-        <div className="flex flex-col">
+      <div className="grid grid-cols-1 gap-1 md:h-[min(calc(100svh-var(--main-navbar-height)-2rem),900px)] md:min-h-[520px] md:grid-cols-[46fr_54fr]">
+        <div className="flex min-h-0 flex-col">
           {heading}
           <HighlightImage
             highlight={second}
             number={2}
             sizes="(max-width: 767px) 100vw, 46vw"
-            className="aspect-[3/4] md:aspect-auto md:min-h-[420px] md:flex-1"
+            className="aspect-[3/4] md:aspect-auto md:min-h-0 md:flex-1"
           />
         </div>
-        <div className="grid gap-1">
-          <HighlightImage highlight={first} number={1} sizes="(max-width: 767px) 100vw, 54vw" className="aspect-[760/560]" />
-          <HighlightImage highlight={third} number={3} sizes="(max-width: 767px) 100vw, 54vw" className="aspect-[760/560]" />
+        <div className="grid min-h-0 gap-1 md:grid-rows-2">
+          <HighlightImage highlight={first} number={1} sizes="(max-width: 767px) 100vw, 54vw" className="aspect-[760/560] md:aspect-auto md:h-full" />
+          <HighlightImage highlight={third} number={3} sizes="(max-width: 767px) 100vw, 54vw" className="aspect-[760/560] md:aspect-auto md:h-full" />
         </div>
       </div>
     </section>

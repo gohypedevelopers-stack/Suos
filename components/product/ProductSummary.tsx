@@ -121,7 +121,7 @@ function OfferCard({ code, headline, detail }: { code: string; headline: string;
         type="button"
         onClick={copy}
         aria-label={`Copy code ${code}`}
-        className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 text-body text-ink-650 underline underline-offset-4 hover:text-black"
+        className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 text-body text-ink-650 underline underline-offset-[5px] hover:text-black"
       >
         {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
         {copied ? "Copied" : "Copy"}
@@ -133,7 +133,7 @@ function OfferCard({ code, headline, detail }: { code: string; headline: string;
 function MiniProductCard({ product }: { product: HomeProductCard }) {
   return (
     <Link href={`/products/${product.slug}`} className="group block w-[180px] shrink-0 snap-start sm:w-[230px]">
-      <div className="relative aspect-[230/304] overflow-hidden bg-[#efefef]">
+      <div data-row-media className="relative aspect-[230/304] overflow-hidden bg-[#efefef]">
         {product.image ? (
           <Image
             src={product.image}
@@ -328,7 +328,7 @@ export function ProductSummary({
             <SizeChartModal images={product.sizeGuideImages} fitType={product.fitType}>
               <button
                 type="button"
-                className="cursor-pointer text-body-lg text-ink-650 underline underline-offset-4 transition-colors hover:text-black"
+                className="cursor-pointer text-body-lg text-ink-650 underline underline-offset-[5px] transition-colors hover:text-black"
               >
                 Discover your Size
               </button>
@@ -417,7 +417,7 @@ export function ProductSummary({
                 More from {product.moreFrom.title}
               </h2>
               {product.moreFrom.href ? (
-                <Link href={product.moreFrom.href} className="text-body text-ink-650 underline underline-offset-4 hover:text-black">
+                <Link href={product.moreFrom.href} className="text-body text-ink-650 underline underline-offset-[5px] hover:text-black">
                   View all
                 </Link>
               ) : null}
@@ -507,7 +507,7 @@ export function ProductSummary({
                     </ul>
                   </div>
                 ))}
-                <Link href="/returns-policy" className="inline-block underline underline-offset-4">
+                <Link href="/returns-policy" className="inline-block underline underline-offset-[5px]">
                   Read the full shipping, returns &amp; exchange policy
                 </Link>
               </div>
