@@ -77,6 +77,13 @@ export type AdminOrderDetail = AdminOrderListItem & {
     sgst: number
     igst: number
   }>
+  paymentMethod: string | null
+  paymentDetails: {
+    razorpayOrderId?: string
+    razorpayPaymentId?: string
+    razorpaySignature?: string
+    paidAt?: string
+  } | null
 }
 
 export type AdminOrderCreateOption = {
@@ -260,6 +267,8 @@ export async function getOrderForAdmin(
     gstin: taxSettings.gstin,
     taxSettings,
     shippingAddress: (order.shippingAddress as any) ?? null,
+    paymentMethod: order.paymentMethod,
+    paymentDetails: (order.taxDetails as any)?.payment ?? null,
     items: mappedItems,
   }
 }

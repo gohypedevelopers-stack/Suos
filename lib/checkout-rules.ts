@@ -5,9 +5,9 @@
  */
 
 export const SHIPPING_METHODS = {
-  standard: { label: "Standard", price: 0 },
-  "second-day": { label: "Second Day", price: 149 },
-  "next-day": { label: "Next Day", price: 299 },
+  standard: { label: "Free Delivery", price: 0 },
+  "second-day": { label: "Free Delivery", price: 0 },
+  "next-day": { label: "Free Delivery", price: 0 },
 } as const
 
 export type ShippingMethodId = keyof typeof SHIPPING_METHODS

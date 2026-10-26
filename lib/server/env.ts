@@ -79,6 +79,13 @@ const googleAuthEnvSchema = z.object({
   GOOGLE_CLIENT_SECRET: optionalString,
 })
 
+const razorpayEnvSchema = z.object({
+  RAZORPAY_KEY_ID: optionalString,
+  RAZORPAY_KEY_SECRET: optionalString,
+  RAZORPAY_WEBHOOK_SECRET: optionalString,
+  NEXT_PUBLIC_RAZORPAY_KEY_ID: optionalString,
+})
+
 const siteEnvSchema = z.object({
   NEXT_PUBLIC_SITE_URL: z.url().optional(),
   BETTER_AUTH_URL: z.url().default("http://localhost:3000"),
@@ -93,6 +100,7 @@ let r2Env: z.infer<typeof r2EnvSchema> | undefined
 let emailEnv: z.infer<typeof emailEnvSchema> | undefined
 let whatsappEnv: z.infer<typeof whatsappEnvSchema> | undefined
 let googleAuthEnv: z.infer<typeof googleAuthEnvSchema> | undefined
+let razorpayEnv: z.infer<typeof razorpayEnvSchema> | undefined
 let siteEnv: z.infer<typeof siteEnvSchema> | undefined
 
 export function getDatabaseEnv() {
@@ -123,6 +131,11 @@ export function getWhatsAppEnv() {
 export function getGoogleAuthEnv() {
   googleAuthEnv ??= googleAuthEnvSchema.parse(process.env)
   return googleAuthEnv
+}
+
+export function getRazorpayEnv() {
+  razorpayEnv ??= razorpayEnvSchema.parse(process.env)
+  return razorpayEnv
 }
 
 export function getSiteEnv() {

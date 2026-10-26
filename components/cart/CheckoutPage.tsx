@@ -22,9 +22,27 @@ import {
 import { useCart } from "@/lib/cart-context"
 import { toast } from "sonner"
 
-import { placeOrderAction } from "@/app/actions/checkout"
+import {
+  placeOrderAction,
+  createRazorpayOrderAction,
+  confirmRazorpayOrderAction,
+  validatePromoCodeAction,
+} from "@/app/actions/checkout"
+import { automaticDiscountFor } from "@/lib/checkout-rules"
+import { loadRazorpayCheckoutScript } from "@/lib/razorpay-client"
 import { getSessionId, track } from "@/lib/analytics-client"
 import { usePageContent } from "@/lib/site-content-context"
+
+export type AppliedPromo = {
+  code: string
+  title: string
+  amount: number
+  freeShipping: boolean
+  discountType: string
+  valueType: string
+  value: number
+  description: string
+}
 
 /* ─────────────────────────────────────────────
    Helpers & Options
@@ -49,21 +67,9 @@ type ShippingOption = {
 const SHIPPING_OPTIONS: ShippingOption[] = [
   {
     id: "standard",
-    label: "Standard",
-    description: "Enter zip code above for delivery estimate",
+    label: "Free Delivery",
+    description: "Complimentary shipping for all orders",
     price: 0,
-  },
-  {
-    id: "second-day",
-    label: "Second Day",
-    description: "Usually delivered in 2 business days",
-    price: 149,
-  },
-  {
-    id: "next-day",
-    label: "Next Day",
-    description: "Usually delivered in 1 business day",
-    price: 299,
   },
 ]
 
@@ -199,76 +205,17 @@ function FloatingSelect({
   )
 }
 
-/* ─────────────────────────────────────────────
-   Shipping Method Card Selector
-───────────────────────────────────────────── */
-function ShippingMethodCards({
-  selected,
-  onChange,
-}: {
-  selected: string
-  onChange: (id: string) => void
-}) {
-  return (
-    <div className="divide-y divide-black/15 border border-black/25">
-      {SHIPPING_OPTIONS.map((opt) => {
-        const isSelected = selected === opt.id
-        return (
-          <label
-            key={opt.id}
-            className={`flex cursor-pointer items-center justify-between px-4 py-4 transition-colors ${
-              isSelected ? "bg-black/[0.03]" : "hover:bg-black/[0.01]"
-            }`}
-          >
-            <div className="flex items-center gap-3.5">
-              <div
-                className={`flex size-4 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
-                  isSelected ? "border-black" : "border-black/35"
-                }`}
-              >
-                {isSelected && (
-                  <span className="size-2 rounded-full bg-black" />
-                )}
-              </div>
-              <div>
-                <p className="text-[13px] font-normal uppercase tracking-[0.04em] text-black">
-                  {opt.label}
-                </p>
-                <p className="mt-0.5 text-[12px] tracking-[0.02em] text-black/55">
-                  {opt.description}
-                </p>
-              </div>
-            </div>
 
-            <span className="text-[13px] font-normal tracking-[0.04em] text-black">
-              {opt.price === 0 ? "FREE" : formatPrice(opt.price)}
-            </span>
-          </label>
-        )
-      })}
-    </div>
-  )
-}
-
-/* ─────────────────────────────────────────────
-   Payment Method Selector & Form
-───────────────────────────────────────────── */
 function PaymentSection({
-  selectedMethod,
-  setSelectedMethod,
-  total,
+  billingSame,
+  setBillingSame,
+  isFreeOrder = false,
 }: {
-  selectedMethod: string
-  setSelectedMethod: (m: string) => void
-  total: number
+  billingSame: boolean
+  setBillingSame: (v: boolean) => void
+  isFreeOrder?: boolean
 }) {
   const page = usePageContent("checkoutPage")
-  const [upiId, setUpiId] = useState("")
-  const [cardNumber, setCardNumber] = useState("")
-  const [cardExpiry, setCardExpiry] = useState("")
-  const [cardCvv, setCardCvv] = useState("")
-  const [cardName, setCardName] = useState("")
-  const [billingSame, setBillingSame] = useState(true)
 
   return (
     <div className="space-y-6 pt-4">
@@ -277,168 +224,63 @@ function PaymentSection({
           {page.text("payment", "heading")}
         </h2>
         <p className="text-[12px] uppercase tracking-[0.04em] text-black/50">
-          {page.text("payment", "text")}
+          All transactions are secure and encrypted.
         </p>
       </div>
 
-      {/* Payment Method Cards */}
-      <div className="divide-y divide-black/15 border border-black/25">
-        {/* UPI */}
-        <label
-          className={`flex cursor-pointer items-center justify-between p-4 transition-colors ${
-            selectedMethod === "upi" ? "bg-black/[0.03]" : "hover:bg-black/[0.01]"
-          }`}
-        >
-          <div className="flex items-center gap-3.5">
-            <div
-              className={`flex size-4 shrink-0 items-center justify-center rounded-full border-2 ${
-                selectedMethod === "upi" ? "border-black" : "border-black/35"
-              }`}
-            >
-              {selectedMethod === "upi" && (
-                <span className="size-2 rounded-full bg-black" />
-              )}
-            </div>
+      {isFreeOrder ? (
+        <div className="border border-black/25 bg-black/[0.02] p-4">
+          <div className="flex items-center gap-3">
+            <CheckCircle2 className="size-5 text-black" />
             <div>
               <span className="text-[13px] font-normal uppercase tracking-[0.04em] text-black">
-                UPI / QR Code (Google Pay, PhonePe, Paytm)
+                100% Free Order
               </span>
-              <p className="text-[11px] text-black/50">Instant verification · No convenience fee</p>
+              <p className="text-[11px] text-black/60">
+                Your applied coupon covers the full order balance. No payment gateway required.
+              </p>
             </div>
           </div>
-          <QrCode className="size-5 text-black/60" />
-        </label>
+        </div>
+      ) : (
+        /* Unified Razorpay Secure Payment Card */
+        <div className="border border-black/25 bg-white">
+          <div className="flex items-center justify-between p-4 bg-black/[0.02]">
+            <div className="flex items-center gap-3.5">
+              <div className="flex size-4 shrink-0 items-center justify-center rounded-full border-2 border-black">
+                <span className="size-2 rounded-full bg-black" />
+              </div>
+              <div>
+                <span className="text-[13px] font-normal uppercase tracking-[0.04em] text-black">
+                  Razorpay Secure
+                </span>
+                <p className="text-[11px] text-black/50">
+                  UPI (Google Pay, PhonePe, Paytm), Cards, Net Banking &amp; Wallets
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <QrCode className="size-4 text-black/60" />
+              <CreditCard className="size-4 text-black/60" />
+              <Building2 className="size-4 text-black/60" />
+            </div>
+          </div>
 
-        {selectedMethod === "upi" && (
-          <div className="bg-neutral-50 p-4 space-y-3 border-t border-black/10">
-            <p className="text-[12px] uppercase tracking-[0.04em] text-black/70">
-              Enter your UPI ID or scan QR upon placing order:
+          <div className="border-t border-black/10 bg-neutral-50 p-4 text-[12px] leading-relaxed text-black/70">
+            <p>
+              After clicking <strong>Pay with Razorpay</strong>, the secure Razorpay checkout window will open with all payment options (Google Pay, PhonePe, Paytm, QR Code, Debit/Credit Cards, and Net Banking).
             </p>
-            <input
-              type="text"
-              placeholder="username@okhdfcbank"
-              value={upiId}
-              onChange={(e) => setUpiId(e.target.value)}
-              className="h-11 w-full border border-black/25 bg-white px-3.5 text-[13px] text-black placeholder:text-black/35 focus:border-black focus:outline-none"
-            />
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Credit / Debit Card */}
-        <label
-          className={`flex cursor-pointer items-center justify-between p-4 transition-colors ${
-            selectedMethod === "card" ? "bg-black/[0.03]" : "hover:bg-black/[0.01]"
-          }`}
-        >
-          <div className="flex items-center gap-3.5">
-            <div
-              className={`flex size-4 shrink-0 items-center justify-center rounded-full border-2 ${
-                selectedMethod === "card" ? "border-black" : "border-black/35"
-              }`}
-            >
-              {selectedMethod === "card" && (
-                <span className="size-2 rounded-full bg-black" />
-              )}
-            </div>
-            <div>
-              <span className="text-[13px] font-normal uppercase tracking-[0.04em] text-black">
-                Credit or Debit Card
-              </span>
-              <p className="text-[11px] text-black/50">Visa, Mastercard, RuPay, Amex</p>
-            </div>
-          </div>
-          <CreditCard className="size-5 text-black/60" />
-        </label>
-
-        {selectedMethod === "card" && (
-          <div className="bg-neutral-50 p-4 space-y-3 border-t border-black/10">
-            <input
-              type="text"
-              placeholder="Card Number"
-              maxLength={19}
-              value={cardNumber}
-              onChange={(e) => setCardNumber(e.target.value)}
-              className="h-11 w-full border border-black/25 bg-white px-3.5 text-[13px] text-black placeholder:text-black/35 focus:border-black focus:outline-none"
-            />
-            <div className="grid grid-cols-2 gap-3">
-              <input
-                type="text"
-                placeholder="MM / YY"
-                maxLength={5}
-                value={cardExpiry}
-                onChange={(e) => setCardExpiry(e.target.value)}
-                className="h-11 border border-black/25 bg-white px-3.5 text-[13px] text-black placeholder:text-black/35 focus:border-black focus:outline-none"
-              />
-              <input
-                type="password"
-                placeholder="CVV"
-                maxLength={4}
-                value={cardCvv}
-                onChange={(e) => setCardCvv(e.target.value)}
-                className="h-11 border border-black/25 bg-white px-3.5 text-[13px] text-black placeholder:text-black/35 focus:border-black focus:outline-none"
-              />
-            </div>
-            <input
-              type="text"
-              placeholder="Name on Card"
-              value={cardName}
-              onChange={(e) => setCardName(e.target.value)}
-              className="h-11 w-full border border-black/25 bg-white px-3.5 text-[13px] text-black placeholder:text-black/35 focus:border-black focus:outline-none"
-            />
-          </div>
-        )}
-
-        {/* Net Banking */}
-        <label
-          className={`flex cursor-pointer items-center justify-between p-4 transition-colors ${
-            selectedMethod === "netbanking" ? "bg-black/[0.03]" : "hover:bg-black/[0.01]"
-          }`}
-        >
-          <div className="flex items-center gap-3.5">
-            <div
-              className={`flex size-4 shrink-0 items-center justify-center rounded-full border-2 ${
-                selectedMethod === "netbanking" ? "border-black" : "border-black/35"
-              }`}
-            >
-              {selectedMethod === "netbanking" && (
-                <span className="size-2 rounded-full bg-black" />
-              )}
-            </div>
-            <div>
-              <span className="text-[13px] font-normal uppercase tracking-[0.04em] text-black">
-                Net Banking
-              </span>
-              <p className="text-[11px] text-black/50">All Indian major banks supported</p>
-            </div>
-          </div>
-          <Building2 className="size-5 text-black/60" />
-        </label>
-
-        {/* Cash on Delivery */}
-        <label
-          className={`flex cursor-pointer items-center justify-between p-4 transition-colors ${
-            selectedMethod === "cod" ? "bg-black/[0.03]" : "hover:bg-black/[0.01]"
-          }`}
-        >
-          <div className="flex items-center gap-3.5">
-            <div
-              className={`flex size-4 shrink-0 items-center justify-center rounded-full border-2 ${
-                selectedMethod === "cod" ? "border-black" : "border-black/35"
-              }`}
-            >
-              {selectedMethod === "cod" && (
-                <span className="size-2 rounded-full bg-black" />
-              )}
-            </div>
-            <div>
-              <span className="text-[13px] font-normal uppercase tracking-[0.04em] text-black">
-                Cash on Delivery (Pay on Delivery)
-              </span>
-              <p className="text-[11px] text-black/50">Pay cash or UPI upon delivery at doorstep</p>
-            </div>
-          </div>
-          <Truck className="size-5 text-black/60" />
-        </label>
+      {/* Security Badge */}
+      <div className="flex items-center justify-between border border-black/15 bg-black/[0.02] px-4 py-3 text-[12px] text-black/75">
+        <div className="flex items-center gap-2">
+          <Lock className="size-3.5 text-black/70" />
+          <span className="font-normal uppercase tracking-[0.04em]">100% Encrypted &amp; Secure Checkout</span>
+        </div>
+        <span className="text-[11px] uppercase tracking-[0.04em] text-black/50">Razorpay Live</span>
       </div>
 
       {/* Billing Address Option */}
@@ -476,25 +318,47 @@ function PaymentSection({
 /* ─────────────────────────────────────────────
    Right Column: Sticky SUOS Order Summary
 ───────────────────────────────────────────── */
+type CheckoutRightSummaryProps = {
+  subtotal: number
+  shippingCost: number
+  automaticDiscount: number
+  promoDiscount: number
+  appliedPromo: AppliedPromo | null
+  onApplyPromo: (code: string) => Promise<boolean>
+  onRemovePromo: () => void
+  isApplyingPromo: boolean
+}
+
 function CheckoutRightSummary({
   subtotal,
   shippingCost,
-}: {
-  subtotal: number
-  shippingCost: number
-}) {
+  automaticDiscount,
+  promoDiscount,
+  appliedPromo,
+  onApplyPromo,
+  onRemovePromo,
+  isApplyingPromo,
+}: CheckoutRightSummaryProps) {
   const page = usePageContent("checkoutPage")
   const { cart } = useCart()
   const [bagOpen, setBagOpen] = useState(true)
-  const [promoOpen, setPromoOpen] = useState(false)
-  const [promoCode, setPromoCode] = useState("")
-  const [promoApplied, setPromoApplied] = useState(false)
+  const [promoOpen, setPromoOpen] = useState(Boolean(appliedPromo))
+  const [inputCode, setInputCode] = useState("")
 
-  const discount = subtotal >= 2999 ? Math.round(subtotal * 0.1) : 0
-  const total = subtotal - discount + shippingCost
+  const totalDiscount = appliedPromo ? promoDiscount : automaticDiscount
+  const total = Math.max(0, subtotal - totalDiscount + shippingCost)
   const installment = Math.round(total / 4)
 
   const totalItemCount = cart.reduce((s, i) => s + i.quantity, 0)
+
+  const handleApplyClick = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!inputCode.trim() || isApplyingPromo) return
+    const success = await onApplyPromo(inputCode.trim())
+    if (success) {
+      setInputCode("")
+    }
+  }
 
   return (
     <aside className="border border-black/15 bg-white p-6 sm:p-7 lg:sticky lg:top-8">
@@ -558,22 +422,42 @@ function CheckoutRightSummary({
           <span>{formatPrice(subtotal)}</span>
         </div>
 
-        {discount > 0 && (
+        {!appliedPromo && automaticDiscount > 0 && (
           <div className="flex items-center justify-between text-black font-normal">
             <span className="uppercase tracking-[0.04em]">Extra 10% off ₹2,999+</span>
-            <span>-{formatPrice(discount)}</span>
+            <span>-{formatPrice(automaticDiscount)}</span>
+          </div>
+        )}
+
+        {appliedPromo && promoDiscount > 0 && (
+          <div className="flex items-center justify-between text-black font-normal">
+            <span className="flex items-center gap-1.5 uppercase tracking-[0.04em]">
+              <Tag className="size-3" />
+              Coupon ({appliedPromo.code})
+            </span>
+            <span className="text-black">-{formatPrice(promoDiscount)}</span>
+          </div>
+        )}
+
+        {appliedPromo && appliedPromo.freeShipping && (
+          <div className="flex items-center justify-between text-black font-normal">
+            <span className="flex items-center gap-1.5 uppercase tracking-[0.04em]">
+              <Tag className="size-3" />
+              Coupon ({appliedPromo.code})
+            </span>
+            <span className="text-black uppercase">Free Shipping</span>
           </div>
         )}
 
         <div className="flex items-center justify-between text-black/80">
           <span className="uppercase tracking-[0.04em]">GST (Taxes)</span>
           <span className="text-black/60 font-mono text-[12px]">
-            Included ({formatPrice(Math.max(0, Math.round(((subtotal - discount) * 12) / 112)))})
+            Included ({formatPrice(Math.max(0, Math.round(((subtotal - totalDiscount) * 12) / 112)))})
           </span>
         </div>
 
         <div className="flex items-center justify-between text-black/80">
-          <span className="uppercase tracking-[0.04em]">Standard Shipping</span>
+          <span className="uppercase tracking-[0.04em]">Shipping</span>
           <span className="font-normal text-black uppercase tracking-[0.04em]">
             {shippingCost === 0 ? "FREE" : formatPrice(shippingCost)}
           </span>
@@ -582,47 +466,72 @@ function CheckoutRightSummary({
 
       {/* Promo Code Accordion */}
       {page.show("promo") ? (
-      <div className="mt-5 border-t border-black/15 pt-4">
-        <button
-          type="button"
-          onClick={() => setPromoOpen((p) => !p)}
-          className="flex w-full items-center justify-between text-[13px] uppercase tracking-[0.04em] text-black/60 transition-colors hover:text-black"
-        >
-          <span className="flex items-center gap-2">
-            <Tag className="size-3.5" />
-            {page.text("promo", "label")}
-          </span>
-          <ChevronDown
-            className={`size-4 transition-transform duration-200 ${
-              promoOpen ? "rotate-180" : ""
-            }`}
-          />
-        </button>
-
-        {promoOpen && (
-          <div className="mt-3 flex gap-2">
-            <input
-              type="text"
-              value={promoCode}
-              onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-              placeholder="SUOS10"
-              className="flex-1 border border-black/25 px-3 py-2 text-[12px] uppercase tracking-[0.04em] placeholder:normal-case placeholder:text-black/35 focus:border-black focus:outline-none"
+        <div className="mt-5 border-t border-black/15 pt-4">
+          <button
+            type="button"
+            onClick={() => setPromoOpen((p) => !p)}
+            className="flex w-full items-center justify-between text-[13px] uppercase tracking-[0.04em] text-black/60 transition-colors hover:text-black"
+          >
+            <span className="flex items-center gap-2">
+              <Tag className="size-3.5" />
+              {page.text("promo", "label")}
+            </span>
+            <ChevronDown
+              className={`size-4 transition-transform duration-200 ${
+                promoOpen ? "rotate-180" : ""
+              }`}
             />
-            <button
-              type="button"
-              onClick={() => setPromoApplied(true)}
-              className="border border-black bg-black px-4 text-[12px] uppercase tracking-[0.04em] text-white transition-opacity hover:opacity-85"
-            >
-              Apply
-            </button>
-          </div>
-        )}
-        {promoApplied && (
-          <p className="mt-2 text-[11px] uppercase tracking-[0.04em] text-black font-normal">
-            ✓ Code applied
-          </p>
-        )}
-      </div>
+          </button>
+
+          {promoOpen && (
+            <div className="mt-3">
+              {appliedPromo ? (
+                <div className="flex items-center justify-between border border-black/25 bg-neutral-50 px-3.5 py-3">
+                  <div className="flex items-center gap-2.5">
+                    <CheckCircle2 className="size-4 text-black" />
+                    <div>
+                      <p className="text-[12px] font-semibold uppercase tracking-[0.04em] text-black">
+                        {appliedPromo.code}
+                      </p>
+                      <p className="text-[11px] text-black/60">
+                        {appliedPromo.description}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={onRemovePromo}
+                    className="text-[11px] uppercase tracking-[0.04em] text-black/60 underline hover:text-black"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleApplyClick} className="flex gap-2">
+                  <input
+                    type="text"
+                    value={inputCode}
+                    onChange={(e) => setInputCode(e.target.value.toUpperCase())}
+                    placeholder="Enter coupon code"
+                    disabled={isApplyingPromo}
+                    className="flex-1 border border-black/25 px-3 py-2 text-[12px] uppercase tracking-[0.04em] placeholder:normal-case placeholder:text-black/35 focus:border-black focus:outline-none disabled:opacity-50"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isApplyingPromo || !inputCode.trim()}
+                    className="flex items-center justify-center min-w-[72px] border border-black bg-black px-4 text-[12px] uppercase tracking-[0.04em] text-white transition-opacity hover:opacity-85 disabled:opacity-50"
+                  >
+                    {isApplyingPromo ? (
+                      <LoaderCircle className="size-3.5 animate-spin" />
+                    ) : (
+                      "Apply"
+                    )}
+                  </button>
+                </form>
+              )}
+            </div>
+          )}
+        </div>
       ) : null}
 
       {/* Total */}
@@ -686,10 +595,12 @@ export function CheckoutPage() {
 
   // Step management
   const [step, setStep] = useState<"details" | "payment">("details")
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("upi")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [orderComplete, setOrderComplete] = useState(false)
   const [orderId, setOrderId] = useState("")
+  const [billingSame, setBillingSame] = useState(true)
+  const [appliedPromo, setAppliedPromo] = useState<AppliedPromo | null>(null)
+  const [isApplyingPromo, setIsApplyingPromo] = useState(false)
 
   useEffect(() => {
     if (cart.length > 0) {
@@ -708,8 +619,41 @@ export function CheckoutPage() {
     (sum, item) => sum + parseAmount(item.price) * item.quantity,
     0
   )
-  const discount = subtotal >= 2999 ? Math.round(subtotal * 0.1) : 0
-  const finalTotal = subtotal - discount + selectedShipping.price
+  const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0)
+  const automaticDiscount = automaticDiscountFor(subtotal)
+  const promoDiscount = appliedPromo
+    ? appliedPromo.valueType === "PERCENTAGE"
+      ? Math.round((subtotal * appliedPromo.value) / 100)
+      : Math.min(subtotal, Math.round(appliedPromo.value))
+    : 0
+  const totalDiscount = appliedPromo ? promoDiscount : automaticDiscount
+  const shippingCost = appliedPromo?.freeShipping ? 0 : selectedShipping.price
+  const finalTotal = Math.max(0, subtotal - totalDiscount + shippingCost)
+
+  const handleApplyPromo = async (code: string): Promise<boolean> => {
+    setIsApplyingPromo(true)
+    try {
+      const res = await validatePromoCodeAction(code, subtotal, totalQuantity)
+      if (!res.success) {
+        toast.error(res.message)
+        setIsApplyingPromo(false)
+        return false
+      }
+      setAppliedPromo(res)
+      toast.success(`Coupon "${res.code}" applied!`)
+      setIsApplyingPromo(false)
+      return true
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to apply coupon.")
+      setIsApplyingPromo(false)
+      return false
+    }
+  }
+
+  const handleRemovePromo = () => {
+    setAppliedPromo(null)
+    toast.info("Coupon removed.")
+  }
 
   const handleContinueToPayment = (e: React.FormEvent) => {
     e.preventDefault()
@@ -717,11 +661,25 @@ export function CheckoutPage() {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
+  // Preload Razorpay Checkout script when entering payment step
+  useEffect(() => {
+    if (step === "payment") {
+      loadRazorpayCheckoutScript().catch(() => {})
+    }
+  }, [step])
+
   const handlePlaceOrder = async () => {
     if (isSubmitting) return
+
+    if (!email || !firstName || !address || !city || !state || !pincode || !phone) {
+      toast.error("Please fill in all required shipping details.")
+      setStep("details")
+      return
+    }
+
     setIsSubmitting(true)
 
-    const result = await placeOrderAction({
+    const basePayload = {
       email,
       firstName,
       lastName,
@@ -733,7 +691,8 @@ export function CheckoutPage() {
       postalCode: pincode,
       country: "India",
       shippingMethod: shippingMethodId,
-      paymentMethod: selectedPaymentMethod,
+      paymentMethod: finalTotal === 0 ? "FREE_PROMO" : "razorpay",
+      promoCode: appliedPromo?.code ? appliedPromo.code : undefined,
       giftMessage: giftNote && giftMessage ? giftMessage : undefined,
       newsletter,
       analyticsSessionId: getSessionId(),
@@ -742,18 +701,123 @@ export function CheckoutPage() {
         size: item.size,
         quantity: item.quantity,
       })),
-    })
-
-    if (!result.success) {
-      setIsSubmitting(false)
-      toast.error(result.message)
-      return
     }
 
-    setOrderId(result.reference)
-    setIsSubmitting(false)
-    setOrderComplete(true)
-    clearCart()
+    // Free Order via 100% discount promo coupon
+    if (finalTotal === 0) {
+      try {
+        const orderRes = await placeOrderAction({
+          ...basePayload,
+          paymentMethod: "FREE_PROMO",
+        })
+        if (!orderRes.success) {
+          setIsSubmitting(false)
+          toast.error(orderRes.message)
+          return
+        }
+
+        setOrderId(orderRes.reference)
+        setIsSubmitting(false)
+        setOrderComplete(true)
+        clearCart()
+        toast.success("Order confirmed successfully!")
+        return
+      } catch (err: any) {
+        console.error("Free order confirmation failed:", err)
+        setIsSubmitting(false)
+        toast.error(err?.message || "Could not confirm order. Please try again.")
+        return
+      }
+    }
+
+    // Online Payment via Razorpay Live Gateway
+    try {
+      const scriptReady = await loadRazorpayCheckoutScript()
+      if (!scriptReady || !window.Razorpay) {
+        setIsSubmitting(false)
+        toast.error("Could not load payment gateway. Please check your internet connection and try again.")
+        return
+      }
+
+      const createRes = await createRazorpayOrderAction(basePayload)
+      if (!createRes.success) {
+        setIsSubmitting(false)
+        toast.error(createRes.message)
+        return
+      }
+
+      const rzp = new window.Razorpay({
+        key: createRes.keyId,
+        amount: createRes.amount,
+        currency: createRes.currency,
+        name: "SUOS",
+        description: `Order Checkout (${cart.reduce((s, i) => s + i.quantity, 0)} items)`,
+        image: "/logo.svg",
+        order_id: createRes.razorpayOrderId,
+        prefill: {
+          name: `${firstName} ${lastName}`.trim(),
+          email: email.trim(),
+          contact: phone.trim(),
+        },
+        notes: {
+          city,
+          state,
+          pincode,
+        },
+        theme: {
+          color: "#000000",
+        },
+        modal: {
+          confirm_close: true,
+          ondismiss: () => {
+            setIsSubmitting(false)
+            toast.info("Payment window closed. You can complete your order anytime.")
+          },
+        },
+        handler: async (response) => {
+          try {
+            const confirmRes = await confirmRazorpayOrderAction({
+              ...basePayload,
+              paymentMethod: "razorpay",
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+            })
+
+            if (!confirmRes.success) {
+              setIsSubmitting(false)
+              toast.error(confirmRes.message)
+              return
+            }
+
+            setOrderId(confirmRes.reference)
+            setIsSubmitting(false)
+            setOrderComplete(true)
+            clearCart()
+            toast.success("Payment verified! Order confirmed.")
+          } catch (err) {
+            console.error("Payment confirmation failed:", err)
+            setIsSubmitting(false)
+            toast.error(
+              `Payment was received (Ref: ${response.razorpay_payment_id}), but confirmation encountered an issue. SUOS support is investigating.`
+            )
+          }
+        },
+      })
+
+      rzp.on("payment.failed", (errorData: any) => {
+        setIsSubmitting(false)
+        const reason =
+          errorData?.error?.description || "Payment was declined. Please try another card or UPI."
+        toast.error(reason)
+      })
+
+      rzp.open()
+    } catch (err) {
+      console.error("Razorpay initiation error:", err)
+      setIsSubmitting(false)
+      toast.error("Unable to initiate payment with Razorpay. Please try again.")
+    }
   }
 
   // Order Confirmed Screen
@@ -887,39 +951,6 @@ export function CheckoutPage() {
           {/* ─── LEFT COLUMN: Steps Form ─── */}
           <div className="space-y-10">
 
-            {/* Express Checkout Section */}
-            {step === "details" && page.show("express") && (
-              <div>
-                <p className="text-center text-[12px] uppercase tracking-[0.04em] text-black/60">
-                  {page.text("express", "heading")}
-                </p>
-                <div className="mt-3 grid grid-cols-2 gap-2 sm:gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setStep("payment")}
-                    className="flex h-12 items-center justify-center border border-black bg-white px-1 sm:px-2 text-center text-[11px] min-[360px]:text-[11px] sm:text-[12px] font-normal uppercase tracking-[0.02em] sm:tracking-[0.04em] text-black transition-colors hover:bg-black hover:text-white"
-                  >
-                    UPI / GPay
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setStep("payment")}
-                    className="flex h-12 items-center justify-center border border-black bg-white px-1 sm:px-2 text-center text-[11px] min-[360px]:text-[11px] sm:text-[12px] font-normal uppercase tracking-[0.02em] sm:tracking-[0.04em] text-black transition-colors hover:bg-black hover:text-white"
-                  >
-                    Cards / Netbanking
-                  </button>
-                </div>
-
-                <div className="relative my-7 text-center">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-black/15" />
-                  </div>
-                  <span className="relative bg-white px-4 text-[11px] uppercase tracking-[0.04em] text-black/50">
-                    or
-                  </span>
-                </div>
-              </div>
-            )}
 
             {/* Back button if in payment step */}
             {step === "payment" && (
@@ -1081,38 +1112,13 @@ export function CheckoutPage() {
                   </div>
                 </section>
 
-                {/* 3. Shipping Method */}
-                <section className="space-y-4">
-                  <div>
-                    <h2 className="text-[20px] font-normal uppercase tracking-[0.04em] text-black sm:text-[22px]">
-                      {page.text("method", "heading")}
-                    </h2>
-                    {page.text("method", "note") ? (
-                      <p className="mt-1 text-[12px] uppercase tracking-[0.04em] text-black/50">
-                        {page.text("method", "note")}
-                      </p>
-                    ) : null}
-                  </div>
-
-                  <ShippingMethodCards
-                    selected={shippingMethodId}
-                    onChange={setShippingMethodId}
-                  />
-
-                  {page.lines("method", "info").length > 0 ? (
-                    <p className="text-[11px] leading-[1.5] tracking-[0.02em] text-black/55">
-                      {page.lines("method", "info").join(" ")}
-                    </p>
-                  ) : null}
-                </section>
-
                 {/* Continue to Payment CTA */}
                 <div>
                   <button
                     type="submit"
                     className="flex h-12 w-full items-center justify-center bg-black text-[14px] font-normal uppercase tracking-[0.04em] text-white transition-opacity hover:opacity-90 active:scale-[0.99]"
                   >
-                    {page.text("method", "continue")}
+                    Continue to Payment
                   </button>
                 </div>
               </form>
@@ -1120,9 +1126,9 @@ export function CheckoutPage() {
               /* Step 2: Payment View */
               <div className="space-y-8">
                 <PaymentSection
-                  selectedMethod={selectedPaymentMethod}
-                  setSelectedMethod={setSelectedPaymentMethod}
-                  total={finalTotal}
+                  billingSame={billingSame}
+                  setBillingSame={setBillingSame}
+                  isFreeOrder={finalTotal === 0}
                 />
 
                 <button
@@ -1136,8 +1142,10 @@ export function CheckoutPage() {
                       <LoaderCircle className="size-4 animate-spin" />
                       Securing Order…
                     </>
+                  ) : finalTotal === 0 ? (
+                    "Complete Order (Free)"
                   ) : (
-                    `Place Order & Pay ${formatPrice(finalTotal)}`
+                    `Pay ${formatPrice(finalTotal)} with Razorpay`
                   )}
                 </button>
               </div>
@@ -1180,7 +1188,13 @@ export function CheckoutPage() {
           {/* ─── RIGHT COLUMN: Order Summary ─── */}
           <CheckoutRightSummary
             subtotal={subtotal}
-            shippingCost={selectedShipping.price}
+            shippingCost={shippingCost}
+            automaticDiscount={automaticDiscount}
+            promoDiscount={promoDiscount}
+            appliedPromo={appliedPromo}
+            onApplyPromo={handleApplyPromo}
+            onRemovePromo={handleRemovePromo}
+            isApplyingPromo={isApplyingPromo}
           />
         </div>
       </div>

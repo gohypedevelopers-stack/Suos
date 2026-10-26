@@ -419,6 +419,24 @@ export default async function OrderDetailPage({
                         </dd>
                       </div>
                       <div className="flex items-center justify-between gap-3">
+                        <dt className="text-black/60">Method</dt>
+                        <dd className="font-medium text-black uppercase text-xs">
+                          {order.paymentMethod?.toLowerCase().includes("razorpay")
+                            ? "Razorpay Live"
+                            : order.paymentMethod === "cod" || order.paymentMethod === "COD"
+                            ? "Cash on Delivery (COD)"
+                            : order.paymentMethod || "Standard"}
+                        </dd>
+                      </div>
+                      {order.paymentDetails?.razorpayPaymentId && (
+                        <div className="flex flex-col gap-1 border-t border-black/5 pt-2 text-xs">
+                          <dt className="text-black/50">Razorpay Payment ID</dt>
+                          <dd className="font-mono font-medium text-emerald-800 break-all">
+                            {order.paymentDetails.razorpayPaymentId}
+                          </dd>
+                        </div>
+                      )}
+                      <div className="flex items-center justify-between gap-3">
                         <dt className="text-black/60">Fulfillment</dt>
                         <dd className="font-medium text-black">
                           {fulfillmentLabel(order.status)}

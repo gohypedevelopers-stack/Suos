@@ -42,6 +42,14 @@ export const checkoutInputSchema = z.object({
 export type CheckoutInput = z.infer<typeof checkoutInputSchema>
 export type CheckoutItemInput = z.infer<typeof checkoutItemSchema>
 
+export const razorpayConfirmationSchema = checkoutInputSchema.extend({
+  razorpayOrderId: z.string().trim().min(1, "Razorpay Order ID is required."),
+  razorpayPaymentId: z.string().trim().min(1, "Razorpay Payment ID is required."),
+  razorpaySignature: z.string().trim().min(1, "Razorpay Signature is required."),
+})
+
+export type RazorpayConfirmationInput = z.infer<typeof razorpayConfirmationSchema>
+
 export const cartSyncSchema = z
   .array(checkoutItemSchema)
   .max(50)
