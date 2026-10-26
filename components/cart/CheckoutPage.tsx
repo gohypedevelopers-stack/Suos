@@ -826,7 +826,7 @@ export function CheckoutPage() {
       <main className="min-h-screen bg-white text-black">
         {/* Minimal Checkout Header */}
         <header className="border-b border-black/15 px-6 py-4 sm:px-10">
-          <div className="mx-auto flex max-w-6xl items-center justify-between">
+          <div className="mx-auto flex max-w-6xl items-center justify-center">
             <Link
               href="/"
               aria-label="SUOS home"
@@ -899,25 +899,38 @@ export function CheckoutPage() {
     <main className="min-h-screen bg-white text-black">
       {/* ─── SUOS MINIMAL CHECKOUT HEADER ─── */}
       <header className="border-b border-black/15 px-4 py-5 sm:px-8">
-        <div className="mx-auto flex max-w-6xl items-center justify-between">
-          {/* Logo */}
-          <Link
-            href="/"
-            aria-label="SUOS home"
-            className="transition-opacity hover:opacity-70"
-          >
-            <Image
-              src="/logo.svg"
-              alt="SUOS"
-              width={160}
-              height={74}
-              priority
-              className="block h-auto w-[5.8rem] sm:w-[6.8rem]"
-            />
-          </Link>
+        <div className="mx-auto grid max-w-6xl grid-cols-3 items-center">
+          {/* Left: Back to Shop */}
+          <div className="flex items-center justify-start">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.04em] text-black/55 transition-colors hover:text-black"
+            >
+              <ArrowLeft className="size-3.5" />
+              <span className="hidden sm:inline">Shop</span>
+            </Link>
+          </div>
 
-          {/* Help & Bag Icon with Item Count */}
-          <div className="flex items-center gap-5 text-[12px] tracking-[0.04em] text-black/60">
+          {/* Center: SUOS Logo */}
+          <div className="flex items-center justify-center">
+            <Link
+              href="/"
+              aria-label="SUOS home"
+              className="transition-opacity hover:opacity-70"
+            >
+              <Image
+                src="/logo.svg"
+                alt="SUOS"
+                width={160}
+                height={74}
+                priority
+                className="block h-auto w-[5.8rem] sm:w-[6.8rem]"
+              />
+            </Link>
+          </div>
+
+          {/* Right: Help & Bag Icon with Item Count */}
+          <div className="flex items-center justify-end gap-5 text-[12px] tracking-[0.04em] text-black/60">
             {page.show("help") ? (
               <div className="hidden items-center gap-2 sm:flex">
                 <span>{page.text("help", "text")}</span>

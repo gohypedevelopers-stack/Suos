@@ -84,6 +84,23 @@ function createAuth() {
         },
       },
     },
+    databaseHooks: {
+      user: {
+        create: {
+          after: async (user) => {
+            try {
+              const prisma = getPrisma()
+              await prisma.order.updateMany({
+                where: { email: { equals: user.email, mode: "insensitive" }, userId: null },
+                data: { userId: user.id },
+              })
+            } catch (err) {
+              console.error("[auth] failed linking guest orders to user", err)
+            }
+          },
+        },
+      },
+    },
     rateLimit: {
       enabled: true,
       window: 60,

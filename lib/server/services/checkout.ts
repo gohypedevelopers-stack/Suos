@@ -365,9 +365,16 @@ export async function placeStorefrontOrder(
       phone: input.phone,
     }
 
+    const customerUser =
+      user ??
+      (await tx.user.findFirst({
+        where: { email: { equals: input.email.trim(), mode: "insensitive" } },
+        select: { id: true },
+      }))
+
     const order = await tx.order.create({
       data: {
-        userId: user?.id ?? null,
+        userId: customerUser?.id ?? null,
         email: input.email,
         phone: input.phone,
         status: options?.status ?? "PENDING",
