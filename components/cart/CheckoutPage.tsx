@@ -878,14 +878,20 @@ export function CheckoutPage() {
 
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
-              href="/collections"
+              href="/account"
               className="inline-flex h-12 w-full items-center justify-center bg-black px-8 text-[14px] uppercase tracking-[0.04em] text-white transition-opacity hover:opacity-90 sm:w-auto"
+            >
+              View Order in Account
+            </Link>
+            <Link
+              href="/collections"
+              className="inline-flex h-12 w-full items-center justify-center border border-black px-8 text-[14px] uppercase tracking-[0.04em] text-black transition-colors hover:bg-black hover:text-white sm:w-auto"
             >
               Continue Shopping
             </Link>
             <Link
               href="/"
-              className="inline-flex h-12 w-full items-center justify-center border border-black px-8 text-[14px] uppercase tracking-[0.04em] text-black transition-colors hover:bg-black hover:text-white sm:w-auto"
+              className="inline-flex h-12 w-full items-center justify-center border border-black/20 px-8 text-[14px] uppercase tracking-[0.04em] text-black/70 transition-colors hover:border-black hover:text-black sm:w-auto"
             >
               Return to Home
             </Link>

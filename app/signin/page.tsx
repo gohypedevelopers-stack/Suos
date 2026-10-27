@@ -1,6 +1,9 @@
 import Image from "next/image"
+import { redirect } from "next/navigation"
 
 import { resolvePage } from "@/lib/page-content"
+import { isStaffRole } from "@/lib/roles"
+import { getCurrentUser } from "@/lib/server/dal/auth"
 import { getSiteContent } from "@/lib/server/dal/site-content"
 
 import { AuthFormPanel } from "@/components/auth/AuthFormPanel"
@@ -11,6 +14,14 @@ export const metadata = {
 }
 
 export default async function SignInPage() {
+  const user = await getCurrentUser()
+  if (user) {
+    if (isStaffRole(user.role)) {
+      redirect("/dashboard")
+    }
+    redirect("/account")
+  }
+
   const page = resolvePage("signupPage", (await getSiteContent()).signupPage)
   const showImage = page.show("image")
 

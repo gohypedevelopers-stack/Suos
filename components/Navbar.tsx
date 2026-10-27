@@ -30,6 +30,7 @@ import {
 import { useWishlist } from "@/lib/wishlist-context"
 import { useCart } from "@/lib/cart-context"
 import { useSiteContent } from "@/lib/site-content-context"
+import { authClient } from "@/lib/auth-client"
 import type { NavMenuCard, NavMenuLink } from "@/lib/site-content"
 
 type NavKey = "women" | "men" | "bestsellers" | "collections"
@@ -336,6 +337,8 @@ export function Navbar({
   const isOverlay = pathname === "/"
   const { wishlist, isLoaded, setIsSidebarOpen } = useWishlist()
   const { isCartOpen, setIsCartOpen, totalItems } = useCart()
+  const { data: session } = authClient.useSession()
+  const accountHref = session?.user ? "/account" : "/login"
   const [isScrolled, setIsScrolled] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -601,8 +604,9 @@ export function Navbar({
             </IconButton>
 
             <Link
-              href="/login"
-              aria-label="Profile"
+              href={accountHref}
+              aria-label={session?.user ? "My Account" : "Sign In"}
+              title={session?.user ? (session.user.name || session.user.email) : "Sign In"}
               className="inline-flex size-9 cursor-pointer items-center justify-center text-current transition-[color,opacity] duration-300 ease-out hover:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current/30"
             >
               <UserRound className="size-[18px] stroke-[1.7]" />
@@ -1016,12 +1020,12 @@ export function Navbar({
                 </button>
 
                 <Link
-                  href="/login"
+                  href={accountHref}
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center gap-3 py-2 transition-colors hover:text-white"
                 >
                   <UserRound className="size-4 stroke-[1.8]" />
-                  <span>My Account</span>
+                  <span>{session?.user ? "My Account" : "Sign In"}</span>
                 </Link>
 
                 <button

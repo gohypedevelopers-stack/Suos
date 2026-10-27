@@ -1,7 +1,10 @@
 import type { Metadata } from "next"
 import Image from "next/image"
+import { redirect } from "next/navigation"
 
 import { resolvePage } from "@/lib/page-content"
+import { isStaffRole } from "@/lib/roles"
+import { getCurrentUser } from "@/lib/server/dal/auth"
 import { getSiteContent } from "@/lib/server/dal/site-content"
 
 import { AuthFormPanel } from "@/components/auth/AuthFormPanel"
@@ -12,6 +15,14 @@ export const metadata: Metadata = {
 }
 
 export default async function LoginPage() {
+  const user = await getCurrentUser()
+  if (user) {
+    if (isStaffRole(user.role)) {
+      redirect("/dashboard")
+    }
+    redirect("/account")
+  }
+
   const page = resolvePage("loginPage", (await getSiteContent()).loginPage)
   const showImage = page.show("image")
 
