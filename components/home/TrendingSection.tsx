@@ -488,7 +488,7 @@ export function ProductCardView({
             onClick={handleCartClick}
             aria-label="Add to cart"
             title="Add to cart"
-            className="shrink-0 cursor-pointer p-0.5 text-black transition-transform duration-200 hover:scale-110 active:scale-95"
+            className="shrink-0 cursor-pointer p-1 mr-2 sm:mr-3 md:mr-4 text-black transition-transform duration-200 hover:scale-110 active:scale-95"
           >
             <CartIcon className="size-[15px] md:size-[18px]" />
           </button>
