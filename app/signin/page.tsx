@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import Image from "next/image"
 import { redirect } from "next/navigation"
 
@@ -9,8 +10,9 @@ import { getSiteContent } from "@/lib/server/dal/site-content"
 import { AuthFormPanel } from "@/components/auth/AuthFormPanel"
 import { SignUpPanel } from "@/components/auth/SignUpPanel"
 
-export const metadata = {
-  title: "Create account | SUOS",
+export const metadata: Metadata = {
+  title: "Create Account | SUOS",
+  description: "Create your SUOS account to save your favourites and follow your orders.",
 }
 
 export default async function SignInPage() {

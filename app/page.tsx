@@ -1,3 +1,5 @@
+import type { Metadata } from "next"
+
 import { Hero } from "@/components/home/Hero"
 import { DenimCarousel } from "@/components/home/DenimCarousel"
 import { DenimEditorialSection } from "@/components/home/DenimEditorialSection"
@@ -14,6 +16,12 @@ import { listPublishedProducts } from "@/lib/server/dal/products"
 import { getHomeBanners } from "@/lib/server/dal/banners"
 
 export const dynamic = "force-dynamic"
+
+export const metadata: Metadata = {
+  title: "SUOS | Luxury Menswear & Premium Denim",
+  description:
+    "Discover SUOS — contemporary luxury menswear, artisanal denim, and tailored essentials crafted in India. Explore our curated collections of premium denim, shirts, and modern luxury essentials.",
+}
 
 export default async function Home() {
   const [products, banners] = await Promise.all([

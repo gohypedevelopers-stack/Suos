@@ -6,6 +6,7 @@ import { getSiteContent } from "@/lib/server/dal/site-content"
 
 export const metadata = {
   title: "Contact Us | SUOS",
+  description: "Get in touch with the SUOS client services team for orders, styling assistance, and general inquiries.",
 }
 
 export const dynamic = "force-dynamic"

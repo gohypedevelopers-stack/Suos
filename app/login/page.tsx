@@ -12,6 +12,7 @@ import { LoginPanel } from "@/components/auth/LoginPanel"
 
 export const metadata: Metadata = {
   title: "Login | SUOS",
+  description: "Sign in to your SUOS account to manage orders, track deliveries, and access your profile.",
 }
 
 export default async function LoginPage() {

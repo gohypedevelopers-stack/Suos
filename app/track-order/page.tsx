@@ -8,6 +8,7 @@ import { trackOrderLookupSchema } from "@/lib/validations/contact"
 
 export const metadata = {
   title: "Track Your Order | SUOS",
+  description: "Track your SUOS order status and shipment delivery in real-time.",
 }
 
 export const dynamic = "force-dynamic"
