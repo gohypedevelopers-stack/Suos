@@ -67,9 +67,9 @@ export function SignUpPanel() {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full text-black">
       <div>
-        <h1 className="font-heading text-[22px] sm:text-[24px] font-normal uppercase leading-tight tracking-normal">
+        <h1 className="font-heading text-[22px] font-normal uppercase leading-tight tracking-[0.02em] text-black sm:text-[24px]">
           {page.text("intro", "heading")}
         </h1>
         <p className="mt-3 max-w-sm text-left text-[12px] uppercase leading-[1.6] tracking-normal text-black/70">
@@ -79,7 +79,7 @@ export function SignUpPanel() {
 
       <form className="mt-6 space-y-4" onSubmit={handleSubmit} noValidate>
         <div>
-          <label htmlFor="full-name" className="mb-2 block text-[13px] font-normal uppercase leading-none">
+          <label htmlFor="full-name" className="mb-2 block text-[13px] font-normal uppercase leading-none tracking-[0.04em] text-black">
             Full name
           </label>
           <input
@@ -89,12 +89,12 @@ export function SignUpPanel() {
             autoComplete="name"
             required
             placeholder="YOUR FULL NAME"
-            className="auth-form-input h-12 w-full border border-black bg-white px-4 text-[16px] sm:text-[13px] placeholder:text-black/40 focus:outline-none focus:ring-1 focus:ring-black"
+            className="auth-form-input h-12 w-full border border-black bg-white px-4 text-[16px] sm:text-[13px] font-normal uppercase tracking-[0.02em] text-black outline-none placeholder:text-black/40 focus:ring-1 focus:ring-black"
           />
         </div>
 
         <div>
-          <label htmlFor="email" className="mb-2 block text-[13px] font-normal uppercase leading-none">
+          <label htmlFor="email" className="mb-2 block text-[13px] font-normal uppercase leading-none tracking-[0.04em] text-black">
             Email address
           </label>
           <input
@@ -104,13 +104,13 @@ export function SignUpPanel() {
             autoComplete="email"
             required
             placeholder="YOU@EXAMPLE.COM"
-            className="auth-form-input h-12 w-full border border-black bg-white px-4 text-[16px] sm:text-[13px] placeholder:text-black/40 focus:outline-none focus:ring-1 focus:ring-black"
+            className="auth-form-input h-12 w-full border border-black bg-white px-4 text-[16px] sm:text-[13px] font-normal uppercase tracking-[0.02em] text-black outline-none placeholder:text-black/40 focus:ring-1 focus:ring-black"
           />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="password" className="mb-2 block text-[13px] font-normal uppercase leading-none">
+            <label htmlFor="password" className="mb-2 block text-[13px] font-normal uppercase leading-none tracking-[0.04em] text-black">
               Password
             </label>
             <div className="relative">
@@ -125,7 +125,7 @@ export function SignUpPanel() {
                 onChange={(event) => {
                   setPasswordValue(event.target.value)
                 }}
-                className="auth-form-input h-12 w-full border border-black bg-white px-4 pr-12 text-[16px] sm:text-[13px] placeholder:text-black/40 focus:outline-none focus:ring-1 focus:ring-black"
+                className="auth-form-input h-12 w-full border border-black bg-white px-4 pr-12 text-[16px] sm:text-[13px] font-normal uppercase tracking-[0.02em] text-black outline-none placeholder:text-black/40 focus:ring-1 focus:ring-black"
               />
               <button
                 type="button"
@@ -144,7 +144,7 @@ export function SignUpPanel() {
             </div>
           </div>
           <div>
-            <label htmlFor="confirm-password" className="mb-2 block text-[13px] font-normal uppercase leading-none">
+            <label htmlFor="confirm-password" className="mb-2 block text-[13px] font-normal uppercase leading-none tracking-[0.04em] text-black">
               Confirm password
             </label>
             <div className="relative">
@@ -157,7 +157,7 @@ export function SignUpPanel() {
                 minLength={8}
                 placeholder="REPEAT PASSWORD"
                 onChange={(event) => setConfirmPasswordValue(event.target.value)}
-                className="auth-form-input h-12 w-full border border-black bg-white px-4 pr-12 text-[16px] sm:text-[13px] placeholder:text-black/40 focus:outline-none focus:ring-1 focus:ring-black"
+                className="auth-form-input h-12 w-full border border-black bg-white px-4 pr-12 text-[16px] sm:text-[13px] font-normal uppercase tracking-[0.02em] text-black outline-none placeholder:text-black/40 focus:ring-1 focus:ring-black"
               />
               <button
                 type="button"
@@ -180,33 +180,33 @@ export function SignUpPanel() {
         <button
           type="submit"
           disabled={isPending}
-          className="flex h-14 w-full items-center justify-center bg-black px-5 text-[13px] font-normal uppercase text-white transition-colors hover:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:cursor-wait disabled:bg-black/60"
+          className="mt-4 flex h-12 w-full items-center justify-center bg-black px-5 text-[13px] font-normal uppercase tracking-[0.04em] text-white transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-50"
         >
           <span>{isPending ? "Creating account…" : page.text("form", "button")}</span>
         </button>
 
         {page.show("terms") ? (
-        <p className="text-justify text-[12px] uppercase leading-[1.5] tracking-normal text-black/60">
-          {page.text("terms", "text")}{" "}
-          <Link href="/terms" className="font-medium underline underline-offset-2 hover:text-black">
-            Terms &amp; Conditions
-          </Link>{" "}
-          and{" "}
-          <Link href="/privacy" className="font-medium underline underline-offset-2 hover:text-black">
-            Privacy Policy
-          </Link>
-          . {page.text("terms", "after")}
-        </p>
+          <p className="mt-4 text-left text-[12px] uppercase leading-[1.5] tracking-normal text-black/60">
+            {page.text("terms", "text")}{" "}
+            <Link href="/terms" className="font-normal underline underline-offset-4 text-black hover:opacity-70 transition-opacity">
+              Terms &amp; Conditions
+            </Link>{" "}
+            and{" "}
+            <Link href="/privacy" className="font-normal underline underline-offset-4 text-black hover:opacity-70 transition-opacity">
+              Privacy Policy
+            </Link>
+            . {page.text("terms", "after")}
+          </p>
         ) : null}
       </form>
 
       {page.show("login") ? (
-      <p className="mt-5 text-center text-[13px] font-normal uppercase">
-        {page.text("login", "text")}{" "}
-        <Link href="/login" className="font-[500] underline underline-offset-4 hover:text-black/60">
-          {page.text("login", "link")}
-        </Link>
-      </p>
+        <p className="mt-6 text-center text-[13px] font-normal uppercase tracking-[0.04em] text-black">
+          <span className="text-black/60">{page.text("login", "text")}</span>{" "}
+          <Link href="/login" className="font-normal underline underline-offset-4 text-black hover:opacity-70 transition-opacity">
+            {page.text("login", "link")}
+          </Link>
+        </p>
       ) : null}
     </div>
   )
