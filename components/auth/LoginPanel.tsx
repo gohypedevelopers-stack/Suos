@@ -76,10 +76,10 @@ export function LoginPanel() {
   return (
     <div className="w-full text-black">
       <div>
-        <h1 className="font-heading text-[24px] font-normal uppercase leading-none tracking-normal">
+        <h1 className="font-heading text-[22px] sm:text-[24px] font-normal uppercase leading-tight tracking-normal">
           {page.text("intro", "heading")}
         </h1>
-        <p className="mt-3 max-w-sm text-justify text-[12px] uppercase leading-[1.6] tracking-normal text-black">
+        <p className="mt-3 max-w-sm text-left text-[12px] uppercase leading-[1.6] tracking-normal text-black/70">
           {page.text("intro", "text")}
         </p>
       </div>
@@ -91,16 +91,16 @@ export function LoginPanel() {
             {page.text("mobile", "legend")}
           </legend>
 
-          <div className="mt-3 flex h-12 border border-black bg-white focus-within:ring-1 focus-within:ring-black">
-            <div className="flex shrink-0 items-center gap-2 border-r border-black/20 px-3 text-[13px]">
+          <div className="mt-3 flex h-12 w-full border border-black bg-white focus-within:ring-1 focus-within:ring-black">
+            <div className="flex shrink-0 items-center gap-1.5 border-r border-black/20 px-2.5 sm:px-3 text-[12px] sm:text-[13px]">
               <Image
                 src="/images/india-flag.svg"
-                alt=""
+                alt="India"
                 width={18}
                 height={12}
                 className="h-3 w-[18px] object-cover"
               />
-              <span>+ 91</span>
+              <span className="font-normal text-black">+91</span>
             </div>
 
             <label htmlFor="mobile-number" className="sr-only">
@@ -117,19 +117,19 @@ export function LoginPanel() {
               onChange={(event) => {
                 setMobileNumber(event.target.value.replace(/\D/g, "").slice(0, 10))
               }}
-              placeholder={page.text("mobile", "placeholder").toUpperCase()}
-              className="auth-form-input min-w-0 flex-1 bg-transparent px-3 text-[13px] uppercase outline-none placeholder:text-black/45"
+              placeholder="MOBILE NUMBER"
+              className="auth-form-input min-w-0 flex-1 bg-transparent px-2.5 sm:px-3 text-[16px] sm:text-[13px] uppercase outline-none placeholder:text-black/40"
             />
 
             <button
               type="submit"
-              className="shrink-0 cursor-pointer bg-black px-5 text-[13px] font-normal uppercase text-white transition-colors hover:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+              className="shrink-0 cursor-pointer bg-black px-4 sm:px-5 text-[12px] sm:text-[13px] font-normal uppercase text-white transition-colors hover:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
             >
               {page.text("mobile", "button")}
             </button>
           </div>
 
-          <label className="mt-4 flex w-fit cursor-pointer items-center gap-2 text-[12px] uppercase">
+          <label className="mt-4 flex w-fit cursor-pointer items-center gap-2 py-1 text-[12px] uppercase">
             <input
               type="checkbox"
               defaultChecked
@@ -141,7 +141,7 @@ export function LoginPanel() {
             >
               <Check className="size-3 stroke-[3]" />
             </span>
-            <span>{page.text("mobile", "newsletter")}</span>
+            <span className="select-none">{page.text("mobile", "newsletter")}</span>
           </label>
         </fieldset>
       </form>
@@ -170,7 +170,7 @@ export function LoginPanel() {
                 required
                 autoComplete="email"
                 placeholder="YOU@EXAMPLE.COM"
-                className="auth-form-input h-12 w-full border border-black bg-white px-4 text-[13px] outline-none placeholder:text-black/40 focus:ring-1 focus:ring-black"
+                className="auth-form-input h-12 w-full border border-black bg-white px-4 text-[16px] sm:text-[13px] outline-none placeholder:text-black/40 focus:ring-1 focus:ring-black"
               />
             </label>
 
@@ -191,7 +191,7 @@ export function LoginPanel() {
                   onChange={(event) => {
                     setPassword(event.target.value)
                   }}
-                  className="auth-form-input h-12 w-full border border-black bg-white px-4 pr-11 text-[13px] outline-none focus:ring-1 focus:ring-black"
+                  className="auth-form-input h-12 w-full border border-black bg-white px-4 pr-12 text-[16px] sm:text-[13px] outline-none focus:ring-1 focus:ring-black"
                 />
                 <button
                   type="button"
@@ -199,7 +199,7 @@ export function LoginPanel() {
                   aria-pressed={showPassword}
                   disabled={password.length === 0}
                   onClick={() => setShowPassword((visible) => !visible)}
-                  className="absolute right-3 top-1/2 inline-flex size-6 -translate-y-1/2 cursor-pointer items-center justify-center text-black/55 transition-colors hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30 disabled:cursor-not-allowed disabled:text-black/25"
+                  className="absolute right-1 top-1/2 inline-flex size-10 -translate-y-1/2 cursor-pointer items-center justify-center text-black/55 transition-colors hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30 disabled:cursor-not-allowed disabled:text-black/25"
                 >
                   {showPassword ? (
                     <EyeOff aria-hidden="true" className="size-[18px] stroke-[1.7]" />
@@ -222,7 +222,7 @@ export function LoginPanel() {
       ) : null}
 
       {page.show("terms") ? (
-      <div className="mt-3 flex items-start gap-2 text-justify text-[12px] uppercase leading-[1.5] tracking-normal text-black/50">
+      <div className="mt-3 flex items-start gap-2 text-left text-[12px] uppercase leading-[1.5] tracking-normal text-black/50">
         <Info aria-hidden="true" className="mt-0.5 size-3.5 shrink-0 fill-black/20 stroke-white" />
         <p>
           {page.text("terms", "text")}{" "}
@@ -245,9 +245,9 @@ export function LoginPanel() {
         <h2 id="access-heading" className="text-[13px] font-normal uppercase leading-none">
           {page.text("social", "heading")}
         </h2>
-        <p className="mt-2 max-w-md text-justify text-[12px] uppercase leading-[1.5] tracking-normal">
+        <p className="mt-2 max-w-md text-left text-[12px] uppercase leading-[1.5] tracking-normal text-black/60">
           {page.text("social", "text")}{" "}
-          <Link href="/privacy" className="underline underline-offset-2 hover:text-black/60">
+          <Link href="/privacy" className="underline underline-offset-2 hover:text-black">
             Privacy Policy
           </Link>
           .

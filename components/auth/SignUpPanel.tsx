@@ -69,10 +69,10 @@ export function SignUpPanel() {
   return (
     <div className="w-full">
       <div>
-        <h1 className="font-heading text-[24px] font-normal uppercase leading-none tracking-normal">
+        <h1 className="font-heading text-[22px] sm:text-[24px] font-normal uppercase leading-tight tracking-normal">
           {page.text("intro", "heading")}
         </h1>
-        <p className="mt-3 max-w-sm text-justify text-[12px] uppercase leading-[1.6] tracking-normal text-black">
+        <p className="mt-3 max-w-sm text-left text-[12px] uppercase leading-[1.6] tracking-normal text-black/70">
           {page.text("intro", "text")}
         </p>
       </div>
@@ -89,7 +89,7 @@ export function SignUpPanel() {
             autoComplete="name"
             required
             placeholder="YOUR FULL NAME"
-            className="auth-form-input h-12 w-full border border-black bg-white px-4 text-[13px] placeholder:text-black/40 focus:outline-none focus:ring-1 focus:ring-black"
+            className="auth-form-input h-12 w-full border border-black bg-white px-4 text-[16px] sm:text-[13px] placeholder:text-black/40 focus:outline-none focus:ring-1 focus:ring-black"
           />
         </div>
 
@@ -104,11 +104,11 @@ export function SignUpPanel() {
             autoComplete="email"
             required
             placeholder="YOU@EXAMPLE.COM"
-            className="auth-form-input h-12 w-full border border-black bg-white px-4 text-[13px] placeholder:text-black/40 focus:outline-none focus:ring-1 focus:ring-black"
+            className="auth-form-input h-12 w-full border border-black bg-white px-4 text-[16px] sm:text-[13px] placeholder:text-black/40 focus:outline-none focus:ring-1 focus:ring-black"
           />
         </div>
 
-        <div className="grid gap-5 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="password" className="mb-2 block text-[13px] font-normal uppercase leading-none">
               Password
@@ -125,7 +125,7 @@ export function SignUpPanel() {
                 onChange={(event) => {
                   setPasswordValue(event.target.value)
                 }}
-                className="auth-form-input h-12 w-full border border-black bg-white px-4 pr-11 text-[13px] placeholder:text-black/40 focus:outline-none focus:ring-1 focus:ring-black"
+                className="auth-form-input h-12 w-full border border-black bg-white px-4 pr-12 text-[16px] sm:text-[13px] placeholder:text-black/40 focus:outline-none focus:ring-1 focus:ring-black"
               />
               <button
                 type="button"
@@ -133,7 +133,7 @@ export function SignUpPanel() {
                 aria-pressed={showPassword}
                 disabled={passwordValue.length === 0}
                 onClick={() => setShowPassword((visible) => !visible)}
-                className="absolute right-3 top-1/2 inline-flex size-6 -translate-y-1/2 cursor-pointer items-center justify-center text-black/55 transition-colors hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30 disabled:cursor-not-allowed disabled:text-black/25"
+                className="absolute right-1 top-1/2 inline-flex size-10 -translate-y-1/2 cursor-pointer items-center justify-center text-black/55 transition-colors hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30 disabled:cursor-not-allowed disabled:text-black/25"
               >
                 {showPassword ? (
                   <EyeOff aria-hidden="true" className="size-[18px] stroke-[1.7]" />
@@ -157,7 +157,7 @@ export function SignUpPanel() {
                 minLength={8}
                 placeholder="REPEAT PASSWORD"
                 onChange={(event) => setConfirmPasswordValue(event.target.value)}
-                className="auth-form-input h-12 w-full border border-black bg-white px-4 pr-11 text-[13px] placeholder:text-black/40 focus:outline-none focus:ring-1 focus:ring-black"
+                className="auth-form-input h-12 w-full border border-black bg-white px-4 pr-12 text-[16px] sm:text-[13px] placeholder:text-black/40 focus:outline-none focus:ring-1 focus:ring-black"
               />
               <button
                 type="button"
@@ -165,7 +165,7 @@ export function SignUpPanel() {
                 aria-pressed={showConfirmPassword}
                 disabled={confirmPasswordValue.length === 0}
                 onClick={() => setShowConfirmPassword((visible) => !visible)}
-                className="absolute right-3 top-1/2 inline-flex size-6 -translate-y-1/2 cursor-pointer items-center justify-center text-black/55 transition-colors hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30 disabled:cursor-not-allowed disabled:text-black/25"
+                className="absolute right-1 top-1/2 inline-flex size-10 -translate-y-1/2 cursor-pointer items-center justify-center text-black/55 transition-colors hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30 disabled:cursor-not-allowed disabled:text-black/25"
               >
                 {showConfirmPassword ? (
                   <EyeOff aria-hidden="true" className="size-[18px] stroke-[1.7]" />

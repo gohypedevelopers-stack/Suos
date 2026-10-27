@@ -28,7 +28,7 @@ export default async function LoginPage() {
 
   return (
     <main
-      className={`grid min-h-[calc(100svh-var(--header-stack-height))] bg-white lg:h-[calc(100svh-var(--header-stack-height))] lg:min-h-0 lg:overflow-hidden ${showImage ? "lg:grid-cols-2" : ""}`}
+      className={`grid min-h-[calc(100svh-var(--header-stack-height))] w-full max-w-full overflow-x-hidden bg-white lg:h-[calc(100svh-var(--header-stack-height))] lg:min-h-0 lg:overflow-hidden ${showImage ? "lg:grid-cols-2" : ""}`}
     >
       {showImage ? (
         <section className="relative hidden min-h-full overflow-hidden bg-[#b5aa9c] lg:block">
