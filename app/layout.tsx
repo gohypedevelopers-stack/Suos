@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { akzidenzGrotesk, georgia, holiday } from "@/lib/fonts";
+import { akzidenzGrotesk, georgia, holiday, inter } from "@/lib/fonts";
 import { SiteChrome } from "@/components/SiteChrome";
 import { Toaster } from "@/components/ui/sonner";
 import { WishlistProvider } from "@/lib/wishlist-context";
@@ -70,6 +70,7 @@ export default async function RootLayout({
         "h-full",
         "antialiased",
         akzidenzGrotesk.variable,
+        inter.variable,
         georgia.variable,
         holiday.variable,
         "font-sans"

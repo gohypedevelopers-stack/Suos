@@ -56,7 +56,7 @@ export function ResponsibleDenimSection() {
             Your Skin Matters
           </h2>
 
-          <p className="mt-5 max-w-[480px] mx-auto lg:mx-0 text-[16px] leading-[22px] sm:text-[20px] sm:leading-[25px] tracking-normal text-black">
+          <p className="mt-5 max-w-[480px] mx-auto lg:mx-0 font-inter text-[16px] leading-[22px] sm:text-[20px] sm:leading-[25px] tracking-normal text-black">
             Our denim is washed and finished using inputs selected to meet
             recognised textile and chemical safety standards.
           </p>
@@ -121,7 +121,7 @@ export function ResponsibleDenimSection() {
                   </span>
                 ))}
               </h3>
-              <p className="mt-2 sm:mt-3 text-[13px] leading-[17px] sm:text-[16px] sm:leading-[21px] xl:text-[20px] xl:leading-[25px] text-center drop-shadow-sm">
+              <p className="mt-2 sm:mt-3 font-inter text-[13px] leading-[17px] sm:text-[16px] sm:leading-[21px] xl:text-[20px] xl:leading-[25px] text-center drop-shadow-sm">
                 {feature.description}
               </p>
             </div>

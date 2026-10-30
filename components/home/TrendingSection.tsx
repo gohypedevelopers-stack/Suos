@@ -463,7 +463,7 @@ export function ProductCardView({
       </div>
 
       {/* Info Area Below Image */}
-      <div className="mt-2.5 md:mt-3 flex flex-col gap-1.5">
+      <div className="mt-2.5 md:mt-3 flex flex-col gap-1.5 font-inter">
         {isCompact && (product.lineName || product.category?.name) ? (
           <p className="truncate text-[11px] md:text-[12px] uppercase tracking-normal leading-none text-ink-400">
             {product.lineName || product.category?.name}

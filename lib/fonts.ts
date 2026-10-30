@@ -1,3 +1,4 @@
+import { Inter } from "next/font/google";
 import localFont from "next/font/local";
 
 // woff2 copies of the three Figma weights (~100 KB in total versus ~1.7 MB
@@ -62,6 +63,16 @@ export const holiday = localFont({
     },
   ],
   variable: "--font-holiday",
+  display: "swap",
+  preload: false,
+});
+
+// Secondary face for small supporting text (card names, prices, descriptions).
+// Headings, nav and buttons stay in Akzidenz-Grotesk. Use the `font-inter` class.
+export const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-inter-family",
   display: "swap",
   preload: false,
 });

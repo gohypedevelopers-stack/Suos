@@ -46,6 +46,7 @@
   --font-serif: var(--font-georgia);
   --font-heading: var(--font-akzidenz-grotesk);
   --font-display: var(--font-holiday);
+  --font-inter: var(--font-inter-family);
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
 
   --color-sidebar-ring: var(--sidebar-ring);

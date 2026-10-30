@@ -132,7 +132,7 @@ function OfferCard({ code, headline, detail }: { code: string; headline: string;
 
 function MiniProductCard({ product }: { product: HomeProductCard }) {
   return (
-    <Link href={`/products/${product.slug}`} className="group block w-[180px] shrink-0 snap-start sm:w-[230px]">
+    <Link href={`/products/${product.slug}`} className="group block font-inter w-[180px] shrink-0 snap-start sm:w-[230px]">
       <div data-row-media className="relative aspect-[230/304] overflow-hidden bg-[#efefef]">
         {product.image ? (
           <Image
