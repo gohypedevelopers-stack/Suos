@@ -256,6 +256,7 @@ export function ProductCardView({
 
   return (
     <article
+      data-reveal="up"
       className={cn(
         // No outline on hover/expand (client + updated Figma); no inner padding, so cards sit closer.
         "group relative flex flex-col bg-white text-black pb-2 sm:pb-2.5 hover:z-10",
@@ -571,11 +572,11 @@ export function TrendingSection({ products = [] }: { products?: ProductCard[] })
       id="bestsellers"
       className="w-full scroll-mt-[var(--main-navbar-height)] bg-white px-3 sm:px-6 lg:px-8 py-10 md:py-16 text-black"
     >
-      <h2 className="font-heading text-[28px] sm:text-[32px] lg:text-h2 font-normal uppercase leading-none tracking-normal">
+      <h2 data-reveal="up" className="font-heading text-[28px] sm:text-[32px] lg:text-h2 font-normal uppercase leading-none tracking-normal">
         Our Favourite
       </h2>
 
-      <div className="mt-6 sm:mt-8 grid grid-cols-2 gap-0.5 sm:gap-1 md:grid-cols-2 lg:grid-cols-4 items-start">
+      <div className="reveal-stagger mt-6 sm:mt-8 grid grid-cols-2 gap-0.5 sm:gap-1 md:grid-cols-2 lg:grid-cols-4 items-start">
         {products.map((product) => (
           <ProductCardView key={product.id} product={product} />
         ))}

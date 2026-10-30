@@ -12,7 +12,7 @@ function LookbookCard({ slide }: { slide: LookbookSlideContent }) {
   const objectPosition = slide.objectPosition || "center"
 
   return (
-    <article className="relative aspect-[7/11] overflow-hidden bg-[#e6e8eb]">
+    <article data-reveal="zoom" className="relative aspect-[7/11] overflow-hidden bg-[#e6e8eb]">
       {isVideoMedia(slide.image) ? (
         <video
           src={slide.image}
@@ -48,7 +48,7 @@ export function LookbookCarousel() {
   return (
     <section className="w-full bg-white px-3 py-10 text-black sm:px-6 lg:px-8">
       <h2 className="sr-only">Lookbook</h2>
-      <div className="grid grid-cols-3 gap-1 sm:gap-2 lg:grid-cols-6">
+      <div className="reveal-stagger grid grid-cols-3 gap-1 sm:gap-2 lg:grid-cols-6">
         {slides.map((slide) => (
           <LookbookCard key={slide.id} slide={slide} />
         ))}

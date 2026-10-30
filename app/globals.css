@@ -508,3 +508,60 @@
     object-position: var(--focus-desktop);
   }
 }
+
+/* ───────── Scroll reveal (components/RevealObserver.tsx) ─────────
+   Hidden states only apply once the observer has started (.reveal-ready),
+   so content never stays hidden without JavaScript. */
+.reveal-ready [data-reveal] {
+  transition:
+    opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0s),
+    transform 1.1s cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0s);
+}
+.reveal-ready [data-reveal]:not(.is-revealed) {
+  opacity: 0;
+}
+.reveal-ready [data-reveal="up"]:not(.is-revealed) {
+  transform: translate3d(0, 40px, 0);
+}
+/* Big photos: fade in while the image settles from a slight zoom. */
+.reveal-ready [data-reveal="zoom"] img,
+.reveal-ready [data-reveal="zoom"] video {
+  transition: transform 1.8s cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0s);
+}
+.reveal-ready [data-reveal="zoom"]:not(.is-revealed) img,
+.reveal-ready [data-reveal="zoom"]:not(.is-revealed) video {
+  transform: scale(1.12);
+}
+/* Rows of cards come in one after another. */
+.reveal-stagger > :nth-child(6n + 2) { --reveal-delay: 0.08s; }
+.reveal-stagger > :nth-child(6n + 3) { --reveal-delay: 0.16s; }
+.reveal-stagger > :nth-child(6n + 4) { --reveal-delay: 0.24s; }
+.reveal-stagger > :nth-child(6n + 5) { --reveal-delay: 0.32s; }
+.reveal-stagger > :nth-child(6n + 6) { --reveal-delay: 0.4s; }
+
+/* Hero text and button rise in on page load. */
+@keyframes hero-rise {
+  from { opacity: 0; transform: translate3d(0, 28px, 0); }
+  to { opacity: 1; transform: none; }
+}
+.hero-rise > * {
+  animation: hero-rise 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.hero-rise > :nth-child(2) { animation-delay: 0.12s; }
+.hero-rise > :nth-child(3) { animation-delay: 0.24s; }
+
+/* Big banners: a slow zoom on hover. */
+.hover-zoom img,
+.hover-zoom video {
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-zoom:hover img,
+.hover-zoom:hover video {
+  transform: scale(1.04);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-rise > * { animation: none; }
+  .hover-zoom:hover img,
+  .hover-zoom:hover video { transform: none; }
+}

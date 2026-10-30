@@ -11,7 +11,7 @@ function SplitPanel({ banner, width }: { banner: HomeEditorialBanner; width: str
   const focus = bannerFocusProps(banner.desktopFocus, banner.mobileFocus, "md")
 
   const media = (
-    <div className="relative aspect-[4/5] h-full w-full overflow-hidden bg-[#f3f0ea] md:aspect-auto">
+    <div data-reveal="zoom" className="hover-zoom relative aspect-[4/5] h-full w-full overflow-hidden bg-[#f3f0ea] md:aspect-auto">
       {banner.mobileImageUrl ? (
         <>
           <Image
@@ -58,7 +58,7 @@ export function SplitBannerSection({ banners }: { banners?: HomeEditorialBanner[
   if (!left || !right) return null
 
   return (
-    <section className="grid w-full grid-cols-1 bg-white md:aspect-[1440/777] md:grid-cols-[61fr_39fr]">
+    <section className="reveal-stagger grid w-full grid-cols-1 bg-white md:aspect-[1440/777] md:grid-cols-[61fr_39fr]">
       <h2 className="sr-only">Editorial</h2>
       <SplitPanel banner={left} width="61vw" />
       <SplitPanel banner={right} width="39vw" />

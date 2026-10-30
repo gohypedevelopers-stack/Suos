@@ -16,7 +16,7 @@ function HighlightImage({
   className: string
 }) {
   return (
-    <figure className={`relative overflow-hidden bg-[#efefef] ${className}`}>
+    <figure data-reveal="zoom" className={`relative overflow-hidden bg-[#efefef] ${className}`}>
       <Image
         src={highlight.src}
         alt={highlight.title || `Detail ${number}`}
@@ -55,7 +55,7 @@ export function ProductHighlightsSection({
   const [first, second, third] = highlights
   const heading = (
     <div className="px-3 pb-6 pt-10 sm:px-6 lg:px-8 md:pt-2">
-      <h2 className="font-heading text-[28px] font-normal uppercase leading-none sm:text-[32px] lg:text-h2">
+      <h2 data-reveal="up" className="font-heading text-[28px] font-normal uppercase leading-none sm:text-[32px] lg:text-h2">
         It&apos;s in the Details
       </h2>
       {intro ? (
@@ -98,7 +98,7 @@ export function ProductHighlightsSection({
             className="aspect-[3/4] md:aspect-auto md:min-h-0 md:flex-1"
           />
         </div>
-        <div className="grid min-h-0 gap-1 md:grid-rows-2">
+        <div className="reveal-stagger grid min-h-0 gap-1 md:grid-rows-2">
           <HighlightImage highlight={first} number={1} sizes="(max-width: 767px) 100vw, 54vw" className="aspect-[760/560] md:aspect-auto md:h-full" />
           <HighlightImage highlight={third} number={3} sizes="(max-width: 767px) 100vw, 54vw" className="aspect-[760/560] md:aspect-auto md:h-full" />
         </div>

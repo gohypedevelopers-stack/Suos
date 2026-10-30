@@ -88,13 +88,13 @@ export function RecommendedSection({
   return (
     <section className="w-full bg-white py-10 md:py-16 text-black">
       <div className="w-full px-3 sm:px-6 lg:px-8">
-        <h2 className="font-heading text-[28px] sm:text-[32px] lg:text-h2 font-normal uppercase leading-none tracking-normal">
+        <h2 data-reveal="up" className="font-heading text-[28px] sm:text-[32px] lg:text-h2 font-normal uppercase leading-none tracking-normal">
           You May Also Like
         </h2>
       </div>
 
       <ScrollRow
-        className="mt-6 sm:mt-8 items-start gap-0.5 overscroll-x-contain px-3 sm:gap-1 sm:px-6 lg:px-8"
+        className="reveal-stagger mt-6 sm:mt-8 items-start gap-0.5 overscroll-x-contain px-3 sm:gap-1 sm:px-6 lg:px-8"
         label="You may also like"
       >
         {displayProducts.map((product) => (

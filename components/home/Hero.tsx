@@ -133,7 +133,7 @@ export function Hero({ banners }: { banners?: HomeHeroBanner[] }) {
             {(slide.title || slide.subtitle || slide.ctaText) && (
               <div
                 className={cn(
-                  "absolute inset-x-0 bottom-15 sm:bottom-12 lg:bottom-16 z-20 px-4 sm:px-8 flex flex-col pointer-events-none",
+                  "hero-rise absolute inset-x-0 bottom-15 sm:bottom-12 lg:bottom-16 z-20 px-4 sm:px-8 flex flex-col pointer-events-none",
                   slide.textAlignment === "LEFT"
                     ? "items-start text-left max-w-7xl mx-auto"
                     : slide.textAlignment === "RIGHT"

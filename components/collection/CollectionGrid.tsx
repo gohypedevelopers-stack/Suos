@@ -91,7 +91,7 @@ export function CollectionGrid({
 
   return (
     <div>
-      <div className="grid grid-cols-2 gap-0.5 lg:grid-cols-4">
+      <div className="reveal-stagger grid grid-cols-2 gap-0.5 lg:grid-cols-4">
         {visibleItems.map((item) =>
           item.kind === "product" ? (
             <div key={item.product.id} className="min-w-0">

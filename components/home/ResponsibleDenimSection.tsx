@@ -32,9 +32,9 @@ export function ResponsibleDenimSection() {
   return (
     <section className="w-full bg-white text-black">
       {/* Top Row: 3 Columns (Hand Image | Core Message Card | Looping Video) */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.3fr_1fr] items-stretch">
+      <div className="reveal-stagger grid grid-cols-1 lg:grid-cols-[1fr_1.3fr_1fr] items-stretch">
         {/* Left: Hand on Denim Image */}
-        <div className="relative min-h-[280px] sm:min-h-[360px] lg:min-h-[480px] w-full overflow-hidden bg-neutral-100">
+        <div data-reveal="zoom" className="relative min-h-[280px] sm:min-h-[360px] lg:min-h-[480px] w-full overflow-hidden bg-neutral-100">
           <Image
             src="/responsible-denim/hand-denim.png"
             alt="Hand touching responsibly finished denim"
@@ -45,7 +45,7 @@ export function ResponsibleDenimSection() {
         </div>
 
         {/* Middle: Mission Statement Card */}
-        <div className="flex flex-col justify-center items-center text-center lg:items-start lg:text-left px-6 py-12 sm:px-10 lg:px-12 xl:px-16">
+        <div data-reveal="up" className="flex flex-col justify-center items-center text-center lg:items-start lg:text-left px-6 py-12 sm:px-10 lg:px-12 xl:px-16">
           <p className="text-[14px] sm:text-[16px] font-normal uppercase leading-[25px] tracking-normal text-[#6c6c6c]">
             Considered Beyond The Surface
           </p>
@@ -69,7 +69,7 @@ export function ResponsibleDenimSection() {
         </div>
 
         {/* Right: Looping Video with "TO A BRIGHTER TOMORROW" Overlay */}
-        <div className="relative min-h-[280px] sm:min-h-[360px] lg:min-h-[480px] w-full overflow-hidden bg-neutral-900">
+        <div data-reveal="zoom" className="relative min-h-[280px] sm:min-h-[360px] lg:min-h-[480px] w-full overflow-hidden bg-neutral-900">
           <video
             autoPlay
             loop
@@ -93,11 +93,12 @@ export function ResponsibleDenimSection() {
       </div>
 
       {/* Bottom Row: 4 Feature Cards (2x2 on Mobile, 4 in a row on Desktop) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4">
+      <div className="reveal-stagger grid grid-cols-2 lg:grid-cols-4">
         {bottomFeatures.map((feature) => (
           <div
             key={feature.title}
-            className="relative aspect-square sm:aspect-[6/5] w-full overflow-hidden flex flex-col justify-center items-center text-center p-3 sm:p-6 lg:p-8"
+            data-reveal="zoom"
+            className="hover-zoom relative aspect-square sm:aspect-[6/5] w-full overflow-hidden flex flex-col justify-center items-center text-center p-3 sm:p-6 lg:p-8"
           >
             {/* Background Texture Image */}
             <Image

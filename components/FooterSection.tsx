@@ -75,7 +75,7 @@ function FooterGroup({
   children: React.ReactNode
 }) {
   return (
-    <div>
+    <div data-reveal="up">
       <h3 className={headingClass}>{title}</h3>
       <div className={cn("mt-4", bodyClass)}>{children}</div>
     </div>
@@ -93,7 +93,7 @@ export function FooterSection() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-2 gap-x-6 gap-y-10 py-10 sm:gap-x-10 lg:grid-cols-4 lg:gap-x-12">
+        <div className="reveal-stagger grid grid-cols-2 gap-x-6 gap-y-10 py-10 sm:gap-x-10 lg:grid-cols-4 lg:gap-x-12">
           <FooterGroup title="Company">
             <FooterLinkList links={companyLinks} />
           </FooterGroup>
@@ -121,7 +121,7 @@ export function FooterSection() {
             </FooterGroup>
           </div>
 
-          <div className="col-span-2 lg:col-span-1">
+          <div data-reveal="up" className="col-span-2 lg:col-span-1">
             <h3 className="text-[14px] font-normal uppercase leading-[18px] tracking-normal text-black sm:text-body">Subscribe to our newsletter</h3>
 
             <div className="mt-4">

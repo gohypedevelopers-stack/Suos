@@ -103,7 +103,7 @@ export default async function Page(props: PageProps) {
       <ProductHighlightsSection intro={product.highlightsIntro} highlights={product.highlights} />
       <YouMayAlsoLikeSection excludeProductId={product.id} pickedIds={product.alsoLikeIds} />
       {product.lifestyleImage ? (
-        <section className="relative aspect-[4/5] w-full overflow-hidden bg-[#efefef] sm:aspect-[1440/720]">
+        <section data-reveal="zoom" className="relative aspect-[4/5] w-full overflow-hidden bg-[#efefef] sm:aspect-[1440/720]">
           <Image
             src={product.lifestyleImage}
             alt={`${product.title} lifestyle`}

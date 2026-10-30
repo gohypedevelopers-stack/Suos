@@ -32,7 +32,7 @@ function DenimPanel({
   showHeart = false,
 }: DenimPanelProps) {
   const content = (
-    <div className={cn("relative overflow-hidden bg-[#f3f0ea]", className)}>
+    <div data-reveal="zoom" className={cn("hover-zoom relative overflow-hidden bg-[#f3f0ea]", className)}>
       {mobileSrc ? (
         <>
           <div className="relative block sm:hidden w-full h-full">
@@ -111,7 +111,7 @@ export function DenimEditorialSection({
   const p2Link = banner2?.ctaLink
 
   const bottomPanel = (
-    <div className="relative overflow-hidden bg-[#f3f0ea] aspect-[17/9] md:aspect-[20/9]">
+    <div data-reveal="zoom" className="hover-zoom relative overflow-hidden bg-[#f3f0ea] aspect-[17/9] md:aspect-[20/9]">
       {p2MobileSrc ? (
         <>
           <div className="relative block sm:hidden w-full h-full">
@@ -152,7 +152,7 @@ export function DenimEditorialSection({
     <section className="w-full bg-white text-black">
       <h2 className="sr-only">Skinny denims editorial</h2>
 
-      <div className="grid grid-cols-1 gap-0 bg-white md:grid-cols-2">
+      <div className="reveal-stagger grid grid-cols-1 gap-0 bg-white md:grid-cols-2">
         <DenimPanel
           src={p0Src}
           mobileSrc={banner0?.mobileImageUrl}

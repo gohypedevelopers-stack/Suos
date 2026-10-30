@@ -69,7 +69,7 @@ export function FullWidthBanner({
   const focus = bannerFocusProps(banner.desktopFocus, banner.mobileFocus)
 
   const content = (
-    <section className={cn("group/banner relative w-full overflow-hidden bg-black", className)}>
+    <section data-reveal="zoom" className={cn("hover-zoom group/banner relative w-full overflow-hidden bg-black", className)}>
       {banner.mobileImageUrl ? (
         <>
           <div className="absolute inset-0 sm:hidden">
