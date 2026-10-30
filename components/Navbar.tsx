@@ -4,7 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Heart, Search, UserRound, Menu, X, ChevronRight, ChevronDown } from "lucide-react"
-import { AnimatePresence, motion, useReducedMotion, type Transition } from "motion/react"
+import { AnimatePresence, motion, useReducedMotion, type Transition, type Variants } from "motion/react"
 import {
   useEffect,
   useLayoutEffect,
@@ -47,33 +47,70 @@ type PrimaryNavItem = {
 
 const megaMenuOrder: MegaMenuKey[] = ["collections", "men"]
 
+// Calvin Klein-style: the panel unfolds downwards, then its contents rise
+// in one after another (columns → links → image cards that wipe in).
+const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const
+
 const megaMenuRevealTransition: Transition = {
-  type: "spring",
-  stiffness: 145,
-  damping: 24,
-  mass: 0.8,
-  bounce: 0,
+  duration: 0.7,
+  ease: EASE_OUT_EXPO,
 }
 
 const megaMenuCloseTransition: Transition = {
-  duration: 0.16,
-  ease: [0.4, 0, 1, 1],
+  duration: 0.28,
+  ease: [0.4, 0, 0.2, 1],
 }
 
 const megaMenuContentTransition: Transition = {
-  type: "tween",
-  duration: 0.56,
-  ease: [0.16, 1, 0.3, 1],
+  duration: 0.3,
+  ease: "easeOut",
 }
 
-const megaMenuContentVariants = {
-  enter: (direction: number) => ({
-    x: direction > 0 ? "100%" : "-100%",
-  }),
-  center: { x: 0 },
-  exit: (direction: number) => ({
-    x: direction > 0 ? "-100%" : "100%",
-  }),
+/** Panel contents: cross-fade between menus and stagger the items in. */
+const megaMenuContentVariants: Variants = {
+  enter: { opacity: 0 },
+  center: {
+    opacity: 1,
+    transition: { duration: 0.25, delayChildren: 0.22, staggerChildren: 0.12 },
+  },
+  exit: { opacity: 0, transition: { duration: 0.2 } },
+}
+
+/** A link column: rises into place, then staggers its links. */
+const megaMenuItemVariants: Variants = {
+  enter: { opacity: 0, y: 28 },
+  center: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.75, ease: EASE_OUT_EXPO, staggerChildren: 0.07 },
+  },
+  exit: { opacity: 0, y: -6, transition: { duration: 0.18 } },
+}
+
+/** A single link inside a column. */
+const megaMenuLinkVariants: Variants = {
+  enter: { opacity: 0, y: 16 },
+  center: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE_OUT_EXPO } },
+  exit: { opacity: 0 },
+}
+
+/** Image card: wipes open from the top while rising. */
+const megaMenuCardVariants: Variants = {
+  enter: { opacity: 0, y: 36, clipPath: "inset(0 0 100% 0)" },
+  center: {
+    opacity: 1,
+    y: 0,
+    clipPath: "inset(0 0 0% 0)",
+    transition: { duration: 0.95, ease: EASE_OUT_EXPO },
+  },
+  exit: { opacity: 0, transition: { duration: 0.18 } },
+}
+
+/** The photo inside a card settles from a slight zoom. */
+const megaMenuCardImageVariants: Variants = {
+  enter: { scale: 1.12 },
+  center: { scale: 1, transition: { duration: 1.4, ease: EASE_OUT_EXPO } },
+  exit: {},
 }
 
 /**
@@ -194,14 +231,14 @@ function MenuSection({
   onClose: () => void
 }) {
   return (
-    <section className="min-w-0">
-      <p className="text-[13px] font-[400] uppercase leading-[1.4] tracking-normal text-black">
+    <motion.section variants={megaMenuItemVariants} className="min-w-0">
+      <motion.p variants={megaMenuLinkVariants} className="text-[13px] font-[400] uppercase leading-[1.4] tracking-normal text-black">
         {title}
-      </p>
+      </motion.p>
 
       <ul className="mt-4 space-y-3">
         {items.map((item) => (
-          <li key={`${item.label}-${item.href}`}>
+          <motion.li variants={megaMenuLinkVariants} key={`${item.label}-${item.href}`}>
             <Link
               href={item.href}
               tabIndex={open ? 0 : -1}
@@ -210,10 +247,10 @@ function MenuSection({
             >
               {item.label}
             </Link>
-          </li>
+          </motion.li>
         ))}
       </ul>
-    </section>
+    </motion.section>
   )
 }
 
@@ -231,6 +268,7 @@ function MenuCard({
   const { image, alt, eyebrow, title, href } = card
 
   return (
+    <motion.div variants={megaMenuCardVariants} className="shrink-0">
     <Link
       href={href || "/collections"}
       tabIndex={open ? 0 : -1}
@@ -238,15 +276,17 @@ function MenuCard({
       style={{ height: NAV_CARD_HEIGHT }}
       className="group/card relative block aspect-[3/2] shrink-0 cursor-pointer overflow-hidden bg-neutral-100"
     >
-      <Image
-        src={image}
-        alt={alt}
-        fill
-        sizes="(max-width: 1280px) 25vw, 450px"
-        // Load with the page so the cards are ready the moment a menu opens.
-        loading="eager"
-        className="object-cover transition-transform duration-500 group-hover/card:scale-105"
-      />
+      <motion.div variants={megaMenuCardImageVariants} className="absolute inset-0">
+        <Image
+          src={image}
+          alt={alt}
+          fill
+          sizes="(max-width: 1280px) 25vw, 450px"
+          // Load with the page so the cards are ready the moment a menu opens.
+          loading="eager"
+          className="object-cover transition-transform duration-500 group-hover/card:scale-105"
+        />
+      </motion.div>
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.1)_0%,rgba(0,0,0,0.12)_58%,rgba(0,0,0,0.28)_100%)]" />
       <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center text-white drop-shadow-[0_2px_16px_rgba(0,0,0,0.45)]">
         {eyebrow ? (
@@ -261,6 +301,7 @@ function MenuCard({
         ) : null}
       </div>
     </Link>
+    </motion.div>
   )
 }
 
@@ -787,10 +828,7 @@ export function Navbar({
               onMouseEnter={cancelMenuClose}
               onMouseLeave={scheduleMenuClose}
             >
-              <AnimatePresence
-                initial={false}
-                custom={menuSlideDirection}
-              >
+              <AnimatePresence custom={menuSlideDirection}>
                 <motion.div
                   key={activeMenu}
                   custom={menuSlideDirection}
@@ -798,11 +836,7 @@ export function Navbar({
                   initial={prefersReducedMotion ? false : "enter"}
                   animate="center"
                   exit={prefersReducedMotion ? undefined : "exit"}
-                  transition={
-                    prefersReducedMotion
-                      ? { duration: 0 }
-                      : megaMenuContentTransition
-                  }
+                  transition={prefersReducedMotion ? { duration: 0 } : megaMenuContentTransition}
                   className="absolute inset-0"
                 >
                   {activeMenu === "collections" ? (
@@ -815,7 +849,7 @@ export function Navbar({
                         />
                       ) : null}
 
-                      <div className="min-w-[10rem] flex-1">
+                      <motion.div variants={megaMenuContentVariants} className="min-w-[10rem] flex-1">
                         {menuGroups.collections.map((group) => (
                           <MenuSection
                             key={group.title}
@@ -825,10 +859,10 @@ export function Navbar({
                             onClose={closeMenu}
                           />
                         ))}
-                      </div>
+                      </motion.div>
 
                       {collectionsRightCards.length > 0 ? (
-                        <div className="flex shrink-0 gap-4">
+                        <motion.div variants={megaMenuContentVariants} className="flex shrink-0 gap-4">
                           {collectionsRightCards.map((card, index) => (
                             <MenuCard
                               key={`${card.image}-${index}`}
@@ -837,12 +871,12 @@ export function Navbar({
                               onClose={closeMenu}
                             />
                           ))}
-                        </div>
+                        </motion.div>
                       ) : null}
                     </div>
                   ) : (
                     <div className="flex h-full w-full items-start gap-12 px-4 py-7 sm:px-6 lg:px-8">
-                      <div className="grid min-w-0 flex-1 grid-cols-3 gap-x-8 xl:gap-x-12">
+                      <motion.div variants={megaMenuContentVariants} className="grid min-w-0 flex-1 grid-cols-3 gap-x-8 xl:gap-x-12">
                         {menuGroups.men.map((group) => (
                           <MenuSection
                             key={group.title}
@@ -852,10 +886,10 @@ export function Navbar({
                             onClose={closeMenu}
                           />
                         ))}
-                      </div>
+                      </motion.div>
 
                       {menCards.length > 0 ? (
-                        <div className="flex shrink-0 gap-4">
+                        <motion.div variants={megaMenuContentVariants} className="flex shrink-0 gap-4">
                           {menCards.map((card, index) => (
                             <MenuCard
                               key={`${card.image}-${index}`}
@@ -864,7 +898,7 @@ export function Navbar({
                               onClose={closeMenu}
                             />
                           ))}
-                        </div>
+                        </motion.div>
                       ) : null}
                     </div>
                   )}
