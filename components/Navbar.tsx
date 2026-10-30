@@ -3,7 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Heart, Search, UserRound, Menu, X, ChevronRight, ChevronDown } from "lucide-react"
+import { Heart, Search, UserRound, Menu, X, ChevronRight, ChevronDown, Truck, Mail } from "lucide-react"
 import { AnimatePresence, motion, useReducedMotion, type Transition, type Variants } from "motion/react"
 import {
   useEffect,
@@ -394,7 +394,13 @@ export function Navbar({
   const menuCloseTimeoutRef = useRef<number | null>(null)
   const headerRef = useRef<HTMLElement | null>(null)
   const announcementHeightRef = useRef(0)
+  const lastScrollYRef = useRef(0)
+  const idleTimerRef = useRef<number | null>(null)
   const hasOpenMenu = Boolean(activeMenu)
+  const keepHeaderVisibleRef = useRef(false)
+  useEffect(() => {
+    keepHeaderVisibleRef.current = hasOpenMenu || isHovered || mobileMenuOpen || searchOpen
+  }, [hasOpenMenu, isHovered, mobileMenuOpen, searchOpen])
   const isInteractiveSurface = isHovered || hasOpenMenu
   const isHeroTransparent = isOverlay && !isScrolled && !isInteractiveSurface
   const isLightSurface = !isHeroTransparent
@@ -506,6 +512,19 @@ export function Navbar({
 
       if (headerRef.current) {
         headerRef.current.style.transform = `translate3d(0, ${navbarTranslateY}px, 0)`
+
+        // Hide while scrolling (past the first screenful), show again on pause.
+        const header = headerRef.current
+        const delta = scrollY - lastScrollYRef.current
+        lastScrollYRef.current = scrollY
+        if (idleTimerRef.current !== null) window.clearTimeout(idleTimerRef.current)
+        if (scrollY > 160 && Math.abs(delta) > 2 && !keepHeaderVisibleRef.current) {
+          header.classList.add("is-scroll-hidden")
+        }
+        if (scrollY <= 160) header.classList.remove("is-scroll-hidden")
+        idleTimerRef.current = window.setTimeout(() => {
+          header.classList.remove("is-scroll-hidden")
+        }, 260)
       }
 
       if (isScrolledRef.current !== nextIsScrolled) {
@@ -539,6 +558,7 @@ export function Navbar({
         window.cancelAnimationFrame(scrollFrameRef.current)
         scrollFrameRef.current = null
       }
+      if (idleTimerRef.current !== null) window.clearTimeout(idleTimerRef.current)
 
       window.removeEventListener("scroll", scheduleScrollStateUpdate)
       window.removeEventListener("pageshow", syncScrollState)
@@ -553,7 +573,7 @@ export function Navbar({
       onMouseLeave={scheduleMenuClose}
       className={cn(
         "main-navbar navbar-shell border-b",
-        "h-14 sm:h-16 lg:h-[98px]",
+        "h-[52px] lg:h-[72px]",
         isInteractiveSurface
           ? "!bg-white text-black border-transparent shadow-none"
           : isLightSurface
@@ -624,7 +644,7 @@ export function Navbar({
               height={120}
               priority
               className={cn(
-                "block h-auto w-[8.5rem] max-w-none transition-[filter,opacity] duration-300 ease-out",
+                "block h-auto w-[6.5rem] max-w-none transition-[filter,opacity] duration-300 ease-out",
                 isOverlay && !isLightSurface && "invert"
               )}
             />
@@ -743,7 +763,7 @@ export function Navbar({
               height={70}
               priority
               className={cn(
-                "block h-auto w-[6rem] max-w-none transition-[filter,opacity] duration-300 ease-out",
+                "block h-auto w-[5rem] max-w-none transition-[filter,opacity] duration-300 ease-out",
                 isOverlay && !isLightSurface && "invert"
               )}
             />
@@ -919,8 +939,8 @@ export function Navbar({
           side="left"
           showCloseButton={false}
           overlayClassName="!z-[10000] bg-black/60 backdrop-blur-[2px]"
-          className="!z-[10001] flex flex-col justify-between border-r border-white/10 bg-black p-0 text-white shadow-2xl"
-          style={{ width: "min(100vw, 340px)", maxWidth: "none" }}
+          className="mobile-menu-panel !z-[10001] flex flex-col justify-between bg-black p-0 text-white"
+          style={{ width: "100vw", maxWidth: "none" }}
         >
           <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
           <SheetDescription className="sr-only">
@@ -955,7 +975,7 @@ export function Navbar({
 
           {/* Navigation Links */}
           <div className="flex-1 overflow-y-auto px-6 py-6">
-            <div className="flex flex-col gap-6">
+            <div className="menu-stagger flex flex-col gap-6">
               <p className="text-[11px] font-medium uppercase leading-[1.4] tracking-normal text-white/40">
                 Menu
               </p>
@@ -1100,14 +1120,32 @@ export function Navbar({
                   )}
                 </button>
               </div>
-            </div>
-          </div>
 
-          {/* Footer in Drawer */}
-          <div className="border-t border-white/10 p-5">
-            <p className="text-[11px] uppercase leading-[1.4] tracking-normal text-white/40">
-              SUOS ORIGINALS — FREE SHIPPING OVER ₹2,900
-            </p>
+              <div className="my-1 h-px w-full bg-white/10" />
+
+              <p className="text-[11px] font-medium uppercase leading-[1.4] tracking-normal text-white/40">
+                Help
+              </p>
+
+              <div className="flex flex-col gap-2 text-[14px] uppercase leading-[1.4] tracking-normal text-white/75">
+                <Link
+                  href="/track-order"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-3 py-2 transition-colors hover:text-white"
+                >
+                  <Truck className="size-4 stroke-[1.8]" />
+                  <span>Track Order</span>
+                </Link>
+                <Link
+                  href="/contact"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-3 py-2 transition-colors hover:text-white"
+                >
+                  <Mail className="size-4 stroke-[1.8]" />
+                  <span>Contact Us</span>
+                </Link>
+              </div>
+            </div>
           </div>
         </SheetContent>
       </Sheet>

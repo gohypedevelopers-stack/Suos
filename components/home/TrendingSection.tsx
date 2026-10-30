@@ -265,6 +265,7 @@ export function ProductCardView({
     >
       <div
         data-row-media
+        data-card-zoom
         className={cn(
           "relative aspect-[2/3] w-full overflow-hidden bg-neutral-900 touch-pan-y select-none",
           isCompact ? "sm:aspect-[234/342]" : "sm:aspect-[330/440]"
@@ -287,7 +288,7 @@ export function ProductCardView({
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 className={cn(
-                  "object-cover object-center group-hover:scale-[1.015]",
+                  "object-cover object-center md:group-hover:scale-[1.05]",
                   isActive
                     ? "z-10 opacity-100 transition-opacity duration-150 ease-out"
                     : isPrev
@@ -313,7 +314,7 @@ export function ProductCardView({
         />
 
         {/* Badge at Top-Left (Smaller and corner-aligned on mobile) */}
-        <div className="pointer-events-none absolute left-1.5 top-1.5 sm:left-2.5 sm:top-2.5 z-20">
+        <div className="pointer-events-none absolute left-1.5 top-1.5 sm:left-2.5 sm:top-2.5 z-20 hidden md:block">
           <span className="inline-block bg-black px-1.5 py-1 sm:px-2 sm:py-[5px] text-[11px] sm:text-[12px] font-normal uppercase tracking-normal text-white leading-none shadow-xs">
             {product.badge || "NEW ARRIVAL"}
           </span>
@@ -341,7 +342,7 @@ export function ProductCardView({
           type="button"
           aria-label={isExpanded ? "Collapse details" : "Expand size options"}
           onClick={toggleExpand}
-          className="pointer-events-auto absolute bottom-1.5 right-1.5 sm:bottom-2 sm:right-2 z-20 flex md:hidden size-[22px] sm:size-6 items-center justify-center bg-white text-black shadow-xs transition-transform duration-200 hover:scale-105 active:scale-95 cursor-pointer"
+          className="pointer-events-auto absolute bottom-1.5 right-1.5 sm:bottom-2 sm:right-2 z-20 hidden size-[22px] sm:size-6 items-center justify-center bg-white text-black shadow-xs transition-transform duration-200 hover:scale-105 active:scale-95 cursor-pointer"
         >
           <div className="relative size-3 flex items-center justify-center">
             <svg
@@ -391,7 +392,7 @@ export function ProductCardView({
 
         {/* Mobile Expanded Quick View Button */}
         {isExpanded && (
-          <div className="pointer-events-auto absolute inset-x-0 bottom-6.5 z-20 flex md:hidden items-center justify-center px-2">
+          <div className="pointer-events-auto absolute inset-x-0 bottom-6.5 z-20 hidden items-center justify-center px-2">
             <button
               type="button"
               onClick={handleQuickView}
@@ -410,21 +411,23 @@ export function ProductCardView({
               onClick={(e) => stepImage(-1, e)}
               onMouseMove={(e) => e.stopPropagation()}
               aria-label={`Previous image of ${product.title}`}
-              className="pointer-events-auto absolute left-1.5 top-1/2 -translate-y-1/2 sm:left-2 md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100"
+              size="sm"
+              className="pointer-events-auto absolute left-2 top-1/2 hidden -translate-y-1/2 md:flex md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100"
             />
             <CarouselArrow
               direction="next"
               onClick={(e) => stepImage(1, e)}
               onMouseMove={(e) => e.stopPropagation()}
               aria-label={`Next image of ${product.title}`}
-              className="pointer-events-auto absolute right-1.5 top-1/2 -translate-y-1/2 sm:right-2 md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100"
+              size="sm"
+              className="pointer-events-auto absolute right-2 top-1/2 hidden -translate-y-1/2 md:flex md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100"
             />
           </>
         )}
 
         {/* Gallery indicator bars, one per image (max 6), styled like the client reference */}
         {indicatorCount > 1 && (
-          <div className="pointer-events-auto absolute inset-x-0 bottom-2 sm:bottom-3 z-20 flex items-center justify-center gap-0 px-2 drop-shadow-[0_0_3px_rgba(0,0,0,0.55)]">
+          <div className="pointer-events-auto absolute inset-x-0 bottom-2 sm:bottom-3 z-20 hidden items-center justify-center gap-0 px-2 drop-shadow-[0_0_3px_rgba(0,0,0,0.55)] md:flex">
             {Array.from({ length: indicatorCount }).map((_, dashIdx) => {
               const targetImageIndex = Math.round(
                 (dashIdx / (indicatorCount - 1)) * (gallery.length - 1)
@@ -464,7 +467,7 @@ export function ProductCardView({
       </div>
 
       {/* Info Area Below Image */}
-      <div className="mt-2.5 md:mt-3 flex flex-col gap-1.5 font-inter">
+      <div className="mt-2.5 md:mt-3 flex flex-col gap-1.5">
         {isCompact && (product.lineName || product.category?.name) ? (
           <p className="truncate text-[11px] md:text-[12px] uppercase tracking-normal leading-none text-ink-400">
             {product.lineName || product.category?.name}
@@ -585,7 +588,7 @@ export function TrendingSection({ products = [] }: { products?: ProductCard[] })
       <div className="mt-8 flex justify-center">
         <Link
           href="/shop"
-          className="inline-flex h-11 items-center justify-center border border-black px-7 text-[14px] md:text-button font-normal uppercase transition-colors hover:bg-black hover:text-white"
+          className="btn-sweep inline-flex h-11 items-center justify-center border border-black px-7 text-[14px] md:text-button font-normal uppercase"
         >
           View All
         </Link>

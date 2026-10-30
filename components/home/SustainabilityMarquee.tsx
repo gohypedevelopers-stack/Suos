@@ -22,7 +22,7 @@ export function SustainabilityMarquee() {
 
       <div
         className={cn(
-          "flex w-max items-center animate-[marquee_26s_linear_infinite] motion-reduce:animate-none",
+          "flex w-max items-center animate-[marquee_26s_linear_infinite] hover:[animation-play-state:paused] motion-reduce:animate-none",
           "[will-change:transform]"
         )}
       >

@@ -113,9 +113,22 @@ export type ContactContent = {
   faqs: { question: string; answer: string }[]
 }
 
+export type FooterColumn = {
+  title: string
+  links: NavMenuLink[]
+}
+
 export type FooterContent = {
-  /** Contact column: any number of groups, each with emails / phones / text. */
+  /** Contact details: used by the product page's "Origin & Contact". */
   contactGroups: ContactGroup[]
+  /** Footer link columns (SUOS / HELP / FOLLOW). Links with an empty URL are hidden. */
+  columns: FooterColumn[]
+  newsletterHeading: string
+  newsletterPlaceholder: string
+  newsletterButton: string
+  copyright: string
+  /** Small links bottom-right (Privacy Policy, Terms & Conditions). */
+  legalLinks: NavMenuLink[]
 }
 
 export type ReturnsPageContent = {
@@ -197,6 +210,39 @@ export const SITE_CONTENT_LABELS: Record<SiteContentKey, string> = {
   shippingPolicy: "Shipping & returns policy",
   ...(Object.fromEntries(PAGE_KEYS.map((key) => [key, PAGE_DEFS[key].label])) as Record<PageKey, string>),
 }
+
+/** Footer columns from the client's brief. Empty URLs are hidden until filled in the admin. */
+export const DEFAULT_FOOTER_COLUMNS: FooterColumn[] = [
+  {
+    title: "SUOS",
+    links: [
+      { label: "About", href: "" },
+      { label: "Men", href: "/shop" },
+      { label: "New arrivals", href: "/shop?filter=new" },
+      { label: "Bestsellers", href: "/shop?filter=bestsellers" },
+      { label: "Size guide", href: "/size-guide" },
+    ],
+  },
+  {
+    title: "Help",
+    links: [
+      { label: "Track order", href: "/track-order" },
+      { label: "Returns & exchanges", href: "/returns" },
+      { label: "Shipping", href: "/returns-policy" },
+      { label: "Care guide", href: "" },
+      { label: "FAQ", href: "/contact#faq-heading" },
+    ],
+  },
+  {
+    title: "Follow",
+    links: [
+      { label: "Instagram", href: "" },
+      { label: "YouTube", href: "" },
+      { label: "Pinterest", href: "" },
+      { label: "WhatsApp", href: "https://wa.me/917268018889" },
+    ],
+  },
+]
 
 const p = (text: string): PolicyBlock => ({ type: "paragraph", text })
 const list = (...items: string[]): PolicyBlock => ({ type: "list", items })
@@ -339,6 +385,15 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
       { heading: "For customer care", lines: [{ type: "email", label: "", value: "info@suos.in" }] },
       { heading: "For online orders", lines: [{ type: "phone", label: "", value: "+91 000000000" }] },
       { heading: "Timings", lines: [{ type: "text", label: "", value: "Mon-Sat : 9AM - 8PM" }] },
+    ],
+    columns: DEFAULT_FOOTER_COLUMNS,
+    newsletterHeading: "Subscribe to our newsletter",
+    newsletterPlaceholder: "Enter your email address",
+    newsletterButton: "Subscribe",
+    copyright: "All Rights Reserved SUOS India © 2026",
+    legalLinks: [
+      { label: "Privacy Policy", href: "/privacy" },
+      { label: "Terms & Conditions", href: "/terms" },
     ],
   },
   productPage: {

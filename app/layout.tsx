@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { akzidenzGrotesk, georgia, holiday, inter } from "@/lib/fonts";
+import { preload } from "react-dom";
+import { AKZIDENZ_PRELOADS, georgia, holiday } from "@/lib/fonts";
 import { SiteChrome } from "@/components/SiteChrome";
 import { Toaster } from "@/components/ui/sonner";
 import { WishlistProvider } from "@/lib/wishlist-context";
@@ -63,6 +64,9 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const siteContent = await getSiteContent();
+  for (const href of AKZIDENZ_PRELOADS) {
+    preload(href, { as: "font", type: "font/woff2", crossOrigin: "anonymous" });
+  }
 
   return (
     <html
@@ -70,8 +74,6 @@ export default async function RootLayout({
       className={cn(
         "h-full",
         "antialiased",
-        akzidenzGrotesk.variable,
-        inter.variable,
         georgia.variable,
         holiday.variable,
         "font-sans"

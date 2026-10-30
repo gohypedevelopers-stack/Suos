@@ -48,7 +48,7 @@ export function LookbookCarousel() {
   return (
     <section className="w-full bg-white px-3 py-10 text-black sm:px-6 lg:px-8">
       <h2 className="sr-only">Lookbook</h2>
-      <div className="reveal-stagger grid grid-cols-3 gap-1 sm:gap-2 lg:grid-cols-6">
+      <div className="dim-siblings reveal-stagger grid grid-cols-3 gap-1 sm:gap-2 lg:grid-cols-6">
         {slides.map((slide) => (
           <LookbookCard key={slide.id} slide={slide} />
         ))}

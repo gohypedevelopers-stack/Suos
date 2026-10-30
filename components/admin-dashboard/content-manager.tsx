@@ -386,7 +386,7 @@ function FooterEditor({ value, onChange }: SectionProps<"footer">) {
   return (
     <div className="space-y-4">
       <p className="text-xs text-black/55">
-        The Contact column of the footer (also used in the product page&apos;s &ldquo;Origin &amp; Contact&rdquo;). Add as many
+        Contact details, shown in the product page&apos;s &ldquo;Origin &amp; Contact&rdquo;. Add as many
         groups and lines as you need. Emails, phone and WhatsApp numbers become clickable; the label is optional
         (e.g. &ldquo;Customer Care&rdquo; shows as &ldquo;Customer Care: +91…&rdquo;).
       </p>
@@ -471,6 +471,51 @@ function FooterEditor({ value, onChange }: SectionProps<"footer">) {
       >
         <Plus className="size-3.5" /> Add group
       </Button>
+
+      <div className="space-y-3 border-t border-black/10 pt-4">
+        <p className="text-sm font-semibold text-black/80">Footer columns</p>
+        <p className="text-xs text-black/55">
+          The link columns at the bottom of every page. A link with an empty URL is hidden, so you can keep e.g. Pinterest ready without showing it yet. Use full addresses (https://…) for social links.
+        </p>
+        <div className="grid gap-4 lg:grid-cols-3">
+          {value.columns.map((column, index) => (
+            <div key={index} className="space-y-2">
+              <div className="flex items-end gap-2">
+                <Field label="Column title">
+                  <Input
+                    value={column.title}
+                    onChange={(e) => onChange({ ...value, columns: value.columns.map((c, j) => (j === index ? { ...c, title: e.target.value } : c)) })}
+                  />
+                </Field>
+                <ListControls
+                  index={index}
+                  count={value.columns.length}
+                  onMove={(from, to) => onChange({ ...value, columns: move(value.columns, from, to) })}
+                  onRemove={(i) => onChange({ ...value, columns: value.columns.filter((_, j) => j !== i) })}
+                />
+              </div>
+              <NavLinksEditor
+                title="Links"
+                items={column.links}
+                onChange={(links) => onChange({ ...value, columns: value.columns.map((c, j) => (j === index ? { ...c, links } : c)) })}
+              />
+            </div>
+          ))}
+        </div>
+        <Button type="button" variant="outline" onClick={() => onChange({ ...value, columns: [...value.columns, { title: "", links: [] }] })}>
+          <Plus className="size-3.5" /> Add column
+        </Button>
+      </div>
+
+      <div className="grid gap-4 border-t border-black/10 pt-4 md:grid-cols-3">
+        <Field label="Newsletter heading"><Input value={value.newsletterHeading} onChange={(e) => onChange({ ...value, newsletterHeading: e.target.value })} /></Field>
+        <Field label="Email field placeholder"><Input value={value.newsletterPlaceholder} onChange={(e) => onChange({ ...value, newsletterPlaceholder: e.target.value })} /></Field>
+        <Field label="Button text"><Input value={value.newsletterButton} onChange={(e) => onChange({ ...value, newsletterButton: e.target.value })} /></Field>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Field label="Copyright line"><Input value={value.copyright} onChange={(e) => onChange({ ...value, copyright: e.target.value })} /></Field>
+        <NavLinksEditor title="Bottom-right links" items={value.legalLinks} onChange={(legalLinks) => onChange({ ...value, legalLinks })} />
+      </div>
     </div>
   )
 }

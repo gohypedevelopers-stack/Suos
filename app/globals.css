@@ -6,6 +6,58 @@
  * Figma design-system text styles. Use these (text-h2, text-body, …) on the
  * storefront instead of hand-picked sizes. Tracking is 0 except buttons (1%).
  */
+/* Brand typeface. Declared by hand (not next/font) so its real name shows in
+   dev tools. 600 resolves to Bold; Medium has no italic (uses Regular Italic). */
+@font-face {
+  font-family: "Akzidenz-Grotesk Pro";
+  src: url("/fonts/akzidenz-grotesk/AkzidenzGroteskPro-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Akzidenz-Grotesk Pro";
+  src: url("/fonts/akzidenz-grotesk/AkzidenzGroteskPro-LightItalic.woff2") format("woff2");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Akzidenz-Grotesk Pro";
+  src: url("/fonts/akzidenz-grotesk/AkzidenzGroteskPro-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Akzidenz-Grotesk Pro";
+  src: url("/fonts/akzidenz-grotesk/AkzidenzGroteskPro-RegularItalic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Akzidenz-Grotesk Pro";
+  src: url("/fonts/akzidenz-grotesk/AkzidenzGroteskPro-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Akzidenz-Grotesk Pro";
+  src: url("/fonts/akzidenz-grotesk/AkzidenzGroteskPro-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Akzidenz-Grotesk Pro";
+  src: url("/fonts/akzidenz-grotesk/AkzidenzGroteskPro-BoldItalic.woff2") format("woff2");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
 @theme {
   --text-h1: 56px;
   --text-h1--line-height: 120px;
@@ -42,11 +94,10 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
-  --font-sans: var(--font-akzidenz-grotesk);
+  --font-sans: "Akzidenz-Grotesk Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-serif: var(--font-georgia);
-  --font-heading: var(--font-akzidenz-grotesk);
+  --font-heading: "Akzidenz-Grotesk Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-display: var(--font-holiday);
-  --font-inter: var(--font-inter-family);
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
 
   --color-sidebar-ring: var(--sidebar-ring);
@@ -107,8 +158,8 @@
   --brand-blue: #0c5a85;
 
   /* Header stack */
-  --announcement-height: 34px;
-  --main-navbar-height: 56px;
+  --announcement-height: 28px;
+  --main-navbar-height: 52px;
   --header-stack-height: calc(var(--announcement-height) + var(--main-navbar-height));
 
   /* Base */
@@ -473,6 +524,22 @@
   backface-visibility: hidden;
 }
 
+/* Hidden while the page is scrolling; slides back in when scrolling pauses.
+   Uses `translate` so it doesn't fight the inline `transform` offset. */
+.navbar-shell {
+  translate: 0 0;
+  transition-property: background-color, color, border-color, box-shadow, opacity, transform, translate;
+}
+.navbar-shell.is-scroll-hidden {
+  translate: 0 calc(-100% - var(--announcement-height));
+}
+.navbar-shell:not(.is-scroll-hidden) {
+  transition-duration: 280ms, 280ms, 280ms, 280ms, 220ms, 220ms, 520ms;
+}
+.navbar-shell.is-scroll-hidden {
+  transition-duration: 280ms, 280ms, 280ms, 280ms, 220ms, 220ms, 320ms;
+}
+
 .navbar-shell.is-scrolled {
   background-color: #ffffff;
   color: #000000;
@@ -482,13 +549,13 @@
 
 @media (min-width: 640px) {
   :root {
-    --announcement-height: 50px;
+    --announcement-height: 36px;
   }
 }
 
 @media (min-width: 1024px) {
   :root {
-    --main-navbar-height: 98px;
+    --main-navbar-height: 72px;
   }
 }
 
@@ -564,4 +631,68 @@
   .hero-rise > * { animation: none; }
   .hover-zoom:hover img,
   .hover-zoom:hover video { transform: none; }
+}
+
+/* ───────── Mobile menu (Navbar): full-screen slide + staggered items ───────── */
+@keyframes mobile-menu-in {
+  from { transform: translate3d(-100%, 0, 0); }
+  to { transform: none; }
+}
+@keyframes mobile-menu-out {
+  from { transform: none; }
+  to { transform: translate3d(-100%, 0, 0); }
+}
+.mobile-menu-panel[data-state="open"] {
+  animation: mobile-menu-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+}
+.mobile-menu-panel[data-state="closed"] {
+  animation: mobile-menu-out 0.38s cubic-bezier(0.7, 0, 0.84, 0) both !important;
+}
+@keyframes menu-item-in {
+  from { opacity: 0; transform: translate3d(-18px, 0, 0); }
+  to { opacity: 1; transform: none; }
+}
+.mobile-menu-panel[data-state="open"] .menu-stagger > * {
+  animation: menu-item-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.menu-stagger > :nth-child(1) { animation-delay: 0.18s !important; }
+.menu-stagger > :nth-child(2) { animation-delay: 0.24s !important; }
+.menu-stagger > :nth-child(3) { animation-delay: 0.3s !important; }
+.menu-stagger > :nth-child(4) { animation-delay: 0.36s !important; }
+.menu-stagger > :nth-child(5) { animation-delay: 0.42s !important; }
+.menu-stagger > :nth-child(6) { animation-delay: 0.48s !important; }
+.menu-stagger > :nth-child(7) { animation-delay: 0.54s !important; }
+.menu-stagger > :nth-child(8) { animation-delay: 0.6s !important; }
+@media (prefers-reduced-motion: reduce) {
+  .mobile-menu-panel[data-state],
+  .mobile-menu-panel .menu-stagger > * { animation: none !important; }
+}
+
+/* ───────── Hover styles (reference: smooth, slow) ───────── */
+/* Product-card photo: slow zoom; `scale` is separate from the opacity swap. */
+[data-card-zoom] img {
+  transition: opacity 150ms ease-out, scale 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+/* Outlined buttons fill with black from the left. */
+.btn-sweep {
+  background-color: transparent;
+  background-image: linear-gradient(#000, #000);
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: 0% 100%;
+  transition: background-size 0.6s cubic-bezier(0.65, 0, 0.35, 1), color 0.45s ease;
+}
+.btn-sweep:hover,
+.btn-sweep:focus-visible {
+  background-size: 100% 100%;
+  color: #fff;
+}
+/* Photo grids: the others fade back while one is hovered. */
+.dim-siblings > * {
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@media (hover: hover) {
+  .dim-siblings:has(> :hover) > :not(:hover) {
+    opacity: 0.55;
+  }
 }

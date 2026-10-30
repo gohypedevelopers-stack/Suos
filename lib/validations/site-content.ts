@@ -158,7 +158,7 @@ export const siteContentSchemas = {
     (raw) => {
       if (!raw || typeof raw !== "object" || Array.isArray(raw)) return raw
       const value = raw as Record<string, unknown>
-      return Array.isArray(value.contactGroups) ? value : { contactGroups: contactGroupsFromLegacy(value) }
+      return Array.isArray(value.contactGroups) ? value : { ...value, contactGroups: contactGroupsFromLegacy(value) }
     },
     z.object({
       contactGroups: z
@@ -182,6 +182,21 @@ export const siteContentSchemas = {
           }),
         )
         .max(8),
+      columns: z
+        .array(
+          z.object({
+            title: shortText.min(1, "Give each footer column a title."),
+            // An empty link hides that item on the site.
+            links: z.array(z.object({ label: shortText.min(1, "Enter a label."), href: z.string().trim().max(500) })).max(12),
+          }),
+        )
+        .max(5)
+        .default(() => structuredClone(DEFAULT_SITE_CONTENT.footer.columns)),
+      newsletterHeading: shortText.default(DEFAULT_SITE_CONTENT.footer.newsletterHeading),
+      newsletterPlaceholder: shortText.default(DEFAULT_SITE_CONTENT.footer.newsletterPlaceholder),
+      newsletterButton: shortText.min(1).default(DEFAULT_SITE_CONTENT.footer.newsletterButton),
+      copyright: shortText.default(DEFAULT_SITE_CONTENT.footer.copyright),
+      legalLinks: z.array(navMenuLinkSchema).max(6).default(() => structuredClone(DEFAULT_SITE_CONTENT.footer.legalLinks)),
     }),
   ),
   productPage: z.object({

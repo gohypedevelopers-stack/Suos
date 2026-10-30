@@ -57,14 +57,14 @@ function TileCard({ tile, hidden }: { tile: CategoryTile; hidden: boolean }) {
       draggable={false}
       // 2.5 tiles across on desktop (the third is cut in half, as in Figma),
       // and as tall as the screen below the header so the strip fits in view.
-      className="group relative block h-[clamp(420px,calc(100svh-var(--main-navbar-height)),834px)] w-[80vw] shrink-0 overflow-hidden bg-[#efefef] sm:w-[55vw] lg:w-[40vw]"
+      className="group relative block h-[min(60svh,500px)] w-[62vw] shrink-0 overflow-hidden bg-[#efefef] sm:h-[clamp(420px,calc(100svh-var(--main-navbar-height)),834px)] sm:w-[55vw] lg:w-[40vw]"
     >
       <Image
         src={tile.image}
         alt={tile.alt}
         fill
         draggable={false}
-        sizes="(max-width: 639px) 80vw, (max-width: 1023px) 55vw, 40vw"
+        sizes="(max-width: 639px) 62vw, (max-width: 1023px) 55vw, 40vw"
         className={cn("pointer-events-none object-cover object-center", focus.className)}
         style={focus.style}
       />

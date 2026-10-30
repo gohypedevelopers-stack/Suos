@@ -1,30 +1,14 @@
-import { Inter } from "next/font/google";
 import localFont from "next/font/local";
 
-// woff2 copies of the three Figma weights (~100 KB in total versus ~1.7 MB
-// for all 11 .ttf files), so Regular arrives quickly and the Arial fallback
-// barely flashes. 600 (font-semibold) resolves to Bold.
-export const akzidenzGrotesk = localFont({
-  src: [
-    {
-      path: "../fonts/Akzidenz Grotesk/AkzidenzGroteskPro-Regular.woff2",
-      weight: "400",
-      style: "normal",
-    },
-    {
-      path: "../fonts/Akzidenz Grotesk/AkzidenzGroteskPro-Medium.woff2",
-      weight: "500",
-      style: "normal",
-    },
-    {
-      path: "../fonts/Akzidenz Grotesk/AkzidenzGroteskPro-Bold.woff2",
-      weight: "700",
-      style: "normal",
-    },
-  ],
-  variable: "--font-akzidenz-grotesk",
-  display: "swap",
-});
+// Akzidenz-Grotesk Pro is declared with plain @font-face in app/globals.css
+// (files in public/fonts/akzidenz-grotesk) so the browser and dev tools show
+// its real name instead of a generated one. See AKZIDENZ_PRELOADS below.
+
+/** Weights used above the fold on every page; preloaded from the root layout. */
+export const AKZIDENZ_PRELOADS = [
+  "/fonts/akzidenz-grotesk/AkzidenzGroteskPro-Regular.woff2",
+  "/fonts/akzidenz-grotesk/AkzidenzGroteskPro-Medium.woff2",
+];
 
 export const georgia = localFont({
   src: [
@@ -63,16 +47,6 @@ export const holiday = localFont({
     },
   ],
   variable: "--font-holiday",
-  display: "swap",
-  preload: false,
-});
-
-// Secondary face for small supporting text (card names, prices, descriptions).
-// Headings, nav and buttons stay in Akzidenz-Grotesk. Use the `font-inter` class.
-export const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-inter-family",
   display: "swap",
   preload: false,
 });

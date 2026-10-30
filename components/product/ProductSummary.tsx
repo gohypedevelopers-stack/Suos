@@ -132,7 +132,7 @@ function OfferCard({ code, headline, detail }: { code: string; headline: string;
 
 function MiniProductCard({ product }: { product: HomeProductCard }) {
   return (
-    <Link href={`/products/${product.slug}`} className="group block font-inter w-[180px] shrink-0 snap-start sm:w-[230px]">
+    <Link href={`/products/${product.slug}`} className="group block w-[180px] shrink-0 snap-start sm:w-[230px]">
       <div data-row-media className="relative aspect-[230/304] overflow-hidden bg-[#efefef]">
         {product.image ? (
           <Image
@@ -365,7 +365,7 @@ export function ProductSummary({
           ref={addToCartRef}
           type="button"
           onClick={handleAddToCart}
-          className="flex h-12 w-full cursor-pointer items-center justify-center border border-black bg-white text-[18px] font-medium uppercase tracking-[0.01em] text-black transition-[background-color,color] duration-200 ease-out hover:bg-black hover:text-white active:scale-[0.99] sm:h-[53px] sm:text-h3"
+          className="flex h-12 w-full cursor-pointer items-center justify-center btn-sweep border border-black text-[18px] font-medium uppercase tracking-[0.01em] text-black active:scale-[0.99] sm:h-[53px] sm:text-h3"
         >
           Add To Cart
         </button>
