@@ -427,7 +427,7 @@ export function ProductCardView({
 
         {/* Gallery indicator bars, one per image (max 6), styled like the client reference */}
         {indicatorCount > 1 && (
-          <div className="pointer-events-auto absolute inset-x-0 bottom-2 sm:bottom-3 z-20 hidden items-center justify-center gap-0 px-2 drop-shadow-[0_0_3px_rgba(0,0,0,0.55)] md:flex">
+          <div className="pointer-events-auto absolute inset-x-0 bottom-2 sm:bottom-3 z-20 hidden items-center justify-center gap-0 px-2 drop-shadow-[0_0_2px_rgba(0,0,0,0.6)] md:flex">
             {Array.from({ length: indicatorCount }).map((_, dashIdx) => {
               const targetImageIndex = Math.round(
                 (dashIdx / (indicatorCount - 1)) * (gallery.length - 1)
@@ -446,16 +446,16 @@ export function ProductCardView({
                     e.stopPropagation()
                     changeImage(targetImageIndex)
                   }}
-                  className="group/ind flex items-center justify-center py-2 px-0.5 cursor-pointer"
+                  className="group/ind flex items-center justify-center py-2 px-1 cursor-pointer"
                   aria-label={`Show image ${dashIdx + 1}`}
                   aria-current={dashIdx === activeIndicatorIndex ? "true" : undefined}
                 >
                   <span
                     className={cn(
-                      "block h-[2px] w-4 sm:w-5 md:w-6 transition-colors duration-200",
+                      "block h-[3px] w-6 lg:w-8 transition-colors duration-200",
                       dashIdx === activeIndicatorIndex
                         ? "bg-white"
-                        : "bg-white/45 group-hover/ind:bg-white/80"
+                        : "bg-white/70 group-hover/ind:bg-white"
                     )}
                   />
                 </button>

@@ -62,9 +62,9 @@ export function ProductGallery({
           </div>
         )}
 
-        {/* Dot Indicators on Mobile */}
+        {/* Indicator bars on mobile (same style as the product-card photo bars) */}
         {images.length > 1 && (
-          <div className="mt-2 flex items-center justify-center gap-1.5">
+          <div className="mt-1 flex items-center justify-center">
             {images.map((_, idx) => (
               <button
                 key={idx}
@@ -78,13 +78,16 @@ export function ProductGallery({
                     })
                   }
                 }}
-                className={cn(
-                  "h-1.5 transition-all rounded-full cursor-pointer",
-                  idx === activeIndex
-                    ? "w-5 bg-black"
-                    : "w-1.5 bg-black/20 hover:bg-black/40"
-                )}
-              />
+                aria-current={idx === activeIndex ? "true" : undefined}
+                className="group/ind flex cursor-pointer items-center justify-center px-1 py-2"
+              >
+                <span
+                  className={cn(
+                    "block h-[3px] w-6 transition-colors duration-200",
+                    idx === activeIndex ? "bg-black" : "bg-black/25 group-hover/ind:bg-black/50",
+                  )}
+                />
+              </button>
             ))}
           </div>
         )}

@@ -168,24 +168,26 @@ export function Hero({ banners }: { banners?: HomeHeroBanner[] }) {
         )
       })}
 
-      {/* Subtle Slide Indicator Dots (when multiple slides exist, no arrows) */}
+      {/* Slide indicator bars (same style as the product-card photo bars) */}
       {slides.length > 1 && (
-        <div className="absolute bottom-3.5 right-4 sm:bottom-5 sm:right-6 z-30 flex items-center gap-1.5 bg-black/40 backdrop-blur-xs px-2.5 py-1 rounded-full">
+        <div className="absolute inset-x-0 bottom-3 sm:bottom-5 z-30 flex items-center justify-center drop-shadow-[0_0_2px_rgba(0,0,0,0.6)]">
           {slides.map((_, idx) => (
             <button
               key={idx}
               type="button"
               onClick={() => setActiveSlide(idx)}
               aria-label={`Go to slide ${idx + 1}`}
-              className={cn(
-                "h-1.5 rounded-full transition-all duration-500 cursor-pointer",
-                idx === activeSlide ? "w-6 bg-white" : "w-1.5 bg-white/40 hover:bg-white/70",
-              )}
-            />
+              aria-current={idx === activeSlide ? "true" : undefined}
+              className="group/ind flex cursor-pointer items-center justify-center px-1 py-2"
+            >
+              <span
+                className={cn(
+                  "block h-[3px] w-8 transition-colors duration-200 lg:w-10",
+                  idx === activeSlide ? "bg-white" : "bg-white/70 group-hover/ind:bg-white",
+                )}
+              />
+            </button>
           ))}
-          <span className="ml-1 text-caption text-white">
-            {activeSlide + 1}/{slides.length}
-          </span>
         </div>
       )}
 
