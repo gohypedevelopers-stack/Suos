@@ -91,6 +91,7 @@ export function DenimCarousel({ slides }: { slides?: HomeCarouselSlide[] }) {
     onPointerMove,
     onPointerUp,
     onPointerCancel,
+    onClickCapture,
   } = useContinuousDraggableCarousel({ slideCount: tiles.length })
 
   return (
@@ -106,6 +107,7 @@ export function DenimCarousel({ slides }: { slides?: HomeCarouselSlide[] }) {
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerCancel}
+        onClickCapture={onClickCapture}
       >
         {/* Tiles butt together like the Figma strip (the shared track CSS adds a 1rem gap). */}
         <div ref={trackRef} className="continuous-carousel-track" style={{ gap: 0 }}>

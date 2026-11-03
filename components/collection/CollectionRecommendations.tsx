@@ -17,6 +17,7 @@ export function CollectionRecommendations({ products = [] }: { products?: Produc
     onPointerMove,
     onPointerUp,
     onPointerCancel,
+    onClickCapture,
   } = useContinuousDraggableCarousel({
     slideCount: displayProducts.length || 1,
   })
@@ -59,6 +60,7 @@ export function CollectionRecommendations({ products = [] }: { products?: Produc
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerCancel}
+          onClickCapture={onClickCapture}
         >
           <div ref={trackRef} className="continuous-carousel-track">
             {[...displayProducts, ...displayProducts, ...displayProducts].map((product, index) => (

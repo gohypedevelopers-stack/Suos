@@ -1,6 +1,9 @@
 "use client"
 
-import { useEffect, useRef, type PointerEvent } from "react"
+import { useEffect, useRef, type MouseEvent, type PointerEvent } from "react"
+
+/** Pixels the pointer must travel before a press becomes a drag (below it, it's a click). */
+const DRAG_THRESHOLD = 6
 
 type ContinuousCarouselOptions = {
   slideCount: number
@@ -20,6 +23,8 @@ export function useContinuousDraggableCarousel({
   const isHoveringRef = useRef(false)
   const isDraggingRef = useRef(false)
   const dragRef = useRef<{ pointerId: number; startX: number; startOffset: number } | null>(null)
+  // Set once a press has moved past DRAG_THRESHOLD; swallows the click that ends the drag.
+  const draggedRef = useRef(false)
 
   useEffect(() => {
     const track = trackRef.current
@@ -119,25 +124,33 @@ export function useContinuousDraggableCarousel({
     onPointerDown: (event: PointerEvent<HTMLDivElement>) => {
       if (event.pointerType === "mouse" && event.button !== 0) return
 
-      event.preventDefault()
-      const viewport = viewportRef.current
-      if (!viewport) return
-
+      // No preventDefault / pointer capture yet: capturing here retargets the
+      // click to the viewport, so tile links would never open.
       dragRef.current = {
         pointerId: event.pointerId,
         startX: event.clientX,
         startOffset: offsetRef.current,
       }
-      isDraggingRef.current = true
-      viewport.dataset.dragging = "true"
-      viewport.setPointerCapture(event.pointerId)
+      draggedRef.current = false
     },
     onPointerMove: (event: PointerEvent<HTMLDivElement>) => {
       const drag = dragRef.current
       if (!drag || drag.pointerId !== event.pointerId) return
 
+      const dx = event.clientX - drag.startX
+      if (!isDraggingRef.current) {
+        if (Math.abs(dx) < DRAG_THRESHOLD) return
+        const viewport = viewportRef.current
+        isDraggingRef.current = true
+        draggedRef.current = true
+        if (viewport) {
+          viewport.dataset.dragging = "true"
+          viewport.setPointerCapture(event.pointerId)
+        }
+      }
+
       event.preventDefault()
-      offsetRef.current = normalizeOffset(drag.startOffset + event.clientX - drag.startX)
+      offsetRef.current = normalizeOffset(drag.startOffset + dx)
       renderOffset()
     },
     onPointerUp: (event: PointerEvent<HTMLDivElement>) => {
@@ -148,6 +161,14 @@ export function useContinuousDraggableCarousel({
     onPointerCancel: (event: PointerEvent<HTMLDivElement>) => {
       if (dragRef.current?.pointerId === event.pointerId) {
         finishDrag(event.pointerId)
+      }
+    },
+    /** Attach as onClickCapture: stops a drag from also opening the tile under it. */
+    onClickCapture: (event: MouseEvent<HTMLDivElement>) => {
+      if (draggedRef.current) {
+        event.preventDefault()
+        event.stopPropagation()
+        draggedRef.current = false
       }
     },
   }
