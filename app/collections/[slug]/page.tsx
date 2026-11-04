@@ -67,7 +67,10 @@ export default async function Page({
     collection.image || collection.products[0]?.image || "/home-page-content/hero-1.png"
 
   const otherCollections = collections.filter((item) => item.id !== collection.id)
-  const editorialImages = buildEditorialImages(
+  // Images chosen in Products → Collections win; otherwise pick them automatically.
+  const editorialImages = collection.editorialImages.length > 0
+    ? collection.editorialImages
+    : buildEditorialImages(
     collection.products,
     otherCollections.flatMap((item) =>
       item.images.slice(0, 1).map((image) => ({
@@ -78,7 +81,9 @@ export default async function Page({
   )
 
   const bannerSource = otherCollections.find((item) => item.image)
-  const banner = bannerSource
+  const banner = collection.banner?.src
+    ? { image: collection.banner.src, alt: collection.banner.alt, href: collection.banner.href }
+    : bannerSource
     ? {
         image: bannerSource.image,
         alt: bannerSource.alt,

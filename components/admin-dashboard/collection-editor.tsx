@@ -5,6 +5,8 @@ import Link from "next/link"
 import { useRef, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import {
+  ArrowDown,
+  ArrowUp,
   ChevronRight,
   CirclePlus,
   Link2,
@@ -31,6 +33,7 @@ import {
 import { Switch } from "@/components/ui/switch"
 import type {
   AdminCollectionEditor,
+  AdminCollectionPageImage,
   AdminCollectionProduct,
 } from "@/lib/server/dal/collections"
 
@@ -62,6 +65,154 @@ async function readUploadInstruction(response: Response): Promise<UploadInstruct
     return { error: `The upload service returned an unexpected response (${response.status}).` }
   }
 }
+
+const ACCEPTED_IMAGE_TYPES = new Set(["image/avif", "image/jpeg", "image/png", "image/webp"])
+
+/** Uploads one collection image and returns its storage key and preview URL. */
+async function uploadCollectionImage(file: File) {
+  if (!ACCEPTED_IMAGE_TYPES.has(file.type) || file.size > 10 * 1024 * 1024) {
+    throw new Error("Choose an AVIF, JPG, PNG, or WebP image up to 10 MB.")
+  }
+
+  const presignResponse = await fetch("/api/uploads/presign", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      filename: file.name,
+      contentType: file.type,
+      size: file.size,
+      scope: "collection",
+    }),
+  })
+  const presign = await readUploadInstruction(presignResponse)
+  if (!presignResponse.ok || !presign.objectKey || !presign.uploadUrl || !presign.publicUrl) {
+    throw new Error(presign.error || "The upload service is unavailable.")
+  }
+
+  const uploadResponse = await fetch(presign.uploadUrl, {
+    method: "PUT",
+    headers: { "Content-Type": file.type },
+    body: file,
+  })
+  if (!uploadResponse.ok) throw new Error("The image could not be uploaded.")
+
+  return { objectKey: presign.objectKey, url: presign.publicUrl }
+}
+
+/**
+ * One storefront image on the collection page: preview, upload / replace,
+ * alt text and an optional link. `controls` adds reorder buttons.
+ */
+function PageImageField({
+  label,
+  value,
+  onChange,
+  onRemove,
+  controls,
+  wide,
+}: {
+  label: string
+  value: AdminCollectionPageImage | null
+  onChange: (value: AdminCollectionPageImage) => void
+  onRemove: () => void
+  controls?: React.ReactNode
+  wide?: boolean
+}) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [isUploading, setIsUploading] = useState(false)
+
+  const handleFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    event.target.value = ""
+    if (!file) return
+
+    setIsUploading(true)
+    try {
+      const uploaded = await uploadCollectionImage(file)
+      onChange({ alt: value?.alt ?? "", href: value?.href ?? "", ...uploaded })
+      toast.success("Image uploaded.")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "The image could not be uploaded.")
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  return (
+    <div className="grid gap-3 rounded-lg border border-black/10 bg-white p-3 sm:grid-cols-[160px_1fr]">
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/avif,image/jpeg,image/png,image/webp"
+        onChange={handleFile}
+        className="sr-only"
+      />
+      <button
+        type="button"
+        disabled={isUploading}
+        onClick={() => inputRef.current?.click()}
+        aria-label={value?.url ? `Replace ${label}` : `Upload ${label}`}
+        className={`relative grid w-full place-items-center overflow-hidden rounded-lg border border-dashed border-black/30 bg-black/[0.02] text-xs text-black/60 transition hover:bg-black/[0.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black disabled:cursor-wait ${wide ? "aspect-[16/9]" : "aspect-[3/4]"}`}
+      >
+        {value?.url ? (
+          <Image src={value.url} alt={value.alt || label} fill sizes="160px" className="object-cover" />
+        ) : null}
+        <span className={`relative inline-flex items-center gap-1.5 rounded-md px-2 py-1 ${value?.url ? "bg-white/90 text-black shadow-sm" : ""}`}>
+          {isUploading ? <LoaderCircle className="size-3.5 animate-spin" /> : <UploadCloud className="size-3.5" />}
+          {isUploading ? "Uploading" : value?.url ? "Replace" : "Upload"}
+        </span>
+      </button>
+
+      <div className="grid content-start gap-2">
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-sm font-medium text-black/80">{label}</span>
+          <div className="flex items-center gap-1">
+            {controls}
+            {value ? (
+              <button
+                type="button"
+                onClick={onRemove}
+                aria-label={`Remove ${label}`}
+                className="grid size-7 place-items-center rounded-md text-black/55 transition hover:bg-black/[0.05] hover:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+              >
+                <X className="size-3.5" />
+              </button>
+            ) : null}
+          </div>
+        </div>
+        {value ? (
+          <>
+            <label className="grid gap-1 text-xs text-black/65">
+              <span>Alt text</span>
+              <input
+                value={value.alt}
+                onChange={(event) => onChange({ ...value, alt: event.target.value })}
+                maxLength={300}
+                placeholder="Describe the photo"
+                className={inputClass}
+              />
+            </label>
+            <label className="grid gap-1 text-xs text-black/65">
+              <span>Link (optional)</span>
+              <input
+                value={value.href}
+                onChange={(event) => onChange({ ...value, href: event.target.value })}
+                maxLength={500}
+                placeholder="/products/... or /collections/..."
+                className={inputClass}
+              />
+            </label>
+          </>
+        ) : (
+          <span className="text-xs text-black/55">AVIF, JPG, PNG, or WebP up to 10 MB.</span>
+        )}
+      </div>
+    </div>
+  )
+}
+
+const iconButtonClass =
+  "grid size-7 place-items-center rounded-md text-black/55 transition hover:bg-black/[0.05] hover:text-black disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
 
 function slugify(value: string) {
   return value
@@ -145,6 +296,12 @@ export function CollectionEditor({
     toAdminUppercase(collection?.image?.altText ?? ""),
   )
   const [isUploadingImage, setIsUploadingImage] = useState(false)
+  const [editorialImages, setEditorialImages] = useState<AdminCollectionPageImage[]>(
+    collection?.pageContent.editorialImages ?? [],
+  )
+  const [banner, setBanner] = useState<AdminCollectionPageImage | null>(
+    collection?.pageContent.banner ?? null,
+  )
   const [isSaved, setIsSaved] = useState(Boolean(collection))
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [formMessage, setFormMessage] = useState<string | null>(null)
@@ -194,51 +351,10 @@ export function CollectionEditor({
     event.target.value = ""
     if (!file) return
 
-    const allowedTypes = new Set([
-      "image/avif",
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-    ])
-    if (!allowedTypes.has(file.type) || file.size > 10 * 1024 * 1024) {
-      toast.error("Choose an AVIF, JPG, PNG, or WebP image up to 10 MB.")
-      return
-    }
-
     setIsUploadingImage(true)
     try {
-      const presignResponse = await fetch("/api/uploads/presign", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          filename: file.name,
-          contentType: file.type,
-          size: file.size,
-          scope: "collection",
-        }),
-      })
-      const presign = await readUploadInstruction(presignResponse)
-      if (
-        !presignResponse.ok ||
-        !presign.objectKey ||
-        !presign.uploadUrl ||
-        !presign.publicUrl
-      ) {
-        throw new Error(presign.error || "The upload service is unavailable.")
-      }
-
-      const uploadResponse = await fetch(presign.uploadUrl, {
-        method: "PUT",
-        headers: { "Content-Type": file.type },
-        body: file,
-      })
-      if (!uploadResponse.ok) throw new Error("The image could not be uploaded.")
-
-      setImage({
-        objectKey: presign.objectKey,
-        url: presign.publicUrl,
-        altText: imageAltText || null,
-      })
+      const uploaded = await uploadCollectionImage(file)
+      setImage({ ...uploaded, altText: imageAltText || null })
       markChanged()
       toast.success("Collection image uploaded.")
     } catch (error) {
@@ -260,6 +376,10 @@ export function CollectionEditor({
         isPublished,
         imageObjectKey: image?.objectKey ?? null,
         imageAltText: image ? imageAltText || null : null,
+        pageContent: {
+          editorialImages: editorialImages.map(({ objectKey, alt, href }) => ({ objectKey, alt, href })),
+          banner: banner ? { objectKey: banner.objectKey, alt: banner.alt, href: banner.href } : null,
+        },
         productIds: assignedProductIds,
       }
       const result = collection
@@ -416,7 +536,103 @@ export function CollectionEditor({
                       />
                     </label>
                   ) : null}
-                  <span className="text-xs text-black/55">Shown in the collection dashboard. AVIF, JPG, PNG, or WebP up to 10 MB.</span>
+                  <span className="text-xs text-black/55">The large image at the top of the collection page, also used on collection tiles. AVIF, JPG, PNG, or WebP up to 10 MB.</span>
+                </div>
+              </div>
+            </SectionCard>
+
+            <SectionCard title="Collection page images">
+              <div className="grid gap-4 border-t border-black/10 p-4">
+                <div className="grid gap-2">
+                  <div>
+                    <p className="text-sm font-medium text-black/80">Large photos in the product grid</p>
+                    <p className="text-xs text-black/55">
+                      The big photos placed between products, in this order (shown once the collection has 6 or more products). Leave empty to use product photos automatically. Up to 6.
+                    </p>
+                  </div>
+                  {editorialImages.map((item, index) => (
+                    <PageImageField
+                      key={`${item.objectKey}-${index}`}
+                      label={`Grid photo ${index + 1}`}
+                      value={item}
+                      onChange={(next) => {
+                        setEditorialImages(editorialImages.map((current, j) => (j === index ? next : current)))
+                        markChanged()
+                      }}
+                      onRemove={() => {
+                        setEditorialImages(editorialImages.filter((_, j) => j !== index))
+                        markChanged()
+                      }}
+                      controls={
+                        <>
+                          <button
+                            type="button"
+                            disabled={index === 0}
+                            onClick={() => {
+                              const next = [...editorialImages]
+                              const swap = index + (-1)
+                              ;[next[swap], next[index]] = [next[index], next[swap]]
+                              setEditorialImages(next)
+                              markChanged()
+                            }}
+                            aria-label={`Move grid photo ${index + 1} up`}
+                            className={iconButtonClass}
+                          >
+                            <ArrowUp className="size-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={index === editorialImages.length - 1}
+                            onClick={() => {
+                              const next = [...editorialImages]
+                              const swap = index + (1)
+                              ;[next[swap], next[index]] = [next[index], next[swap]]
+                              setEditorialImages(next)
+                              markChanged()
+                            }}
+                            aria-label={`Move grid photo ${index + 1} down`}
+                            className={iconButtonClass}
+                          >
+                            <ArrowDown className="size-3.5" />
+                          </button>
+                        </>
+                      }
+                    />
+                  ))}
+                  {editorialImages.length < 6 ? (
+                    <PageImageField
+                      key={`new-${editorialImages.length}`}
+                      label={editorialImages.length ? "Add another grid photo" : "Add a grid photo"}
+                      value={null}
+                      onChange={(next) => {
+                        setEditorialImages([...editorialImages, next])
+                        markChanged()
+                      }}
+                      onRemove={() => {}}
+                    />
+                  ) : null}
+                </div>
+
+                <div className="grid gap-2 border-t border-black/10 pt-4">
+                  <div>
+                    <p className="text-sm font-medium text-black/80">Bottom banner</p>
+                    <p className="text-xs text-black/55">
+                      The full-width photo near the bottom of the page, above the shipping strip. Leave empty to show another collection&apos;s image.
+                    </p>
+                  </div>
+                  <PageImageField
+                    label="Bottom banner"
+                    wide
+                    value={banner}
+                    onChange={(next) => {
+                      setBanner(next)
+                      markChanged()
+                    }}
+                    onRemove={() => {
+                      setBanner(null)
+                      markChanged()
+                    }}
+                  />
                 </div>
               </div>
             </SectionCard>

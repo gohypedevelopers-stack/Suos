@@ -267,6 +267,8 @@ model Collection {
   isPublished    Boolean                 @default(false)
   imageObjectKey String?
   imageAltText   String?
+  /// Collection page images: { editorialImages: [{ objectKey, alt, href }], banner: { objectKey, alt, href } | null }
+  pageContent    Json?
   products       ProductsOnCollections[]
   createdAt      DateTime                @default(now())
   updatedAt      DateTime                @updatedAt

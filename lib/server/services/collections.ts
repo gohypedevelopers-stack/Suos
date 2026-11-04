@@ -68,6 +68,7 @@ function collectionData(input: CollectionInput, slug: string) {
     imageAltText: input.imageObjectKey && input.imageAltText
       ? toAdminUppercase(input.imageAltText)
       : null,
+    pageContent: input.pageContent,
   }
 }
 

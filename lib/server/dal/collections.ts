@@ -2,6 +2,7 @@ import "server-only"
 
 import { requirePermission } from "@/lib/server/dal/auth"
 import { getPrisma } from "@/lib/server/db"
+import { parseCollectionPageContent, type CollectionPageImage } from "@/lib/validations/collection"
 
 function imageUrl(objectKey: string | null) {
   if (!objectKey) return null
@@ -37,6 +38,13 @@ export type AdminCollectionProduct = {
   image: { url: string | null; altText: string | null } | null
 }
 
+/** A page image with its preview URL, for the admin editor. */
+export type AdminCollectionPageImage = CollectionPageImage & { url: string | null }
+
+function withUrl(image: CollectionPageImage): AdminCollectionPageImage {
+  return { ...image, url: imageUrl(image.objectKey) }
+}
+
 export type AdminCollectionEditor = {
   id: string
   title: string
@@ -44,6 +52,10 @@ export type AdminCollectionEditor = {
   description: string | null
   isPublished: boolean
   image: { objectKey: string; url: string | null; altText: string | null } | null
+  pageContent: {
+    editorialImages: AdminCollectionPageImage[]
+    banner: AdminCollectionPageImage | null
+  }
   products: AdminCollectionProduct[]
 }
 
@@ -146,6 +158,7 @@ export async function getCollectionForAdmin(
       isPublished: true,
       imageObjectKey: true,
       imageAltText: true,
+      pageContent: true,
       products: {
         orderBy: { position: "asc" },
         select: {
@@ -188,6 +201,13 @@ export async function getCollectionForAdmin(
           altText: collection.imageAltText,
         }
       : null,
+    pageContent: (() => {
+      const content = parseCollectionPageContent(collection.pageContent)
+      return {
+        editorialImages: content.editorialImages.map(withUrl),
+        banner: content.banner ? withUrl(content.banner) : null,
+      }
+    })(),
     products: collection.products.map(({ product }) => toCollectionProduct(product)),
   }
 }
@@ -230,6 +250,7 @@ export async function getPublishedCollectionBySlug(slug: string) {
       description: true,
       imageObjectKey: true,
       imageAltText: true,
+      pageContent: true,
       products: {
         orderBy: { position: "asc" },
         select: {
@@ -330,6 +351,19 @@ export async function getPublishedCollectionBySlug(slug: string) {
     image: collection.imageObjectKey ? (imageUrl(collection.imageObjectKey) ?? "") : "",
     alt: collection.imageAltText || collection.title,
     products: activeProducts,
+    // Admin-chosen page images; empty / null means the page picks them automatically.
+    ...(() => {
+      const content = parseCollectionPageContent(collection.pageContent)
+      const toImage = (image: CollectionPageImage) => ({
+        src: imageUrl(image.objectKey) ?? "",
+        alt: image.alt || collection.title,
+        href: image.href || undefined,
+      })
+      return {
+        editorialImages: content.editorialImages.map(toImage).filter((image) => image.src),
+        banner: content.banner ? toImage(content.banner) : null,
+      }
+    })(),
   }
 }
 
