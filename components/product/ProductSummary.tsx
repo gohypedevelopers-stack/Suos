@@ -329,7 +329,7 @@ export function ProductSummary({
             <p className="text-body-lg text-ink-400">
               Size: <span className="text-ink-900">{selectedSize}</span>
             </p>
-            <SizeChartModal images={product.sizeGuideImages} fitType={product.fitType}>
+            <SizeChartModal fitType={product.fitType} image={product.gallery[0]}>
               <button
                 type="button"
                 className="cursor-pointer text-body-lg text-ink-650 underline underline-offset-[5px] transition-colors hover:text-black"

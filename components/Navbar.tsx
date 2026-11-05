@@ -1060,7 +1060,7 @@ export function Navbar({
                 Account & Utilities
               </p>
 
-              <div className="flex flex-col gap-2 text-[14px] uppercase leading-[1.4] tracking-normal text-white/75">
+              <div className="flex flex-col gap-2 text-[14px] leading-[1.4] tracking-normal text-white/75">
                 <button
                   type="button"
                   onClick={() => {
@@ -1127,7 +1127,7 @@ export function Navbar({
                 Help
               </p>
 
-              <div className="flex flex-col gap-2 text-[14px] uppercase leading-[1.4] tracking-normal text-white/75">
+              <div className="flex flex-col gap-2 text-[14px] leading-[1.4] tracking-normal text-white/75">
                 <Link
                   href="/track-order"
                   onClick={() => setMobileMenuOpen(false)}

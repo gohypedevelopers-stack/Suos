@@ -301,7 +301,7 @@ export function ProductQuickViewModal({
                     Size{" "}
                     <span className="font-[500] text-black">{selectedSize}</span>
                   </p>
-                  <SizeChartModal images={product.sizeGuideImages} fitType={product.fitType}>
+                  <SizeChartModal fitType={product.fitType} image={product.gallery[0]}>
                     <button
                       type="button"
                       className="group inline-flex flex-col items-start pb-0.5 text-[12px] sm:text-[13px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black/55 transition-colors duration-200 hover:text-black focus-visible:text-black cursor-pointer"

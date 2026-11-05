@@ -686,10 +686,6 @@ export async function getProductBySlug(slug: string, options: { preview?: boolea
     gallery: gallery.length > 0 ? gallery : [{ src: "/home-page-content/product-urban.png", alt: product.title }],
     deliveryPerks: badges,
     completeLook: gallery.slice(0, 3),
-    sizeGuideImages: [
-      "/size-charts/SU022026-27_TECHPACK_page_1.png",
-      "/size-charts/SU022026-27_TECHPACK_page_2.png",
-    ],
     fitType: fitType as "regular" | "straight" | "bootcut",
   }
 }

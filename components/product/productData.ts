@@ -80,7 +80,6 @@ export type ProductDetail = {
   gallery: ProductImage[]
   deliveryPerks: DeliveryPerk[]
   completeLook: ProductImage[]
-  sizeGuideImages?: string[]
   fitType?: "regular" | "bootcut" | "straight"
 }
 
@@ -267,15 +266,6 @@ export const featuredProduct: ProductDetail = {
     { ...sharedChairPose, objectPosition: "center 32%" },
     { ...sharedChairPose, objectPosition: "center 40%" },
     { ...sharedChairPose, objectPosition: "center 28%" },
-  ],
-  sizeGuideImages: [
-    "/size-charts/SU022026-27_TECHPACK_page_1.png",
-    "/size-charts/SU022026-27_TECHPACK_page_2.png",
-    "/size-charts/SU022026-27_TECHPACK_page_3.png",
-    "/size-charts/SU022026-27_TECHPACK_page_4.png",
-    "/size-charts/SU022026-27_TECHPACK_page_5.png",
-    "/size-charts/SU022026-27_TECHPACK_page_6.png",
-    "/size-charts/SU022026-27_TECHPACK_page_7.png",
   ],
   fitType: "bootcut",
 }

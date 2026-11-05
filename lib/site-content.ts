@@ -139,8 +139,10 @@ export type ReturnsPageContent = {
 
 export type SizeGuideContent = {
   title: string
+  /** Optional line under the title; hidden when empty. */
   subtitle: string
-  images: string[]
+  /** Shown under the size table on /size-guide and in the product size chart. */
+  note: string
 }
 
 /** Shared product-page text, edited once and used on every product. */
@@ -427,12 +429,9 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     ],
   },
   sizeGuide: {
-    title: "Size Guide",
-    subtitle: "Find your perfect fit",
-    images: [
-      ...Array.from({ length: 7 }, (_, i) => `/size-charts/SU022026-27_TECHPACK_page_${i + 1}.png`),
-      ...Array.from({ length: 8 }, (_, i) => `/size-charts/SU202026-27_TECHPACK_page_${i + 1}.png`),
-    ],
+    title: "Men's Size Chart and Fit Guide",
+    subtitle: "",
+    note: "These are garment measurements, not body measurements. For the best fit, compare them with a similar pair of jeans you already own. Measurements may vary by up to 0.5 inch (1.3 cm) due to the manufacturing process.",
   },
   privacyPolicy: {
     title: "Privacy Policy",

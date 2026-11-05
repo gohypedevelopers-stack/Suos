@@ -214,11 +214,23 @@ export const siteContentSchemas = {
     image: imagePath,
     conditions: z.array(mediumText.min(1)).max(20),
   }),
-  sizeGuide: z.object({
-    title: shortText.min(1),
-    subtitle: shortText,
-    images: z.array(imagePath).max(40),
-  }),
+  // Rows saved before the Figma redesign carry `images` (tech-pack pages) and the
+  // old "Size Guide" heading; drop the images and move them to the new title.
+  sizeGuide: z.preprocess(
+    (value) => {
+      if (!value || typeof value !== "object" || !("images" in value)) return value
+      const { images: _images, ...rest } = value as Record<string, unknown>
+      void _images
+      return rest.title === "Size Guide"
+        ? { ...rest, title: DEFAULT_SITE_CONTENT.sizeGuide.title, subtitle: "" }
+        : rest
+    },
+    z.object({
+      title: shortText.min(1),
+      subtitle: shortText.default(""),
+      note: mediumText.default(DEFAULT_SITE_CONTENT.sizeGuide.note),
+    }),
+  ),
   privacyPolicy: policyContentSchema,
   termsPolicy: policyContentSchema,
   shippingPolicy: policyContentSchema,

@@ -649,27 +649,15 @@ function ReturnsPageEditor({ value, onChange }: SectionProps<"returnsPage">) {
 }
 
 function SizeGuideEditor({ value, onChange }: SectionProps<"sizeGuide">) {
-  const images = value.images
-  const set = (next: string[]) => onChange({ ...value, images: next })
   return (
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-2">
-        <Field label="Title"><Input value={value.title} onChange={(e) => onChange({ ...value, title: e.target.value })} /></Field>
-        <Field label="Subtitle"><Input value={value.subtitle} onChange={(e) => onChange({ ...value, subtitle: e.target.value })} /></Field>
+        <Field label="Title" hint="The big heading on /size-guide"><Input value={value.title} onChange={(e) => onChange({ ...value, title: e.target.value })} /></Field>
+        <Field label="Subtitle" hint="Optional line under the title; leave empty to hide"><Input value={value.subtitle} onChange={(e) => onChange({ ...value, subtitle: e.target.value })} /></Field>
       </div>
-      <div className="space-y-3">
-        {images.map((image, index) => (
-          <div key={`${image}-${index}`} className="flex items-end gap-2">
-            <div className="flex-1">
-              <ImageField label={`Page ${index + 1}`} value={image} onChange={(next) => set(images.map((img, j) => (j === index ? next : img)))} />
-            </div>
-            <ListControls index={index} count={images.length} onMove={(from, to) => set(move(images, from, to))} onRemove={(i) => set(images.filter((_, j) => j !== i))} />
-          </div>
-        ))}
-        <Button type="button" variant="outline" onClick={() => set([...images, ""])}>
-          <Plus className="size-3.5" /> Add page
-        </Button>
-      </div>
+      <Field label="Note under the size table" hint="Shown on /size-guide and in the size chart on product pages">
+        <Textarea rows={3} value={value.note} onChange={(e) => onChange({ ...value, note: e.target.value })} />
+      </Field>
     </div>
   )
 }
