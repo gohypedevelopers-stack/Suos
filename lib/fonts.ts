@@ -1,14 +1,11 @@
 import localFont from "next/font/local";
 
-// Akzidenz-Grotesk Pro is declared with plain @font-face in app/globals.css
-// (files in public/fonts/akzidenz-grotesk) so the browser and dev tools show
-// its real name instead of a generated one. See AKZIDENZ_PRELOADS below.
+// The site typeface (Inter) is declared with plain @font-face in app/globals.css
+// (files in public/fonts/inter) so the browser and dev tools show its real
+// name instead of a generated one.
 
-/** Weights used above the fold on every page; preloaded from the root layout. */
-export const AKZIDENZ_PRELOADS = [
-  "/fonts/akzidenz-grotesk/AkzidenzGroteskPro-Regular.woff2",
-  "/fonts/akzidenz-grotesk/AkzidenzGroteskPro-Medium.woff2",
-];
+/** Font files every page needs straight away; preloaded from the root layout. */
+export const FONT_PRELOADS = ["/fonts/inter/inter-latin-wght-normal.woff2"];
 
 export const georgia = localFont({
   src: [

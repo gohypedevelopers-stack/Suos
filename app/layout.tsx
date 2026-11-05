@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { preload } from "react-dom";
-import { AKZIDENZ_PRELOADS, georgia, holiday } from "@/lib/fonts";
+import { FONT_PRELOADS, georgia, holiday } from "@/lib/fonts";
 import { SiteChrome } from "@/components/SiteChrome";
 import { Toaster } from "@/components/ui/sonner";
 import { WishlistProvider } from "@/lib/wishlist-context";
@@ -64,7 +64,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const siteContent = await getSiteContent();
-  for (const href of AKZIDENZ_PRELOADS) {
+  for (const href of FONT_PRELOADS) {
     preload(href, { as: "font", type: "font/woff2", crossOrigin: "anonymous" });
   }
 
