@@ -15,7 +15,7 @@ export function CollectionHero({
   heightClassName?: string
 }) {
   return (
-    <section className={`relative w-full overflow-hidden bg-[#e7e7e4] ${heightClassName}`}>
+    <section data-parallax className={`relative w-full overflow-hidden bg-[#e7e7e4] ${heightClassName}`}>
       {image ? (
         <Image
           src={image}

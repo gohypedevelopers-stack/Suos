@@ -27,10 +27,10 @@ export function CollectionBanner({
     "group relative block h-[48vh] min-h-[300px] w-full overflow-hidden bg-[#e7e7e4] sm:h-[64vh]"
 
   return href ? (
-    <Link href={href} className={className} aria-label={alt}>
+    <Link href={href} data-unfold className={className} aria-label={alt}>
       {content}
     </Link>
   ) : (
-    <div className={className}>{content}</div>
+    <div data-unfold className={className}>{content}</div>
   )
 }

@@ -10,6 +10,7 @@ import { CartProvider } from "@/lib/cart-context";
 import { AnalyticsBeacon } from "@/components/analytics/AnalyticsBeacon";
 import { SessionRecorder } from "@/components/analytics/SessionRecorder";
 import { RevealObserver } from "@/components/RevealObserver";
+import { SmoothMotion } from "@/components/SmoothMotion";
 import { SiteContentProvider } from "@/lib/site-content-context";
 import { getSiteContent } from "@/lib/server/dal/site-content";
 
@@ -85,6 +86,7 @@ export default async function RootLayout({
         <Toaster position="bottom-right" />
         <AnalyticsBeacon />
         <RevealObserver />
+        <SmoothMotion />
         <SessionRecorder />
         <div className="relative flex flex-1 flex-col overflow-x-clip">
           <SiteContentProvider content={siteContent}>

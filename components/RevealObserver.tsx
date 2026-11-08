@@ -4,9 +4,10 @@ import { useEffect } from "react"
 import { usePathname } from "next/navigation"
 
 /**
- * Scroll-reveal for the storefront (Calvin Klein-style). Any element with a
- * `data-reveal` attribute ("up", "fade", "zoom") starts hidden and animates in
- * when it scrolls into view; the look lives in globals.css (.reveal-ready).
+ * Scroll-reveal for the storefront. Any element with a `data-reveal` attribute
+ * ("up", "fade", "zoom", "text") starts hidden and animates in when it scrolls
+ * into view; the look lives in globals.css (.reveal-ready). Page headings
+ * (h1/h2 inside <main>) get "text" automatically: they rise out of a mask.
  *
  * Content is only hidden once this script runs, so pages still show
  * everything without JavaScript. Elements already on screen when it starts are
@@ -31,6 +32,14 @@ export function RevealObserver() {
     )
 
     const watch = (scope: ParentNode) => {
+      // Headings rise out of a mask (layered on any block reveal around them).
+      scope.querySelectorAll<HTMLElement>("main h1, main h2").forEach((el) => {
+        if (el.closest("[data-no-text-reveal], [role='dialog']")) return
+        // A heading's own plain fade-up is upgraded too; zoom etc. are left alone.
+        if (el.hasAttribute("data-reveal") && el.dataset.reveal !== "up") return
+        if (el.classList.contains("sr-only")) return
+        el.dataset.reveal = "text"
+      })
       scope.querySelectorAll<HTMLElement>("[data-reveal]:not(.is-revealed)").forEach((el) => {
         // Already visible at start: show without animating.
         if (!root.classList.contains("reveal-ready") && el.getBoundingClientRect().top < window.innerHeight) {

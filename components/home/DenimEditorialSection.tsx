@@ -32,7 +32,7 @@ function DenimPanel({
   showHeart = false,
 }: DenimPanelProps) {
   const content = (
-    <div data-reveal="zoom" className={cn("hover-zoom relative overflow-hidden bg-[#f3f0ea]", className)}>
+    <div data-reveal="zoom" data-parallax className={cn("hover-zoom relative overflow-hidden bg-[#f3f0ea]", className)}>
       {mobileSrc ? (
         <>
           <div className="relative block sm:hidden w-full h-full">
@@ -111,7 +111,7 @@ export function DenimEditorialSection({
   const p2Link = banner2?.ctaLink
 
   const bottomPanel = (
-    <div data-reveal="zoom" className="hover-zoom relative overflow-hidden bg-[#f3f0ea] aspect-[17/9] md:aspect-[20/9]">
+    <div data-reveal="zoom" data-parallax className="hover-zoom relative overflow-hidden bg-[#f3f0ea] aspect-[17/9] md:aspect-[20/9]">
       {p2MobileSrc ? (
         <>
           <div className="relative block sm:hidden w-full h-full">

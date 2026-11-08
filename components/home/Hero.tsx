@@ -3,7 +3,6 @@
 import Image from "next/image"
 import Link from "next/link"
 import { useEffect, useState } from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
 
 import { bannerFocusProps, isVideoMedia } from "@/lib/banner-media"
 import { cn } from "@/lib/utils"
@@ -82,7 +81,12 @@ export function Hero({ banners }: { banners?: HomeHeroBanner[] }) {
   }, [slides.length])
 
   return (
-    <section className="relative -mt-[var(--header-stack-height)] w-full h-[100svh] min-h-[580px] bg-black text-white overflow-hidden">
+    <section
+      data-parallax="out"
+      // The hero copy has its own load animation, so skip the heading mask reveal.
+      data-no-text-reveal
+      className="relative -mt-[var(--header-stack-height)] w-full h-[100svh] min-h-[580px] bg-black text-white overflow-hidden"
+    >
       {slides.map((slide, index) => {
         const isActive = index === activeSlide
 
@@ -96,7 +100,7 @@ export function Hero({ banners }: { banners?: HomeHeroBanner[] }) {
             )}
           >
             {/* Full-screen hero image covering full viewport without black letterboxing */}
-            <div className="relative w-full h-full">
+            <div data-parallax-media className="hero-settle relative w-full h-full">
               {slide.mobileImageUrl ? (
                 <>
                   <div className="relative block sm:hidden w-full h-full">
@@ -132,6 +136,7 @@ export function Hero({ banners }: { banners?: HomeHeroBanner[] }) {
             {/* Content & CTA Button (Only rendered if title, subtitle, or button exists) */}
             {(slide.title || slide.subtitle || slide.ctaText) && (
               <div
+                data-parallax-copy
                 className={cn(
                   "hero-rise absolute inset-x-0 bottom-15 sm:bottom-12 lg:bottom-16 z-20 px-4 sm:px-8 flex flex-col pointer-events-none",
                   slide.textAlignment === "LEFT"

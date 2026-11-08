@@ -11,7 +11,7 @@ function SplitPanel({ banner, width }: { banner: HomeEditorialBanner; width: str
   const focus = bannerFocusProps(banner.desktopFocus, banner.mobileFocus, "md")
 
   const media = (
-    <div data-reveal="zoom" className="hover-zoom relative aspect-[4/5] h-full w-full overflow-hidden bg-[#f3f0ea] md:aspect-auto">
+    <div data-reveal="zoom" data-parallax className="hover-zoom relative aspect-[4/5] h-full w-full overflow-hidden bg-[#f3f0ea] md:aspect-auto">
       {banner.mobileImageUrl ? (
         <>
           <Image

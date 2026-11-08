@@ -12,7 +12,7 @@ function LookbookCard({ slide }: { slide: LookbookSlideContent }) {
   const objectPosition = slide.objectPosition || "center"
 
   return (
-    <article data-reveal="zoom" className="relative aspect-[7/11] overflow-hidden bg-[#e6e8eb]">
+    <article data-reveal="zoom" data-parallax className="relative aspect-[7/11] overflow-hidden bg-[#e6e8eb]">
       {isVideoMedia(slide.image) ? (
         <video
           src={slide.image}

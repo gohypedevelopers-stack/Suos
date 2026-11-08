@@ -14,7 +14,7 @@ function FooterLink({ link, className }: { link: NavMenuLink; className?: string
       href={link.href}
       target={external ? "_blank" : undefined}
       rel={external ? "noopener noreferrer" : undefined}
-      className={`underline-offset-4 transition-opacity hover:opacity-60 ${className ?? ""}`}
+      className={`link-swap ${className ?? ""}`}
     >
       {link.label}
     </Link>

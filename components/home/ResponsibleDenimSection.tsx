@@ -34,7 +34,7 @@ export function ResponsibleDenimSection() {
       {/* Top Row: 3 Columns (Hand Image | Core Message Card | Looping Video) */}
       <div className="reveal-stagger grid grid-cols-1 lg:grid-cols-[1fr_1.3fr_1fr] items-stretch">
         {/* Left: Hand on Denim Image */}
-        <div data-reveal="zoom" className="relative min-h-[280px] sm:min-h-[360px] lg:min-h-[480px] w-full overflow-hidden bg-neutral-100">
+        <div data-reveal="zoom" data-parallax className="relative min-h-[280px] sm:min-h-[360px] lg:min-h-[480px] w-full overflow-hidden bg-neutral-100">
           <Image
             src="/responsible-denim/hand-denim.png"
             alt="Hand touching responsibly finished denim"
@@ -69,7 +69,7 @@ export function ResponsibleDenimSection() {
         </div>
 
         {/* Right: Looping Video with "TO A BRIGHTER TOMORROW" Overlay */}
-        <div data-reveal="zoom" className="relative min-h-[280px] sm:min-h-[360px] lg:min-h-[480px] w-full overflow-hidden bg-neutral-900">
+        <div data-reveal="zoom" data-parallax className="relative min-h-[280px] sm:min-h-[360px] lg:min-h-[480px] w-full overflow-hidden bg-neutral-900">
           <video
             autoPlay
             loop
