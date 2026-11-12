@@ -100,7 +100,7 @@ export function AccountDashboard({ user, orders }: AccountDashboardProps) {
               <p className="text-[12px] font-normal uppercase tracking-[0.06em] text-black/60">
                 Account
               </p>
-              <h1 className="mt-2 font-heading text-[22px] font-normal uppercase leading-[1.15] tracking-[0.02em] text-black sm:text-[28px]">
+              <h1 className="type-title mt-2 text-black">
                 {user.name || "Customer Account"}
               </h1>
               <p className="mt-2 text-[14px] font-normal leading-[1.4] text-black/60">

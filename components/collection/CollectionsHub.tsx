@@ -54,7 +54,7 @@ function CollectionSection({
     <section aria-labelledby={headingId} className="w-full">
       <h2
         id={headingId}
-        className="px-4 pb-4 pt-10 text-[14px] font-normal uppercase leading-[1.15] tracking-[0.04em] sm:px-6 sm:pb-5 sm:pt-14 sm:text-[16px] lg:px-8"
+        className="type-title px-4 pb-4 pt-10 sm:px-6 sm:pb-5 sm:pt-14 lg:px-8"
       >
         {collection.title}
       </h2>

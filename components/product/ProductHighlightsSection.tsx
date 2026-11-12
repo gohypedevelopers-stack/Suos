@@ -55,7 +55,7 @@ export function ProductHighlightsSection({
   const [first, second, third] = highlights
   const heading = (
     <div className="px-3 pb-6 pt-10 sm:px-6 lg:px-8 md:pt-2">
-      <h2 data-reveal="up" className="font-heading text-[28px] font-normal uppercase leading-none sm:text-[32px] lg:text-h2">
+      <h2 data-reveal="up" className="type-title">
         It&apos;s in the Details
       </h2>
       {intro ? (

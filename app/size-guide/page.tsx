@@ -14,7 +14,7 @@ export default async function SizeGuidePage() {
 
   return (
     <main className="mx-auto w-full max-w-[1240px] flex-1 bg-white px-4 pb-20 pt-10 text-black sm:px-6 md:pt-16 lg:px-8">
-      <h1 className="max-w-[560px] font-heading text-[30px] font-normal uppercase leading-[1.1] sm:text-[40px] lg:text-[48px]">
+      <h1 className="type-title max-w-[560px]">
         {sizeGuide.title}
       </h1>
       {sizeGuide.subtitle ? (

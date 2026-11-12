@@ -220,7 +220,7 @@ function PaymentSection({
   return (
     <div className="space-y-6 pt-4">
       <div className="space-y-3">
-        <h2 className="text-[20px] font-normal uppercase tracking-[0.04em] text-black sm:text-[22px]">
+        <h2 className="type-title text-black">
           {page.text("payment", "heading")}
         </h2>
         <p className="text-[12px] uppercase tracking-[0.04em] text-black/50">
@@ -848,7 +848,7 @@ export function CheckoutPage() {
           <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-black text-white">
             <CheckCircle2 className="size-10" />
           </div>
-          <h1 className="mt-6 text-[24px] font-normal uppercase leading-[1.15] tracking-[0.02em] text-black sm:text-[28px]">
+          <h1 className="type-title mt-6 text-black">
             {page.text("thankYou", "heading")}
           </h1>
           <p className="mt-2 text-[14px] uppercase tracking-[0.04em] text-black/60">
@@ -986,7 +986,7 @@ export function CheckoutPage() {
               <form onSubmit={handleContinueToPayment} className="space-y-10">
                 {/* 1. Email Address */}
                 <section className="space-y-4">
-                  <h2 className="text-[20px] font-normal uppercase tracking-[0.04em] text-black sm:text-[22px]">
+                  <h2 className="type-title text-black">
                     {page.text("contact", "heading")}
                   </h2>
                   <FloatingField
@@ -1022,7 +1022,7 @@ export function CheckoutPage() {
                 {/* 2. Shipping To */}
                 <section className="space-y-4">
                   <div>
-                    <h2 className="text-[20px] font-normal uppercase tracking-[0.04em] text-black sm:text-[22px]">
+                    <h2 className="type-title text-black">
                       {page.text("shipping", "heading")}
                     </h2>
                     {page.text("shipping", "note") ? (

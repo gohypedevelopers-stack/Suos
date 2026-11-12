@@ -15,7 +15,7 @@ export function CollectionHeader({
 }) {
   return (
     <header className="w-full">
-      <h1 className="font-heading text-[24px] font-normal uppercase leading-[1.15] tracking-[0.01em] text-black sm:text-[28px] lg:text-[32px]">
+      <h1 className="type-title text-black">
         {title}
       </h1>
       {description ? (

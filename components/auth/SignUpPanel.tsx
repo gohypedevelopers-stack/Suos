@@ -69,7 +69,7 @@ export function SignUpPanel() {
   return (
     <div className="w-full text-black">
       <div>
-        <h1 className="font-heading text-[22px] font-normal uppercase leading-tight tracking-[0.02em] text-black sm:text-[24px]">
+        <h1 className="type-title text-black">
           {page.text("intro", "heading")}
         </h1>
         <p className="mt-3 max-w-sm text-left text-[12px] uppercase leading-[1.6] tracking-normal text-black/70">

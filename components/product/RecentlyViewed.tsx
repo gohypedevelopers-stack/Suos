@@ -71,7 +71,7 @@ export function RecentlyViewed({ current }: { current: ViewedProduct }) {
 
   return (
     <section className="w-full bg-white px-3 py-10 text-black sm:px-6 lg:px-8">
-      <h2 className="text-h4 font-normal uppercase">Recently Viewed</h2>
+      <h2 className="type-title">Recently Viewed</h2>
       <ScrollRow className="mt-5 gap-2 pb-1" label="Recently viewed">
         {others.map((item) => (
           <Link key={item.id} href={`/products/${item.slug}`} className="group block w-[160px] shrink-0 snap-start sm:w-[200px]">

@@ -26,7 +26,7 @@ export function PolicyDocument({
           <p className="text-[12px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black/45 sm:text-[13px]">
             SUOS policies
           </p>
-          <h1 className="mt-3 font-heading text-[22px] font-normal uppercase leading-[1.15] tracking-[-0.01em] sm:text-[24px]">
+          <h1 className="type-title mt-3">
             {title}
           </h1>
 

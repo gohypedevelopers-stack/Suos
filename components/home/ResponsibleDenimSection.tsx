@@ -50,7 +50,7 @@ export function ResponsibleDenimSection() {
             Considered Beyond The Surface
           </p>
 
-          <h2 className="mt-4 font-heading text-[28px] leading-[36px] sm:text-[40px] sm:leading-[50px] font-normal uppercase tracking-normal text-black">
+          <h2 className="type-title mt-4 text-black">
             What Touches
             <br className="hidden sm:inline" />{" "}
             Your Skin Matters

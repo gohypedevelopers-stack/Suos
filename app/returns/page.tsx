@@ -29,7 +29,7 @@ export default async function ReturnsPage() {
 
         <section className="flex items-center justify-center px-6 py-14 sm:px-12 lg:px-20 xl:px-24">
           <div className="w-full max-w-[474px]">
-            <h1 className="font-heading text-[18px] font-normal uppercase leading-[1.15] tracking-[0.02em] sm:text-[20px]">
+            <h1 className="type-title">
               {returnsPage.title}
             </h1>
 

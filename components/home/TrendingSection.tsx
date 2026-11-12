@@ -575,7 +575,7 @@ export function TrendingSection({ products = [] }: { products?: ProductCard[] })
       id="bestsellers"
       className="w-full scroll-mt-[var(--main-navbar-height)] bg-white px-3 sm:px-6 lg:px-8 py-10 md:py-16 text-black"
     >
-      <h2 data-reveal="up" className="font-heading text-[28px] sm:text-[32px] lg:text-h2 font-normal uppercase leading-none tracking-normal">
+      <h2 data-reveal="up" className="type-title">
         Our Favourite
       </h2>
 

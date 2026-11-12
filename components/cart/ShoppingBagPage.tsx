@@ -455,7 +455,7 @@ function EmptyBagState() {
   return (
     <div className="flex min-h-[50vh] flex-col items-center justify-center py-20 text-center">
       <ShoppingBag className="mb-6 size-12 text-black/20" strokeWidth={1} />
-      <h2 className="text-[20px] font-normal uppercase tracking-[0.04em] text-black sm:text-[24px]">
+      <h2 className="type-title text-black">
         {page.text("empty", "heading")}
       </h2>
       <p className="mt-2 max-w-sm text-[13px] uppercase tracking-[0.04em] text-black/50">
@@ -483,7 +483,7 @@ function BeforeYouGoSection() {
     <section className="mt-20 border-t border-black/15 pt-12">
       <div className="flex items-start sm:items-baseline justify-between gap-4">
         <div className="min-w-0">
-          <h2 className="text-[18px] sm:text-[22px] font-normal uppercase tracking-[0.04em] text-black">
+          <h2 className="type-title text-black">
             {page.text("recommendations", "heading")}
           </h2>
           <p className="mt-1 text-[11px] sm:text-[12px] uppercase tracking-[0.04em] text-black/45">
@@ -562,7 +562,7 @@ export function ShoppingBagPage() {
             {/* Top Page Title & Total */}
             <div className="border-b border-black/15 pb-5">
               <div className="flex items-baseline justify-between gap-3">
-                <h1 className="flex flex-wrap items-baseline gap-1.5 sm:gap-2 text-[18px] sm:text-[22px] font-normal uppercase tracking-[0.04em] text-black">
+                <h1 className="type-title flex flex-wrap items-baseline gap-1.5 sm:gap-2 text-black">
                   <span>{page.text("header", "heading")}</span>
                   <span className="text-[13px] sm:text-[15px] font-normal text-black/50 tracking-[0.04em]">
                     ({totalItems} {totalItems === 1 ? "item" : "items"})

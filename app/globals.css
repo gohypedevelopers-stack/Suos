@@ -605,6 +605,25 @@
   }
 }
 
+/* ───────── Page and section titles ─────────
+   One heading style for every storefront page (the collection title style):
+   24px phones, 28px tablets, 40px desktop. Use `type-title` on page titles
+   and main section headings instead of hand-picked sizes. */
+@utility type-title {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  @media (width >= 40rem) {
+    font-size: 28px;
+  }
+  @media (width >= 64rem) {
+    font-size: 40px;
+  }
+}
+
 /* ───────── Scroll reveal (components/RevealObserver.tsx) ─────────
    Hidden states only apply once the observer has started (.reveal-ready),
    so content never stays hidden without JavaScript. */

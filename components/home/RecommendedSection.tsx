@@ -88,7 +88,7 @@ export function RecommendedSection({
   return (
     <section className="w-full bg-white py-10 md:py-16 text-black">
       <div className="w-full px-3 sm:px-6 lg:px-8">
-        <h2 data-reveal="up" className="font-heading text-[28px] sm:text-[32px] lg:text-h2 font-normal uppercase leading-none tracking-normal">
+        <h2 data-reveal="up" className="type-title">
           You May Also Like
         </h2>
       </div>

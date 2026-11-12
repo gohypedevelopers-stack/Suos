@@ -29,7 +29,7 @@ export function CollectionTiles({
   return (
     <section aria-label={heading ?? "Shop by collection"} className="w-full bg-white">
       {heading ? (
-        <h2 className="px-4 pb-5 pt-12 font-heading text-[20px] font-normal uppercase leading-[1.15] tracking-[0.01em] text-black sm:px-6 sm:text-[24px] lg:px-8">
+        <h2 className="type-title px-4 pb-5 pt-12 text-black sm:px-6 lg:px-8">
           {heading}
         </h2>
       ) : null}

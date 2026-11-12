@@ -54,7 +54,7 @@ export default async function ContactPage({
           <p className="text-[13px] uppercase leading-[1.4] tracking-[0.04em]">{contact.eyebrow}</p>
           <h1
             id="contact-heading"
-            className="mt-5 max-w-[32rem] font-heading text-[24px] font-normal uppercase leading-[1.15] tracking-[-0.01em] sm:text-[28px]"
+            className="type-title mt-5 max-w-[32rem]"
           >
             {contact.titleLines.map((line, index) => (
               <span key={index}>

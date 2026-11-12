@@ -33,7 +33,7 @@ export function CollectionRecommendations({ products = [] }: { products?: Produc
         <div className="flex items-center justify-between gap-6">
           <h2
             id="collection-recommendations-heading"
-            className="font-heading text-[24px] sm:text-[26px] font-normal uppercase leading-[1.15] tracking-[0.01em]"
+            className="type-title"
           >
             You May Also Like
           </h2>
