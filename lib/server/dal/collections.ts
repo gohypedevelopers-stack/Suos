@@ -358,6 +358,7 @@ export async function getPublishedCollectionBySlug(slug: string) {
         src: imageUrl(image.objectKey) ?? "",
         alt: image.alt || collection.title,
         href: image.href || undefined,
+        caption: image.caption || undefined,
       })
       return {
         editorialImages: content.editorialImages.map(toImage).filter((image) => image.src),

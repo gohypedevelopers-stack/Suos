@@ -80,6 +80,15 @@ export default async function Page({
     ),
   )
 
+  // A grid photo linked to a product shows that product's name and price under it.
+  const productBySlug = new Map(
+    [...allProducts, ...collection.products].map((product) => [product.slug, product]),
+  )
+  const captionedEditorial = editorialImages.map((image) => {
+    const slug = image.href?.match(/^\/products\/([^/?#]+)/)?.[1]
+    return { ...image, product: slug ? productBySlug.get(decodeURIComponent(slug)) : undefined }
+  })
+
   const bannerSource = otherCollections.find((item) => item.image)
   const banner = collection.banner?.src
     ? { image: collection.banner.src, alt: collection.banner.alt, href: collection.banner.href }
@@ -111,7 +120,7 @@ export default async function Page({
         title={collection.title}
         products={products}
         sort={sort}
-        editorialImages={editorialImages}
+        editorialImages={captionedEditorial}
         emptyState={
           <p className="py-16 text-center text-[14px] uppercase leading-[1.4] tracking-[0.04em] text-black/55">
             New pieces are on their way. Check back soon.

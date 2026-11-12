@@ -110,6 +110,7 @@ function PageImageField({
   onRemove,
   controls,
   wide,
+  captioned,
 }: {
   label: string
   value: AdminCollectionPageImage | null
@@ -117,6 +118,8 @@ function PageImageField({
   onRemove: () => void
   controls?: React.ReactNode
   wide?: boolean
+  /** Grid photos show a caption; the banner doesn't. */
+  captioned?: boolean
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [isUploading, setIsUploading] = useState(false)
@@ -129,7 +132,7 @@ function PageImageField({
     setIsUploading(true)
     try {
       const uploaded = await uploadCollectionImage(file)
-      onChange({ alt: value?.alt ?? "", href: value?.href ?? "", ...uploaded })
+      onChange({ alt: value?.alt ?? "", href: value?.href ?? "", caption: value?.caption ?? "", ...uploaded })
       toast.success("Image uploaded.")
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "The image could not be uploaded.")
@@ -202,6 +205,18 @@ function PageImageField({
                 className={inputClass}
               />
             </label>
+            {captioned ? (
+              <label className="grid gap-1 text-xs text-black/65">
+                <span>Caption under the photo (optional)</span>
+                <input
+                  value={value.caption}
+                  onChange={(event) => onChange({ ...value, caption: event.target.value })}
+                  maxLength={120}
+                  placeholder="Empty: shows the linked product's name and price"
+                  className={inputClass}
+                />
+              </label>
+            ) : null}
           </>
         ) : (
           <span className="text-xs text-black/55">AVIF, JPG, PNG, or WebP up to 10 MB.</span>
@@ -377,8 +392,8 @@ export function CollectionEditor({
         imageObjectKey: image?.objectKey ?? null,
         imageAltText: image ? imageAltText || null : null,
         pageContent: {
-          editorialImages: editorialImages.map(({ objectKey, alt, href }) => ({ objectKey, alt, href })),
-          banner: banner ? { objectKey: banner.objectKey, alt: banner.alt, href: banner.href } : null,
+          editorialImages: editorialImages.map(({ objectKey, alt, href, caption }) => ({ objectKey, alt, href, caption })),
+          banner: banner ? { objectKey: banner.objectKey, alt: banner.alt, href: banner.href, caption: "" } : null,
         },
         productIds: assignedProductIds,
       }
@@ -547,13 +562,14 @@ export function CollectionEditor({
                   <div>
                     <p className="text-sm font-medium text-black/80">Large photos in the product grid</p>
                     <p className="text-xs text-black/55">
-                      The big photos placed between products, in this order (shown once the collection has 6 or more products). Leave empty to use product photos automatically. Up to 6.
+                      The big photos placed between products, in this order (shown once the collection has 6 or more products). Link a photo to a product (/products/...) to show that product&apos;s name and price under it, or type your own caption. Leave empty to use product photos automatically. Up to 6.
                     </p>
                   </div>
                   {editorialImages.map((item, index) => (
                     <PageImageField
                       key={`${item.objectKey}-${index}`}
                       label={`Grid photo ${index + 1}`}
+                      captioned
                       value={item}
                       onChange={(next) => {
                         setEditorialImages(editorialImages.map((current, j) => (j === index ? next : current)))
@@ -603,6 +619,7 @@ export function CollectionEditor({
                     <PageImageField
                       key={`new-${editorialImages.length}`}
                       label={editorialImages.length ? "Add another grid photo" : "Add a grid photo"}
+                      captioned
                       value={null}
                       onChange={(next) => {
                         setEditorialImages([...editorialImages, next])

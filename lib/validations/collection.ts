@@ -28,6 +28,8 @@ export const collectionPageImageSchema = z.object({
   objectKey: collectionImageObjectKeySchema,
   alt: z.string().trim().max(300).default(""),
   href: collectionLinkSchema,
+  /** Text under a grid photo; empty shows the linked product's name and price. */
+  caption: z.string().trim().max(120).default(""),
 })
 
 /** Images on the collection page beyond the hero. Empty means "pick automatically". */

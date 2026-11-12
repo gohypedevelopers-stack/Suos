@@ -4,12 +4,16 @@ import { useMemo, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 
-import { ProductCardView, type ProductCard } from "@/components/home/TrendingSection"
+import { ProductCardView, productCardInfo, type ProductCard } from "@/components/home/TrendingSection"
 
 export type EditorialImage = {
   src: string
   alt: string
   href?: string
+  /** Text under the photo, set in the admin. */
+  caption?: string
+  /** Product the photo links to: its name and price show under the photo. */
+  product?: ProductCard
 }
 
 type GridItem =
@@ -122,11 +126,9 @@ export function CollectionGrid({
 }
 
 function EditorialTile({ image, span }: { image: EditorialImage; span: 2 | 3 }) {
-  const className = `relative col-span-2 aspect-[4/3] overflow-hidden bg-[#e7e7e4] lg:aspect-auto ${
-    span === 3 ? "lg:col-span-3" : "lg:col-span-2"
-  }`
   const sizes = span === 3 ? "(max-width: 1024px) 100vw, 75vw" : "(max-width: 1024px) 100vw, 50vw"
-  const img = (
+  const hasCaption = Boolean(image.caption || image.product)
+  const media = (
     <Image
       src={image.src}
       alt={image.alt}
@@ -135,18 +137,65 @@ function EditorialTile({ image, span }: { image: EditorialImage; span: 2 | 3 }) 
       className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
     />
   )
-
-  if (image.href) {
-    return (
-      <Link href={image.href} className={`group block ${className}`} aria-label={image.alt}>
-        {img}
-      </Link>
-    )
-  }
+  // On desktop the tile is as tall as its row; with a caption the photo stops
+  // where the product photos beside it stop and the caption sits in line with
+  // their names and prices.
+  const mediaClass = "relative block aspect-[4/3] overflow-hidden bg-[#e7e7e4] lg:aspect-auto lg:min-h-0 lg:flex-1"
 
   return (
-    <div className={className}>
-      {img}
+    <div className={`group col-span-2 flex min-w-0 flex-col ${span === 3 ? "lg:col-span-3" : "lg:col-span-2"}`}>
+      {image.href ? (
+        <Link href={image.href} className={mediaClass} aria-label={image.caption || image.product?.title || image.alt}>
+          {media}
+        </Link>
+      ) : (
+        <div className={mediaClass}>{media}</div>
+      )}
+      {hasCaption ? <EditorialCaption image={image} /> : null}
+    </div>
+  )
+}
+
+/** Same rows, sizes and spacing as the info under a product card. */
+function EditorialCaption({ image }: { image: EditorialImage }) {
+  const product = image.product
+  const title = image.caption || product?.title || ""
+  const titleClass =
+    "truncate py-px text-[12px] font-normal uppercase leading-none tracking-normal text-black transition-opacity hover:opacity-70 md:text-[14px]"
+  const info = product ? productCardInfo(product) : null
+
+  return (
+    // Desktop: as tall as a product card's info block (72px) plus the space
+    // under it (10px), so the photo ends level with the product photos.
+    <div className="mt-2.5 flex flex-col gap-1.5 md:mt-3 lg:min-h-[72px] lg:mb-2.5">
+      {/* Title row: as tall as the card's title row with its bag button. */}
+      <div className="flex min-h-[23px] items-center md:min-h-[26px]">
+        {image.href ? (
+          <Link href={image.href} className={titleClass}>
+            {title}
+          </Link>
+        ) : (
+          <p className={titleClass}>{title}</p>
+        )}
+      </div>
+      {info ? (
+        <>
+          <p className="truncate text-[11px] font-normal uppercase leading-none tracking-normal text-[#7d7d7d] md:text-[14px]">
+            {info.subtitle}
+          </p>
+          <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 text-[12px] leading-none tracking-normal md:gap-x-2 md:text-[14px]">
+            {info.comparePriceStr ? (
+              <span className="font-normal text-[#7d7d7d] line-through">{info.comparePriceStr}</span>
+            ) : null}
+            <span className="font-normal text-black">{info.displayPrice}</span>
+            {info.discountPercent > 0 ? (
+              <span className="text-[10px] font-normal uppercase tracking-normal text-[#ed0000]">
+                SAVE {info.discountPercent}%
+              </span>
+            ) : null}
+          </div>
+        </>
+      ) : null}
     </div>
   )
 }

@@ -31,6 +31,29 @@ export type ProductCard = {
   lineName?: string | null
 }
 
+/** Price, sale and subtitle text shown under a product card (also used by grid captions). */
+export function productCardInfo(product: ProductCard) {
+  const displayPrice = product.price && product.price !== "N/A" ? product.price : "₹2,200"
+  const numPrice = parseInt(displayPrice.replace(/[^\d]/g, "") || "2200", 10)
+
+  // Sale styling (struck-through price + SAVE %) only when a real compare-at
+  // price above the selling price is set, as in the Figma cards.
+  const numCompare = product.compareAtPrice
+    ? parseInt(product.compareAtPrice.replace(/[^\d]/g, "") || "0", 10)
+    : 0
+  const isOnSale = numCompare > numPrice
+  const comparePriceStr = isOnSale ? product.compareAtPrice : null
+  const discountPercent = isOnSale
+    ? Math.round(((numCompare - numPrice) / numCompare) * 100)
+    : 0
+
+  const subtitle = product.category?.name
+    ? `ORIGINALS 001 - ${product.category.name.toUpperCase()}`
+    : "ORIGINALS 001 - AFTER DARK"
+
+  return { displayPrice, comparePriceStr, discountPercent, subtitle }
+}
+
 function cardToProductDetail(card: ProductCard): ProductDetail {
   const galleryImages = (card.gallery?.length ? card.gallery : [card.image]).map((src) => ({
     src,
@@ -230,24 +253,7 @@ export function ProductCardView({
     setIsCartOpen(true)
   }
 
-  // Price calculations
-  const displayPrice = product.price && product.price !== "N/A" ? product.price : "₹2,200"
-  const numPrice = parseInt(displayPrice.replace(/[^\d]/g, "") || "2200", 10)
-  
-  // Sale styling (struck-through price + SAVE %) only when a real compare-at
-  // price above the selling price is set, as in the Figma cards.
-  const numCompare = product.compareAtPrice
-    ? parseInt(product.compareAtPrice.replace(/[^\d]/g, "") || "0", 10)
-    : 0
-  const isOnSale = numCompare > numPrice
-  const comparePriceStr = isOnSale ? product.compareAtPrice : null
-  const discountPercent = isOnSale
-    ? Math.round(((numCompare - numPrice) / numCompare) * 100)
-    : 0
-
-  const subtitle = product.category?.name
-    ? `ORIGINALS 001 - ${product.category.name.toUpperCase()}`
-    : "ORIGINALS 001 - AFTER DARK"
+  const { displayPrice, comparePriceStr, discountPercent, subtitle } = productCardInfo(product)
 
   const sizesList =
     product.sizes && product.sizes.length > 0
