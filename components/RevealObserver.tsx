@@ -20,16 +20,34 @@ export function RevealObserver() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
     const root = document.documentElement
 
+    // A masked heading is clipped to nothing while hidden, and Chrome then
+    // reports it as never on screen, so headings are watched through their
+    // parent block instead (parent -> headings waiting on it).
+    const viaParent = new Map<Element, HTMLElement[]>()
+
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue
-          entry.target.classList.add("is-revealed")
-          observer.unobserve(entry.target)
+          const target = entry.target
+          if (target.hasAttribute("data-reveal")) target.classList.add("is-revealed")
+          viaParent.get(target)?.forEach((el) => el.classList.add("is-revealed"))
+          viaParent.delete(target)
+          observer.unobserve(target)
         }
       },
       { rootMargin: "0px 0px -8% 0px", threshold: 0.12 },
     )
+
+    const track = (el: HTMLElement) => {
+      const parent = el.parentElement
+      if (el.dataset.reveal !== "text" || !parent) {
+        observer.observe(el)
+        return
+      }
+      viaParent.set(parent, [...(viaParent.get(parent) ?? []), el])
+      observer.observe(parent)
+    }
 
     const watch = (scope: ParentNode) => {
       // Headings rise out of a mask (layered on any block reveal around them).
@@ -46,7 +64,7 @@ export function RevealObserver() {
           el.classList.add("is-revealed")
           return
         }
-        observer.observe(el)
+        track(el)
       })
     }
 
@@ -58,7 +76,7 @@ export function RevealObserver() {
       for (const record of records) {
         record.addedNodes.forEach((node) => {
           if (node instanceof HTMLElement) {
-            if (node.matches("[data-reveal]")) observer.observe(node)
+            if (node.matches("[data-reveal]:not(.is-revealed)")) track(node)
             watch(node)
           }
         })
