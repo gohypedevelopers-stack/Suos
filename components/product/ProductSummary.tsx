@@ -205,10 +205,11 @@ export function ProductSummary({
     let frame = 0
     const update = () => {
       frame = 0
-      // Only alongside the product details: hidden again once the main product
-      // area has scrolled away, so it never covers "It's in the Details".
+      // Only while the product itself fills the screen: hidden as soon as the
+      // product section's bottom edge comes into view, before the next section
+      // ("It's in the Details", "You May Also Like") starts.
       const area = target.closest("section")
-      const areaEnded = area ? area.getBoundingClientRect().bottom < window.innerHeight * 0.6 : false
+      const areaEnded = area ? area.getBoundingClientRect().bottom < window.innerHeight : false
       setShowStickyBar(target.getBoundingClientRect().bottom < 0 && !areaEnded)
     }
     const schedule = () => {
@@ -547,33 +548,44 @@ export function ProductSummary({
               <div
                 aria-hidden={!showStickyBar}
                 className={cn(
-                  "fixed inset-x-0 bottom-0 z-40 border-t border-black/15 bg-white text-black shadow-[0_-4px_16px_rgba(0,0,0,0.08)] transition-transform duration-300 ease-out lg:inset-x-auto lg:bottom-6 lg:right-8 lg:w-[min(573px,calc(40vw-3rem))] lg:border",
+                  "fixed inset-x-0 bottom-0 z-40 bg-[#f7f7f7] text-black shadow-[0_-4px_18px_rgba(0,0,0,0.08)] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] lg:inset-x-auto lg:bottom-6 lg:right-8 lg:w-[min(573px,calc(40vw-3rem))] lg:shadow-[0_6px_24px_rgba(0,0,0,0.1)]",
                   showStickyBar ? "translate-y-0" : "pointer-events-none translate-y-[calc(100%+24px)]"
                 )}
               >
-                <div className="flex items-center gap-3 p-3">
+                {/* Figma: photo | line, title, size | price row with Add to cart on the right. */}
+                <div className="flex gap-3 p-3 sm:gap-4">
                   {product.gallery[0]?.src ? (
-                    <div className="relative h-[72px] w-14 shrink-0 overflow-hidden bg-[#efefef]">
-                      <Image src={product.gallery[0].src} alt="" fill sizes="56px" className="object-cover" />
+                    <div className="relative h-[92px] w-[68px] shrink-0 overflow-hidden bg-[#e9e9e9] sm:h-[120px] sm:w-[90px]">
+                      <Image src={product.gallery[0].src} alt="" fill sizes="90px" className="object-cover" />
                     </div>
                   ) : null}
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-[12px] uppercase leading-none text-ink-400">{product.editLabel}</p>
-                    <p className="mt-1.5 truncate text-[15px] uppercase leading-none text-ink-800 sm:text-body-lg">{product.title}</p>
-                    <p className="mt-1.5 flex flex-wrap items-baseline gap-x-2 text-caption text-ink-600">
-                      {selectedSize ? <span>Size: {selectedSize}</span> : null}
-                      {product.originalPrice ? <span className="line-through">{product.originalPrice}</span> : null}
-                      <span className="font-medium text-ink-900">{product.price}</span>
+                  <div className="flex min-w-0 flex-1 flex-col">
+                    {product.editLabel ? (
+                      <p className="truncate text-[12px] uppercase leading-none text-ink-400 sm:text-[14px]">{product.editLabel}</p>
+                    ) : null}
+                    <p className="mt-1.5 line-clamp-2 text-[14px] uppercase leading-[1.2] text-black sm:mt-2 sm:text-[18px]">
+                      {product.title}
                     </p>
+                    {selectedSize ? (
+                      <p className="mt-1.5 text-[12px] leading-none text-ink-400 sm:mt-2 sm:text-[13px]">Size: {selectedSize}</p>
+                    ) : null}
+                    <div className="mt-auto flex items-end justify-between gap-3 pt-2">
+                      <p className="flex flex-wrap items-baseline gap-x-2 leading-none">
+                        {product.originalPrice ? (
+                          <span className="text-[13px] text-ink-400 line-through sm:text-[16px]">{product.originalPrice}</span>
+                        ) : null}
+                        <span className="text-[17px] font-medium text-black sm:text-[20px]">{product.price}</span>
+                      </p>
+                      <button
+                        type="button"
+                        tabIndex={showStickyBar ? 0 : -1}
+                        onClick={handleAddToCart}
+                        className="h-8 shrink-0 cursor-pointer bg-black px-3 text-[13px] font-medium uppercase leading-none text-white transition-opacity hover:opacity-85 sm:h-9 sm:px-4 sm:text-[15px]"
+                      >
+                        Add To Cart
+                      </button>
+                    </div>
                   </div>
-                  <button
-                    type="button"
-                    tabIndex={showStickyBar ? 0 : -1}
-                    onClick={handleAddToCart}
-                    className="h-11 shrink-0 cursor-pointer bg-black px-4 text-button font-medium uppercase text-white transition-opacity hover:opacity-90 sm:px-6"
-                  >
-                    Add To Cart
-                  </button>
                 </div>
               </div>,
             document.body,
