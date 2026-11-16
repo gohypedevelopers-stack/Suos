@@ -1,133 +1,86 @@
 import Image from "next/image"
-import { cn } from "@/lib/utils"
 
-const bottomFeatures = [
+const features = [
   {
-    title: "SUSTAINABLE PACKAGING",
-    description: "Packaging designed to reduce material waste.",
-    bgImage: "/responsible-denim/sustainable-packaging.png",
-    textColor: "text-black",
-  },
-  {
-    title: "LOWER-WATER WASHING",
+    title: "Lower-water washing",
     description: "Wash processes designed to reduce water use.",
-    bgImage: "/responsible-denim/lower-water-washing.png",
-    textColor: "text-black",
+    image: "/responsible-denim/lower-water-washing.png",
   },
   {
-    title: "SAFER CHEMICALS",
+    title: "Safer chemicals",
     description: "Inputs aligned with recognised safety standards.",
-    bgImage: "/responsible-denim/safer-chemicals.png",
-    textColor: "text-black",
+    image: "/responsible-denim/safer-chemicals.png",
   },
   {
-    title: "RESPONSIBLE DENIM",
+    title: "Responsible denim",
     description: "Thoughtfully sourced materials and considered processes.",
-    bgImage: "/responsible-denim/responsible-denim.png",
-    textColor: "text-white",
+    image: "/responsible-denim/responsible-denim.png",
+  },
+  {
+    title: "Sustainable packaging",
+    description: "Packaging designed to reduce material waste.",
+    image: "/responsible-denim/sustainable-packaging.png",
   },
 ]
 
+const certifications = ["OEKO-TEX®", "GOTS", "RoHS"]
+
+/**
+ * Home "What touches your skin matters": a large photo held on the left while
+ * the right side scrolls (label, headline, a 2×2 grid of numbered practices
+ * and the certifications).
+ */
 export function ResponsibleDenimSection() {
   return (
-    <section className="w-full bg-white text-black">
-      {/* Top Row: 3 Columns (Hand Image | Core Message Card | Looping Video) */}
-      <div className="reveal-stagger grid grid-cols-1 lg:grid-cols-[1fr_1.3fr_1fr] items-stretch">
-        {/* Left: Hand on Denim Image */}
-        <div data-reveal="zoom" data-parallax className="relative min-h-[280px] sm:min-h-[360px] lg:min-h-[480px] w-full overflow-hidden bg-neutral-100">
+    <section className="grid w-full bg-white text-black lg:grid-cols-2">
+      {/* Left: stays in view (desktop) while the right column scrolls past. */}
+      <div className="relative aspect-[4/5] w-full sm:aspect-[4/3] lg:aspect-auto">
+        <div data-reveal="zoom" className="relative h-full w-full overflow-hidden bg-neutral-100 lg:sticky lg:top-0 lg:h-[100svh]">
           <Image
             src="/responsible-denim/hand-denim.png"
             alt="Hand touching responsibly finished denim"
             fill
-            sizes="(max-width: 1024px) 100vw, 33vw"
+            sizes="(max-width: 1024px) 100vw, 50vw"
             className="object-cover object-center"
           />
         </div>
-
-        {/* Middle: Mission Statement Card */}
-        <div data-reveal="up" className="flex flex-col justify-center items-center text-center lg:items-start lg:text-left px-6 py-12 sm:px-10 lg:px-12 xl:px-16">
-          <p className="text-[14px] sm:text-[16px] font-normal uppercase leading-[25px] tracking-normal text-[#6c6c6c]">
-            Considered Beyond The Surface
-          </p>
-
-          <h2 className="type-title mt-4 text-black">
-            What Touches
-            <br className="hidden sm:inline" />{" "}
-            Your Skin Matters
-          </h2>
-
-          <p className="mt-5 max-w-[480px] mx-auto lg:mx-0 text-[16px] leading-[22px] sm:text-[20px] sm:leading-[25px] tracking-normal text-black">
-            Our denim is washed and finished using inputs selected to meet
-            recognised textile and chemical safety standards.
-          </p>
-
-          <div className="mt-6 sm:mt-10 w-full text-center lg:text-left">
-            <p className="text-[20px] sm:text-[28px] leading-[25px] font-normal tracking-normal text-black">
-              OEKO-TEX® &nbsp;|&nbsp; RoHS &nbsp;|&nbsp; GOTS
-            </p>
-          </div>
-        </div>
-
-        {/* Right: Looping Video with "TO A BRIGHTER TOMORROW" Overlay */}
-        <div data-reveal="zoom" data-parallax className="relative min-h-[280px] sm:min-h-[360px] lg:min-h-[480px] w-full overflow-hidden bg-neutral-900">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            poster="/responsible-denim/mountains.png"
-            className="absolute inset-0 h-full w-full object-cover object-center"
-          >
-            <source src="/Looping Video.mp4" type="video/mp4" />
-          </video>
-
-          {/* Top-Left Text Overlay */}
-          <div className="absolute left-6 top-6 sm:left-8 sm:top-8 z-10">
-            <p className="text-[14px] sm:text-[16px] font-normal uppercase tracking-normal text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] leading-[25px]">
-              To A<br />
-              Brighter<br />
-              Tomorrow
-            </p>
-          </div>
-        </div>
       </div>
 
-      {/* Bottom Row: 4 Feature Cards (2x2 on Mobile, 4 in a row on Desktop) */}
-      <div className="reveal-stagger grid grid-cols-2 lg:grid-cols-4">
-        {bottomFeatures.map((feature) => (
-          <div
-            key={feature.title}
-            data-reveal="zoom"
-            className="hover-zoom relative aspect-square sm:aspect-[6/5] w-full overflow-hidden flex flex-col justify-center items-center text-center p-3 sm:p-6 lg:p-8"
-          >
-            {/* Background Texture Image */}
-            <Image
-              src={feature.bgImage}
-              alt={feature.title}
-              fill
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 25vw"
-              className="object-cover object-center"
-            />
+      {/* Right: label, headline, practices, certifications. */}
+      <div className="px-4 pb-14 pt-10 sm:px-6 sm:pb-16 sm:pt-12 lg:px-8 lg:pb-20 lg:pt-6">
+        <p className="text-[14px] font-normal uppercase leading-[25px] tracking-normal text-[#6c6c6c] sm:text-[16px]">
+          Considered beyond the surface
+        </p>
+        <h2 className="type-title mt-3 max-w-[640px]">
+          What touches your skin matters
+        </h2>
 
-            {/* Subtle scrim for contrast if needed */}
-            <div className="absolute inset-0 bg-black/5" />
-
-            {/* Card Content Overlay */}
-            <div className={cn("relative z-10 max-w-[180px] sm:max-w-[260px] lg:max-w-[300px] flex flex-col items-center justify-center", feature.textColor)}>
-              <h3 className="font-heading text-[16px] leading-[20px] sm:text-[22px] sm:leading-[28px] xl:text-[28px] xl:leading-[38px] font-normal uppercase tracking-normal drop-shadow-sm">
-                {/* Figma sets each title on two lines, one word per line. */}
-                {feature.title.split(" ").map((word, index) => (
-                  <span key={word} className="block">
-                    {index === 0 ? word : ` ${word}`}
-                  </span>
-                ))}
+        <ul className="reveal-stagger mt-10 grid grid-cols-2 gap-x-0.5 gap-y-8 sm:mt-12 sm:gap-y-10">
+          {features.map((feature, index) => (
+            <li key={feature.title} data-reveal="up">
+              <div className="hover-zoom relative aspect-[4/3] w-full overflow-hidden bg-neutral-100">
+                <Image
+                  src={feature.image}
+                  alt={feature.title}
+                  fill
+                  sizes="(max-width: 1024px) 50vw, 25vw"
+                  className="object-cover object-center"
+                />
+              </div>
+              {/* Same type as the name and subtitle under a product card. */}
+              <h3 className="mt-2.5 text-[12px] font-normal uppercase leading-none tracking-normal md:mt-3 md:text-[14px]">
+                {String(index + 1).padStart(2, "0")} — {feature.title}
               </h3>
-              <p className="mt-2 sm:mt-3 text-[13px] leading-[17px] sm:text-[16px] sm:leading-[21px] xl:text-[20px] xl:leading-[25px] text-center drop-shadow-sm">
-                {feature.description}
-              </p>
-            </div>
-          </div>
-        ))}
+              <p className="mt-1.5 pr-3 text-[11px] leading-[1.3] tracking-normal text-[#7d7d7d] md:text-[14px]">{feature.description}</p>
+            </li>
+          ))}
+        </ul>
+
+        <ul className="mt-12 flex flex-wrap gap-x-7 gap-y-2 text-[12px] uppercase leading-none tracking-normal text-[#7d7d7d] sm:mt-16 md:text-[14px]">
+          {certifications.map((name) => (
+            <li key={name}>{name}</li>
+          ))}
+        </ul>
       </div>
     </section>
   )
