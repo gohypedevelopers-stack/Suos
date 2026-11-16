@@ -16,7 +16,7 @@ function HighlightImage({
   className: string
 }) {
   return (
-    <figure data-reveal="zoom" className={`relative overflow-hidden bg-[#efefef] ${className}`}>
+    <figure data-reveal="zoom" data-scroll-zoom className={`relative overflow-hidden bg-[#efefef] ${className}`}>
       <Image
         src={highlight.src}
         alt={highlight.title || `Detail ${number}`}

@@ -553,8 +553,8 @@
   backface-visibility: hidden;
 }
 
-/* Hidden while the page is scrolling; slides back in when scrolling pauses.
-   Uses `translate` so it doesn't fight the inline `transform` offset. */
+/* Hidden while scrolling down; slides back on scroll-up or when scrolling
+   pauses. Uses `translate` so it doesn't fight the inline `transform` offset. */
 .navbar-shell {
   translate: 0 0;
   transition-property: background-color, color, border-color, box-shadow, opacity, transform, translate;
@@ -562,11 +562,10 @@
 .navbar-shell.is-scroll-hidden {
   translate: 0 calc(-100% - var(--announcement-height));
 }
-.navbar-shell:not(.is-scroll-hidden) {
-  transition-duration: 280ms, 280ms, 280ms, 280ms, 220ms, 220ms, 520ms;
-}
+.navbar-shell:not(.is-scroll-hidden),
 .navbar-shell.is-scroll-hidden {
-  transition-duration: 280ms, 280ms, 280ms, 280ms, 220ms, 220ms, 320ms;
+  transition-duration: 280ms, 280ms, 280ms, 280ms, 220ms, 220ms, 700ms;
+  transition-timing-function: ease, ease, ease, ease, ease, ease, cubic-bezier(0.7, 0, 0.2, 1);
 }
 
 .navbar-shell.is-scrolled {
@@ -635,8 +634,26 @@
 .reveal-ready [data-reveal]:not(.is-revealed) {
   opacity: 0;
 }
+/* Cards and blocks only move (no fade), as in the reference. */
+.reveal-ready :is([data-reveal="up"], [data-reveal="right"]):not(.is-revealed) {
+  opacity: 1;
+}
+/* Softer rise with a fade (footer columns: 30px, 1s). */
+.reveal-ready [data-reveal="soft"] {
+  transition-duration: 1s, 1s;
+}
+.reveal-ready [data-reveal="soft"]:not(.is-revealed) {
+  transform: translate3d(0, 30px, 0);
+}
 .reveal-ready [data-reveal="up"]:not(.is-revealed) {
   transform: translate3d(0, 60px, 0);
+}
+/* Cards in horizontal rows slide in from the right. */
+.reveal-ready [data-reveal="right"] {
+  transition-duration: 0.9s, 1.3s;
+}
+.reveal-ready [data-reveal="right"]:not(.is-revealed) {
+  transform: translate3d(80px, 0, 0);
 }
 /* Headings rise out of a mask: the text slides up while the clip keeps it
    inside its own box, so it appears to come from behind an edge. */
@@ -669,19 +686,21 @@
 
 /* Hero text and button rise in on page load. */
 @keyframes hero-rise {
-  from { opacity: 0; transform: translate3d(0, 28px, 0); }
+  from { opacity: 0; transform: translate3d(0, 20px, 0); }
   to { opacity: 1; transform: none; }
 }
 .hero-rise > * {
-  animation: hero-rise 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: hero-rise 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
 }
-.hero-rise > :nth-child(2) { animation-delay: 0.12s; }
-.hero-rise > :nth-child(3) { animation-delay: 0.24s; }
+/* Reference intro: label 0.3s, title 0.4s over 1.3s, buttons 0.6s. */
+.hero-rise > p { animation-delay: 0.3s; }
+.hero-rise > :is(h1, h2) { animation-duration: 1.3s; animation-delay: 0.4s; }
+.hero-rise > div { animation-delay: 0.6s; }
 
 /* Big banners: a slow zoom on hover. */
 .hover-zoom img,
 .hover-zoom video {
-  transition: transform 1.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 1.6s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 .hover-zoom:hover img,
 .hover-zoom:hover video {
@@ -732,7 +751,7 @@
 /* ───────── Hover styles (reference: smooth, slow) ───────── */
 /* Product-card photo: slow zoom; `scale` is separate from the opacity swap. */
 [data-card-zoom] img {
-  transition: opacity 0.6s ease, scale 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.6s ease, scale 1.4s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 /* Outlined buttons fill with black from the left. */
 .btn-sweep {
@@ -797,27 +816,47 @@ html.lenis body {
   will-change: translate, scale;
 }
 [data-parallax="out"] [data-parallax-copy] {
-  translate: 0 calc(var(--parallax-out, 0) * -100px);
-  opacity: calc(1 - var(--parallax-out, 0) * 1.8);
+  translate: 0 calc(clamp(0, (var(--parallax-out, 0) - 0.2) / 0.5, 1) * -100px);
+  opacity: calc(1 - clamp(0, (var(--parallax-out, 0) - 0.2) / 0.5, 1));
 }
 /* Hero media settles from a slow zoom on page load. */
 @keyframes hero-settle {
-  from { transform: scale(1.18); }
+  from { transform: scale(1.25); }
   to { transform: none; }
 }
 .hero-settle {
-  animation: hero-settle 2.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: hero-settle 2.2s cubic-bezier(0.215, 0.61, 0.355, 1) both;
 }
 
 /* Banners open from a smaller frame and the photo settles from a zoom as
    they scroll in. */
 [data-unfold] {
   clip-path: inset(
-    calc((1 - var(--unfold, 1)) * 14%) calc((1 - var(--unfold, 1)) * 18%)
+    calc((1 - var(--unfold, 1)) * 14%) calc((1 - var(--unfold, 1)) * 20%)
   );
 }
 [data-unfold] :is(img, video) {
-  scale: calc(1.3 - var(--unfold, 1) * 0.3);
+  scale: calc(1.35 - var(--unfold-zoom, 1) * 0.35);
+}
+
+/* Photos settle from a slight zoom while they scroll into view. */
+[data-scroll-zoom] :is(img, video) {
+  scale: calc(1 + var(--scroll-zoom, 0) * 0.15);
+}
+
+/* A row of tiles where the hovered one widens and the others give way
+   (desktop with a mouse only). */
+@media (hover: hover) and (min-width: 64rem) {
+  .expand-row > * {
+    flex: 1 1 0%;
+    transition: flex-grow 1s cubic-bezier(0.7, 0, 0.2, 1);
+  }
+  .expand-row:hover > * {
+    flex-grow: 0.7;
+  }
+  .expand-row > :hover {
+    flex-grow: 2.2;
+  }
 }
 
 /* Text links: the underline slides out to the right, a new one draws in
@@ -863,11 +902,13 @@ html.lenis body {
   [data-parallax] :is(img, video),
   [data-parallax] [data-parallax-media],
   [data-parallax] [data-parallax-copy],
-  [data-unfold] :is(img, video) {
+  [data-unfold] :is(img, video),
+  [data-scroll-zoom] :is(img, video) {
     translate: none;
     scale: none;
     opacity: 1;
   }
+  .expand-row > * { transition: none; }
   [data-unfold] { clip-path: none; }
   .link-swap::before,
   .link-swap::after { transition: none; }

@@ -59,7 +59,7 @@ export function FooterSection() {
 
         <div className={`reveal-stagger mt-6 grid grid-cols-2 gap-x-6 gap-y-9 sm:mt-8 sm:grid-cols-3 ${desktopGrid}`}>
           {columns.map((column) => (
-            <div key={column.title} data-reveal="up">
+            <div key={column.title} data-reveal="soft">
               <h3 className={columnTitle}>{column.title}</h3>
               <ul className={`mt-4 space-y-3.5 ${smallCaps}`}>
                 {column.links.map((link) => (
@@ -72,7 +72,7 @@ export function FooterSection() {
           ))}
 
           {contactGroups.length > 0 ? (
-            <div data-reveal="up" className="col-span-2 sm:col-span-1">
+            <div data-reveal="soft" className="col-span-2 sm:col-span-1">
               <h3 className={columnTitle}>{footer.contactHeading}</h3>
               <div className="mt-4 space-y-3.5">
                 {contactGroups.map((group, index) => (
@@ -89,7 +89,7 @@ export function FooterSection() {
             </div>
           ) : null}
 
-          <div data-reveal="up" className="col-span-2 sm:col-span-3 lg:col-span-1">
+          <div data-reveal="soft" className="col-span-2 sm:col-span-3 lg:col-span-1">
             <h3 className={smallCaps}>{footer.newsletterHeading}</h3>
             <form className="mt-5 max-w-[460px] lg:max-w-none" onSubmit={(event) => event.preventDefault()}>
               <label className="flex items-center gap-3 border-b border-black pb-1.5">

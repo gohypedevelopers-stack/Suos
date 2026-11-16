@@ -294,7 +294,7 @@ export function ProductCardView({
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 className={cn(
-                  "object-cover object-center md:group-hover:scale-[1.05]",
+                  "object-cover object-center md:group-hover:scale-[1.04]",
                   isActive
                     ? "z-10 opacity-100 transition-opacity duration-150 ease-out"
                     : isPrev

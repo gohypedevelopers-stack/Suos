@@ -513,15 +513,16 @@ export function Navbar({
       if (headerRef.current) {
         headerRef.current.style.transform = `translate3d(0, ${navbarTranslateY}px, 0)`
 
-        // Hide while scrolling (past the first screenful), show again on pause.
+        // Hide while scrolling down (past the first screenful); show again as
+        // soon as the visitor scrolls up, or when scrolling pauses.
         const header = headerRef.current
         const delta = scrollY - lastScrollYRef.current
         lastScrollYRef.current = scrollY
         if (idleTimerRef.current !== null) window.clearTimeout(idleTimerRef.current)
-        if (scrollY > 160 && Math.abs(delta) > 2 && !keepHeaderVisibleRef.current) {
+        if (scrollY > 240 && delta > 2 && !keepHeaderVisibleRef.current) {
           header.classList.add("is-scroll-hidden")
         }
-        if (scrollY <= 160) header.classList.remove("is-scroll-hidden")
+        if (scrollY <= 240 || delta < -2) header.classList.remove("is-scroll-hidden")
         idleTimerRef.current = window.setTimeout(() => {
           header.classList.remove("is-scroll-hidden")
         }, 260)

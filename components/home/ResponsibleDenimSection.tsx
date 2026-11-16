@@ -58,7 +58,7 @@ export function ResponsibleDenimSection() {
         <ul className="reveal-stagger mt-10 grid grid-cols-2 gap-x-0.5 gap-y-8 sm:mt-12 sm:gap-y-10">
           {features.map((feature, index) => (
             <li key={feature.title} data-reveal="up">
-              <div className="hover-zoom relative aspect-[4/3] w-full overflow-hidden bg-neutral-100">
+              <div data-scroll-zoom className="hover-zoom relative aspect-[4/3] w-full overflow-hidden bg-neutral-100">
                 <Image
                   src={feature.image}
                   alt={feature.title}

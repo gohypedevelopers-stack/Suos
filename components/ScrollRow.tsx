@@ -63,8 +63,10 @@ export function ScrollRow({
         ref={ref}
         role="region"
         aria-label={label}
+        // Cards slide in from the right, one after another (RevealObserver).
+        data-reveal-children="right"
         className={cn(
-          "flex snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+          "reveal-stagger flex snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
           className,
         )}
         onPointerDown={(e) => {

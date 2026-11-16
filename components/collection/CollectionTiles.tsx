@@ -23,8 +23,10 @@ export function CollectionTiles({
   // Fewer than 2 tiles doesn't make a row worth showing.
   if (tiles.length < 2) return null
 
-  const cols =
-    tiles.length >= 4 ? "lg:grid-cols-4" : tiles.length === 3 ? "lg:grid-cols-3" : "lg:grid-cols-2"
+  // Desktop: a flex row (fixed height, about 2:3 tiles at rest) where the
+  // hovered tile widens and the others give way; phones keep the grid.
+  const rowHeight =
+    tiles.length >= 4 ? "lg:h-[min(37.5vw,760px)]" : tiles.length === 3 ? "lg:h-[min(44vw,760px)]" : "lg:h-[min(48vw,700px)]"
 
   return (
     <section aria-label={heading ?? "Shop by collection"} className="w-full bg-white">
@@ -33,12 +35,12 @@ export function CollectionTiles({
           {heading}
         </h2>
       ) : null}
-      <div className={`grid grid-cols-2 gap-0.5 ${cols}`}>
+      <div className={`expand-row grid grid-cols-2 gap-0.5 lg:flex ${rowHeight}`}>
         {tiles.map((tile, index) => (
           <Link
             key={tile.id}
             href={`/collections/${tile.slug}`}
-            className={`group relative block overflow-hidden bg-[#e7e7e4] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-black lg:col-span-1 lg:aspect-[2/3] ${
+            className={`group relative block overflow-hidden bg-[#e7e7e4] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-black lg:aspect-auto lg:h-full lg:min-w-0 ${
               tiles.length === 3 && index === 2
                 ? "col-span-2 aspect-[3/2]"
                 : "aspect-[3/4]"
@@ -48,8 +50,8 @@ export function CollectionTiles({
               src={tile.image}
               alt={tile.alt}
               fill
-              sizes={`(max-width: 1024px) 50vw, ${Math.round(100 / tiles.length)}vw`}
-              className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              sizes="50vw"
+              className="object-cover transition-transform duration-[1600ms] ease-[cubic-bezier(0.2,0.7,0.2,1)] group-hover:scale-[1.05]"
             />
             <span
               aria-hidden="true"

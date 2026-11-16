@@ -145,11 +145,11 @@ function EditorialTile({ image, span }: { image: EditorialImage; span: 2 | 3 }) 
   return (
     <div className={`group col-span-2 flex min-w-0 flex-col ${span === 3 ? "lg:col-span-3" : "lg:col-span-2"}`}>
       {image.href ? (
-        <Link href={image.href} className={mediaClass} aria-label={image.caption || image.product?.title || image.alt}>
+        <Link href={image.href} data-scroll-zoom className={mediaClass} aria-label={image.caption || image.product?.title || image.alt}>
           {media}
         </Link>
       ) : (
-        <div className={mediaClass}>{media}</div>
+        <div data-scroll-zoom className={mediaClass}>{media}</div>
       )}
       {hasCaption ? <EditorialCaption image={image} /> : null}
     </div>

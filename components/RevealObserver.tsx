@@ -36,7 +36,8 @@ export function RevealObserver() {
           observer.unobserve(target)
         }
       },
-      { rootMargin: "0px 0px -8% 0px", threshold: 0.12 },
+      // Starts when the element's top reaches 90% down the screen ("top 90%").
+      { rootMargin: "0px 0px -10% 0px", threshold: 0 },
     )
 
     const track = (el: HTMLElement) => {
@@ -57,6 +58,18 @@ export function RevealObserver() {
         if (el.hasAttribute("data-reveal") && el.dataset.reveal !== "up") return
         if (el.classList.contains("sr-only")) return
         el.dataset.reveal = "text"
+      })
+      // Rows: each card slides in from the right. A card that already has its
+      // own fade-up (product cards) is switched over instead of doubled up.
+      scope.querySelectorAll<HTMLElement>("[data-reveal-children]").forEach((row) => {
+        const mode = row.dataset.revealChildren || "up"
+        for (const child of Array.from(row.children) as HTMLElement[]) {
+          const target =
+            child.hasAttribute("data-reveal")
+              ? child
+              : child.querySelector<HTMLElement>(":scope > [data-reveal='up'], :scope > * > [data-reveal='up']") ?? child
+          if (!target.classList.contains("is-revealed")) target.dataset.reveal = mode
+        }
       })
       scope.querySelectorAll<HTMLElement>("[data-reveal]:not(.is-revealed)").forEach((el) => {
         // Already visible at start: show without animating.

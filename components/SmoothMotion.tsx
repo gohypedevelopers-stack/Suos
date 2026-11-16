@@ -12,6 +12,7 @@ import { usePathname } from "next/navigation"
  *   data-parallax          photo drifts slowly against the scroll (--parallax: -1…1)
  *   data-parallax="out"    hero: media sinks and copy lifts away as it scrolls off (--parallax-out: 0…1)
  *   data-unfold            banner opens from a smaller frame as it enters (--unfold: 0…1)
+ *   data-scroll-zoom       photo settles from a slight zoom as it scrolls in (--scroll-zoom: 1…0)
  *
  * Everything is skipped for visitors who prefer reduced motion.
  */
@@ -29,7 +30,7 @@ export function SmoothMotion() {
       duration: 1.25,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
-      anchors: true,
+      anchors: { duration: 1.6, offset: -70 },
       autoRaf: true,
       // Let drawers, dialogs and inner scroll areas scroll natively.
       prevent: (node) => Boolean(node.closest?.('[role="dialog"], [data-lenis-prevent], [data-radix-scroll-area-viewport]')),
@@ -90,10 +91,15 @@ export function SmoothMotion() {
       const vh = window.innerHeight
       for (const el of visible) {
         const rect = el.getBoundingClientRect()
-        if (el.hasAttribute("data-unfold")) {
-          // 0 when the top edge enters at the bottom, 1 once it reaches 25% from the top.
-          const progress = (vh - rect.top) / (vh * 0.75)
-          el.style.setProperty("--unfold", clamp(progress, 0, 1).toFixed(4))
+        if (el.hasAttribute("data-scroll-zoom")) {
+          // 1 when the top edge enters at the bottom, 0 once the bottom edge reaches the middle.
+          const progress = (vh - rect.top) / (rect.height + vh / 2)
+          el.style.setProperty("--scroll-zoom", (1 - clamp(progress, 0, 1)).toFixed(4))
+        } else if (el.hasAttribute("data-unfold")) {
+          // Frame: opens from the top edge entering at the bottom until it reaches the top.
+          el.style.setProperty("--unfold", clamp((vh - rect.top) / vh, 0, 1).toFixed(4))
+          // Photo: settles from the same start until the banner's bottom reaches the bottom.
+          el.style.setProperty("--unfold-zoom", clamp((vh - rect.top) / rect.height, 0, 1).toFixed(4))
         } else if (el.dataset.parallax === "out") {
           el.style.setProperty("--parallax-out", clamp(-rect.top / rect.height, 0, 1).toFixed(4))
         } else {
@@ -120,12 +126,13 @@ export function SmoothMotion() {
     )
 
     const scan = () => {
-      document.querySelectorAll<HTMLElement>("[data-parallax], [data-unfold]").forEach((el) => {
+      document.querySelectorAll<HTMLElement>("[data-parallax], [data-unfold], [data-scroll-zoom]").forEach((el) => {
         if (tracked.has(el)) return
         tracked.add(el)
         // Start banners closed so they open as they arrive.
         if (el.hasAttribute("data-unfold") && el.getBoundingClientRect().top > window.innerHeight) {
           el.style.setProperty("--unfold", "0")
+          el.style.setProperty("--unfold-zoom", "0")
         }
         io.observe(el)
       })

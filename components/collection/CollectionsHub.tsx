@@ -175,6 +175,7 @@ function CollectionMosaic({
           tabIndex={index === 0 ? undefined : -1}
           aria-label={index === 0 ? `Shop the ${title} collection` : undefined}
           aria-hidden={index === 0 ? undefined : true}
+          data-scroll-zoom
           className={`group relative block overflow-hidden bg-[#e7e7e4] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-black ${tiles[index].className}`}
         >
           <Image
