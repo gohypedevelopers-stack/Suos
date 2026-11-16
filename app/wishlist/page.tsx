@@ -18,7 +18,7 @@ export default function WishlistPage() {
   if (!isLoaded) return null
 
   return (
-    <main className="mx-auto min-h-screen max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <main className="min-h-screen w-full px-4 py-12 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="mb-10 flex flex-col items-start justify-between gap-4 border-b pb-6 sm:flex-row sm:items-center">
         <h1 className="type-title text-black">

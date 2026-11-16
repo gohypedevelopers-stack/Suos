@@ -13,7 +13,7 @@ export default async function SizeGuidePage() {
   const { sizeGuide } = await getSiteContent()
 
   return (
-    <main className="mx-auto w-full max-w-[1240px] flex-1 bg-white px-4 pb-20 pt-10 text-black sm:px-6 md:pt-16 lg:px-8">
+    <main className="w-full flex-1 bg-white px-4 pb-20 pt-10 text-black sm:px-6 md:pt-16 lg:px-8">
       <h1 className="type-title max-w-[560px]">
         {sizeGuide.title}
       </h1>

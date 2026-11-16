@@ -825,8 +825,8 @@ export function CheckoutPage() {
     return (
       <main className="min-h-screen bg-white text-black">
         {/* Minimal Checkout Header */}
-        <header className="border-b border-black/15 px-6 py-4 sm:px-10">
-          <div className="mx-auto flex max-w-6xl items-center justify-center">
+        <header className="border-b border-black/15 px-4 py-4 sm:px-6 lg:px-8">
+          <div className="flex w-full items-center justify-center">
             <Link
               href="/"
               aria-label="SUOS home"
@@ -904,8 +904,8 @@ export function CheckoutPage() {
   return (
     <main className="min-h-screen bg-white text-black">
       {/* ─── SUOS MINIMAL CHECKOUT HEADER ─── */}
-      <header className="border-b border-black/15 px-4 py-5 sm:px-8">
-        <div className="mx-auto grid max-w-6xl grid-cols-3 items-center">
+      <header className="border-b border-black/15 px-4 py-5 sm:px-6 lg:px-8">
+        <div className="grid w-full grid-cols-3 items-center">
           {/* Left: Back to Shop */}
           <div className="flex items-center justify-start">
             <Link
@@ -964,7 +964,7 @@ export function CheckoutPage() {
       </header>
 
       {/* ─── MAIN TWO-COLUMN CHECKOUT BODY ─── */}
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+      <div className="w-full px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_390px] lg:items-start xl:gap-16">
 
           {/* ─── LEFT COLUMN: Steps Form ─── */}

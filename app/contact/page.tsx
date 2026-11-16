@@ -49,7 +49,7 @@ export default async function ContactPage({
 
   return (
     <main className="bg-white text-black">
-      <div className="mx-auto w-full max-w-[1600px] px-5 pb-24 pt-28 sm:px-8 lg:px-20 lg:pb-32 lg:pt-[8.5rem]">
+      <div className="w-full px-4 pb-24 pt-28 sm:px-6 lg:px-8 lg:pb-32 lg:pt-[8.5rem]">
         <section aria-labelledby="contact-heading">
           <p className="text-[13px] uppercase leading-[1.4] tracking-[0.04em]">{contact.eyebrow}</p>
           <h1

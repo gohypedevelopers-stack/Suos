@@ -63,7 +63,7 @@ export default async function TrackOrderPage({
 
   return (
     <main className="flex min-h-[calc(100svh-var(--header-stack-height))] bg-white text-black">
-      <div className={`mx-auto grid w-full px-5 py-16 sm:px-8 lg:px-20 lg:py-[6.25rem] ${showSignIn ? "max-w-[1600px] lg:grid-cols-2" : "max-w-[720px]"}`}>
+      <div className={`mx-auto grid w-full px-4 py-16 sm:px-6 lg:px-8 lg:py-[6.25rem] ${showSignIn ? "lg:grid-cols-2" : "max-w-[720px]"}`}>
         <section className={showSignIn ? "lg:border-r lg:border-black/55 lg:pr-[6rem]" : undefined}>
           <h1 className="type-title">
             {page.text("intro", "heading")}

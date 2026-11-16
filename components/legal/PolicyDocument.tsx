@@ -21,7 +21,7 @@ export function PolicyDocument({
       id={id}
       className="scroll-mt-[calc(var(--header-stack-height)+1rem)] border-t border-black/15 bg-white text-black"
     >
-      <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-4 py-14 sm:px-6 sm:py-16 lg:grid-cols-[240px_minmax(0,800px)] lg:gap-20 lg:px-8 lg:py-20">
+      <div className="grid w-full gap-12 px-4 py-14 sm:px-6 sm:py-16 lg:grid-cols-[240px_minmax(0,800px)] lg:gap-20 lg:px-8 lg:py-20">
         <header className="self-start lg:sticky lg:top-[calc(var(--header-stack-height)+2rem)]">
           <p className="text-[12px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-black/45 sm:text-[13px]">
             SUOS policies

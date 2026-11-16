@@ -92,7 +92,7 @@ export function AccountDashboard({ user, orders }: AccountDashboardProps) {
 
   return (
     <main className="min-h-[calc(100svh-var(--header-stack-height))] bg-white text-black">
-      <div className="mx-auto w-full max-w-[1280px] px-5 py-12 sm:px-8 lg:px-16 lg:py-16">
+      <div className="w-full px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         {/* ─── Header ─── */}
         <section className="border-b border-black pb-8">
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
