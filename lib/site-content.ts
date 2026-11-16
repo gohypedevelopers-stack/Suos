@@ -121,8 +121,15 @@ export type FooterColumn = {
 export type FooterContent = {
   /** Contact details: used by the product page's "Origin & Contact". */
   contactGroups: ContactGroup[]
-  /** Footer link columns (SUOS / HELP / FOLLOW). Links with an empty URL are hidden. */
+  /** Heading over the whole footer (Figma: "More about SUOS"). */
+  heading: string
+  /** Footer link columns. Links with an empty URL are hidden. A column titled
+   *  "Follow" is shown at the bottom right instead (social links). */
   columns: FooterColumn[]
+  /** Title of the column built from contactGroups. */
+  contactHeading: string
+  /** Label before the social links at the bottom right. */
+  followHeading: string
   newsletterHeading: string
   newsletterPlaceholder: string
   newsletterButton: string
@@ -388,7 +395,10 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
       { heading: "For online orders", lines: [{ type: "phone", label: "", value: "+91 000000000" }] },
       { heading: "Timings", lines: [{ type: "text", label: "", value: "Mon-Sat : 9AM - 8PM" }] },
     ],
+    heading: "More about SUOS",
     columns: DEFAULT_FOOTER_COLUMNS,
+    contactHeading: "Contact",
+    followHeading: "Follow us",
     newsletterHeading: "Subscribe to our newsletter",
     newsletterPlaceholder: "Enter your email address",
     newsletterButton: "Subscribe",

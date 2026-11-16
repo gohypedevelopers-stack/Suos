@@ -192,6 +192,9 @@ export const siteContentSchemas = {
         )
         .max(5)
         .default(() => structuredClone(DEFAULT_SITE_CONTENT.footer.columns)),
+      heading: shortText.default(DEFAULT_SITE_CONTENT.footer.heading),
+      contactHeading: shortText.default(DEFAULT_SITE_CONTENT.footer.contactHeading),
+      followHeading: shortText.default(DEFAULT_SITE_CONTENT.footer.followHeading),
       newsletterHeading: shortText.default(DEFAULT_SITE_CONTENT.footer.newsletterHeading),
       newsletterPlaceholder: shortText.default(DEFAULT_SITE_CONTENT.footer.newsletterPlaceholder),
       newsletterButton: shortText.min(1).default(DEFAULT_SITE_CONTENT.footer.newsletterButton),

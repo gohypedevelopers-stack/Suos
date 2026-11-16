@@ -1,7 +1,7 @@
 "use client"
 
 import Lenis from "lenis"
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import { usePathname } from "next/navigation"
 
 /**
@@ -17,6 +17,9 @@ import { usePathname } from "next/navigation"
  */
 export function SmoothMotion() {
   const pathname = usePathname()
+  const lenisRef = useRef<Lenis | null>(null)
+  const fromHistoryRef = useRef(false)
+  const lastPathRef = useRef(pathname)
 
   // Smooth scrolling, created once for the whole visit.
   useEffect(() => {
@@ -40,11 +43,39 @@ export function SmoothMotion() {
     const lockObserver = new MutationObserver(syncLock)
     lockObserver.observe(document.body, { attributes: true, attributeFilter: ["data-scroll-locked"] })
 
+    // Back / Forward: drop any glide still running so the browser can restore
+    // the old page's position, and remember not to jump to the top.
+    const onHistory = () => {
+      fromHistoryRef.current = true
+      lenis.stop()
+      lenis.start()
+    }
+    window.addEventListener("popstate", onHistory)
+
+    lenisRef.current = lenis
     return () => {
+      window.removeEventListener("popstate", onHistory)
       lockObserver.disconnect()
       lenis.destroy()
+      lenisRef.current = null
     }
   }, [])
+
+  // A new page always opens at the top. Without this, a glide still running
+  // from the previous page (click right after scrolling) carries on and lands
+  // the new page half-way down.
+  useEffect(() => {
+    if (lastPathRef.current === pathname) return
+    lastPathRef.current = pathname
+    const lenis = lenisRef.current
+    if (!lenis) return
+    if (fromHistoryRef.current) {
+      fromHistoryRef.current = false
+      return
+    }
+    if (window.location.hash) return
+    lenis.scrollTo(0, { immediate: true, force: true })
+  }, [pathname])
 
   // Scroll-linked effects, re-scanned on every page.
   useEffect(() => {
