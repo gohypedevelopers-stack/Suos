@@ -13,7 +13,7 @@ import {
   Undo2,
   X,
 } from "lucide-react"
-import type { ButtonHTMLAttributes, ReactNode } from "react"
+import type { ButtonHTMLAttributes, MouseEvent as ReactMouseEvent, ReactNode } from "react"
 import { useEffect, useRef, useState, useSyncExternalStore } from "react"
 import { createPortal } from "react-dom"
 
@@ -195,6 +195,23 @@ export function ProductSummary({
   )
 
   // Sticky add-to-cart bar: shown once the main button has scrolled off the top.
+  // Opening or closing a details section changes this column's height. With the
+  // column sticky, the browser would shift everything above the section; so
+  // while it animates, the page scroll follows the clicked header and keeps it
+  // (and all content above it) exactly where it was on screen.
+  const holdSectionInPlace = (event: ReactMouseEvent<HTMLElement>) => {
+    const trigger = (event.target as HTMLElement).closest<HTMLElement>('[data-slot="accordion-trigger"]')
+    if (!trigger) return
+    const startTop = trigger.getBoundingClientRect().top
+    const until = performance.now() + 700
+    const follow = () => {
+      const drift = trigger.getBoundingClientRect().top - startTop
+      if (Math.abs(drift) >= 1) window.scrollBy(0, drift)
+      if (performance.now() < until) window.requestAnimationFrame(follow)
+    }
+    window.requestAnimationFrame(follow)
+  }
+
   const addToCartRef = useRef<HTMLButtonElement>(null)
   const [showStickyBar, setShowStickyBar] = useState(false)
   // Checked on every scroll frame rather than with an IntersectionObserver:
@@ -451,6 +468,7 @@ export function ProductSummary({
           defaultValue="Features & Care"
           collapsible
           className="mt-8 border-t border-black/15"
+          onClickCapture={holdSectionInPlace}
         >
           <Section title="Features & Care">
             <div className="space-y-4">
