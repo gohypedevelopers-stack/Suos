@@ -167,7 +167,7 @@ function EditorialCaption({ image }: { image: EditorialImage }) {
   return (
     // Desktop: as tall as a product card's info block (72px) plus the space
     // under it (10px), so the photo ends level with the product photos.
-    <div className="mt-2.5 flex flex-col gap-1.5 md:mt-3 lg:min-h-[72px] lg:mb-2.5">
+    <div className="mt-2.5 flex flex-col gap-1.5 px-1.5 sm:px-2.5 md:mt-3 lg:min-h-[72px] lg:mb-2.5">
       {/* Title row: as tall as the card's title row with its bag button. */}
       <div className="flex min-h-[23px] items-center md:min-h-[26px]">
         {image.href ? (

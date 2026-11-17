@@ -472,8 +472,8 @@ export function ProductCardView({
 
       </div>
 
-      {/* Info Area Below Image */}
-      <div className="mt-2.5 md:mt-3 flex flex-col gap-1.5">
+      {/* Info Area Below Image: inset like the badge on the photo (6px / 10px). */}
+      <div className="mt-2.5 md:mt-3 flex flex-col gap-1.5 px-1.5 sm:px-2.5">
         {isCompact && (product.lineName || product.category?.name) ? (
           <p className="truncate text-[11px] md:text-[12px] uppercase tracking-normal leading-none text-ink-400">
             {product.lineName || product.category?.name}
@@ -498,7 +498,7 @@ export function ProductCardView({
             onClick={handleCartClick}
             aria-label="Add to cart"
             title="Add to cart"
-            className="shrink-0 cursor-pointer p-1 mr-2 sm:mr-3 md:mr-4 text-black transition-transform duration-200 hover:scale-110 active:scale-95"
+            className="shrink-0 cursor-pointer p-1 -mr-1 text-black transition-transform duration-200 hover:scale-110 active:scale-95"
           >
             <CartIcon className="size-[15px] md:size-[18px]" />
           </button>

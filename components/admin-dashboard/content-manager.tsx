@@ -475,7 +475,7 @@ function FooterEditor({ value, onChange }: SectionProps<"footer">) {
       <div className="space-y-3 border-t border-black/10 pt-4">
         <p className="text-sm font-semibold text-black/80">Footer columns</p>
         <p className="text-xs text-black/55">
-          The link columns at the bottom of every page. A link with an empty URL is hidden, so you can keep e.g. Pinterest ready without showing it yet. Use full addresses (https://…) for social links. A column titled &ldquo;Follow&rdquo; shows at the bottom right next to &ldquo;Follow us&rdquo;.
+          The link columns at the bottom of every page. A link with an empty URL is hidden, so you can keep e.g. Pinterest ready without showing it yet. Use full addresses (https://…) for social links.
         </p>
         <div className="grid gap-4 lg:grid-cols-3">
           {value.columns.map((column, index) => (
@@ -508,11 +508,6 @@ function FooterEditor({ value, onChange }: SectionProps<"footer">) {
       </div>
 
       <div className="grid gap-4 border-t border-black/10 pt-4 md:grid-cols-3">
-        <Field label="Footer heading" hint="Line across the top of the footer"><Input value={value.heading} onChange={(e) => onChange({ ...value, heading: e.target.value })} /></Field>
-        <Field label="Contact column title" hint="Shows the contact details above"><Input value={value.contactHeading} onChange={(e) => onChange({ ...value, contactHeading: e.target.value })} /></Field>
-        <Field label="Social links label" hint='Bottom right, before the links of a column titled "Follow"'><Input value={value.followHeading} onChange={(e) => onChange({ ...value, followHeading: e.target.value })} /></Field>
-      </div>
-      <div className="grid gap-4 md:grid-cols-3">
         <Field label="Newsletter heading"><Input value={value.newsletterHeading} onChange={(e) => onChange({ ...value, newsletterHeading: e.target.value })} /></Field>
         <Field label="Email field placeholder"><Input value={value.newsletterPlaceholder} onChange={(e) => onChange({ ...value, newsletterPlaceholder: e.target.value })} /></Field>
         <Field label="Button text"><Input value={value.newsletterButton} onChange={(e) => onChange({ ...value, newsletterButton: e.target.value })} /></Field>
