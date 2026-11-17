@@ -513,8 +513,11 @@ function FooterEditor({ value, onChange }: SectionProps<"footer">) {
         <Field label="Button text"><Input value={value.newsletterButton} onChange={(e) => onChange({ ...value, newsletterButton: e.target.value })} /></Field>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
-        <Field label="Copyright line"><Input value={value.copyright} onChange={(e) => onChange({ ...value, copyright: e.target.value })} /></Field>
-        <NavLinksEditor title="Bottom-right links" items={value.legalLinks} onChange={(legalLinks) => onChange({ ...value, legalLinks })} />
+        <div className="space-y-4">
+          <Field label="Copyright line"><Input value={value.copyright} onChange={(e) => onChange({ ...value, copyright: e.target.value })} /></Field>
+          <Field label="Location (shown with a pin, empty = hidden)"><Input value={value.location} placeholder="India" onChange={(e) => onChange({ ...value, location: e.target.value })} /></Field>
+        </div>
+        <NavLinksEditor title="Bottom legal links" items={value.legalLinks} onChange={(legalLinks) => onChange({ ...value, legalLinks })} />
       </div>
     </div>
   )

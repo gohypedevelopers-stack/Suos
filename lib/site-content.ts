@@ -127,8 +127,10 @@ export type FooterContent = {
   newsletterPlaceholder: string
   newsletterButton: string
   copyright: string
-  /** Small links bottom-right (Privacy Policy, Terms & Conditions). */
+  /** Bottom legal links (Privacy Policy, Terms & Conditions, …). */
   legalLinks: NavMenuLink[]
+  /** Country / region shown with a pin under the copyright; hidden when empty. */
+  location: string
 }
 
 export type ReturnsPageContent = {
@@ -396,7 +398,11 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     legalLinks: [
       { label: "Privacy Policy", href: "/privacy" },
       { label: "Terms & Conditions", href: "/terms" },
+      { label: "Shipping Policy", href: "/returns-policy" },
+      { label: "Returns & Exchanges", href: "/returns" },
+      { label: "Contact Us", href: "/contact" },
     ],
+    location: "India",
   },
   productPage: {
     showHighlightStrip: true,

@@ -1,6 +1,8 @@
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
+import { MapPin } from "lucide-react"
 
 import { useSiteContent } from "@/lib/site-content-context"
 import type { NavMenuLink } from "@/lib/site-content"
@@ -74,6 +76,9 @@ export function FooterSection() {
         </div>
 
         <div className="mt-16 text-[13px] leading-5 text-black/60 lg:mt-[120px]">
+          <Link href="/" aria-label="SUOS home" className="mb-5 inline-block transition-opacity hover:opacity-70">
+            <Image src="/logo.svg" alt="SUOS" width={260} height={120} className="block h-auto w-[5.5rem]" />
+          </Link>
           {footer.legalLinks.length > 0 ? (
             <ul className="flex flex-wrap items-center gap-y-1">
               {footer.legalLinks.map((link, index) => (
@@ -85,6 +90,12 @@ export function FooterSection() {
             </ul>
           ) : null}
           <p className="mt-1.5">{footer.copyright}</p>
+          {footer.location.trim() ? (
+            <p className="mt-4 flex items-center gap-1.5 text-[14px] text-black/80">
+              <MapPin aria-hidden="true" className="size-4" strokeWidth={1.5} />
+              {footer.location}
+            </p>
+          ) : null}
         </div>
       </div>
     </footer>

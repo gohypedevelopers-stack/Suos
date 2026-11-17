@@ -23,12 +23,9 @@ const features = [
   },
 ]
 
-const certifications = ["OEKO-TEX®", "GOTS", "RoHS"]
-
 /**
  * Home "What touches your skin matters": a large photo held on the left while
- * the right side scrolls (label, headline, a 2×2 grid of numbered practices
- * and the certifications).
+ * the right side scrolls (label, headline and a 2×2 grid of numbered practices).
  */
 export function ResponsibleDenimSection() {
   return (
@@ -46,7 +43,7 @@ export function ResponsibleDenimSection() {
         </div>
       </div>
 
-      {/* Right: label, headline, practices, certifications. */}
+      {/* Right: label, headline, practices. */}
       <div className="px-4 pb-14 pt-10 sm:px-6 sm:pb-16 sm:pt-12 lg:px-8 lg:pb-20 lg:pt-6">
         <p className="text-[14px] font-normal uppercase leading-[25px] tracking-normal text-[#6c6c6c] sm:text-[16px]">
           Considered beyond the surface
@@ -69,18 +66,13 @@ export function ResponsibleDenimSection() {
               </div>
               {/* Same type as the name and subtitle under a product card. */}
               <h3 className="mt-2.5 text-[12px] font-normal uppercase leading-none tracking-normal md:mt-3 md:text-[14px]">
-                {String(index + 1).padStart(2, "0")} — {feature.title}
+                {String(index + 1).padStart(2, "0")} - {feature.title}
               </h3>
               <p className="mt-1.5 pr-3 text-[11px] leading-[1.3] tracking-normal text-[#7d7d7d] md:text-[14px]">{feature.description}</p>
             </li>
           ))}
         </ul>
 
-        <ul className="mt-12 flex flex-wrap gap-x-7 gap-y-2 text-[12px] uppercase leading-none tracking-normal text-[#7d7d7d] sm:mt-16 md:text-[14px]">
-          {certifications.map((name) => (
-            <li key={name}>{name}</li>
-          ))}
-        </ul>
       </div>
     </section>
   )

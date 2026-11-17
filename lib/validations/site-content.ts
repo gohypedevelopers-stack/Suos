@@ -197,6 +197,7 @@ export const siteContentSchemas = {
       newsletterButton: shortText.min(1).default(DEFAULT_SITE_CONTENT.footer.newsletterButton),
       copyright: shortText.default(DEFAULT_SITE_CONTENT.footer.copyright),
       legalLinks: z.array(navMenuLinkSchema).max(6).default(() => structuredClone(DEFAULT_SITE_CONTENT.footer.legalLinks)),
+      location: shortText.default(DEFAULT_SITE_CONTENT.footer.location),
     }),
   ),
   productPage: z.object({

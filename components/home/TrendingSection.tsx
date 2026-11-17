@@ -163,14 +163,11 @@ export function ProductCardView({
     changeImage((activeImageIndex + direction + gallery.length) % gallery.length)
   }
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  // Hover shows only the second image (the admin's "card hover image" is
+  // placed second); the arrows and indicator bars still reach the rest.
+  const handleMouseEnter = () => {
     if (gallery.length <= 1 || arrowNavRef.current) return
-    const rect = e.currentTarget.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    if (rect.width <= 0) return
-    const fraction = Math.max(0, Math.min(x / rect.width, 0.999))
-    const newIndex = Math.floor(fraction * gallery.length)
-    changeImage(newIndex)
+    changeImage(1)
   }
 
   const handleMouseLeave = () => {
@@ -276,7 +273,7 @@ export function ProductCardView({
           "relative aspect-[2/3] w-full overflow-hidden bg-neutral-900 touch-pan-y select-none",
           isCompact ? "sm:aspect-[234/342]" : "sm:aspect-[330/440]"
         )}
-        onMouseMove={handleMouseMove}
+        onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
@@ -294,12 +291,17 @@ export function ProductCardView({
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 className={cn(
-                  "object-cover object-center md:group-hover:scale-[1.04]",
+                  "object-cover object-center md:group-hover:scale-[1.025]",
                   isActive
-                    ? "z-10 opacity-100 transition-opacity duration-150 ease-out"
+                    ? idx === 0
+                      ? "z-0 opacity-100"
+                      : "z-10 opacity-100"
+                    : idx === 0
+                    ? // The first photo stays underneath, so other images fade over it and back out.
+                      "z-0 opacity-100"
                     : isPrev
-                    ? "z-[5] opacity-100 transition-none"
-                    : "z-0 opacity-0 pointer-events-none transition-none"
+                    ? cn("z-[5]", activeImageIndex === 0 ? "opacity-0" : "opacity-100")
+                    : "z-0 opacity-0 pointer-events-none"
                 )}
                 priority={idx < 2}
                 loading={idx < 2 ? "eager" : "lazy"}

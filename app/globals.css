@@ -750,8 +750,16 @@
 
 /* ───────── Hover styles (reference: smooth, slow) ───────── */
 /* Product-card photo: slow zoom; `scale` is separate from the opacity swap. */
+/* Card image swap: a slow, soft cross-fade with a gentle zoom. Both ease in
+   and out evenly, and the photos stay on their own GPU layer so the fade
+   never jolts or flickers when it starts or ends. */
 [data-card-zoom] img {
-  transition: opacity 0.6s ease, scale 1.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition:
+    opacity 1.1s cubic-bezier(0.45, 0, 0.25, 1),
+    scale 1.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+  will-change: opacity, scale;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 /* Outlined buttons fill with black from the left. */
 .btn-sweep {
