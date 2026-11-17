@@ -4,7 +4,7 @@ import { useMemo, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 
-import { ProductCardView, productCardInfo, type ProductCard } from "@/components/home/TrendingSection"
+import { ProductCardView, type ProductCard } from "@/components/home/TrendingSection"
 
 export type EditorialImage = {
   src: string
@@ -127,7 +127,8 @@ export function CollectionGrid({
 
 function EditorialTile({ image, span }: { image: EditorialImage; span: 2 | 3 }) {
   const sizes = span === 3 ? "(max-width: 1024px) 100vw, 75vw" : "(max-width: 1024px) 100vw, 50vw"
-  const hasCaption = Boolean(image.caption || image.product)
+  // Only the caption typed in admin is shown; no caption means no text.
+  const hasCaption = Boolean(image.caption?.trim())
   const media = (
     <Image
       src={image.src}
@@ -156,46 +157,24 @@ function EditorialTile({ image, span }: { image: EditorialImage; span: 2 | 3 }) 
   )
 }
 
-/** Same rows, sizes and spacing as the info under a product card. */
+/** The admin caption, set in the same type and spacing as a product card's name. */
 function EditorialCaption({ image }: { image: EditorialImage }) {
-  const product = image.product
-  const title = image.caption || product?.title || ""
   const titleClass =
     "truncate py-px text-[12px] font-normal uppercase leading-none tracking-normal text-black transition-opacity hover:opacity-70 md:text-[14px]"
-  const info = product ? productCardInfo(product) : null
 
   return (
     // Desktop: as tall as a product card's info block (72px) plus the space
     // under it (10px), so the photo ends level with the product photos.
     <div className="mt-2.5 flex flex-col gap-1.5 px-1.5 sm:px-2.5 md:mt-3 lg:min-h-[72px] lg:mb-2.5">
-      {/* Title row: as tall as the card's title row with its bag button. */}
       <div className="flex min-h-[23px] items-center md:min-h-[26px]">
         {image.href ? (
           <Link href={image.href} className={titleClass}>
-            {title}
+            {image.caption}
           </Link>
         ) : (
-          <p className={titleClass}>{title}</p>
+          <p className={titleClass}>{image.caption}</p>
         )}
       </div>
-      {info ? (
-        <>
-          <p className="truncate text-[11px] font-normal uppercase leading-none tracking-normal text-[#7d7d7d] md:text-[14px]">
-            {info.subtitle}
-          </p>
-          <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 text-[12px] leading-none tracking-normal md:gap-x-2 md:text-[14px]">
-            {info.comparePriceStr ? (
-              <span className="font-normal text-[#7d7d7d] line-through">{info.comparePriceStr}</span>
-            ) : null}
-            <span className="font-normal text-black">{info.displayPrice}</span>
-            {info.discountPercent > 0 ? (
-              <span className="text-[10px] font-normal uppercase tracking-normal text-[#ed0000]">
-                SAVE {info.discountPercent}%
-              </span>
-            ) : null}
-          </div>
-        </>
-      ) : null}
     </div>
   )
 }

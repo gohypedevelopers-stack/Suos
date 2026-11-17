@@ -10,6 +10,7 @@ import { CartIcon } from "@/components/icons/CartIcon"
 import { CarouselArrow } from "@/components/CarouselArrow"
 import { ProductQuickViewModal } from "@/components/product/ProductQuickViewModal"
 import { useWishlist } from "@/lib/wishlist-context"
+import { useSiteContent } from "@/lib/site-content-context"
 import { useCart } from "@/lib/cart-context"
 import type { ProductDetail } from "@/components/product/productData"
 
@@ -165,8 +166,9 @@ export function ProductCardView({
 
   // Hover shows only the second image (the admin's "card hover image" is
   // placed second); the arrows and indicator bars still reach the rest.
+  const { productPage } = useSiteContent()
   const handleMouseEnter = () => {
-    if (gallery.length <= 1 || arrowNavRef.current) return
+    if (!productPage.showSecondImageOnHover || gallery.length <= 1 || arrowNavRef.current) return
     changeImage(1)
   }
 

@@ -151,6 +151,8 @@ export type SizeGuideContent = {
 export type ProductPageSharedContent = {
   /** Highlight strip (4 tiles under the badges) on all product pages. */
   showHighlightStrip: boolean
+  /** Product cards everywhere: cross-fade to the second photo on hover. */
+  showSecondImageOnHover: boolean
   /** Trust badges under Add to Cart (empty = hidden). */
   returnsBadge: string
   exchangesBadge: string
@@ -406,6 +408,7 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
   },
   productPage: {
     showHighlightStrip: true,
+    showSecondImageOnHover: true,
     returnsBadge: "Easy 7 Days Returns",
     exchangesBadge: "Easy Exchanges",
     shipping: [

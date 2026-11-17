@@ -622,6 +622,15 @@ function ProductPageSharedEditor({ value, onChange }: SectionProps<"productPage"
         />
         Show the highlight strip (4 tiles under the badges) on product pages
       </label>
+      <label className="flex cursor-pointer items-center gap-2 text-sm text-black/75">
+        <input
+          type="checkbox"
+          className="size-4 accent-black"
+          checked={value.showSecondImageOnHover}
+          onChange={(e) => onChange({ ...value, showSecondImageOnHover: e.target.checked })}
+        />
+        Show second image on hover (product cards fade to the product&apos;s hover image)
+      </label>
       <div className="grid gap-4 md:grid-cols-2">
         <Field label="Returns badge" hint="Leave empty to hide. A product can also hide both badges.">
           <Input value={value.returnsBadge} onChange={(e) => onChange({ ...value, returnsBadge: e.target.value })} />
