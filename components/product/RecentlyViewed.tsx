@@ -1,6 +1,6 @@
 "use client"
 
-import Image from "next/image"
+import { HoverSwapImage } from "@/components/HoverSwapImage"
 import Link from "next/link"
 import { useEffect, useSyncExternalStore } from "react"
 
@@ -11,6 +11,8 @@ type ViewedProduct = {
   slug: string
   title: string
   image: string
+  /** Second photo, cross-faded in on hover (missing on older stored items). */
+  hoverImage?: string
   price: string
   line: string
 }
@@ -77,7 +79,7 @@ export function RecentlyViewed({ current }: { current: ViewedProduct }) {
           <Link key={item.id} href={`/products/${item.slug}`} className="group block w-[160px] shrink-0 snap-start sm:w-[200px]">
             <div data-row-media className="relative aspect-[3/4] overflow-hidden bg-[#efefef]">
               {item.image ? (
-                <Image src={item.image} alt={item.title} fill sizes="200px" className="object-cover transition-transform duration-500 group-hover:scale-[1.02]" />
+                <HoverSwapImage src={item.image} hoverSrc={item.hoverImage} alt={item.title} sizes="200px" />
               ) : null}
             </div>
             {item.line ? <p className="mt-2.5 truncate text-[12px] uppercase leading-none text-ink-400">{item.line}</p> : null}

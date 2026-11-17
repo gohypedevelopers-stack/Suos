@@ -120,6 +120,7 @@ export default async function Page(props: PageProps) {
             slug: product.slug,
             title: product.title,
             image: product.gallery[0]?.src ?? "",
+            hoverImage: product.gallery[1]?.src,
             price: product.price,
             line: product.editLabel,
           }}

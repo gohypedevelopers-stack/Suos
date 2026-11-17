@@ -26,6 +26,7 @@ import {
 import { cn } from "@/lib/utils"
 import type { ProductDetail } from "@/components/product/productData"
 import type { ProductCard as HomeProductCard } from "@/components/home/TrendingSection"
+import { HoverSwapImage } from "@/components/HoverSwapImage"
 import { SizeChartModal } from "@/components/product/SizeChartModal"
 import { ScrollRow } from "@/components/ScrollRow"
 import { useCart } from "@/lib/cart-context"
@@ -135,12 +136,11 @@ function MiniProductCard({ product }: { product: HomeProductCard }) {
     <Link href={`/products/${product.slug}`} className="group block w-[180px] shrink-0 snap-start sm:w-[230px]">
       <div data-row-media className="relative aspect-[230/304] overflow-hidden bg-[#efefef]">
         {product.image ? (
-          <Image
+          <HoverSwapImage
             src={product.image}
+            hoverSrc={product.gallery?.[1]}
             alt={product.alt || product.title}
-            fill
             sizes="230px"
-            className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
           />
         ) : null}
       </div>

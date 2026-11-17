@@ -1,6 +1,6 @@
 "use client"
 
-import Image from "next/image"
+import { HoverSwapImage } from "@/components/HoverSwapImage"
 import Link from "next/link"
 
 import { useContinuousDraggableCarousel } from "@/components/home/useContinuousDraggableCarousel"
@@ -73,12 +73,11 @@ export function CollectionRecommendations({ products = [] }: { products?: Produc
                 tabIndex={index >= displayProducts.length ? -1 : undefined}
               >
                 <div className="relative aspect-[330/479] overflow-hidden bg-[#e7e7e4]">
-                  <Image
+                  <HoverSwapImage
                     src={product.image}
+                    hoverSrc={product.gallery?.[1]}
                     alt={product.alt}
-                    fill
                     sizes="(max-width: 640px) 42vw, (max-width: 1024px) 20vw, 12vw"
-                    className="object-cover"
                   />
                 </div>
               </Link>

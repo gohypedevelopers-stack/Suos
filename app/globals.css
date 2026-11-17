@@ -754,12 +754,60 @@
    and out evenly, and the photos stay on their own GPU layer so the fade
    never jolts or flickers when it starts or ends. */
 [data-card-zoom] img {
+  will-change: opacity, scale;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+/* Fade-through: the leaving photo fades out first (0.45s); the next one waits
+   for that, then fades in (0.6s). The two photos are never visible together. */
+[data-card-zoom] img.card-photo {
+  opacity: 0;
   transition:
-    opacity 1.1s cubic-bezier(0.45, 0, 0.25, 1),
+    opacity 0.45s cubic-bezier(0.4, 0, 1, 1),
+    scale 1.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+[data-card-zoom] img.card-photo.is-active {
+  opacity: 1;
+  transition:
+    opacity 0.6s cubic-bezier(0, 0, 0.2, 1) 0.45s,
+    scale 1.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+/* "Show second image on hover" for the smaller product cards
+   (components/HoverSwapImage.tsx): same soft cross-fade and gentle zoom. */
+.hover-swap-img {
+  transition:
+    opacity 0.6s cubic-bezier(0, 0, 0.2, 1) 0.45s,
     scale 1.8s cubic-bezier(0.25, 0.1, 0.25, 1);
   will-change: opacity, scale;
   backface-visibility: hidden;
   transform: translateZ(0);
+}
+/* Fade-through, as on the main cards: one photo fully out, then the other in. */
+.hover-swap-img--second {
+  opacity: 0;
+  transition:
+    opacity 0.45s cubic-bezier(0.4, 0, 1, 1),
+    scale 1.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+@media (hover: hover) {
+  .group:hover .hover-swap-img {
+    scale: 1.025;
+  }
+  .group:hover .hover-swap-img--first {
+    opacity: 0;
+    transition:
+      opacity 0.45s cubic-bezier(0.4, 0, 1, 1),
+      scale 1.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  .group:hover .hover-swap-img--second {
+    opacity: 1;
+    transition:
+      opacity 0.6s cubic-bezier(0, 0, 0.2, 1) 0.45s,
+      scale 1.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hover-swap-img { transition: none; }
 }
 /* Outlined buttons fill with black from the left. */
 .btn-sweep {

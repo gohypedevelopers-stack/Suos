@@ -121,7 +121,6 @@ export function ProductCardView({
   const isCompact = variant === "compact"
   const gallery = product.gallery?.length ? product.gallery : [product.image]
   const [activeImageIndex, setActiveImageIndex] = useState(0)
-  const [prevImageIndex, setPrevImageIndex] = useState(0)
   const [isExpanded, setIsExpanded] = useState(expanded)
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
   const [quickViewOpen, setQuickViewOpen] = useState(false)
@@ -147,7 +146,6 @@ export function ProductCardView({
 
   const changeImage = (newIndex: number) => {
     if (newIndex !== activeImageIndex && newIndex >= 0 && newIndex < gallery.length) {
-      setPrevImageIndex(activeImageIndex)
       setActiveImageIndex(newIndex)
     }
   }
@@ -272,7 +270,7 @@ export function ProductCardView({
         data-row-media
         data-card-zoom
         className={cn(
-          "relative aspect-[2/3] w-full overflow-hidden bg-neutral-900 touch-pan-y select-none",
+          "relative aspect-[2/3] w-full overflow-hidden bg-[#d6d1cb] touch-pan-y select-none",
           isCompact ? "sm:aspect-[234/342]" : "sm:aspect-[330/440]"
         )}
         onMouseEnter={handleMouseEnter}
@@ -283,7 +281,6 @@ export function ProductCardView({
         {gallery.length > 0 ? (
           gallery.map((imgSrc, idx) => {
             const isActive = idx === activeImageIndex
-            const isPrev = idx === prevImageIndex
 
             return (
               <Image
@@ -292,18 +289,11 @@ export function ProductCardView({
                 alt={product.alt || product.title}
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                // Fade-through (globals.css): the shown photo fades out fully,
+                // then the next one fades in, so two photos never overlap.
                 className={cn(
-                  "object-cover object-center md:group-hover:scale-[1.025]",
-                  isActive
-                    ? idx === 0
-                      ? "z-0 opacity-100"
-                      : "z-10 opacity-100"
-                    : idx === 0
-                    ? // The first photo stays underneath, so other images fade over it and back out.
-                      "z-0 opacity-100"
-                    : isPrev
-                    ? cn("z-[5]", activeImageIndex === 0 ? "opacity-0" : "opacity-100")
-                    : "z-0 opacity-0 pointer-events-none"
+                  "card-photo object-cover object-center md:group-hover:scale-[1.025]",
+                  isActive ? "is-active z-10" : "z-0 pointer-events-none"
                 )}
                 priority={idx < 2}
                 loading={idx < 2 ? "eager" : "lazy"}
