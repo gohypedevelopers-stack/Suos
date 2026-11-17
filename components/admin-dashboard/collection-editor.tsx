@@ -634,7 +634,7 @@ export function CollectionEditor({
                   <div>
                     <p className="text-sm font-medium text-black/80">Bottom banner</p>
                     <p className="text-xs text-black/55">
-                      The full-width photo near the bottom of the page, above the shipping strip. Leave empty to show another collection&apos;s image.
+                      The full-width photo at the bottom of this collection&apos;s page and of every product page in this collection, just above the footer. Leave empty to show another collection&apos;s image.
                     </p>
                   </div>
                   <PageImageField

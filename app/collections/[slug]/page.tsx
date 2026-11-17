@@ -2,15 +2,13 @@ import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 
 import { CollectionBanner } from "@/components/collection/CollectionBanner"
-import { CollectionBenefitsBar } from "@/components/collection/CollectionBenefitsBar"
 import { CollectionHero } from "@/components/collection/CollectionHero"
-import { CollectionRecommendations } from "@/components/collection/CollectionRecommendations"
-import { CollectionTiles } from "@/components/collection/CollectionTiles"
 import { ProductListing, buildEditorialImages } from "@/components/collection/ProductListing"
 import { parseSort, sortProducts } from "@/components/collection/productSort"
 import {
   getPublishedCollectionBySlug,
   listPublishedCollectionsWithImages,
+  pickCollectionBanner,
 } from "@/lib/server/dal/collections"
 import { listPublishedProducts } from "@/lib/server/dal/products"
 
@@ -89,22 +87,8 @@ export default async function Page({
     return { ...image, product: slug ? productBySlug.get(decodeURIComponent(slug)) : undefined }
   })
 
-  const bannerSource = otherCollections.find((item) => item.image)
-  const banner = collection.banner?.src
-    ? { image: collection.banner.src, alt: collection.banner.alt, href: collection.banner.href }
-    : bannerSource
-    ? {
-        image: bannerSource.image,
-        alt: bannerSource.alt,
-        href: `/collections/${bannerSource.slug}`,
-      }
-    : { image: "/home-page-content/hero-2.png", alt: "SUOS", href: "/shop" }
+  const banner = pickCollectionBanner(collection, collections)
 
-  const collectionIds = new Set(collection.products.map((product) => product.id))
-  const recommendations = [
-    ...allProducts.filter((product) => !collectionIds.has(product.id)),
-    ...allProducts.filter((product) => collectionIds.has(product.id)),
-  ]
 
   return (
     <main className="flex-1 bg-white">
@@ -128,25 +112,9 @@ export default async function Page({
         }
       />
 
-      <div className="px-4 sm:px-6 lg:px-8">
-        <CollectionRecommendations products={recommendations} />
-      </div>
-
-      <CollectionTiles
-        collections={collections.map((item) => ({
-          id: item.id,
-          title: item.title,
-          slug: item.slug,
-          image: item.image,
-          alt: item.alt,
-        }))}
-      />
-
       <div className="mt-0.5">
         <CollectionBanner {...banner} />
       </div>
-
-      <CollectionBenefitsBar />
     </main>
   )
 }

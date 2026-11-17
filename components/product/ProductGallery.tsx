@@ -94,7 +94,7 @@ export function ProductGallery({
       </div>
 
       {/* Desktop 2-Column Grid (>= md) */}
-      <div className="hidden md:grid md:grid-cols-2 gap-[5px]">
+      <div className="hidden md:grid md:grid-cols-2 gap-1">
         {images.map((image, index) => (
           <figure
             key={`desktop-${image.src}-${index}`}

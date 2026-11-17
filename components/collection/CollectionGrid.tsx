@@ -95,7 +95,7 @@ export function CollectionGrid({
 
   return (
     <div>
-      <div className="reveal-stagger grid grid-cols-2 gap-0.5 lg:grid-cols-4">
+      <div className="reveal-stagger grid grid-cols-2 gap-0.5 sm:gap-1 lg:grid-cols-4">
         {visibleItems.map((item) =>
           item.kind === "product" ? (
             <div key={item.product.id} className="min-w-0">
@@ -152,7 +152,13 @@ function EditorialTile({ image, span }: { image: EditorialImage; span: 2 | 3 }) 
       ) : (
         <div data-scroll-zoom className={mediaClass}>{media}</div>
       )}
-      {hasCaption ? <EditorialCaption image={image} /> : null}
+      {hasCaption ? (
+        <EditorialCaption image={image} />
+      ) : (
+        // No caption: keep the same empty space on desktop so the photo still
+        // ends level with the product photos beside it (shop and collections).
+        <div aria-hidden="true" className="hidden lg:mt-3 lg:mb-2.5 lg:block lg:min-h-[72px]" />
+      )}
     </div>
   )
 }

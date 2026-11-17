@@ -35,7 +35,7 @@ export function CollectionTiles({
           {heading}
         </h2>
       ) : null}
-      <div className={`expand-row grid grid-cols-2 gap-0.5 lg:flex ${rowHeight}`}>
+      <div className={`expand-row grid grid-cols-2 gap-0.5 sm:gap-1 lg:flex ${rowHeight}`}>
         {tiles.map((tile, index) => (
           <Link
             key={tile.id}

@@ -4,12 +4,14 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ChevronRight } from "lucide-react"
 
+import { CollectionBanner } from "@/components/collection/CollectionBanner"
 import { ProductGallery } from "@/components/product/ProductGallery"
 import { ProductHighlightsSection } from "@/components/product/ProductHighlightsSection"
 import { RecentlyViewed } from "@/components/product/RecentlyViewed"
 import { ProductSummary } from "@/components/product/ProductSummary"
 import { YouMayAlsoLikeSection } from "@/components/product/YouMayAlsoLikeSection"
 import { getCurrentUser } from "@/lib/server/dal/auth"
+import { getCollectionBanner } from "@/lib/server/dal/collections"
 import { getProductBySlug } from "@/lib/server/dal/products"
 import { isStaffRole } from "@/lib/roles"
 
@@ -56,6 +58,9 @@ export default async function Page(props: PageProps) {
   if (!product) {
     notFound()
   }
+
+  // Same banner as the product's collection page, shown just before the footer.
+  const banner = await getCollectionBanner(product.collectionSlug)
 
   return (
     <main className="flex-1 bg-white text-black w-full min-w-0 overflow-x-clip">
@@ -126,6 +131,7 @@ export default async function Page(props: PageProps) {
           }}
         />
       )}
+      <CollectionBanner {...banner} />
     </main>
   )
 }

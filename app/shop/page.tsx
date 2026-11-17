@@ -1,7 +1,9 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 
+import { CollectionBanner } from "@/components/collection/CollectionBanner"
 import { CollectionBenefitsBar } from "@/components/collection/CollectionBenefitsBar"
+import { getCollectionBanner } from "@/lib/server/dal/collections"
 import { resolvePage, type ResolvedPage } from "@/lib/page-content"
 import { getSiteContent } from "@/lib/server/dal/site-content"
 import { CollectionRecommendations } from "@/components/collection/CollectionRecommendations"
@@ -90,6 +92,15 @@ export default async function Page({
     .filter(Boolean)
     .join(" — ") || "Shop All"
 
+  // Bottom banner: Website content → Shop → Bottom banner; with no image set,
+  // a collection's image is used (same fallback as the collection pages).
+  const bannerImage = page.text("banner", "src").trim()
+  const banner = !page.show("banner")
+    ? null
+    : bannerImage
+    ? { image: bannerImage, alt: page.text("banner", "alt"), href: page.text("banner", "href").trim() || undefined }
+    : await getCollectionBanner(null)
+
   const shownIds = new Set(sorted.map((product) => product.id))
   const recommendations = [
     ...allProducts.filter((product) => !shownIds.has(product.id)),
@@ -109,6 +120,8 @@ export default async function Page({
       <div className="px-4 sm:px-6 lg:px-8">
         <CollectionRecommendations products={recommendations} />
       </div>
+
+      {banner ? <CollectionBanner {...banner} /> : null}
 
       <CollectionBenefitsBar />
     </main>

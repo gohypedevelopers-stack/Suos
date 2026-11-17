@@ -167,7 +167,7 @@ function CollectionMosaic({
   }
 
   return (
-    <div className="grid grid-cols-2 gap-0.5 lg:grid-cols-6">
+    <div className="grid grid-cols-2 gap-0.5 sm:gap-1 lg:grid-cols-6">
       {shown.map((image, index) => (
         <Link
           key={image.src}

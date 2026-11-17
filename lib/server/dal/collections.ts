@@ -457,3 +457,32 @@ export async function listPublishedCollectionsWithImages(
     }
   })
 }
+
+export type CollectionBannerData = { image: string; alt: string; href?: string }
+
+/**
+ * The full-width banner for a collection: the one chosen in Products →
+ * Collections, otherwise another collection's main image linking there,
+ * otherwise a default. Shared by the collection page and its products' pages.
+ */
+export function pickCollectionBanner(
+  collection: { id: string; banner: { src: string; alt: string; href?: string } | null } | null,
+  collections: { id: string; slug: string; image: string; alt: string }[],
+): CollectionBannerData {
+  if (collection?.banner?.src) {
+    return { image: collection.banner.src, alt: collection.banner.alt, href: collection.banner.href }
+  }
+  const source = collections.find((item) => item.id !== collection?.id && item.image)
+  return source
+    ? { image: source.image, alt: source.alt, href: `/collections/${source.slug}` }
+    : { image: "/home-page-content/hero-2.png", alt: "SUOS", href: "/shop" }
+}
+
+/** Banner for a collection by slug (null slug = no collection: the fallback banner). */
+export async function getCollectionBanner(slug: string | null): Promise<CollectionBannerData> {
+  const [collection, collections] = await Promise.all([
+    slug ? getPublishedCollectionBySlug(slug) : Promise.resolve(null),
+    listPublishedCollectionsWithImages(),
+  ])
+  return pickCollectionBanner(collection, collections)
+}

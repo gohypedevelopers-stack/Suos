@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 
-/** Full-width editorial banner image, optionally linking somewhere. */
+/** Full-width editorial banner image, optionally linking somewhere. Fades in slowly as it scrolls into view. */
 export function CollectionBanner({
   image,
   alt,
@@ -27,10 +27,10 @@ export function CollectionBanner({
     "group relative block h-[48vh] min-h-[300px] w-full overflow-hidden bg-[#e7e7e4] sm:h-[64vh]"
 
   return href ? (
-    <Link href={href} data-unfold className={className} aria-label={alt}>
+    <Link href={href} data-reveal="fade" className={className} aria-label={alt}>
       {content}
     </Link>
   ) : (
-    <div data-unfold className={className}>{content}</div>
+    <div data-reveal="fade" className={className}>{content}</div>
   )
 }

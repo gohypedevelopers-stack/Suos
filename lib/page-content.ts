@@ -231,6 +231,11 @@ export const PAGE_DEFS = {
     label: "Shop",
     description: "The /shop page (all products, new arrivals, bestsellers).",
     sections: [
+      { id: "banner", label: "Bottom banner", hint: "The full-width photo at the bottom of the Shop page, above the footer.", hideable: true, fields: [
+        image("src", "Image", "", "Leave empty to use a collection's image. Full width, about 2880 × 1400 px."),
+        text("alt", "Image description (alt text)", "SUOS"),
+        text("href", "Link when clicked (optional)", "", "e.g. /collections/originals. Leave empty for no link."),
+      ] },
       { id: "empty", label: "No products", hideable: false, fields: [
         text("heading", "Heading", "Nothing here yet"),
         text("text", "Text (no products at all)", "New pieces are on their way. Check back soon."),

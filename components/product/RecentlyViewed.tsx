@@ -72,19 +72,41 @@ export function RecentlyViewed({ current }: { current: ViewedProduct }) {
   if (others.length === 0) return null
 
   return (
-    <section className="w-full bg-white px-3 py-10 text-black sm:px-6 lg:px-8">
-      <h2 className="type-title">Recently Viewed</h2>
-      <ScrollRow className="mt-5 gap-2 pb-1" label="Recently viewed">
+    // Same row, card widths, gaps, photo shape and type as "You May Also Like"
+    // (components/home/RecommendedSection.tsx) so the two rows line up.
+    <section className="w-full bg-white py-10 text-black md:py-16">
+      <div className="w-full px-3 sm:px-6 lg:px-8">
+        <h2 className="type-title">Recently Viewed</h2>
+      </div>
+      <ScrollRow
+        className="mt-6 items-start gap-0.5 overscroll-x-contain px-3 sm:mt-8 sm:gap-1 sm:px-6 lg:px-8"
+        label="Recently viewed"
+      >
         {others.map((item) => (
-          <Link key={item.id} href={`/products/${item.slug}`} className="group block w-[160px] shrink-0 snap-start sm:w-[200px]">
-            <div data-row-media className="relative aspect-[3/4] overflow-hidden bg-[#efefef]">
+          <Link
+            key={item.id}
+            href={`/products/${item.slug}`}
+            className="group block w-[46vw] shrink-0 snap-start pb-2 sm:w-[34vw] sm:pb-2.5 md:w-[26vw] lg:w-[calc((100%-5*0.25rem)/6)]"
+          >
+            <div data-row-media className="relative aspect-[2/3] overflow-hidden bg-[#d6d1cb] sm:aspect-[234/342]">
               {item.image ? (
-                <HoverSwapImage src={item.image} hoverSrc={item.hoverImage} alt={item.title} sizes="200px" />
+                <HoverSwapImage
+                  src={item.image}
+                  hoverSrc={item.hoverImage}
+                  alt={item.title}
+                  sizes="(max-width: 640px) 46vw, (max-width: 1024px) 34vw, 17vw"
+                />
               ) : null}
             </div>
-            {item.line ? <p className="mt-2.5 truncate text-[12px] uppercase leading-none text-ink-400">{item.line}</p> : null}
-            <p className="mt-1.5 truncate text-[13px] uppercase leading-none text-ink-800">{item.title}</p>
-            <p className="mt-1.5 text-caption font-medium text-ink-900">{item.price}</p>
+            <div className="mt-2.5 flex flex-col gap-1.5 px-1.5 sm:px-2.5 md:mt-3">
+              {item.line ? (
+                <p className="truncate text-[11px] uppercase leading-none tracking-normal text-ink-400 md:text-[12px]">{item.line}</p>
+              ) : null}
+              <p className="truncate py-px text-[12px] font-normal uppercase leading-none tracking-normal text-ink-800 md:text-[13px]">
+                {item.title}
+              </p>
+              <p className="text-[12px] leading-none tracking-normal text-black md:text-[14px]">{item.price}</p>
+            </div>
           </Link>
         ))}
       </ScrollRow>

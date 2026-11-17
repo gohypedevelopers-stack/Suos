@@ -443,7 +443,7 @@ export function ProductSummary({
                 </Link>
               ) : null}
             </div>
-            <ScrollRow className="gap-2 pb-1" label="More from this collection">
+            <ScrollRow className="gap-0.5 pb-1 sm:gap-1" label="More from this collection">
               {product.moreFrom.products.map((item) => (
                 <MiniProductCard key={item.id} product={item} />
               ))}
@@ -454,7 +454,7 @@ export function ProductSummary({
         {product.completeLookProducts && product.completeLookProducts.length > 0 ? (
           <section className="space-y-4 pt-2">
             <h2 className="text-h4 font-normal uppercase text-black">Complete the Look</h2>
-            <ScrollRow className="gap-2 pb-1" label="Complete the look">
+            <ScrollRow className="gap-0.5 pb-1 sm:gap-1" label="Complete the look">
               {product.completeLookProducts.map((item) => (
                 <MiniProductCard key={item.id} product={item} />
               ))}

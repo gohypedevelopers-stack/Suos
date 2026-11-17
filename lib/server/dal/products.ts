@@ -674,6 +674,8 @@ export async function getProductBySlug(slug: string, options: { preview?: boolea
         }
       : null,
     completeLookProducts,
+    /** Published collection the product belongs to first; its banner shows at the page end. */
+    collectionSlug: primaryCollection?.isPublished ? primaryCollection.slug : null,
     alsoLikeIds: pageContent.alsoLikeIds,
     offers,
     details: detailsList,

@@ -52,7 +52,7 @@ export function ResponsibleDenimSection() {
           What touches your skin matters
         </h2>
 
-        <ul className="reveal-stagger mt-10 grid grid-cols-2 gap-x-0.5 gap-y-8 sm:mt-12 sm:gap-y-10">
+        <ul className="reveal-stagger mt-10 grid grid-cols-2 gap-x-0.5 gap-y-8 sm:gap-x-1 sm:mt-12 sm:gap-y-10">
           {features.map((feature, index) => (
             <li key={feature.title} data-reveal="up">
               <div data-scroll-zoom className="hover-zoom relative aspect-[4/3] w-full overflow-hidden bg-neutral-100">

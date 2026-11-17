@@ -432,7 +432,8 @@
 .continuous-carousel-track {
   display: flex;
   width: max-content;
-  gap: 1rem;
+  /* Same 2px / 4px gap as every other product row. */
+  gap: 0.125rem;
   will-change: transform;
 }
 
@@ -448,6 +449,11 @@
 @media (max-width: 640px) {
   .recommendation-card {
     width: 42vw;
+  }
+}
+@media (min-width: 640px) {
+  .continuous-carousel-track {
+    gap: 0.25rem;
   }
 }
 
@@ -637,6 +643,10 @@
 /* Cards and blocks only move (no fade), as in the reference. */
 .reveal-ready :is([data-reveal="up"], [data-reveal="right"]):not(.is-revealed) {
   opacity: 1;
+}
+/* Slow fade only: no zoom and no movement (collection / product banner). */
+.reveal-ready [data-reveal="fade"] {
+  transition: opacity 1.8s cubic-bezier(0.25, 0.1, 0.25, 1) var(--reveal-delay, 0s);
 }
 /* Softer rise with a fade (footer columns: 30px, 1s). */
 .reveal-ready [data-reveal="soft"] {
