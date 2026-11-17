@@ -205,12 +205,11 @@ export function ProductSummary({
     let frame = 0
     const update = () => {
       frame = 0
-      // Only while the product itself fills the screen: hidden as soon as the
-      // product section's bottom edge comes into view, before the next section
-      // ("It's in the Details", "You May Also Like") starts.
-      const area = target.closest("section")
-      const areaEnded = area ? area.getBoundingClientRect().bottom < window.innerHeight : false
-      setShowStickyBar(target.getBoundingClientRect().bottom < 0 && !areaEnded)
+      // Stays up through the rest of the page and tucks away once the site
+      // footer scrolls into view, so it never covers the footer.
+      const footer = document.querySelector("footer")
+      const footerVisible = footer ? footer.getBoundingClientRect().top < window.innerHeight : false
+      setShowStickyBar(target.getBoundingClientRect().bottom < 0 && !footerVisible)
     }
     const schedule = () => {
       if (!frame) frame = window.requestAnimationFrame(update)
@@ -269,7 +268,7 @@ export function ProductSummary({
           ) : null}
         </div>
 
-        <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="mt-8 flex flex-wrap items-end justify-between gap-3">
           <div className="flex items-baseline gap-3">
             {product.originalPrice ? (
               <span className="text-body-lg text-ink-600 line-through">{product.originalPrice}</span>
@@ -366,7 +365,7 @@ export function ProductSummary({
           ref={addToCartRef}
           type="button"
           onClick={handleAddToCart}
-          className="flex h-12 w-full cursor-pointer items-center justify-center btn-sweep border border-black text-[18px] font-medium uppercase tracking-[0.01em] text-black active:scale-[0.99] sm:h-[53px] sm:text-h3"
+          className="mt-8 flex h-12 w-full cursor-pointer items-center justify-center btn-sweep border border-black text-[18px] font-medium uppercase tracking-[0.01em] text-black active:scale-[0.99] sm:h-[53px] sm:text-h3"
         >
           Add To Cart
         </button>
@@ -416,7 +415,7 @@ export function ProductSummary({
         ) : null}
 
         {product.moreFrom ? (
-          <section className="space-y-4 pt-2">
+          <section className="space-y-4 pt-4">
             <div className="flex items-end justify-between gap-3">
               <h2 className="text-h4 font-normal uppercase text-black">
                 More from {product.moreFrom.title}
@@ -451,7 +450,7 @@ export function ProductSummary({
           type="single"
           defaultValue="Features & Care"
           collapsible
-          className="border-t border-black/15"
+          className="mt-8 border-t border-black/15"
         >
           <Section title="Features & Care">
             <div className="space-y-4">
