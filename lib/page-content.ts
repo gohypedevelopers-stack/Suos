@@ -110,7 +110,7 @@ export const PAGE_DEFS = {
       ] },
       { id: "rewards", label: "Rewards banner", hint: "There's no rewards programme yet; hide this until there is.", hideable: true, fields: [
         text("heading", "Heading", "Rewards"),
-        text("text", "Text", "Sign in or Join SUOS Rewards now"),
+        text("text", "Text", "Sign in or join SUOS Rewards now"),
       ] },
       { id: "summary", label: "Order summary", hideable: false, fields: [
         text("checkout", "Checkout button", "Start Checkout"),
@@ -135,7 +135,7 @@ export const PAGE_DEFS = {
       { id: "sidebar", label: "Side cart", hideable: false, fields: [
         text("empty", "Empty text", "Your cart is empty"),
         text("checkout", "Checkout button", "Checkout"),
-        text("viewCart", "Link to the bag page", "View Shopping Cart"),
+        text("viewCart", "Link to the bag page", "View shopping cart"),
       ] },
       { id: "offerProgress", label: "Side cart offer progress bar", hideable: true, fields: [] },
       { id: "marquee", label: "Side cart scrolling strip", hideable: true, fields: [

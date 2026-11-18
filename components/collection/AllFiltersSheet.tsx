@@ -261,10 +261,10 @@ function FilterSheet({ groups, trigger }: FilterSheetProps) {
           <button
             type="button"
             onClick={() => setSelectedFilters(new Set())}
-            className="mt-4 min-h-4 text-[13px] font-normal uppercase leading-5 tracking-[0.04em] text-white underline underline-offset-4 transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-40"
+            className="mt-4 min-h-4 text-[14px] font-normal leading-5 text-white underline underline-offset-[5px] transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-40"
             disabled={selectedFilters.size === 0}
           >
-            CLEAR ALL
+            Clear all
           </button>
         </div>
       </SheetContent>
@@ -350,10 +350,10 @@ export function CollectionFilterDropdown({
             <button
               type="button"
               onClick={() => setSelectedFilters(new Set())}
-              className="underline underline-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
+              className="normal-case tracking-normal underline underline-offset-[5px] disabled:cursor-not-allowed disabled:opacity-40"
               disabled={selectedFilters.size === 0}
             >
-              CLEAR
+              Clear
             </button>
           </div>
 

@@ -501,7 +501,7 @@ function CheckoutRightSummary({
                   <button
                     type="button"
                     onClick={onRemovePromo}
-                    className="text-[11px] uppercase tracking-[0.04em] text-black/60 underline hover:text-black"
+                    className="text-[13px] text-ink-650 underline underline-offset-[5px] hover:text-black"
                   >
                     Remove
                   </button>

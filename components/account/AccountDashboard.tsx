@@ -184,9 +184,9 @@ export function AccountDashboard({ user, orders }: AccountDashboardProps) {
                   </h2>
                   <Link
                     href="/track-order"
-                    className="text-[12px] font-normal uppercase tracking-[0.04em] text-black/60 underline underline-offset-4 transition-colors hover:text-black"
+                    className="text-body text-ink-650 underline underline-offset-[5px] transition-colors hover:text-black"
                   >
-                    Track by Order Number
+                    Track by order number
                   </Link>
                 </div>
 

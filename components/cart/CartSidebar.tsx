@@ -258,7 +258,7 @@ export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
             <Link
               href="/cart"
               onClick={() => onOpenChange(false)}
-              className="mt-3.5 block text-center text-[13px] font-normal uppercase tracking-[0.04em] text-white/80 underline underline-offset-4 transition-opacity hover:text-white"
+              className="mt-3.5 block text-center text-[14px] font-normal text-white/80 underline underline-offset-[5px] transition-opacity hover:text-white"
             >
               {page.text("sidebar", "viewCart")}
             </Link>

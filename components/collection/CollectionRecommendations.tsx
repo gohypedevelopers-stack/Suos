@@ -40,13 +40,9 @@ export function CollectionRecommendations({ products = [] }: { products?: Produc
 
           <Link
             href="/shop"
-            className="group hidden flex-col items-start pb-0.5 text-[13px] md:text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em] transition-opacity hover:opacity-70 sm:inline-flex"
+            className="hidden text-body text-ink-650 underline underline-offset-[5px] transition-colors hover:text-black sm:inline"
           >
-            <span>View all</span>
-            <span
-              aria-hidden="true"
-              className="mt-[2px] h-px w-full origin-left scale-x-0 bg-black transition-transform duration-200 group-hover:scale-x-100"
-            />
+            View all
           </Link>
         </div>
 

@@ -210,7 +210,7 @@ export function SearchSidebar({ open, onOpenChange }: SearchSidebarProps) {
                     <button
                       type="button"
                       onClick={() => handleApplySuggestion(results.suggestion!)}
-                      className="font-normal uppercase tracking-[0.04em] text-white underline underline-offset-4 hover:opacity-80 cursor-pointer"
+                      className="cursor-pointer font-normal text-white underline underline-offset-[5px] hover:opacity-80"
                     >
                       {results.suggestion}
                     </button>
@@ -367,7 +367,7 @@ export function SearchSidebar({ open, onOpenChange }: SearchSidebarProps) {
                       <button
                         type="button"
                         onClick={clearRecentSearches}
-                        className="cursor-pointer text-[12px] uppercase tracking-[0.04em] text-white/50 underline-offset-4 transition-colors hover:text-white hover:underline"
+                        className="cursor-pointer text-[13px] text-white/60 underline underline-offset-[5px] transition-colors hover:text-white"
                       >
                         Clear
                       </button>

@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { Minus, Plus, ChevronDown, ShoppingBag, Tag, ArrowRight, Trash2 } from "lucide-react"
+import { Minus, Plus, ChevronDown, ShoppingBag, Tag, Trash2 } from "lucide-react"
 import { useState } from "react"
 
 import { useCart, type CartItem } from "@/lib/cart-context"
@@ -185,23 +185,23 @@ function CartItemRow({ item }: { item: CartItem }) {
           <span className="text-emerald-700 font-normal">In Stock:</span> Ships in 1–2 business days
         </p>
 
-        <div className="flex items-center gap-5 text-[12px] font-normal text-neutral-500">
+        <div className="flex items-center gap-5 text-[13px] font-normal text-ink-650">
           <Link
             href={item.slug ? `/products/${item.slug}` : "#"}
-            className="hover:text-black transition-colors"
+            className="underline underline-offset-[5px] transition-colors hover:text-black"
           >
             Edit
           </Link>
           <button
             type="button"
-            className="hover:text-black transition-colors cursor-pointer"
+            className="cursor-pointer underline underline-offset-[5px] transition-colors hover:text-black"
           >
-            Save for Later
+            Save for later
           </button>
           <button
             type="button"
             onClick={() => removeFromCart(item.id, item.size)}
-            className="hover:text-black transition-colors cursor-pointer"
+            className="cursor-pointer underline underline-offset-[5px] transition-colors hover:text-black"
           >
             Remove
           </button>
@@ -293,7 +293,7 @@ function SuosRewardsCard({ subtotal }: { subtotal: number }) {
       </p>
       <Link
         href="/contact"
-        className="mt-2.5 inline-block text-[11px] font-normal uppercase tracking-[0.04em] text-white underline underline-offset-4 transition-opacity hover:opacity-75"
+        className="mt-2.5 inline-block text-[13px] font-normal text-white underline underline-offset-[5px] transition-opacity hover:opacity-75"
       >
         {page.text("rewards", "text")}
       </Link>
@@ -492,10 +492,9 @@ function BeforeYouGoSection() {
         </div>
         <Link
           href="/collections"
-          className="flex shrink-0 items-center gap-1.5 whitespace-nowrap text-[11px] sm:text-[12px] uppercase tracking-[0.04em] text-black transition-opacity hover:opacity-60 pt-0.5 sm:pt-0"
+          className="shrink-0 whitespace-nowrap pt-0.5 text-body text-ink-650 underline underline-offset-[5px] transition-colors hover:text-black sm:pt-0"
         >
-          <span>View All</span>
-          <ArrowRight className="size-3.5 shrink-0" />
+          View all
         </Link>
       </div>
 

@@ -44,7 +44,7 @@ export function SizeChartModal({
             <Link
               href="/size-guide"
               onClick={() => setOpen(false)}
-              className="mt-4 inline-block text-[11px] uppercase text-black/60 underline underline-offset-4 transition-colors hover:text-black"
+              className="mt-4 inline-block text-body text-ink-650 underline underline-offset-[5px] transition-colors hover:text-black"
             >
               View full size guide
             </Link>
