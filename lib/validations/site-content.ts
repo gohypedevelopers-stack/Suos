@@ -190,13 +190,13 @@ export const siteContentSchemas = {
             links: z.array(z.object({ label: shortText.min(1, "Enter a label."), href: z.string().trim().max(500) })).max(12),
           }),
         )
-        .max(5)
+        .max(4, "The footer has room for 4 link columns.")
         .default(() => structuredClone(DEFAULT_SITE_CONTENT.footer.columns)),
       newsletterHeading: shortText.default(DEFAULT_SITE_CONTENT.footer.newsletterHeading),
       newsletterPlaceholder: shortText.default(DEFAULT_SITE_CONTENT.footer.newsletterPlaceholder),
       newsletterButton: shortText.min(1).default(DEFAULT_SITE_CONTENT.footer.newsletterButton),
       copyright: shortText.default(DEFAULT_SITE_CONTENT.footer.copyright),
-      legalLinks: z.array(navMenuLinkSchema).max(6).default(() => structuredClone(DEFAULT_SITE_CONTENT.footer.legalLinks)),
+      bottomLinks: z.array(navMenuLinkSchema).max(6).default(() => structuredClone(DEFAULT_SITE_CONTENT.footer.bottomLinks)),
       location: shortText.default(DEFAULT_SITE_CONTENT.footer.location),
     }),
   ),

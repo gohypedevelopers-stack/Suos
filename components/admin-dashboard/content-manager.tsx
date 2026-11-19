@@ -475,9 +475,9 @@ function FooterEditor({ value, onChange }: SectionProps<"footer">) {
       <div className="space-y-3 border-t border-black/10 pt-4">
         <p className="text-sm font-semibold text-black/80">Footer columns</p>
         <p className="text-xs text-black/55">
-          The link columns at the bottom of every page. A link with an empty URL is hidden, so you can keep e.g. Pinterest ready without showing it yet. Use full addresses (https://…) for social links.
+          Up to 4 link columns (e.g. SUOS, Help, About SUOS, Follow) sit beside the newsletter on desktop; on phones they show two per row. A link with an empty URL is hidden, so you can keep e.g. Instagram ready without showing it yet. Use full addresses (https://…) for social links.
         </p>
-        <div className="grid gap-4 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {value.columns.map((column, index) => (
             <div key={index} className="space-y-2">
               <div className="flex items-end gap-2">
@@ -502,7 +502,7 @@ function FooterEditor({ value, onChange }: SectionProps<"footer">) {
             </div>
           ))}
         </div>
-        <Button type="button" variant="outline" onClick={() => onChange({ ...value, columns: [...value.columns, { title: "", links: [] }] })}>
+        <Button type="button" variant="outline" disabled={value.columns.length >= 4} onClick={() => onChange({ ...value, columns: [...value.columns, { title: "", links: [] }] })}>
           <Plus className="size-3.5" /> Add column
         </Button>
       </div>
@@ -517,7 +517,7 @@ function FooterEditor({ value, onChange }: SectionProps<"footer">) {
           <Field label="Copyright line"><Input value={value.copyright} onChange={(e) => onChange({ ...value, copyright: e.target.value })} /></Field>
           <Field label="Location (shown with a pin, empty = hidden)"><Input value={value.location} placeholder="India" onChange={(e) => onChange({ ...value, location: e.target.value })} /></Field>
         </div>
-        <NavLinksEditor title="Bottom legal links" items={value.legalLinks} onChange={(legalLinks) => onChange({ ...value, legalLinks })} />
+        <NavLinksEditor title="Links under the logo (e.g. Contact Us)" items={value.bottomLinks} onChange={(bottomLinks) => onChange({ ...value, bottomLinks })} />
       </div>
     </div>
   )

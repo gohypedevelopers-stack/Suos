@@ -121,14 +121,14 @@ export type FooterColumn = {
 export type FooterContent = {
   /** Contact details: used by the product page's "Origin & Contact". */
   contactGroups: ContactGroup[]
-  /** Footer link columns (SUOS / HELP / FOLLOW). Links with an empty URL are hidden. */
+  /** Footer link columns (SUOS / HELP / ABOUT SUOS / FOLLOW). Links with an empty URL are hidden. */
   columns: FooterColumn[]
   newsletterHeading: string
   newsletterPlaceholder: string
   newsletterButton: string
   copyright: string
-  /** Bottom legal links (Privacy Policy, Terms & Conditions, …). */
-  legalLinks: NavMenuLink[]
+  /** Small links under the SUOS logo (Contact Us, …), separated by bullets. */
+  bottomLinks: NavMenuLink[]
   /** Country / region shown with a pin under the copyright; hidden when empty. */
   location: string
 }
@@ -217,12 +217,12 @@ export const SITE_CONTENT_LABELS: Record<SiteContentKey, string> = {
   ...(Object.fromEntries(PAGE_KEYS.map((key) => [key, PAGE_DEFS[key].label])) as Record<PageKey, string>),
 }
 
-/** Footer columns from the client's brief. Empty URLs are hidden until filled in the admin. */
+/** Footer columns from the footer design. Empty URLs are hidden until filled in the admin. */
 export const DEFAULT_FOOTER_COLUMNS: FooterColumn[] = [
   {
     title: "SUOS",
     links: [
-      { label: "About", href: "" },
+      { label: "About Us", href: "" },
       { label: "Men", href: "/shop" },
       { label: "New arrivals", href: "/shop?filter=new" },
       { label: "Bestsellers", href: "/shop?filter=bestsellers" },
@@ -235,16 +235,23 @@ export const DEFAULT_FOOTER_COLUMNS: FooterColumn[] = [
       { label: "Track order", href: "/track-order" },
       { label: "Returns & exchanges", href: "/returns" },
       { label: "Shipping", href: "/returns-policy" },
-      { label: "Care guide", href: "" },
       { label: "FAQ", href: "/contact#faq-heading" },
+    ],
+  },
+  {
+    title: "About SUOS",
+    links: [
+      { label: "Our Story", href: "" },
+      { label: "Privacy Policy", href: "/privacy" },
+      { label: "Terms & Conditions", href: "/terms" },
     ],
   },
   {
     title: "Follow",
     links: [
       { label: "Instagram", href: "" },
-      { label: "YouTube", href: "" },
-      { label: "Pinterest", href: "" },
+      { label: "Facebook", href: "" },
+      { label: "Youtube", href: "" },
       { label: "WhatsApp", href: "https://wa.me/917268018889" },
     ],
   },
@@ -397,13 +404,7 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     newsletterPlaceholder: "Enter your email address",
     newsletterButton: "Subscribe",
     copyright: "All Rights Reserved SUOS India © 2026",
-    legalLinks: [
-      { label: "Privacy Policy", href: "/privacy" },
-      { label: "Terms & Conditions", href: "/terms" },
-      { label: "Shipping Policy", href: "/returns-policy" },
-      { label: "Returns & Exchanges", href: "/returns" },
-      { label: "Contact Us", href: "/contact" },
-    ],
+    bottomLinks: [{ label: "Contact Us", href: "/contact" }],
     location: "India",
   },
   productPage: {
