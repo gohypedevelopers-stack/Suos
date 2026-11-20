@@ -2,7 +2,6 @@
 
 import { useRef, useState } from "react"
 import Image from "next/image"
-import { cn } from "@/lib/utils"
 import type { ProductImage } from "@/components/product/productData"
 
 export function ProductGallery({
@@ -23,7 +22,8 @@ export function ProductGallery({
   }
 
   return (
-    <div className="w-full min-w-0 overflow-hidden">
+    // Mobile: bleeds past the page's side padding (px-4, sm:px-6) so the photo runs edge to edge.
+    <div className="w-full min-w-0 overflow-hidden max-sm:-mx-4 max-md:w-auto sm:max-md:-mx-6">
       {/* Mobile Swipeable Gallery (< md) */}
       <div className="relative block w-full min-w-0 overflow-hidden md:hidden">
         <div
@@ -34,7 +34,7 @@ export function ProductGallery({
           {images.map((image, index) => (
             <figure
               key={`mobile-${image.src}-${index}`}
-              className="relative aspect-[3/4] max-h-[460px] w-full min-w-full shrink-0 snap-center overflow-hidden bg-[#efefef]"
+              className="relative aspect-[4/5] max-h-[80svh] w-full min-w-full shrink-0 snap-center overflow-hidden bg-[#efefef]"
             >
               <Image
                 src={image.src}
@@ -53,42 +53,28 @@ export function ProductGallery({
           ))}
         </div>
 
-        {/* Counter Pill on Mobile */}
+        {/* Counter pill (mobile design: "1/6", bottom right of the photo) */}
         {images.length > 1 && (
-          <div className="pointer-events-none absolute bottom-3 right-3 z-10">
-            <span className="inline-flex items-center rounded-full bg-black/60 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-sm">
-              {activeIndex + 1} / {images.length}
+          <div className="pointer-events-none absolute bottom-[14px] right-3 z-10">
+            <span
+              aria-live="polite"
+              className="inline-flex h-6 min-w-[38px] items-center justify-center rounded-full bg-white/85 px-2.5 text-[11px] font-medium leading-none tabular-nums text-black backdrop-blur-sm"
+            >
+              {activeIndex + 1}/{images.length}
             </span>
           </div>
         )}
 
-        {/* Indicator bars on mobile (same style as the product-card photo bars) */}
+        {/* Progress line under the photo: the dark segment marks the current slide. */}
         {images.length > 1 && (
-          <div className="mt-1 flex items-center justify-center">
-            {images.map((_, idx) => (
-              <button
-                key={idx}
-                type="button"
-                aria-label={`Go to slide ${idx + 1}`}
-                onClick={() => {
-                  if (scrollRef.current) {
-                    scrollRef.current.scrollTo({
-                      left: idx * scrollRef.current.clientWidth,
-                      behavior: "smooth",
-                    })
-                  }
-                }}
-                aria-current={idx === activeIndex ? "true" : undefined}
-                className="group/ind flex cursor-pointer items-center justify-center px-1 py-2"
-              >
-                <span
-                  className={cn(
-                    "block h-[3px] w-6 transition-colors duration-200",
-                    idx === activeIndex ? "bg-black" : "bg-black/25 group-hover/ind:bg-black/50",
-                  )}
-                />
-              </button>
-            ))}
+          <div aria-hidden="true" className="relative h-[2px] w-full bg-black/10">
+            <span
+              className="absolute inset-y-0 left-0 bg-black transition-transform duration-300 ease-out"
+              style={{
+                width: `${100 / images.length}%`,
+                transform: `translateX(${Math.min(activeIndex, images.length - 1) * 100}%)`,
+              }}
+            />
           </div>
         )}
       </div>

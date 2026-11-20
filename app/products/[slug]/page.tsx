@@ -69,9 +69,10 @@ export default async function Page(props: PageProps) {
           Preview of a Draft product: only staff can see this page until it is set to Active.
         </p>
       ) : null}
-      <section className="relative w-full min-w-0 overflow-x-clip px-4 pb-10 pt-3 sm:px-6 sm:pb-16 sm:pt-5 lg:px-8 lg:pt-6">
+      <section className="relative w-full min-w-0 overflow-x-clip px-4 pb-10 pt-3 max-md:!pt-0 sm:px-6 sm:pb-16 sm:pt-5 lg:px-8 lg:pt-6">
         <div className="w-full min-w-0">
-          <nav aria-label="Breadcrumb" className="overflow-x-auto scrollbar-none py-1 text-body text-ink-400">
+          {/* Mobile design: no breadcrumb, the gallery starts right under the header. */}
+          <nav aria-label="Breadcrumb" className="overflow-x-auto scrollbar-none py-1 text-body text-ink-400 max-md:hidden">
             <ol className="flex flex-wrap items-center gap-1 sm:gap-1.5">
               {product.breadcrumb.map((crumb, index) => {
                 const isLast = index === product.breadcrumb.length - 1
@@ -98,7 +99,7 @@ export default async function Page(props: PageProps) {
             </ol>
           </nav>
 
-          <div className="mt-3 sm:mt-5 grid w-full min-w-0 gap-6 sm:gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-start lg:gap-10 xl:gap-14">
+          <div className="mt-3 max-md:!mt-0 sm:mt-5 grid w-full min-w-0 gap-6 max-md:!gap-4 sm:gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-start lg:gap-10 xl:gap-14">
             <ProductGallery images={product.gallery} />
             <ProductSummary product={product} />
           </div>
@@ -108,7 +109,7 @@ export default async function Page(props: PageProps) {
       <ProductHighlightsSection intro={product.highlightsIntro} highlights={product.highlights} />
       <YouMayAlsoLikeSection excludeProductId={product.id} pickedIds={product.alsoLikeIds} />
       {product.lifestyleImage ? (
-        <section data-reveal="zoom" data-scroll-zoom className="relative aspect-[4/5] w-full overflow-hidden bg-[#efefef] sm:aspect-[1440/720]">
+        <section data-reveal="zoom" data-scroll-zoom className="relative aspect-[3/2] w-full overflow-hidden bg-[#efefef] sm:aspect-[1440/720]">
           <Image
             src={product.lifestyleImage}
             alt={`${product.title} lifestyle`}

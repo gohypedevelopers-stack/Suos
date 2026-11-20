@@ -50,9 +50,9 @@ function toDisplayCase(label: string) {
 
 // The built-in chevrons are hidden; Figma uses "+" closed and "x" open.
 const accordionTriggerClass =
-  "h-[60px] items-center rounded-none py-0 text-h4 uppercase tracking-normal text-ink-800 hover:no-underline [&_[data-slot=accordion-trigger-icon]]:!hidden"
+  "h-[60px] items-center rounded-none py-0 text-h4 uppercase tracking-normal text-ink-800 hover:no-underline max-md:h-[52px] max-md:text-[15px] max-md:leading-5 [&_[data-slot=accordion-trigger-icon]]:!hidden"
 const accordionBodyClass =
-  "w-full min-w-0 max-w-full pb-6 text-body font-normal text-ink-700 break-words"
+  "w-full min-w-0 max-w-full pb-6 text-body font-normal text-ink-700 break-words max-md:text-[13px] max-md:leading-[1.5]"
 
 function OptionButton({
   active,
@@ -133,7 +133,7 @@ function OfferCard({ code, headline, detail }: { code: string; headline: string;
 
 function MiniProductCard({ product }: { product: HomeProductCard }) {
   return (
-    <Link href={`/products/${product.slug}`} className="group block w-[180px] shrink-0 snap-start sm:w-[230px]">
+    <Link href={`/products/${product.slug}`} className="group block w-[180px] shrink-0 snap-start sm:w-[230px] max-md:!w-[52vw]">
       <div data-row-media className="relative aspect-[230/304] overflow-hidden bg-[#efefef]">
         {product.image ? (
           <HoverSwapImage
@@ -145,12 +145,12 @@ function MiniProductCard({ product }: { product: HomeProductCard }) {
         ) : null}
       </div>
       {product.lineName || product.category?.name ? (
-        <p className="mt-2.5 truncate text-[12px] uppercase leading-none text-ink-400">
+        <p className="mt-2.5 truncate text-[12px] uppercase leading-none text-ink-400 max-md:px-1.5 max-md:text-[11px]">
           {product.lineName || product.category?.name}
         </p>
       ) : null}
-      <p className="mt-1.5 truncate text-[13px] uppercase leading-none text-ink-800">{product.title}</p>
-      <p className="mt-1.5 flex items-baseline gap-2 text-caption">
+      <p className="mt-1.5 truncate text-[13px] uppercase leading-none text-ink-800 max-md:px-1.5 max-md:text-[12px]">{product.title}</p>
+      <p className="mt-1.5 flex items-baseline gap-2 text-caption max-md:px-1.5 max-md:text-[12px]">
         {product.compareAtPrice ? (
           <span className="text-ink-600 line-through">{product.compareAtPrice}</span>
         ) : null}
@@ -274,23 +274,23 @@ export function ProductSummary({
 
   return (
     <aside className="self-start w-full min-w-0 max-w-full [overflow-anchor:none] lg:sticky lg:top-[calc(var(--header-stack-height)+24px)]">
-      <div className="w-full min-w-0 max-w-full space-y-6 text-black">
+      <div className="w-full min-w-0 max-w-full space-y-6 text-black max-md:space-y-5">
         <div>
-          <p className="text-caption uppercase text-ink-400">{product.editLabel}</p>
-          <h1 className="mt-2 font-heading text-[20px] font-normal uppercase leading-none tracking-normal text-ink-800 sm:text-[24px]">
+          <p className="text-caption uppercase text-ink-400 max-md:text-[11px]">{product.editLabel}</p>
+          <h1 className="mt-2 font-heading text-[20px] font-normal uppercase leading-none tracking-normal text-ink-800 sm:text-[24px] max-md:mt-1.5 max-md:!text-[18px] max-md:!leading-[1.15]">
             {product.title}
           </h1>
           {product.subtitle ? (
-            <p className="mt-3 text-body text-ink-600">{product.subtitle}</p>
+            <p className="mt-3 text-body text-ink-600 max-md:mt-2 max-md:text-[13px]">{product.subtitle}</p>
           ) : null}
         </div>
 
-        <div className="mt-8 flex flex-wrap items-end justify-between gap-3">
+        <div className="mt-8 flex flex-wrap items-end justify-between gap-3 max-md:!-mt-3">
           <div className="flex items-baseline gap-3">
             {product.originalPrice ? (
-              <span className="text-body-lg text-ink-600 line-through">{product.originalPrice}</span>
+              <span className="text-body-lg text-ink-600 line-through max-md:text-[14px]">{product.originalPrice}</span>
             ) : null}
-            <span className="text-h3 text-ink-900">{product.price}</span>
+            <span className="text-h3 text-ink-900 max-md:text-[17px] max-md:leading-none">{product.price}</span>
           </div>
 
           {product.sold ? (
@@ -307,7 +307,7 @@ export function ProductSummary({
         </div>
 
         <section className="space-y-3">
-          <p className="text-body-lg text-ink-400">
+          <p className="text-body-lg text-ink-400 max-md:text-[13px]">
             Colour: <span className="text-ink-900">{selectedColor}</span>
           </p>
 
@@ -343,26 +343,27 @@ export function ProductSummary({
 
         <section className="space-y-3">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-body-lg text-ink-400">
+            <p className="text-body-lg text-ink-400 max-md:text-[13px]">
               Size: <span className="text-ink-900">{selectedSize}</span>
             </p>
             <SizeChartModal fitType={product.fitType} image={product.gallery[0]}>
               <button
                 type="button"
-                className="cursor-pointer text-body-lg text-ink-650 underline underline-offset-[5px] transition-colors hover:text-black"
+                className="cursor-pointer text-body-lg text-ink-650 underline underline-offset-[5px] transition-colors hover:text-black max-md:text-[12px] max-md:underline-offset-[4px]"
               >
                 Discover your Size
               </button>
             </SizeChartModal>
           </div>
 
-          <div id="size-guide" className="flex flex-wrap gap-2">
+          {/* Phones: five equal boxes per row (mobile design). */}
+          <div id="size-guide" className="flex flex-wrap gap-2 max-md:grid max-md:grid-cols-5">
             {product.sizes.map((size) => (
               <OptionButton
                 key={size}
                 active={selectedSize === size}
                 onClick={() => setSelectedSize(size)}
-                className="h-10 min-w-[75px] px-3"
+                className="h-10 min-w-[75px] px-3 max-md:min-w-0 max-md:px-0 max-md:!text-[15px]"
               >
                 {size}
               </OptionButton>
@@ -370,7 +371,7 @@ export function ProductSummary({
           </div>
 
           {product.modelInfo || product.fitNote ? (
-            <div className="space-y-1 pt-1 text-body text-ink-600">
+            <div className="space-y-1 pt-1 text-body text-ink-600 max-md:text-[12px] max-md:leading-[1.4]">
               {product.modelInfo ? <p>{product.modelInfo}</p> : null}
               {product.fitNote ? <p>Fit Note: {product.fitNote}</p> : null}
             </div>
@@ -382,7 +383,7 @@ export function ProductSummary({
           ref={addToCartRef}
           type="button"
           onClick={handleAddToCart}
-          className="mt-8 flex h-12 w-full cursor-pointer items-center justify-center btn-sweep border border-black text-[18px] font-medium uppercase tracking-[0.01em] text-black active:scale-[0.99] sm:h-[53px] sm:text-h3"
+          className="mt-8 flex h-12 w-full cursor-pointer items-center justify-center btn-sweep border border-black text-[18px] font-medium uppercase tracking-[0.01em] text-black active:scale-[0.99] sm:h-[53px] sm:text-h3 max-md:!mt-0 max-md:!h-12 max-md:!text-[15px]"
         >
           Add To Cart
         </button>
@@ -409,8 +410,8 @@ export function ProductSummary({
                 key={perk.label}
                 className="flex min-h-[41px] min-w-0 items-center gap-2.5 bg-white px-3 py-2 text-[#080808]"
               >
-                <Icon className="size-5 shrink-0 stroke-[1.5]" aria-hidden="true" />
-                <p className="min-w-0 text-[15px] leading-tight sm:text-body-lg">
+                <Icon className="size-5 shrink-0 stroke-[1.5] max-md:size-4" aria-hidden="true" />
+                <p className="min-w-0 text-[15px] leading-tight sm:text-body-lg max-md:!text-[12px]">
                   {perk.label}
                   {perk.detail ? <span className="text-ink-600"> · {perk.detail}</span> : null}
                 </p>
@@ -432,33 +433,38 @@ export function ProductSummary({
         ) : null}
 
         {product.moreFrom ? (
-          <section className="space-y-4 pt-4">
+          <section className="space-y-4 pt-4 max-md:pt-2">
             <div className="flex items-end justify-between gap-3">
-              <h2 className="text-h4 font-normal uppercase text-black">
+              <h2 className="text-h4 font-normal uppercase text-black max-md:text-[16px] max-md:leading-5">
                 More from {product.moreFrom.title}
               </h2>
               {product.moreFrom.href ? (
-                <Link href={product.moreFrom.href} className="text-body text-ink-650 underline underline-offset-[5px] hover:text-black">
+                <Link href={product.moreFrom.href} className="text-body text-ink-650 underline underline-offset-[5px] hover:text-black max-md:text-[13px]">
                   View all
                 </Link>
               ) : null}
             </div>
-            <ScrollRow className="gap-0.5 pb-1 sm:gap-1" label="More from this collection">
-              {product.moreFrom.products.map((item) => (
-                <MiniProductCard key={item.id} product={item} />
-              ))}
-            </ScrollRow>
+            {/* Phones: the row runs edge to edge, past the page padding. */}
+            <div className="max-sm:-mx-4 sm:max-md:-mx-6">
+              <ScrollRow className="gap-0.5 pb-1 sm:gap-1" label="More from this collection">
+                {product.moreFrom.products.map((item) => (
+                  <MiniProductCard key={item.id} product={item} />
+                ))}
+              </ScrollRow>
+            </div>
           </section>
         ) : null}
 
         {product.completeLookProducts && product.completeLookProducts.length > 0 ? (
           <section className="space-y-4 pt-2">
-            <h2 className="text-h4 font-normal uppercase text-black">Complete the Look</h2>
-            <ScrollRow className="gap-0.5 pb-1 sm:gap-1" label="Complete the look">
-              {product.completeLookProducts.map((item) => (
-                <MiniProductCard key={item.id} product={item} />
-              ))}
-            </ScrollRow>
+            <h2 className="text-h4 font-normal uppercase text-black max-md:text-[16px] max-md:leading-5">Complete the Look</h2>
+            <div className="max-sm:-mx-4 sm:max-md:-mx-6">
+              <ScrollRow className="gap-0.5 pb-1 sm:gap-1" label="Complete the look">
+                {product.completeLookProducts.map((item) => (
+                  <MiniProductCard key={item.id} product={item} />
+                ))}
+              </ScrollRow>
+            </div>
           </section>
         ) : null}
 
